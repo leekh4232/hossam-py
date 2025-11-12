@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="hossam",
-    version="0.0.7",
+    version="0.0.8",
     description="Hossam Data Loader",
     author="Lee Kwang-Ho",
     author_email="leekh4232@gmail.com",

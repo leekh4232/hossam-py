@@ -145,7 +145,7 @@ def load_data(key: str, local: str = None):
             print(e)
         return
 
-    print("\033[94m[data]\033[0m", url)
+    print("\033[94m[data]\033[0m", url.replace("\\", "/"))
     print("\033[94m[desc]\033[0m", desc)
 
     df = None
