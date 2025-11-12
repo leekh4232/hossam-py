@@ -8,11 +8,22 @@ Hossam Data Loader
 This library provides functionality for loading sample datasets used in the Machine Learning Data Analysis course conducted at ITWILL.
 It is intended to be utilized in the lectures of instructor Kwangho Lee.
 
-Usage:
+## Usage:
+
+### 샘플 데이터 가져오기 (load sample data)
 
 ```python
 from hossam import load_data
 df = load_data('AD_SALES')
+```
+
+### 데이터 목록 보기 (view data list)
+
+```python
+from hossam import load_info
+
+# search keyword paramter (default=None --> All List)
+df = load_info(search="keyword")
 ```
 
 
