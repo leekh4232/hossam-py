@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="hossam",
-    version="0.0.6",
+    version="0.0.7",
     description="Hossam Data Loader",
     author="Lee Kwang-Ho",
     author_email="leekh4232@gmail.com",
@@ -15,7 +15,9 @@ setup(
     install_requires=[
         "tabulate",
         "pandas",
-        "requests"
+        "requests",
+        "openpyxl",
+        "xlrd"
     ],
     include_package_data=True,
     long_description=open('README.md', encoding='utf-8').read() if __name__ == '__main__' else '',

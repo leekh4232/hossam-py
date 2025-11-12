@@ -1,3 +1,5 @@
 tabulate
 pandas
 requests
+openpyxl
+xlrd

@@ -22,12 +22,12 @@ def get_df(path: str, index_col=None) -> DataFrame:
     if exec == 'xlsx':
         # If path is a remote URL, fetch the file once and reuse the bytes
         if path.lower().startswith(('http://', 'https://')):
+            path = path.replace("\\", "/")
             with requests.Session() as session:
                 r = session.get(path)
 
                 if r.status_code != 200:
-                    print(f"[error] HTTP {r.status_code} {r.reason}")
-                    return None
+                    raise Exception(f"HTTP {r.status_code} Error - {r.reason} > {path}")
 
                 data_bytes = r.content
 
@@ -64,7 +64,7 @@ def get_data_url(key: str, local: str = None) -> str:
     path = None
 
     if not local:
-        data_path = join(BASE_URL, "metadata.json")
+        data_path = join(BASE_URL, "metadata.json").replace("\\", "/")
 
         with requests.Session() as session:
             r = session.get(data_path)
@@ -100,13 +100,13 @@ def load_info(search: str = None, local: str = None):
     path = None
 
     if not local:
-        data_path = join(BASE_URL, "metadata.json")
+        data_path = join(BASE_URL, "metadata.json").replace("\\", "/")
 
         with requests.Session() as session:
             r = session.get(data_path)
 
             if r.status_code != 200:
-                raise Exception("[%d Error] %s" % (r.status_code, r.reason))
+                raise Exception("[%d Error] %s ::: %s" % (r.status_code, r.reason, data_path))
 
         my_dict = r.json()
     else:
@@ -140,7 +140,7 @@ def load_data(key: str, local: str = None):
         url, desc, index = get_data_url(key, local=local)
     except Exception as e:
         try:
-            print(f"\033[91m[Error] {str(e)}\033[0m")
+            print(f"\033[91m{str(e)}\033[0m")
         except Exception:
             print(e)
         return
@@ -154,7 +154,7 @@ def load_data(key: str, local: str = None):
         df = get_df(url, index_col=index)
     except Exception as e:
         try:
-            print(f"\033[91m[Error] {str(e)}\033[0m")
+            print(f"\033[91m{str(e)}\033[0m")
         except Exception:
             print(e)
         return
@@ -163,7 +163,6 @@ def load_data(key: str, local: str = None):
     return df
 
 if __name__ == "__main__":
-    # df = load_data("AD_SALES")
-    # print(df)
-
-    print(load_info("grade", "C:\\Users\\leekh\\hossam-data"))
+    print(load_info())
+    df = load_data("ad_sales")
+    print(df)

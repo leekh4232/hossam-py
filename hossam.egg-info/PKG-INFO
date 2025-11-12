@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: hossam
-Version: 0.0.6
+Version: 0.0.7
 Summary: Hossam Data Loader
 Home-page: https://github.com/leekh4232/hossam-data
 Author: Lee Kwang-Ho
@@ -18,6 +18,8 @@ License-File: LICENSE
 Requires-Dist: tabulate
 Requires-Dist: pandas
 Requires-Dist: requests
+Requires-Dist: openpyxl
+Requires-Dist: xlrd
 Dynamic: author
 Dynamic: author-email
 Dynamic: classifier
