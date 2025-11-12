@@ -1,0 +1,52 @@
+Metadata-Version: 2.4
+Name: hossam
+Version: 0.0.3
+Summary: Hossam Data Loader
+Home-page: https://github.com/leekh4232/hossam-data
+Author: Lee Kwang-Ho
+Author-email: leekh4232@gmail.com
+License: MIT
+Keywords: data,analysis,helper,hossam,tensorflow,이광호
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Requires-Python: >=3.13.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: tabulate
+Requires-Dist: pandas
+Requires-Dist: requests
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# hossam
+
+Hossam Data Loader
+
+이 라이브러리는 아이티윌에서 진행중인 머신러닝 데이터 분석 수업에서 사용되는 샘플 데이터를 로드하는 기능을 제공하는 라이브러리 입니다.
+이광호 강사의 수업에서 활용되기는 것을 목적으로 합니다.
+
+This library provides functionality for loading sample datasets used in the Machine Learning Data Analysis course conducted at ITWILL.
+It is intended to be utilized in the lectures of instructor Kwangho Lee.
+
+Usage:
+
+```python
+from hossam import load_data
+df = load_data('AD_SALES')
+```
+
+
+License: MIT
