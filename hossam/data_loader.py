@@ -120,13 +120,21 @@ def load_info(search: str = None, local: str = None):
 
     my_data = []
     for key in my_dict:
-        del my_dict[key]['index']
+        if 'index' in my_dict[key]:
+            del my_dict[key]['index']
+
         my_dict[key]['url'] = "%s/%s" % (BASE_URL, my_dict[key]['url'])
         my_dict[key]['name'] = key
+
+        if 'chapter' in my_dict[key]:
+            my_dict[key]['chapter'] = ", ".join(my_dict[key]['chapter'])
+        else:
+            my_dict[key]['chapter'] = '공통'
+
         my_data.append(my_dict[key])
 
     my_df = DataFrame(my_data)
-    my_df2 = my_df.reindex(columns=['name', 'desc', 'url'])
+    my_df2 = my_df.reindex(columns=['name', 'chapter', 'desc', 'url'])
 
     if search:
         my_df2 = my_df2[my_df2['name'].str.contains(search.lower())]
