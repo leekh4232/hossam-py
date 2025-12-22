@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 
 setup(
     name="hossam",
-    version="0.1.0",
-    description="Hossam Data Loader",
+    version="0.2.0",
+    description="Hossam Data Helper",
     author="Lee Kwang-Ho",
     author_email="leekh4232@gmail.com",
     license="MIT",
@@ -13,11 +13,18 @@ setup(
     zip_safe=False,
     url="https://github.com/leekh4232/hossam-data",
     install_requires=[
+        "tqdm",
         "tabulate",
         "pandas",
+        "matplotlib",
+        "seaborn",
         "requests",
         "openpyxl",
-        "xlrd"
+        "xlrd",
+        "statsmodels",
+        "scipy",
+        "pingouin",
+        "statannotations"
     ],
     include_package_data=True,
     long_description=open('README.md', encoding='utf-8').read() if __name__ == '__main__' else '',

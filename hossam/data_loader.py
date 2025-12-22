@@ -1,19 +1,13 @@
 import requests
 import json
 from os.path import join, exists
-from tabulate import tabulate
 from io import BytesIO
 from pandas import DataFrame, read_csv, read_excel
 
+from util import my_pretty_table
+
 BASE_URL = "https://data.hossam.kr"
 
-def my_pretty_table(data: DataFrame, headers: str = "keys") -> None:
-    tabulate.WIDE_CHARS_MODE = False
-    print(
-        tabulate(
-            data, headers="keys", tablefmt="simple", showindex=True, numalign="right"
-        )
-    )
 
 def get_df(path: str, index_col=None) -> DataFrame:
     p = path.rfind(".")
@@ -172,5 +166,5 @@ def load_data(key: str, local: str = None):
 
 if __name__ == "__main__":
     print(load_info())
-    df = load_data("ad_sales")
-    print(df)
+    df = load_data("boston")
+    my_pretty_table(df)
