@@ -4,12 +4,10 @@ from os.path import join, exists
 from io import BytesIO
 from pandas import DataFrame, read_csv, read_excel
 
-from util import my_pretty_table
-
 BASE_URL = "https://data.hossam.kr"
 
 
-def get_df(path: str, index_col=None) -> DataFrame:
+def __get_df(path: str, index_col=None) -> DataFrame:
     p = path.rfind(".")
     exec = path[p+1:].lower()
 
@@ -32,7 +30,8 @@ def get_df(path: str, index_col=None) -> DataFrame:
                 info = read_excel(BytesIO(data_bytes), sheet_name='metadata', index_col=0)
                 #print("\033[94m[metadata]\033[0m")
                 print()
-                my_pretty_table(info)
+                from .util import hs_pretty_table
+                hs_pretty_table(info)
                 print()
             except Exception:
                 print(f"\033[91m[!] Cannot read metadata\033[0m")
@@ -43,7 +42,8 @@ def get_df(path: str, index_col=None) -> DataFrame:
                 info = read_excel(path, sheet_name='metadata', index_col=0)
                 #print("\033[94m[metadata]\033[0m")
                 print()
-                my_pretty_table(info)
+                from .util import hs_pretty_table
+                hs_pretty_table(info)
                 print()
             except:
                 print(f"\033[91m[!] Cannot read metadata\033[0m")
@@ -52,7 +52,7 @@ def get_df(path: str, index_col=None) -> DataFrame:
 
     return df
 
-def get_data_url(key: str, local: str = None) -> str:
+def __get_data_url(key: str, local: str = None) -> str:
     global BASE_URL
 
     path = None
@@ -139,7 +139,7 @@ def load_info(search: str = None, local: str = None):
 def load_data(key: str, local: str = None):
     index = None
     try:
-        url, desc, index = get_data_url(key, local=local)
+        url, desc, index = __get_data_url(key, local=local)
     except Exception as e:
         try:
             print(f"\033[91m{str(e)}\033[0m")
@@ -153,7 +153,7 @@ def load_data(key: str, local: str = None):
     df = None
 
     try:
-        df = get_df(url, index_col=index)
+        df = __get_df(url, index_col=index)
     except Exception as e:
         try:
             print(f"\033[91m{str(e)}\033[0m")
@@ -163,8 +163,3 @@ def load_data(key: str, local: str = None):
 
 
     return df
-
-if __name__ == "__main__":
-    print(load_info())
-    df = load_data("boston")
-    my_pretty_table(df)
