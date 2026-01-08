@@ -43,6 +43,8 @@ plugins:
             members_order: source
             docstring_style: google
             separate_signature: true
+            filters:
+              - "!^_"
 
 markdown_extensions:
   - admonition
