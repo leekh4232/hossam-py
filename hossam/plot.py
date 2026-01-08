@@ -199,7 +199,8 @@ def hs_kdeplot(
 
     Args:
         df (DataFrame): 시각화할 데이터.
-        xname, yname (str|None): 축 컬럼명.
+        xname (str|None): x축 컬럼명.
+        yname (str|None): y축 컬럼명.
         hue (str|None): 범주 컬럼명.
         palette (str|None): 팔레트 이름.
         fill (bool): 면적 채우기 여부.
