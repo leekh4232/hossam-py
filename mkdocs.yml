@@ -25,6 +25,9 @@ theme:
 plugins:
   - search
   - autorefs
+  - gen-files:
+      scripts:
+        - docs/_scripts/gen_api_index.py
   - mkdocstrings:
       handlers:
         python:
@@ -60,6 +63,7 @@ nav:
   - Overview: index.md
   - Architecture: overview/architecture.md
   - API Reference:
+      - Index: api/index.md
       - Package: api/hossam.md
       - analysis: api/analysis.md
       - data_loader: api/data_loader.md

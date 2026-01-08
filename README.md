@@ -47,14 +47,6 @@
 pip install hossam
 ```
 
-### 개발 버전 설치
-
-```bash
-git clone https://github.com/leekh4232/hossam-data.git
-cd hossam-data
-pip install -e .
-```
-
 ### 요구사항
 
 - Python 3.8 이상
@@ -79,33 +71,6 @@ from hossam import load_data, load_info
 # 사용 가능한 데이터셋 목록 확인
 datasets = load_info()
 print(datasets)
-
-## 🧭 문서(호스팅)
-
-- 실시간 문서: https://py.hossam.kr
-- 문서 생성 방식: MkDocs(Material) + mkdocstrings로 코드에서 API 레퍼런스를 자동 생성합니다.
-- 로컬 미리보기:
-
-```bash
-pip install mkdocs mkdocs-material "mkdocstrings[python]" pymdown-extensions mkdocs-autorefs
-mkdocs serve
-```
-
-- 정적 사이트 빌드:
-
-```bash
-mkdocs build
-```
-
-- 배포(깃허브 페이지 + 커스텀 도메인):
-
-```bash
-mkdocs gh-deploy --clean --cname py.hossam.kr
-```
-
-- 구성 파일과 문서 위치:
-    - MkDocs 설정: [mkdocs.yml](mkdocs.yml)
-    - 문서 소스: [docs/](docs)
 
 # 특정 키워드로 검색
 ad_datasets = load_info(search="AD")
