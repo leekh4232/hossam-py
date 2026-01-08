@@ -219,6 +219,9 @@ def hs_save_shape(
         lat_col: DataFrame 입력 시 위도 컬럼명.
         lon_col: DataFrame 입력 시 경도 컬럼명.
 
+    Returns:
+        None: 파일을 저장하고 반환값이 없습니다.
+
     Raises:
         TypeError: 입력 타입이 잘못된 경우.
         ValueError: 경로가 잘못되었거나 CRS가 유효하지 않은 경우,

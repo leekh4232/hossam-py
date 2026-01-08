@@ -21,6 +21,15 @@ def hs_standard_scaler(
     - 배열 입력 시: 그대로 스케일링된 ndarray를 반환합니다.
     - `load_path`가 주어지면 기존 스케일러를 재사용하고, `save_path`가 주어지면 학습된 스케일러를 저장합니다.
 
+    Args:
+        data (DataFrame | ndarray): 스케일링할 데이터.
+        yname (str | None): 종속변수 컬럼명. 분리하지 않으려면 None.
+        save_path (str | None): 학습된 스케일러 저장 경로.
+        load_path (str | None): 기존 스케일러 로드 경로.
+
+    Returns:
+        DataFrame | ndarray: 스케일링된 데이터(입력 타입과 동일).
+
     Examples:
         >>> from hossam.prep import hs_standard_scaler
         >>> std_df = hs_standard_scaler(df, yname="y", save_path="std.pkl")
@@ -77,6 +86,15 @@ def hs_minmax_scaler(
 
     DataFrame은 비수치/종속변수를 분리 후 스케일링하고 재결합하며, 배열 입력은 그대로 ndarray를 반환한다.
     `load_path` 제공 시 기존 스케일러를 사용하고, `save_path` 제공 시 학습 스케일러를 저장한다.
+
+    Args:
+        data (DataFrame | ndarray): 스케일링할 데이터.
+        yname (str | None): 종속변수 컬럼명. 분리하지 않으려면 None.
+        save_path (str | None): 학습된 스케일러 저장 경로.
+        load_path (str | None): 기존 스케일러 로드 경로.
+
+    Returns:
+        DataFrame | ndarray: 스케일링된 데이터(입력 타입과 동일).
 
     Examples:
         >>> from hossam.prep import hs_minmax_scaler
@@ -194,11 +212,18 @@ def hs_replace_missing_value(data: DataFrame, strategy: str = "mean") -> DataFra
 
 
 # -------------------------------------------------------------
-def hs_outlier_table(data: DataFrame, *fields: str):
+def hs_outlier_table(data: DataFrame, *fields: str) -> DataFrame:
     """수치형 컬럼에 대한 사분위수 및 IQR 기반 이상치 경계를 계산한다.
 
     전달된 `fields`가 없으면 데이터프레임의 모든 수치형 컬럼을 대상으로 한다.
     결측치는 제외하고 사분위수를 계산한다.
+
+    Args:
+        data (DataFrame): 분석할 데이터프레임.
+        *fields (str): 대상 컬럼명(들). 생략 시 모든 수치형 컬럼 대상.
+
+    Returns:
+        DataFrame: Q1, Q2(중앙값), Q3, IQR, 하한, 상한을 포함한 통계표.
 
     Examples:
         >>> from hossam.prep import hs_outlier_table

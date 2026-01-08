@@ -45,6 +45,10 @@ plugins:
             separate_signature: true
             filters:
               - "!^_"
+            show_docstring_parameters: true
+            show_docstring_returns: true
+            show_docstring_raises: true
+            show_docstring_examples: true
 
 markdown_extensions:
   - admonition

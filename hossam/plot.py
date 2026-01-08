@@ -39,14 +39,14 @@ if pd.__version__ > "2.0.0":
 def __get_default_ax(width: int = 1280, height: int = 720, rows: int = 1, cols: int = 1, dpi: int = 200):
     """기본 크기의 Figure와 Axes를 생성한다.
 
-    매개변수:
+    Args:
         width (int): 가로 픽셀 크기.
         height (int): 세로 픽셀 크기.
         rows (int): 서브플롯 행 개수.
         cols (int): 서브플롯 열 개수.
         dpi (int): 해상도(DPI).
 
-    반환:
+    Returns:
         tuple[Figure, Axes]: 생성된 matplotlib Figure와 Axes 객체.
     """
     figsize = (width / dpi, height / dpi)
@@ -58,12 +58,12 @@ def __get_default_ax(width: int = 1280, height: int = 720, rows: int = 1, cols: 
 def _finalize_plot(ax: Axes, callback: any, outparams: bool) -> None:
     """공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
 
-    매개변수:
+    Args:
         ax (Axes): 대상 Axes.
         callback (Callable|None): 추가 설정을 위한 사용자 콜백.
         outparams (bool): 내부에서 생성한 Figure인 경우 True.
 
-    반환:
+    Returns:
         None
     """
     if callback:
@@ -92,7 +92,7 @@ def hs_lineplot(
 ) -> None:
     """선 그래프를 그린다.
 
-    매개변수:
+    Args:
         df (DataFrame): 시각화할 데이터.
         xname (str|None): x축 컬럼명.
         yname (str|None): y축 컬럼명.
@@ -106,7 +106,7 @@ def hs_lineplot(
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn lineplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -145,18 +145,20 @@ def hs_boxplot(
 ) -> None:
     """상자그림(boxplot)을 그린다.
 
-    매개변수:
+    Args:
         df (DataFrame): 시각화할 데이터.
         xname (str|None): x축 범주 컬럼명.
         yname (str|None): y축 값 컬럼명.
         orient (str): 'v' 또는 'h' 방향.
         palette (str|None): 팔레트 이름.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn boxplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -195,7 +197,7 @@ def hs_kdeplot(
 ) -> None:
     """커널 밀도 추정(KDE) 그래프를 그린다.
 
-    매개변수:
+    Args:
         df (DataFrame): 시각화할 데이터.
         xname, yname (str|None): 축 컬럼명.
         hue (str|None): 범주 컬럼명.
@@ -203,12 +205,14 @@ def hs_kdeplot(
         fill (bool): 면적 채우기 여부.
         fill_alpha (float): 채움 투명도.
         linewidth (float): 선 굵기.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn kdeplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -266,19 +270,21 @@ def hs_histplot(
 ) -> None:
     """히스토그램을 그리고 필요 시 KDE를 함께 표시한다.
 
-    매개변수:
+    Args:
         df (DataFrame): 시각화할 데이터.
         xname (str): 히스토그램 대상 컬럼명.
         hue (str|None): 범주 컬럼명.
         bins (int|sequence|None): 구간 수 또는 경계.
         kde (bool): KDE 표시 여부.
         palette (str|None): 팔레트 이름.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn histplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -322,17 +328,19 @@ def hs_stackplot(
 ) -> None:
     """클래스 비율을 100% 누적 막대로 표현한다.
 
-    매개변수:
+    Args:
         df (DataFrame): 시각화할 데이터.
         xname (str): x축 기준 컬럼.
         hue (str): 클래스 컬럼.
         palette (str|None): 팔레트 이름.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn histplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -395,18 +403,20 @@ def hs_scatterplot(
 ) -> None:
     """산점도를 그린다.
 
-    매개변수:
+    Args:
         df (DataFrame): 시각화할 데이터.
         xname (str): x축 컬럼.
         yname (str): y축 컬럼.
         hue (str|None): 범주 컬럼.
         palette (str|None): 팔레트 이름.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn scatterplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -436,17 +446,19 @@ def hs_regplot(
 ) -> None:
     """단순 회귀선이 포함된 산점도를 그린다.
 
-    매개변수:
+    Args:
         df (DataFrame): 시각화할 데이터.
         xname (str): 독립변수 컬럼.
         yname (str): 종속변수 컬럼.
         palette (str|None): 선/점 색상.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn regplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -480,16 +492,18 @@ def hs_lmplot(
 ) -> None:
     """seaborn lmplot으로 선형 모델 시각화를 수행한다.
 
-    매개변수:
+    Args:
         df (DataFrame): 시각화할 데이터.
         xname (str): 독립변수 컬럼.
         yname (str): 종속변수 컬럼.
         hue (str|None): 범주 컬럼.
         palette (str|None): 팔레트 이름.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         **params: seaborn lmplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     g = sb.lmplot(data=df, x=xname, y=yname, hue=hue, palette=palette, **params)
@@ -514,15 +528,17 @@ def hs_pairplot(
 ) -> None:
     """모든 숫자형/지정 컬럼 쌍에 대한 관계를 그린다.
 
-    매개변수:
+    Args:
         df (DataFrame): 시각화할 데이터.
         diag_kind (str): 대각선 플롯 종류('kde' 등).
         hue (str|None): 범주 컬럼.
         palette (str|None): 팔레트 이름.
-        width, height, dpi (int): 기본 크기 및 해상도(컬럼 수에 비례해 확대됨).
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 기본 크기 및 해상도(컬럼 수에 비례해 확대됨).
         **params: seaborn pairplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     g = sb.pairplot(data=df, hue=hue, diag_kind=diag_kind, palette=palette, **params)
@@ -552,18 +568,20 @@ def hs_countplot(
 ) -> None:
     """범주 빈도 막대그래프를 그린다.
 
-    매개변수:
+    Args:
         df (DataFrame): 시각화할 데이터.
         xname (str): 범주 컬럼.
         hue (str|None): 보조 범주 컬럼.
         palette (str|None): 팔레트 이름.
         order (int): 숫자형일 때 정렬 방식(1: 값 기준, 기타: 빈도 기준).
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn countplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -602,18 +620,20 @@ def hs_barplot(
 ) -> None:
     """막대그래프를 그린다.
 
-    매개변수:
+    Args:
         df (DataFrame): 시각화할 데이터.
         xname (str): 범주 컬럼.
         yname (str): 값 컬럼.
         hue (str|None): 보조 범주 컬럼.
         palette (str|None): 팔레트 이름.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn barplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -644,18 +664,20 @@ def hs_boxenplot(
 ) -> None:
     """박스앤 위스커 확장(boxen) 플롯을 그린다.
 
-    매개변수:
+    Args:
         df (DataFrame): 시각화할 데이터.
         xname (str): 범주 컬럼.
         yname (str): 값 컬럼.
         hue (str|None): 보조 범주 컬럼.
         palette (str|None): 팔레트 이름.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn boxenplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -700,18 +722,20 @@ def hs_violinplot(
 ) -> None:
     """바이올린 플롯을 그린다.
 
-    매개변수:
+    Args:
         df (DataFrame): 시각화할 데이터.
         xname (str): 범주 컬럼.
         yname (str): 값 컬럼.
         hue (str|None): 보조 범주 컬럼.
         palette (str|None): 팔레트 이름.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn violinplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -756,18 +780,20 @@ def hs_pointplot(
 ) -> None:
     """포인트 플롯을 그린다.
 
-    매개변수:
+    Args:
         df (DataFrame): 시각화할 데이터.
         xname (str): 범주 컬럼.
         yname (str): 값 컬럼.
         hue (str|None): 보조 범주 컬럼.
         palette (str|None): 팔레트 이름.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn pointplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -796,16 +822,18 @@ def hs_jointplot(
 ) -> None:
     """공동 분포(joint) 플롯을 그린다.
 
-    매개변수:
+    Args:
         df (DataFrame): 시각화할 데이터.
         xname (str): x축 컬럼.
         yname (str): y축 컬럼.
         hue (str|None): 범주 컬럼.
         palette (str|None): 팔레트 이름.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         **params: seaborn jointplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     g = sb.jointplot(data=df, x=xname, y=yname, hue=hue, palette=palette, **params)
@@ -835,15 +863,17 @@ def hs_heatmap(
 ) -> None:
     """히트맵을 그린다(값 주석 포함).
 
-    매개변수:
+    Args:
         data (DataFrame): 행렬 형태 데이터.
         palette (str|None): 컬러맵 이름.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn heatmap 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -873,18 +903,20 @@ def hs_convex_hull(
 ):
     """클러스터별 볼록 껍질(convex hull)과 산점도를 그린다.
 
-    매개변수:
+    Args:
         data (DataFrame): 시각화할 데이터.
         xname (str): x축 컬럼.
         yname (str): y축 컬럼.
         hue (str): 클러스터/범주 컬럼.
         palette (str|None): 팔레트 이름.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn scatterplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -934,14 +966,16 @@ def hs_kde_confidence_interval(
 ) -> None:
     """각 숫자 컬럼에 대해 KDE와 t-분포 기반 신뢰구간을 그린다.
 
-    매개변수:
+    Args:
         data (DataFrame): 시각화할 데이터.
         clevel (float): 신뢰수준(0~1).
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -1016,7 +1050,7 @@ def hs_pvalue1_anotation(
 ) -> None:
     """statannotations를 이용해 상자그림에 p-value 주석을 추가한다.
 
-    매개변수:
+    Args:
         data (DataFrame): 시각화할 데이터.
         target (str): 값 컬럼명.
         hue (str): 그룹 컬럼명.
@@ -1024,11 +1058,13 @@ def hs_pvalue1_anotation(
         test (str): 적용할 통계 검정 이름.
         text_format (str): 주석 형식('star' 등).
         loc (str): 주석 위치.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -1064,17 +1100,19 @@ def hs_residplot(
 ) -> None:
     """잔차 대 예측치 산점도를 그린다(선택적으로 MSE 범위와 LOWESS 포함).
 
-    매개변수:
+    Args:
         y (array-like): 실제 값.
         y_pred (array-like): 예측 값.
         lowess (bool): LOWESS 스무딩 적용 여부.
         mse (bool): √MSE, 2√MSE, 3√MSE 대역선과 비율 표시 여부.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn residplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -1160,14 +1198,16 @@ def hs_qqplot(
 ) -> None:
     """표준화된 예측값의 정규성 확인을 위한 QQ 플롯을 그린다.
 
-    매개변수:
+    Args:
         y_pred (array-like): 예측 값.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn scatterplot 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -1200,16 +1240,18 @@ def hs_confusion_matrix(
 ) -> None:
     """예측 결과에 대한 혼동행렬을 표시한다.
 
-    매개변수:
+    Args:
         y (ndarray|Series): 실제 레이블.
         y_pred (ndarray|Series): 예측 레이블.
         cmap (str|None): 컬러맵 이름.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: ConfusionMatrixDisplay.from_predictions 추가 인자.
 
-    반환:
+    Returns:
         None
     """
     outparams = False
@@ -1254,7 +1296,7 @@ def hs_distribution_by_class(
 ) -> None:
     """클래스별로 각 숫자형 특징의 분포를 KDE 또는 히스토그램으로 그린다.
 
-    매개변수:
+    Args:
         data (DataFrame): 시각화할 데이터.
         xnames (list|None): 대상 컬럼 목록(None이면 전 컬럼).
         hue (str|None): 클래스 컬럼.
@@ -1262,10 +1304,12 @@ def hs_distribution_by_class(
         bins (int|sequence|None): 히스토그램 구간.
         palette (str|None): 팔레트 이름.
         fill (bool): KDE 채움 여부.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
 
-    반환:
+    Returns:
         None
     """
     if xnames is None:
@@ -1337,16 +1381,18 @@ def hs_scatter_by_class(
 ) -> None:
     """클래스별로 특징 쌍을 산점도 또는 볼록 껍질로 시각화한다.
 
-    매개변수:
+    Args:
         data (DataFrame): 시각화할 데이터.
         group (list|None): [[x, y], ...] 형태의 축 쌍 목록(None이면 자동 생성).
         hue (str|None): 클래스 컬럼.
         palette (str|None): 팔레트 이름.
         outline (bool): 볼록 껍질을 표시할지 여부.
-        width, height, dpi (int): 그림 크기 및 해상도.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
 
-    반환:
+    Returns:
         None
     """
 
