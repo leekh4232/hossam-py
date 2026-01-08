@@ -156,7 +156,7 @@ def hs_load_data(key: str,
                 timeindex: bool = False,
                 info: bool = True,
                 categories: list = None,
-                local: str = None):
+                local: str = None) -> DataFrame:
     """데이터 키를 통해 데이터를 로드한 뒤 기본 전처리/출력을 수행한다.
 
     Args:

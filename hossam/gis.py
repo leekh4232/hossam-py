@@ -17,7 +17,7 @@ import warnings
 
 from .util import hs_pretty_table
 
-def __geocode_item(session, index: int, addr: str, key: str) -> tuple[float, float]:
+def __geocode_item(session: requests.Session, index: int, addr: str, key: str) -> tuple[float, float]:
     """단일 주소를 VWorld API로 지오코딩합니다.
 
     Args:
