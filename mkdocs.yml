@@ -29,7 +29,7 @@ plugins:
       scripts:
         - docs/_scripts/gen_api_index.py
   - redirects:
-      redirects:
+      redirect_maps:
         docs/index.md: api/index.md
   - mkdocstrings:
       handlers:
