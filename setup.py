@@ -2,14 +2,14 @@ from setuptools import setup, find_packages
 
 setup(
     name="hossam",
-    version="0.3.1",
+    version="0.3.4",
     description="Hossam Data Helper",
     author="Lee Kwang-Ho",
     author_email="leekh4232@gmail.com",
     license="MIT",
     packages=find_packages(exclude=[]),
     keywords=["data", "analysis", "helper", "hossam", "tensorflow", "이광호"],
-    python_requires=">=3.8",
+    python_requires=">=3.11",
     zip_safe=False,
     url="https://github.com/leekh4232/hossam-data",
     install_requires=[
@@ -26,7 +26,8 @@ setup(
         "scikit-learn",
         "pingouin",
         "statannotations",
-        "joblib"
+        "joblib",
+        "geopandas"
     ],
     include_package_data=True,
     long_description=open('README.md', encoding='utf-8').read() if __name__ == '__main__' else '',

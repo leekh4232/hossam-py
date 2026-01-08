@@ -3,7 +3,7 @@
 from typing import TYPE_CHECKING
 
 import numpy as np
-from pandas import DataFrame, DatetimeIndex
+from pandas import DataFrame, DatetimeIndex, read_csv, read_excel
 from scipy.stats import normaltest
 from tabulate import tabulate
 
@@ -171,5 +171,13 @@ def hs_load_data(key: str,
         DataFrame: 전처리(인덱스 설정, 카테고리 변환)가 완료된 데이터프레임
     """
 
-    origin = load_data(key, local)
+    k = key.lower()
+
+    if k.endswith(".xlsx"):
+        origin = read_excel(key)
+    elif k.endswith(".csv"):
+        origin = read_csv(key)
+    else:
+        origin = load_data(key, local)
+
     return __data_info(origin, index_col, timeindex, info, categories)
