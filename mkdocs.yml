@@ -28,6 +28,9 @@ plugins:
   - gen-files:
       scripts:
         - docs/_scripts/gen_api_index.py
+  - redirects:
+      redirects:
+        docs/index.md: api/index.md
   - mkdocstrings:
       handlers:
         python:
@@ -61,6 +64,8 @@ markdown_extensions:
 
 nav:
   - Overview: index.md
+  - Guides:
+      - guides/workflow.md
   - Architecture: overview/architecture.md
   - API Reference:
       - Index: api/index.md

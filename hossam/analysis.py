@@ -26,6 +26,13 @@ def hs_vif_filter(
 
     Returns:
         DataFrame: VIF가 threshold 이하인 변수만 남은 데이터프레임 (원본 컬럼 순서 유지)
+
+    Examples:
+        기본 사용 예:
+
+        >>> from hossam.analysis import hs_vif_filter
+        >>> filtered = hs_vif_filter(df, yname="target", ignore=["id"], threshold=10.0)
+        >>> filtered.head()
     """
 
     df = data.copy()
@@ -114,6 +121,14 @@ def hs_trend(x: any, y: any, degree: int = 1, value_count: int = 100) -> Tuple[n
 
     Returns:
         tuple: (v_trend, t_trend)
+
+    Examples:
+        2차 다항 회귀 추세선:
+
+        >>> from hossam.analysis import hs_trend
+        >>> vx, vy = hs_trend(x, y, degree=2, value_count=200)
+        >>> len(vx), len(vy)
+        (200, 200)
     """
     # [ a, b, c ] ==> ax^2 + bx + c
     x_arr = np.asarray(x)

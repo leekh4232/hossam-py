@@ -89,6 +89,21 @@ def __get_data_url(key: str, local: str = None) -> str:
 
 
 def load_info(search: str = None, local: str = None):
+    """메타데이터에서 사용 가능한 데이터셋 정보를 로드한다.
+
+    Args:
+        search (str, optional): 이름 필터 문자열. 포함하는 항목만 반환.
+        local (str, optional): 로컬 메타데이터 경로. None이면 원격(BASE_URL) 사용.
+
+    Returns:
+        DataFrame: name, chapter, desc, url 컬럼을 갖는 테이블
+
+    Examples:
+        >>> from hossam.data_loader import load_info
+        >>> info = load_info()
+        >>> list(info.columns)
+        ['name', 'chapter', 'desc', 'url']
+    """
     global BASE_URL
 
     path = None
@@ -137,6 +152,19 @@ def load_info(search: str = None, local: str = None):
 
 
 def load_data(key: str, local: str = None):
+    """키로 지정된 데이터셋을 로드한다.
+
+    Args:
+        key (str): 메타데이터에 정의된 데이터 식별자(파일명 또는 별칭)
+        local (str, optional): 로컬 메타데이터 경로. None이면 원격(BASE_URL) 사용.
+
+    Returns:
+        DataFrame | None: 성공 시 데이터프레임, 실패 시 None
+
+    Examples:
+        >>> from hossam.data_loader import load_data
+        >>> df = load_data('AD_SALES')  # 메타데이터에 해당 키가 있어야 함
+    """
     index = None
     try:
         url, desc, index = __get_data_url(key, local=local)

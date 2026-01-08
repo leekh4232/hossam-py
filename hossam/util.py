@@ -23,6 +23,12 @@ def hs_make_normalize_values(
 
     Returns:
         np.ndarray: 정규분포를 따르는 데이터
+
+    Examples:
+        >>> from hossam.util import hs_make_normalize_values
+        >>> x = hs_make_normalize_values(mean=0.0, std=1.0, size=100)
+        >>> x.shape
+        (100,)
     """
     p = 0.0
     x: np.ndarray = np.array([])
@@ -81,6 +87,11 @@ def hs_pretty_table(data: DataFrame, tablefmt="simple", headers: str = "keys") -
 
     Returns:
         None
+
+    Examples:
+        >>> from hossam.util import hs_pretty_table
+        >>> from pandas import DataFrame
+        >>> hs_pretty_table(DataFrame({"a":[1,2],"b":[3,4]}))
     """
 
     tabulate.WIDE_CHARS_MODE = False
@@ -169,6 +180,12 @@ def hs_load_data(key: str,
 
     Returns:
         DataFrame: 전처리(인덱스 설정, 카테고리 변환)가 완료된 데이터프레임
+
+    Examples:
+        >>> from hossam.util import hs_load_data
+        >>> df = hs_load_data("AD_SALES", index_col=None, timeindex=False, info=False)
+        >>> isinstance(df.columns, object)
+        True
     """
 
     k = key.lower()

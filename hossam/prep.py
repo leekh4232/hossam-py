@@ -20,6 +20,10 @@ def hs_standard_scaler(
     - DataFrame 입력 시: 비수치형/종속변수를 분리한 후 스케일링하고 다시 합칩니다.
     - 배열 입력 시: 그대로 스케일링된 ndarray를 반환합니다.
     - `load_path`가 주어지면 기존 스케일러를 재사용하고, `save_path`가 주어지면 학습된 스케일러를 저장합니다.
+
+    Examples:
+        >>> from hossam.prep import hs_standard_scaler
+        >>> std_df = hs_standard_scaler(df, yname="y", save_path="std.pkl")
     """
 
     is_df = isinstance(data, DataFrame)
@@ -73,6 +77,10 @@ def hs_minmax_scaler(
 
     DataFrame은 비수치/종속변수를 분리 후 스케일링하고 재결합하며, 배열 입력은 그대로 ndarray를 반환한다.
     `load_path` 제공 시 기존 스케일러를 사용하고, `save_path` 제공 시 학습 스케일러를 저장한다.
+
+    Examples:
+        >>> from hossam.prep import hs_minmax_scaler
+        >>> mm_df = hs_minmax_scaler(df, yname="y")
     """
 
     is_df = isinstance(data, DataFrame)
@@ -170,6 +178,10 @@ def hs_replace_missing_value(data: DataFrame, strategy: str = "mean") -> DataFra
 
     Returns:
         DataFrame: 결측치가 대체된 데이터프레임
+
+    Examples:
+        >>> from hossam.prep import hs_replace_missing_value
+        >>> out = hs_replace_missing_value(df.select_dtypes(include="number"), strategy="median")
     """
 
     allowed = {"mean", "median", "most_frequent", "constant"}
@@ -187,6 +199,10 @@ def hs_outlier_table(data: DataFrame, *fields: str):
 
     전달된 `fields`가 없으면 데이터프레임의 모든 수치형 컬럼을 대상으로 한다.
     결측치는 제외하고 사분위수를 계산한다.
+
+    Examples:
+        >>> from hossam.prep import hs_outlier_table
+        >>> hs_outlier_table(df, "value")
     """
 
     target_fields = list(fields) if fields else list(data.select_dtypes(include=[np.number]).columns)
