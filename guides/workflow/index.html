@@ -407,7 +407,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/analysis/" class="md-nav__link">
+      <a href="../../api/analysis.md" class="md-nav__link">
         
   
   
@@ -739,15 +739,15 @@
 <span class="n">scaled</span> <span class="o">=</span> <span class="n">prep</span><span class="o">.</span><span class="n">hs_standard_scaler</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">yname</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="s2">&quot;std.pkl&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="3">3) 분석<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">analysis</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">stats</span>
 
 <span class="c1"># 다중공선성 제거(VIF)</span>
-<span class="n">filtered</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">hs_vif_filter</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">yname</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+<span class="n">filtered</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">hs_vif_filter</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">yname</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
 
 <span class="c1"># 추세선 계산</span>
 <span class="n">x</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-<span class="n">vx</span><span class="p">,</span> <span class="n">vy</span> <span class="o">=</span> <span class="n">analysis</span><span class="o">.</span><span class="n">hs_trend</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">vx</span><span class="p">,</span> <span class="n">vy</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">hs_trend</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="4">4) 시각화<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot</span> <span class="k">as</span> <span class="n">hs_plot</span>
