@@ -39,15 +39,15 @@ scaled = prep.hs_standard_scaler(df, yname="y", save_path="std.pkl")
 ## 3) 분석
 
 ```python
-from hossam import analysis
+from hossam import stats
 
 # 다중공선성 제거(VIF)
-filtered = analysis.hs_vif_filter(df, yname="y", ignore=["id"], threshold=10.0)
+filtered = stats.hs_vif_filter(df, yname="y", ignore=["id"], threshold=10.0)
 
 # 추세선 계산
 x = df["x"].to_numpy()
 y = df["y"].to_numpy()
-vx, vy = analysis.hs_trend(x, y, degree=2)
+vx, vy = stats.hs_trend(x, y, degree=2)
 ```
 
 ## 4) 시각화

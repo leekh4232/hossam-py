@@ -2,8 +2,50 @@
 requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "hossam"
+version = "0.3.10"
+description = "Hossam Data Helper"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Lee Kwang-Ho", email = "leekh4232@gmail.com" }]
+license = "MIT"
+classifiers = [
+	"Development Status :: 3 - Alpha",
+	"Intended Audience :: Developers",
+	"Topic :: Software Development :: Libraries",
+	"Programming Language :: Python :: 3",
+	"Programming Language :: Python :: 3 :: Only",
+]
+keywords = ["data", "analysis", "helper", "hossam", "tensorflow"]
+dependencies = [
+	"tqdm",
+	"tabulate",
+	"pandas",
+	"matplotlib",
+	"seaborn",
+	"requests",
+	"openpyxl",
+	"xlrd",
+	"statsmodels",
+	"scipy",
+	"scikit-learn",
+	"pingouin",
+	"statannotations",
+	"joblib",
+	"geopandas",
+	"kmodes",
+]
+
+[project.urls]
+Homepage = "https://github.com/leekh4232/hossam-data"
+Repository = "https://github.com/leekh4232/hossam-data"
+
 [tool.setuptools]
 include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["hossam", "hossam.*"]
 
 [tool.setuptools.package-data]
 hossam = ["*.ttf"]
