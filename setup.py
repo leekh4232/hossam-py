@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="hossam",
-    version="0.3.4",
+    version="0.3.5",
     description="Hossam Data Helper",
     author="Lee Kwang-Ho",
     author_email="leekh4232@gmail.com",
@@ -27,7 +27,8 @@ setup(
         "pingouin",
         "statannotations",
         "joblib",
-        "geopandas"
+        "geopandas",
+        "kmodes"
     ],
     include_package_data=True,
     long_description=open('README.md', encoding='utf-8').read() if __name__ == '__main__' else '',
