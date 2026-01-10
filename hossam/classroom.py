@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 학생 조 편성 모듈
 
@@ -23,72 +24,41 @@ def cluster_students(
     max_iter: int = 200,
     score_metric: str = 'total'
 ) -> DataFrame:
-    """
-    학생들을 균형잡힌 조로 편성하는 함수
+    """학생들을 균형잡힌 조로 편성하는 함수.
 
-    Parameters
-    ----------
-    df : DataFrame or str
-        학생 정보를 담은 데이터프레임 또는 엑셀/CSV 파일 경로
-        데이터프레임인 경우: 반드시 포함해야 할 컬럼: '학생번호'
-        파일 경로인 경우: 자동으로 hs_load_data 함수를 사용하여 로드
-        interest_col이 지정된 경우: 해당 컬럼 필수
-        score_cols이 지정된 경우: 해당 컬럼들 필수
+    관심사 기반 1차 군집과 점수/인원 균형 조정을 통해 동질성 있고
+    균형잡힌 조를 구성합니다.
 
-    n_groups : int
-        목표 조의 개수
+    Args:
+        df: 학생 정보를 담은 데이터프레임 또는 엑셀/CSV 파일 경로.
+            데이터프레임의 경우: 반드시 '학생번호' 컬럼 포함.
+            파일 경로의 경우: 자동으로 hs_load_data 함수를 사용하여 로드.
+            interest_col이 지정된 경우 해당 컬럼 필수.
+            score_cols이 지정된 경우 해당 컬럼들 필수.
+        n_groups: 목표 조의 개수.
+        score_cols: 성적 계산에 사용할 점수 컬럼명 리스트.
+            예: ['과목1점수', '과목2점수', '과목3점수']
+            None일 경우 점수 기반 균형 조정을 하지 않습니다. 기본값: None
+        interest_col: 관심사 정보가 있는 컬럼명.
+            None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: None
+        max_iter: 균형 조정 최대 반복 횟수. 기본값: 200
+        score_metric: 점수 기준 선택 ('total' 또는 'average').
+            'total'이면 총점, 'average'이면 평균점수 기준. 기본값: 'total'
 
-    score_cols : list, optional
-        성적 계산에 사용할 점수 컬럼명 리스트
-        예: ['과목1점수', '과목2점수', '과목3점수']
-        None일 경우 점수 기반 균형 조정을 하지 않음
-        기본값: None
+    Returns:
+        '조' 컬럼이 추가된 데이터프레임. 관심사와 점수로 균형잡힌 조 배치 완료.
 
-    interest_col : str, optional
-        관심사 정보가 있는 컬럼명
-        예: '관심사'
-        None일 경우 관심사 기반 군집화를 하지 않음
-        기본값: None
+    Raises:
+        ValueError: 필수 컬럼이 없거나 입력값이 유효하지 않은 경우.
 
-    max_iter : int, optional
-        균형 조정 최대 반복 횟수
-        기본값: 200
-
-    score_metric : str, optional
-        점수 기준 선택 ('total' 또는 'average').
-        'total'이면 총점을 기준으로 사분위/극단값/성적그룹을 계산하고
-        'average'이면 평균점수를 기준으로 계산합니다.
-        기본값: 'total'
-
-    Returns
-    -------
-    DataFrame
-        '조' 컬럼이 추가된 데이터프레임
-        관심사와 점수로 균형잡힌 조 배치가 완료됨
-
-    Raises
-    ------
-    ValueError
-        필수 컬럼이 없는 경우
-
-    Examples
-    --------
-    >>> # DataFrame 직접 전달
-    >>> df = read_csv('students.csv')
-    >>> result = cluster_students(
-    ...     df=df,
-    ...     n_groups=5,
-    ...     score_cols=['국어', '영어', '수학'],
-    ...     interest_col='관심사'
-    ... )
-    >>>
-    >>> # 파일 경로 전달
-    >>> result = cluster_students(
-    ...     df='students.csv',
-    ...     n_groups=5,
-    ...     score_cols=['국어', '영어', '수학'],
-    ...     interest_col='관심사'
-    ... )
+    Examples:
+        >>> df = read_csv('students.csv')
+        >>> result = cluster_students(
+        ...     df=df,
+        ...     n_groups=5,
+        ...     score_cols=['국어', '영어', '수학'],
+        ...     interest_col='관심사'
+        ... )
     """
 
     # 파일 경로인 경우 데이터프레임으로 로드
@@ -194,6 +164,12 @@ def cluster_students(
             interest_col,
             max_iter
         )
+    else:
+        # score_cols가 없는 경우 최소한 인원 균형만 조정
+        total = len(df_main)
+        min_size = total // actual_n_groups
+        max_size = min_size + 1
+        df_main = _balance_group_sizes_only(df_main, actual_n_groups, min_size, max_size)
 
     # ===== 5단계: 극단값 포함 병합 =====
     if df_outlier is not None and len(df_outlier) > 0:
@@ -232,30 +208,17 @@ def _balance_groups(
     interest_col: str = None,
     max_iter: int = 200
 ) -> DataFrame:
-    """
-    조 내 인원과 성적 균형을 조정하는 내부 함수
+    """조 내 인원과 성적 균형을 조정하는 내부 함수.
 
-    Parameters
-    ----------
-    df : DataFrame
-        '조' 컬럼이 있는 데이터프레임
+    Args:
+        df: '조' 컬럼이 있는 데이터프레임.
+        n_groups: 조의 개수.
+        score_cols: 성적 컬럼명 리스트.
+        interest_col: 관심사 컬럼명. 기본값: None
+        max_iter: 최대 반복 횟수. 기본값: 200
 
-    n_groups : int
-        조의 개수
-
-    score_cols : list
-        성적 컬럼명 리스트
-
-    interest_col : str, optional
-        관심사 컬럼명
-
-    max_iter : int, optional
-        최대 반복 횟수
-
-    Returns
-    -------
-    DataFrame
-        균형이 조정된 데이터프레임
+    Returns:
+        균형이 조정된 데이터프레임.
     """
 
     df = df.copy()
@@ -288,21 +251,7 @@ def _balance_groups(
     for iteration in range(max_iter):
         changed = False
 
-        # ===== 인원 균형 =====
-        for g in sorted(df['조'].unique()):
-            group = df[df['조'] == g]
-            if len(group) > max_size:
-                target = df['조'].value_counts()
-                small = target[target < min_size].index
-                if len(small) > 0:
-                    df.loc[group.index[0], '조'] = small[0]
-                    changed = True
-                    break
-
-        if changed:
-            continue
-
-        # ===== 성적 균형 =====
+        # ===== 성적 균형 (우선순위: 높음) =====
         grade_counts = (
             df.groupby('조')['성적그룹']
             .value_counts()
@@ -330,8 +279,6 @@ def _balance_groups(
                     if other_count >= min_g:
                         continue
                     other_group = df[df['조'] == og]
-                    if len(other_group) >= max_size:
-                        continue
 
                     og_interest = dominant_interest(other_group)
                     need_groups.append((min_g - other_count, og, og_interest))
@@ -342,19 +289,15 @@ def _balance_groups(
                     if len(df[df['조'] == g]) - 1 < min_size:
                         continue
 
-                    # 관심사 고려 여부
+                    # 관심사 일치를 선호하지만, 성적 균형이 우선
                     if interest_col is not None and og_interest is not None:
                         donor_match = donors[donors[interest_col] == og_interest]
                     else:
                         donor_match = donors
 
+                    # 관심사 일치하는 학생이 없으면 상관없이 이동
                     if len(donor_match) == 0:
-                        if interest_col is not None and og_interest is not None:
-                            # 같은 관심사가 없으면 이동하지 않음
-                            continue
-                        else:
-                            # 관심사 고려 없으면 그냥 첫 번째 학생 선택
-                            donor_match = donors
+                        donor_match = donors
 
                     if len(donor_match) == 0:
                         continue
@@ -370,6 +313,20 @@ def _balance_groups(
             if changed:
                 break
 
+        if changed:
+            continue
+
+        # ===== 인원 균형 (우선순위: 낮음) =====
+        for g in sorted(df['조'].unique()):
+            group = df[df['조'] == g]
+            if len(group) > max_size:
+                target = df['조'].value_counts()
+                small = target[target < min_size].index
+                if len(small) > 0:
+                    df.loc[group.index[0], '조'] = small[0]
+                    changed = True
+                    break
+
         if not changed:
             break
 
@@ -382,8 +339,16 @@ def _balance_group_sizes_only(
     min_size: int,
     max_size: int
 ) -> DataFrame:
-    """
-    성적 데이터가 없을 때 인원만 균형조정
+    """성적 데이터가 없을 때 인원만 균형조정합니다.
+
+    Args:
+        df: '조' 컬럼이 있는 데이터프레임.
+        n_groups: 조의 개수.
+        min_size: 조의 최소 인원.
+        max_size: 조의 최대 인원.
+
+    Returns:
+        인원 균형이 조정된 데이터프레임.
     """
     df = df.copy()
 
@@ -407,33 +372,19 @@ def _balance_group_sizes_only(
 
 
 def report_summary(df: DataFrame, figsize: tuple = (20, 4.2), dpi: int = None) -> None:
-    """
-    조 편성 결과의 요약 통계를 시각화하는 함수
-    (조별 인원 분포, 관심사 분포, 평균점수 분포)
+    """조 편성 결과의 요약 통계를 시각화합니다.
 
-    Parameters
-    ----------
-    df : DataFrame
-        cluster_students 함수의 반환 결과 데이터프레임
+    조별 인원 분포, 관심사 분포, 평균점수 분포를 나타냅니다.
 
-    figsize : tuple, optional
-        그래프 크기 (width, height)
-        기본값: (15, 5)
+    Args:
+        df: cluster_students 함수의 반환 결과 데이터프레임.
+        figsize: 그래프 크기 (width, height). 기본값: (20, 4.2)
+        dpi: 그래프 해상도. None이면 my_dpi 사용. 기본값: None
 
-    dpi : int, optional
-        그래프 해상도
-        기본값: None (my_dpi 사용)
-
-    Returns
-    -------
-    None
-        그래프를 화면에 출력합니다
-
-    Examples
-    --------
-    >>> from hossam.classroom import cluster_students, report_summary
-    >>> df_result = cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
-    >>> report_summary(df_result)
+    Examples:
+        >>> from hossam.classroom import cluster_students, report_summary
+        >>> df_result = cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
+        >>> report_summary(df_result)
     """
 
     if dpi is None:
@@ -446,6 +397,9 @@ def report_summary(df: DataFrame, figsize: tuple = (20, 4.2), dpi: int = None) -
     if '조' not in df.columns:
         print("데이터프레임에 '조' 컬럼이 없습니다")
         return
+
+    # 극단값(0조) 제외
+    df = df[df['조'] != 0].copy()
 
     # 필요한 컬럼 확인
     has_score = '총점' in df.columns
@@ -528,14 +482,11 @@ def report_summary(df: DataFrame, figsize: tuple = (20, 4.2), dpi: int = None) -
         axes[plot_idx].set_xlabel("조")
         axes[plot_idx].set_ylabel("평균점수")
 
-        # ylim 조정: 최소값-5%, 최대값+5%
-        all_means = avg_by_group['mean']
-        y_min = all_means.min() * 0.95
-        y_max = all_means.max() * 1.05
-        axes[plot_idx].set_ylim(y_min, y_max)
+        # ylim 고정: 0~100
+        axes[plot_idx].set_ylim(0, 100)
 
         for i, row in avg_by_group.iterrows():
-            axes[plot_idx].text(i, row['mean'] + (y_max - y_min) * 0.02, f"{row['mean']:.1f}", ha='center', fontsize=10)
+            axes[plot_idx].text(i, row['mean'] + 2, f"{row['mean']:.1f}", ha='center', fontsize=10)
         plot_idx += 1
 
     plt.tight_layout()
@@ -543,37 +494,21 @@ def report_summary(df: DataFrame, figsize: tuple = (20, 4.2), dpi: int = None) -
 
 
 def report_kde(df: DataFrame, metric: str = 'average', figsize: tuple = (20, 8), dpi: int = None) -> None:
-    """
-    조별 점수 분포를 KDE(Kernel Density Estimation)로 시각화하는 함수
+    """조별 점수 분포를 KDE(Kernel Density Estimation)로 시각화합니다.
 
-    Parameters
-    ----------
-    df : DataFrame
-        cluster_students 함수의 반환 결과 데이터프레임
+    각 조의 점수 분포를 커널 밀도 추정으로 표시하고 평균 및 95% 신뢰구간을 나타냅니다.
 
-    metric : str, optional
-        점수 기준 선택 ('total' 또는 'average')
-        'total'이면 총점 KDE, 'average'이면 평균점수 KDE를 그립니다
-        기본값: 'average'
+    Args:
+        df: cluster_students 함수의 반환 결과 데이터프레임.
+        metric: 점수 기준 선택 ('total' 또는 'average').
+            'total'이면 총점, 'average'이면 평균점수. 기본값: 'average'
+        figsize: 그래프 크기 (width, height). 기본값: (20, 8)
+        dpi: 그래프 해상도. None이면 my_dpi 사용. 기본값: None
 
-    figsize : tuple, optional
-        그래프 크기 (width, height)
-        기본값: (20, 12)
-
-    dpi : int, optional
-        그래프 해상도
-        기본값: None (my_dpi 사용)
-
-    Returns
-    -------
-    None
-        그래프를 화면에 출력합니다
-
-    Examples
-    --------
-    >>> from hossam.classroom import cluster_students, report_kde
-    >>> df_result = cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
-    >>> report_kde(df_result, metric='average')
+    Examples:
+        >>> from hossam.classroom import cluster_students, report_kde
+        >>> df_result = cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
+        >>> report_kde(df_result, metric='average')
     """
 
     if dpi is None:
@@ -670,31 +605,22 @@ def report_kde(df: DataFrame, metric: str = 'average', figsize: tuple = (20, 8),
 
 
 def group_summary(df: DataFrame, name_col: str = '학생번호') -> DataFrame:
-    """
-    조별로 학생 목록과 평균 점수를 요약하는 함수
+    """조별로 학생 목록과 평균 점수를 요약합니다.
 
-    Parameters
-    ----------
-    df : DataFrame
-        cluster_students 함수의 반환 결과 데이터프레임
-        '조' 컬럼이 필수로 포함되어야 함
+    Args:
+        df: cluster_students 함수의 반환 결과 데이터프레임.
+            '조' 컬럼이 필수로 포함되어야 함.
+        name_col: 학생 이름이 들어있는 컬럼명. 기본값: '학생번호'
 
-    name_col : str, optional
-        학생 이름이 들어있는 컬럼명
-        기본값: '학생번호'
-
-    Returns
-    -------
-    DataFrame
-        조별 요약 정보가 담긴 데이터프레임
+    Returns:
+        조별 요약 정보가 담긴 데이터프레임.
         컬럼: '조', '학생', '총점평균', '평균점수평균'
 
-    Examples
-    --------
-    >>> from hossam.classroom import cluster_students, group_summary
-    >>> df_result = cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
-    >>> summary = group_summary(df_result, name_col='이름')
-    >>> print(summary)
+    Examples:
+        >>> from hossam.classroom import cluster_students, group_summary
+        >>> df_result = cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
+        >>> summary = group_summary(df_result, name_col='이름')
+        >>> print(summary)
     """
 
     if df is None or len(df) == 0:
@@ -752,68 +678,38 @@ def analyze_classroom(
     show_summary: bool = True,
     show_kde: bool = True
 ) -> DataFrame:
-    """
-    학생 조 편성부터 시각화까지 전체 프로세스를 일괄 실행하는 함수
+    """학생 조 편성부터 시각화까지 전체 프로세스를 일괄 실행합니다.
 
-    이 함수는 다음 순서로 실행됩니다:
+    다음 순서로 실행됩니다:
     1. cluster_students: 학생들을 균형잡힌 조로 편성
     2. group_summary: 조별 학생 목록과 평균 점수 요약
     3. report_summary: 조 편성 결과 요약 시각화 (선택적)
     4. report_kde: 조별 점수 분포 KDE 시각화 (선택적)
 
-    Parameters
-    ----------
-    df : DataFrame or str
-        학생 정보를 담은 데이터프레임 또는 파일 경로
+    Args:
+        df: 학생 정보를 담은 데이터프레임 또는 파일 경로.
+        n_groups: 목표 조의 개수.
+        score_cols: 성적 계산에 사용할 점수 컬럼명 리스트. 기본값: None
+        interest_col: 관심사 정보가 있는 컬럼명. 기본값: None
+        max_iter: 균형 조정 최대 반복 횟수. 기본값: 200
+        score_metric: 점수 기준 선택 ('total' 또는 'average'). 기본값: 'average'
+        name_col: 학생 이름 컬럼명. 기본값: '학생번호'
+        show_summary: 요약 시각화 표시 여부. 기본값: True
+        show_kde: KDE 시각화 표시 여부. 기본값: True
 
-    n_groups : int
-        목표 조의 개수
+    Returns:
+        조별 요약 정보 (group_summary의 결과).
 
-    score_cols : list, optional
-        성적 계산에 사용할 점수 컬럼명 리스트
-        기본값: None
-
-    interest_col : str, optional
-        관심사 정보가 있는 컬럼명
-        기본값: None
-
-    max_iter : int, optional
-        균형 조정 최대 반복 횟수
-        기본값: 200
-
-    score_metric : str, optional
-        점수 기준 선택 ('total' 또는 'average')
-        기본값: 'average'
-
-    name_col : str, optional
-        학생 이름 컬럼명
-        기본값: '학생번호'
-
-    show_summary : bool, optional
-        요약 시각화 표시 여부
-        기본값: True
-
-    show_kde : bool, optional
-        KDE 시각화 표시 여부
-        기본값: True
-
-    Returns
-    -------
-    DataFrame
-        조별 요약 정보 (group_summary의 결과)
-
-    Examples
-    --------
-    >>> from hossam.classroom import analyze_classroom
-    >>> # 모든 과정을 한 번에 실행
-    >>> summary = analyze_classroom(
-    ...     df='students.csv',
-    ...     n_groups=5,
-    ...     score_cols=['국어', '영어', '수학'],
-    ...     interest_col='관심사',
-    ...     name_col='이름'
-    ... )
-    >>> print(summary)
+    Examples:
+        >>> from hossam.classroom import analyze_classroom
+        >>> summary = analyze_classroom(
+        ...     df='students.csv',
+        ...     n_groups=5,
+        ...     score_cols=['국어', '영어', '수학'],
+        ...     interest_col='관심사',
+        ...     name_col='이름'
+        ... )
+        >>> print(summary)
     """
 
     print("=" * 60)

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # -------------------------------------------------------------
-import sys
 import numpy as np
 import pandas as pd
 import seaborn as sb
@@ -22,13 +21,6 @@ from sklearn.metrics import (
     mean_squared_error,
     ConfusionMatrixDisplay
 )
-
-# -------------------------------------------------------------
-__FONT_NAME__ = "AppleGothic" if sys.platform == "darwin" else "Malgun Gothic"
-
-plt.rcParams["font.family"] = __FONT_NAME__
-plt.rcParams["font.size"] = 6
-plt.rcParams["axes.unicode_minus"] = False
 
 # -------------------------------------------------------------
 if pd.__version__ > "2.0.0":

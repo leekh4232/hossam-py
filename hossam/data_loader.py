@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# -------------------------------------------------------------
+
 import requests
 import json
 from os.path import join, exists
@@ -8,7 +11,7 @@ from typing import Optional
 
 BASE_URL = "https://data.hossam.kr"
 
-
+# -------------------------------------------------------------
 def __get_df(path: str, index_col=None) -> DataFrame:
     p = path.rfind(".")
     exec = path[p+1:].lower()
@@ -54,6 +57,7 @@ def __get_df(path: str, index_col=None) -> DataFrame:
 
     return df
 
+# -------------------------------------------------------------
 def __get_data_url(key: str, local: str = None) -> str:
     global BASE_URL
 
@@ -89,7 +93,7 @@ def __get_data_url(key: str, local: str = None) -> str:
 
     return path, info.get('desc'), info.get('index')
 
-
+# -------------------------------------------------------------
 def load_info(search: str = None, local: str = None) -> DataFrame:
     """메타데이터에서 사용 가능한 데이터셋 정보를 로드한다.
 
@@ -152,7 +156,7 @@ def load_info(search: str = None, local: str = None) -> DataFrame:
 
     return my_df2
 
-
+# -------------------------------------------------------------
 def load_data(key: str, local: str = None) -> Optional[DataFrame]:
     """키로 지정된 데이터셋을 로드한다.
 

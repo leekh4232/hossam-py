@@ -340,7 +340,6 @@ def hs_drop_outliner(data: DataFrame, *fields: str) -> DataFrame:
 
 
 # -------------------------------------------------------------
-
 def hs_dummies(data: DataFrame, drop_first=True, dtype="int", *args: str) -> DataFrame:
     """명목형 변수를 더미 변수로 변환한다.
 
@@ -363,9 +362,7 @@ def hs_dummies(data: DataFrame, drop_first=True, dtype="int", *args: str) -> Dat
     return get_dummies(data, columns=args, drop_first=drop_first, dtype=dtype)
 
 
-
 # -------------------------------------------------------------
-
 def hs_labelling(data: DataFrame, *fields: str) -> DataFrame:
     """명목형 변수를 라벨링한다.
 

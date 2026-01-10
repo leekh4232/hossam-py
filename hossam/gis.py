@@ -1,8 +1,5 @@
-"""GIS 관련 유틸리티 함수 모음.
-
-주소 지오코딩, Shapefile 로드/저장 등의 기능을 제공합니다.
-"""
-
+# -*- coding: utf-8 -*-
+# -------------------------------------------------------------
 import requests
 import concurrent.futures as futures
 from pandas import DataFrame
@@ -17,6 +14,7 @@ import warnings
 
 from .util import hs_pretty_table
 
+# -------------------------------------------------------------
 def __geocode_item(session: requests.Session, index: int, addr: str, key: str) -> tuple[float, float]:
     """단일 주소를 VWorld API로 지오코딩합니다.
 
@@ -81,7 +79,7 @@ def __geocode_item(session: requests.Session, index: int, addr: str, key: str) -
     #print("%s --> (%s, %s)" % (addr, latitude, longitude))
     return result
 
-
+# -------------------------------------------------------------
 def hs_geocode(df: DataFrame, addr: str, key: str) -> DataFrame:
     """주소 컬럼을 일괄 지오코딩하여 위도/경도 컬럼을 추가합니다.
 
@@ -151,7 +149,7 @@ def hs_geocode(df: DataFrame, addr: str, key: str) -> DataFrame:
 
     return data
 
-
+# -------------------------------------------------------------
 def hs_load_shape(path: str, info: bool = True) -> GeoDataFrame:
     """Shapefile을 읽어 `GeoDataFrame`으로 로드합니다.
 
@@ -191,6 +189,7 @@ def hs_load_shape(path: str, info: bool = True) -> GeoDataFrame:
 
     return data
 
+# -------------------------------------------------------------
 def hs_save_shape(
     gdf: GeoDataFrame | DataFrame,
     path: str,
