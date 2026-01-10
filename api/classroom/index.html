@@ -1,0 +1,3122 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="HOSSAM 패키지의 모듈별 API 레퍼런스와 개요 문서">
+      
+      
+        <meta name="author" content="HOSSAM">
+      
+      
+        <link rel="canonical" href="https://py.hossam.kr/api/classroom/">
+      
+      
+        <link rel="prev" href="../analysis/">
+      
+      
+        <link rel="next" href="../data_loader/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>hossam.classroom - HOSSAM API Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#hossamclassroom" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="HOSSAM API Docs" class="md-header__button md-logo" aria-label="HOSSAM API Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            HOSSAM API Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              hossam.classroom
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="탭" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../hossam/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="HOSSAM API Docs" class="md-nav__button md-logo" aria-label="HOSSAM API Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    HOSSAM API Docs
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hossam/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Package
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    classroom
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    classroom
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#hossam.classroom" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        classroom
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="classroom">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.cluster_students" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cluster_students
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="cluster_students">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.cluster_students--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.cluster_students--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.cluster_students--raises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Raises
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.cluster_students--examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.cluster_students--dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DataFrame 직접 전달
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.cluster_students--_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        파일 경로 전달
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        report_summary
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="report_summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_summary--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_summary--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_summary--examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_kde" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        report_kde
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="report_kde">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_kde--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_kde--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_kde--examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.group_summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        group_summary
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="group_summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.group_summary--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.group_summary--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.group_summary--examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.analyze_classroom" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        analyze_classroom
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="analyze_classroom">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.analyze_classroom--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.analyze_classroom--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.analyze_classroom--examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.analyze_classroom--_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        모든 과정을 한 번에 실행
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_loader/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    data_loader
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    gis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    plot
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prep/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    prep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../util/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    util
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#hossam.classroom" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        classroom
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="classroom">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.cluster_students" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cluster_students
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="cluster_students">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.cluster_students--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.cluster_students--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.cluster_students--raises" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Raises
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.cluster_students--examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.cluster_students--dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DataFrame 직접 전달
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.cluster_students--_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        파일 경로 전달
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        report_summary
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="report_summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_summary--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_summary--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_summary--examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_kde" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        report_kde
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="report_kde">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_kde--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_kde--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.report_kde--examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.group_summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        group_summary
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="group_summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.group_summary--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.group_summary--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.group_summary--examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.analyze_classroom" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        analyze_classroom
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="analyze_classroom">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.analyze_classroom--parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.analyze_classroom--returns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.analyze_classroom--examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.classroom.analyze_classroom--_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        모든 과정을 한 번에 실행
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="hossamclassroom">hossam.classroom<a class="headerlink" href="#hossamclassroom" title="Permanent link">&para;</a></h1>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="hossam.classroom" class="doc doc-heading">
+            <span class="doc doc-object-name doc-module-name">hossam.classroom</span>
+
+
+<a href="#hossam.classroom" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents first">
+
+        <p>학생 조 편성 모듈</p>
+<p>학생들을 균형잡힌 조로 나누기 위한 기능을 제공합니다.
+관심사 기반 1차 군집과 점수/인원 균형 조정을 통해
+동질성 있고 균형잡힌 조를 구성합니다.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.classroom.cluster_students" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">cluster_students</span>
+
+
+<a href="#hossam.classroom.cluster_students" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">cluster_students</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="n">n_groups</span><span class="p">,</span>
+    <span class="n">score_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">interest_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_iter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">score_metric</span><span class="o">=</span><span class="s2">&quot;total&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>학생들을 균형잡힌 조로 편성하는 함수</p>
+<h5 id="hossam.classroom.cluster_students--parameters">Parameters<a class="headerlink" href="#hossam.classroom.cluster_students--parameters" title="Permanent link">&para;</a></h5>
+<p>df : DataFrame or str
+    학생 정보를 담은 데이터프레임 또는 엑셀/CSV 파일 경로
+    데이터프레임인 경우: 반드시 포함해야 할 컬럼: '학생번호'
+    파일 경로인 경우: 자동으로 hs_load_data 함수를 사용하여 로드
+    interest_col이 지정된 경우: 해당 컬럼 필수
+    score_cols이 지정된 경우: 해당 컬럼들 필수</p>
+
+
+<details class="n_groups-" open>
+  <summary>int</summary>
+  <p>목표 조의 개수</p>
+</details>
+
+<details class="score_cols-" open>
+  <summary>list, optional</summary>
+  <p>성적 계산에 사용할 점수 컬럼명 리스트
+예: ['과목1점수', '과목2점수', '과목3점수']
+None일 경우 점수 기반 균형 조정을 하지 않음
+기본값: None</p>
+</details>
+
+<details class="interest_col-" open>
+  <summary>str, optional</summary>
+  <p>관심사 정보가 있는 컬럼명
+예: '관심사'
+None일 경우 관심사 기반 군집화를 하지 않음
+기본값: None</p>
+</details>
+
+<details class="max_iter-" open>
+  <summary>int, optional</summary>
+  <p>균형 조정 최대 반복 횟수
+기본값: 200</p>
+</details>
+
+<details class="score_metric-" open>
+  <summary>str, optional</summary>
+  <p>점수 기준 선택 ('total' 또는 'average').
+'total'이면 총점을 기준으로 사분위/극단값/성적그룹을 계산하고
+'average'이면 평균점수를 기준으로 계산합니다.
+기본값: 'total'</p>
+</details>        <h5 id="hossam.classroom.cluster_students--returns">Returns<a class="headerlink" href="#hossam.classroom.cluster_students--returns" title="Permanent link">&para;</a></h5>
+<p>DataFrame
+    '조' 컬럼이 추가된 데이터프레임
+    관심사와 점수로 균형잡힌 조 배치가 완료됨</p>
+<h5 id="hossam.classroom.cluster_students--raises">Raises<a class="headerlink" href="#hossam.classroom.cluster_students--raises" title="Permanent link">&para;</a></h5>
+<p>ValueError
+    필수 컬럼이 없는 경우</p>
+<h5 id="hossam.classroom.cluster_students--examples">Examples<a class="headerlink" href="#hossam.classroom.cluster_students--examples" title="Permanent link">&para;</a></h5>
+<blockquote>
+<blockquote>
+<blockquote>
+<h4 id="hossam.classroom.cluster_students--dataframe">DataFrame 직접 전달<a class="headerlink" href="#hossam.classroom.cluster_students--dataframe" title="Permanent link">&para;</a></h4>
+<p>df = read_csv('students.csv')
+result = cluster_students(
+...     df=df,
+...     n_groups=5,
+...     score_cols=['국어', '영어', '수학'],
+...     interest_col='관심사'
+... )</p>
+<h4 id="hossam.classroom.cluster_students--_1">파일 경로 전달<a class="headerlink" href="#hossam.classroom.cluster_students--_1" title="Permanent link">&para;</a></h4>
+<p>result = cluster_students(
+...     df='students.csv',
+...     n_groups=5,
+...     score_cols=['국어', '영어', '수학'],
+...     interest_col='관심사'
+... )</p>
+</blockquote>
+</blockquote>
+</blockquote>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/classroom.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 18</span>
+<span class="normal"> 19</span>
+<span class="normal"> 20</span>
+<span class="normal"> 21</span>
+<span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
+<span class="normal"> 26</span>
+<span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cluster_students</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="n">n_groups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">score_cols</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">interest_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
+    <span class="n">score_metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;total&#39;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    학생들을 균형잡힌 조로 편성하는 함수</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : DataFrame or str</span>
+<span class="sd">        학생 정보를 담은 데이터프레임 또는 엑셀/CSV 파일 경로</span>
+<span class="sd">        데이터프레임인 경우: 반드시 포함해야 할 컬럼: &#39;학생번호&#39;</span>
+<span class="sd">        파일 경로인 경우: 자동으로 hs_load_data 함수를 사용하여 로드</span>
+<span class="sd">        interest_col이 지정된 경우: 해당 컬럼 필수</span>
+<span class="sd">        score_cols이 지정된 경우: 해당 컬럼들 필수</span>
+
+<span class="sd">    n_groups : int</span>
+<span class="sd">        목표 조의 개수</span>
+
+<span class="sd">    score_cols : list, optional</span>
+<span class="sd">        성적 계산에 사용할 점수 컬럼명 리스트</span>
+<span class="sd">        예: [&#39;과목1점수&#39;, &#39;과목2점수&#39;, &#39;과목3점수&#39;]</span>
+<span class="sd">        None일 경우 점수 기반 균형 조정을 하지 않음</span>
+<span class="sd">        기본값: None</span>
+
+<span class="sd">    interest_col : str, optional</span>
+<span class="sd">        관심사 정보가 있는 컬럼명</span>
+<span class="sd">        예: &#39;관심사&#39;</span>
+<span class="sd">        None일 경우 관심사 기반 군집화를 하지 않음</span>
+<span class="sd">        기본값: None</span>
+
+<span class="sd">    max_iter : int, optional</span>
+<span class="sd">        균형 조정 최대 반복 횟수</span>
+<span class="sd">        기본값: 200</span>
+
+<span class="sd">    score_metric : str, optional</span>
+<span class="sd">        점수 기준 선택 (&#39;total&#39; 또는 &#39;average&#39;).</span>
+<span class="sd">        &#39;total&#39;이면 총점을 기준으로 사분위/극단값/성적그룹을 계산하고</span>
+<span class="sd">        &#39;average&#39;이면 평균점수를 기준으로 계산합니다.</span>
+<span class="sd">        기본값: &#39;total&#39;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataFrame</span>
+<span class="sd">        &#39;조&#39; 컬럼이 추가된 데이터프레임</span>
+<span class="sd">        관심사와 점수로 균형잡힌 조 배치가 완료됨</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        필수 컬럼이 없는 경우</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; # DataFrame 직접 전달</span>
+<span class="sd">    &gt;&gt;&gt; df = read_csv(&#39;students.csv&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; result = cluster_students(</span>
+<span class="sd">    ...     df=df,</span>
+<span class="sd">    ...     n_groups=5,</span>
+<span class="sd">    ...     score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;],</span>
+<span class="sd">    ...     interest_col=&#39;관심사&#39;</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # 파일 경로 전달</span>
+<span class="sd">    &gt;&gt;&gt; result = cluster_students(</span>
+<span class="sd">    ...     df=&#39;students.csv&#39;,</span>
+<span class="sd">    ...     n_groups=5,</span>
+<span class="sd">    ...     score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;],</span>
+<span class="sd">    ...     interest_col=&#39;관심사&#39;</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># 파일 경로인 경우 데이터프레임으로 로드</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">hs_load_data</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">info</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># 입력 검증</span>
+    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;데이터프레임이 비어있습니다&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">n_groups</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;조의 개수는 최소 2 이상이어야 합니다&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">score_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">score_cols</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;score_cols은 리스트여야 합니다&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">interest_col</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">interest_col</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;interest_col은 문자열이어야 합니다&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 필수 컬럼 확인</span>
+    <span class="k">if</span> <span class="s1">&#39;학생번호&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;데이터프레임에 &#39;학생번호&#39; 컬럼이 필요합니다&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 선택적 컬럼 확인</span>
+    <span class="k">if</span> <span class="n">score_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">missing_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">score_cols</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">missing_cols</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;점수 컬럼이 없습니다: </span><span class="si">{</span><span class="n">missing_cols</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">interest_col</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">interest_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;관심사 컬럼 &#39;</span><span class="si">{</span><span class="n">interest_col</span><span class="si">}</span><span class="s2">&#39;이 없습니다&quot;</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># ===== 1단계: 점수 기반 처리 =====</span>
+    <span class="k">if</span> <span class="n">score_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># 총점/평균점수 계산</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;총점&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">score_cols</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;평균점수&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">score_cols</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># 사용 점수 기준 결정</span>
+        <span class="n">metric_col</span> <span class="o">=</span> <span class="s1">&#39;총점&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="n">score_metric</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;average&#39;</span> <span class="k">else</span> <span class="s1">&#39;평균점수&#39;</span>
+
+        <span class="c1"># 성적사분위 분류 (선택한 기준 사용)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;성적사분위&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qcut</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">metric_col</span><span class="p">],</span>
+            <span class="n">q</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+            <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Q1&#39;</span><span class="p">,</span> <span class="s1">&#39;Q2&#39;</span><span class="p">,</span> <span class="s1">&#39;Q3&#39;</span><span class="p">,</span> <span class="s1">&#39;Q4&#39;</span><span class="p">],</span>
+            <span class="n">duplicates</span><span class="o">=</span><span class="s1">&#39;drop&#39;</span>  <span class="c1"># 중복된 값 처리</span>
+        <span class="p">)</span>
+
+        <span class="c1"># 성적그룹 매핑</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;성적그룹&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;성적사분위&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">({</span>
+            <span class="s1">&#39;Q1&#39;</span><span class="p">:</span> <span class="s1">&#39;하&#39;</span><span class="p">,</span> <span class="s1">&#39;Q2&#39;</span><span class="p">:</span> <span class="s1">&#39;중&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Q3&#39;</span><span class="p">:</span> <span class="s1">&#39;중&#39;</span><span class="p">,</span> <span class="s1">&#39;Q4&#39;</span><span class="p">:</span> <span class="s1">&#39;상&#39;</span>
+        <span class="p">})</span>
+
+        <span class="c1"># 극단값 분리 (선택한 기준 사용)</span>
+        <span class="n">Q1</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">metric_col</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+        <span class="n">Q3</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">metric_col</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.75</span><span class="p">)</span>
+        <span class="n">IQR</span> <span class="o">=</span> <span class="n">Q3</span> <span class="o">-</span> <span class="n">Q1</span>
+
+        <span class="n">lower</span> <span class="o">=</span> <span class="n">Q1</span> <span class="o">-</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">IQR</span>
+        <span class="n">upper</span> <span class="o">=</span> <span class="n">Q3</span> <span class="o">+</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">IQR</span>
+
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;극단여부&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">metric_col</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">lower</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">metric_col</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">upper</span><span class="p">)</span>
+
+        <span class="n">df_outlier</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;극단여부&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">df_main</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;극단여부&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df_main</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">df_outlier</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># ===== 2단계: 조 개수 결정 =====</span>
+    <span class="n">main_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_main</span><span class="p">)</span>
+    <span class="n">actual_n_groups</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">n_groups</span><span class="p">,</span> <span class="n">main_size</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">actual_n_groups</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">actual_n_groups</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="c1"># ===== 3단계: 관심사 기반 1차 군집 =====</span>
+    <span class="k">if</span> <span class="n">interest_col</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">X_interest</span> <span class="o">=</span> <span class="n">df_main</span><span class="p">[[</span><span class="n">interest_col</span><span class="p">]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+
+        <span class="n">kmodes_interest</span> <span class="o">=</span> <span class="n">KModes</span><span class="p">(</span>
+            <span class="n">n_clusters</span><span class="o">=</span><span class="n">actual_n_groups</span><span class="p">,</span>
+            <span class="n">init</span><span class="o">=</span><span class="s1">&#39;Cao&#39;</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+
+        <span class="n">df_main</span><span class="p">[</span><span class="s1">&#39;조&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kmodes_interest</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">X_interest</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># 관심사가 없으면 단순 번호 할당</span>
+        <span class="n">df_main</span><span class="p">[</span><span class="s1">&#39;조&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_main</span><span class="o">.</span><span class="n">index</span> <span class="o">%</span> <span class="n">actual_n_groups</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># ===== 4단계: 조 인원 &amp; 성적 균형 조정 =====</span>
+    <span class="k">if</span> <span class="n">score_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">df_main</span> <span class="o">=</span> <span class="n">_balance_groups</span><span class="p">(</span>
+            <span class="n">df_main</span><span class="p">,</span>
+            <span class="n">actual_n_groups</span><span class="p">,</span>
+            <span class="n">score_cols</span><span class="p">,</span>
+            <span class="n">interest_col</span><span class="p">,</span>
+            <span class="n">max_iter</span>
+        <span class="p">)</span>
+
+    <span class="c1"># ===== 5단계: 극단값 포함 병합 =====</span>
+    <span class="k">if</span> <span class="n">df_outlier</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_outlier</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># &#39;조&#39;는 숫자형 유지: 극단값은 0으로 표시</span>
+        <span class="n">df_outlier</span><span class="p">[</span><span class="s1">&#39;조&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">df_main</span><span class="p">,</span> <span class="n">df_outlier</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">df_main</span>
+
+    <span class="c1"># 평균점수는 이미 계산됨 (score_cols 있을 때)</span>
+
+    <span class="c1"># 임시 컬럼 제거</span>
+    <span class="n">cols_to_drop</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;성적사분위&#39;</span><span class="p">,</span> <span class="s1">&#39;성적그룹&#39;</span><span class="p">,</span> <span class="s1">&#39;극단여부&#39;</span><span class="p">]</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols_to_drop</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="c1"># 컬럼 순서 조정</span>
+    <span class="k">if</span> <span class="n">score_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;총점&#39;</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">columns</span> <span class="ow">and</span> <span class="s1">&#39;조&#39;</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">columns</span> <span class="ow">and</span> <span class="s1">&#39;평균점수&#39;</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="c1"># 기존 컬럼 (총점, 조, 평균점수 제외)</span>
+        <span class="n">other_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;총점&#39;</span><span class="p">,</span> <span class="s1">&#39;조&#39;</span><span class="p">,</span> <span class="s1">&#39;평균점수&#39;</span><span class="p">]]</span>
+        <span class="c1"># 원하는 순서: 총점, 조, 평균점수, 나머지</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[[</span><span class="s1">&#39;총점&#39;</span><span class="p">,</span> <span class="s1">&#39;조&#39;</span><span class="p">,</span> <span class="s1">&#39;평균점수&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">other_cols</span><span class="p">]</span>
+
+    <span class="c1"># &#39;조&#39; 컬럼을 숫자 타입으로 강제 변환 (결과는 pandas nullable Int64)</span>
+    <span class="k">if</span> <span class="s1">&#39;조&#39;</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;조&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_numeric</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;조&#39;</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;Int64&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.classroom.report_summary" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">report_summary</span>
+
+
+<a href="#hossam.classroom.report_summary" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">report_summary</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>조 편성 결과의 요약 통계를 시각화하는 함수
+(조별 인원 분포, 관심사 분포, 평균점수 분포)</p>
+<h5 id="hossam.classroom.report_summary--parameters">Parameters<a class="headerlink" href="#hossam.classroom.report_summary--parameters" title="Permanent link">&para;</a></h5>
+<p>df : DataFrame
+    cluster_students 함수의 반환 결과 데이터프레임</p>
+
+
+<details class="figsize-" open>
+  <summary>tuple, optional</summary>
+  <p>그래프 크기 (width, height)
+기본값: (15, 5)</p>
+</details>
+
+<details class="dpi-" open>
+  <summary>int, optional</summary>
+  <p>그래프 해상도
+기본값: None (my_dpi 사용)</p>
+</details>        <h5 id="hossam.classroom.report_summary--returns">Returns<a class="headerlink" href="#hossam.classroom.report_summary--returns" title="Permanent link">&para;</a></h5>
+<p>None
+    그래프를 화면에 출력합니다</p>
+<h5 id="hossam.classroom.report_summary--examples">Examples<a class="headerlink" href="#hossam.classroom.report_summary--examples" title="Permanent link">&para;</a></h5>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>from hossam.classroom import cluster_students, report_summary
+df_result = cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
+report_summary(df_result)</p>
+</blockquote>
+</blockquote>
+</blockquote>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/classroom.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span>
+<span class="normal">469</span>
+<span class="normal">470</span>
+<span class="normal">471</span>
+<span class="normal">472</span>
+<span class="normal">473</span>
+<span class="normal">474</span>
+<span class="normal">475</span>
+<span class="normal">476</span>
+<span class="normal">477</span>
+<span class="normal">478</span>
+<span class="normal">479</span>
+<span class="normal">480</span>
+<span class="normal">481</span>
+<span class="normal">482</span>
+<span class="normal">483</span>
+<span class="normal">484</span>
+<span class="normal">485</span>
+<span class="normal">486</span>
+<span class="normal">487</span>
+<span class="normal">488</span>
+<span class="normal">489</span>
+<span class="normal">490</span>
+<span class="normal">491</span>
+<span class="normal">492</span>
+<span class="normal">493</span>
+<span class="normal">494</span>
+<span class="normal">495</span>
+<span class="normal">496</span>
+<span class="normal">497</span>
+<span class="normal">498</span>
+<span class="normal">499</span>
+<span class="normal">500</span>
+<span class="normal">501</span>
+<span class="normal">502</span>
+<span class="normal">503</span>
+<span class="normal">504</span>
+<span class="normal">505</span>
+<span class="normal">506</span>
+<span class="normal">507</span>
+<span class="normal">508</span>
+<span class="normal">509</span>
+<span class="normal">510</span>
+<span class="normal">511</span>
+<span class="normal">512</span>
+<span class="normal">513</span>
+<span class="normal">514</span>
+<span class="normal">515</span>
+<span class="normal">516</span>
+<span class="normal">517</span>
+<span class="normal">518</span>
+<span class="normal">519</span>
+<span class="normal">520</span>
+<span class="normal">521</span>
+<span class="normal">522</span>
+<span class="normal">523</span>
+<span class="normal">524</span>
+<span class="normal">525</span>
+<span class="normal">526</span>
+<span class="normal">527</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span>
+<span class="normal">531</span>
+<span class="normal">532</span>
+<span class="normal">533</span>
+<span class="normal">534</span>
+<span class="normal">535</span>
+<span class="normal">536</span>
+<span class="normal">537</span>
+<span class="normal">538</span>
+<span class="normal">539</span>
+<span class="normal">540</span>
+<span class="normal">541</span>
+<span class="normal">542</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_summary</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mf">4.2</span><span class="p">),</span> <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    조 편성 결과의 요약 통계를 시각화하는 함수</span>
+<span class="sd">    (조별 인원 분포, 관심사 분포, 평균점수 분포)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : DataFrame</span>
+<span class="sd">        cluster_students 함수의 반환 결과 데이터프레임</span>
+
+<span class="sd">    figsize : tuple, optional</span>
+<span class="sd">        그래프 크기 (width, height)</span>
+<span class="sd">        기본값: (15, 5)</span>
+
+<span class="sd">    dpi : int, optional</span>
+<span class="sd">        그래프 해상도</span>
+<span class="sd">        기본값: None (my_dpi 사용)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        그래프를 화면에 출력합니다</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from hossam.classroom import cluster_students, report_summary</span>
+<span class="sd">    &gt;&gt;&gt; df_result = cluster_students(df, n_groups=5, score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; report_summary(df_result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">dpi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dpi</span> <span class="o">=</span> <span class="n">my_dpi</span>
+
+    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;데이터프레임이 비어있습니다&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="s1">&#39;조&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;데이터프레임에 &#39;조&#39; 컬럼이 없습니다&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># 필요한 컬럼 확인</span>
+    <span class="n">has_score</span> <span class="o">=</span> <span class="s1">&#39;총점&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+    <span class="n">has_avg</span> <span class="o">=</span> <span class="s1">&#39;평균점수&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+    <span class="n">has_interest</span> <span class="o">=</span> <span class="s1">&#39;관심사&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+
+    <span class="c1"># 혼합 타입 안전 정렬 라벨 준비</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;조&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sort_key</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+    <span class="n">ordered_labels</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">_sort_key</span><span class="p">)</span>
+
+    <span class="c1"># 플롯 개수 결정</span>
+    <span class="n">n_plots</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># 인원 분포는 항상 표시</span>
+    <span class="k">if</span> <span class="n">has_interest</span><span class="p">:</span>
+        <span class="n">n_plots</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">has_score</span> <span class="ow">and</span> <span class="n">has_avg</span><span class="p">:</span>
+        <span class="n">n_plots</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_plots</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+
+    <span class="c1"># axes를 배열로 변환 (단일 플롯인 경우 대비)</span>
+    <span class="k">if</span> <span class="n">n_plots</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">axes</span><span class="p">]</span>
+
+    <span class="n">plot_idx</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># ===== 1. 조별 인원 분포 =====</span>
+    <span class="n">group_sizes</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;조&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+    <span class="n">group_sizes</span> <span class="o">=</span> <span class="n">group_sizes</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">ordered_labels</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">plot_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;조&#39;</span><span class="p">:</span> <span class="n">group_sizes</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;인원&#39;</span><span class="p">:</span> <span class="n">group_sizes</span><span class="o">.</span><span class="n">values</span><span class="p">})</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">plot_df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;조&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;인원&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;조&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">],</span> <span class="n">palette</span><span class="o">=</span><span class="s1">&#39;Set2&#39;</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;조별 인원 분포&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;조&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;인원&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">group_sizes</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="o">+</span> <span class="mf">0.1</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)),</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">plot_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># ===== 2. 조별 관심사 분포 =====</span>
+    <span class="k">if</span> <span class="n">has_interest</span><span class="p">:</span>
+        <span class="n">interest_dist</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;조&#39;</span><span class="p">,</span> <span class="s1">&#39;관심사&#39;</span><span class="p">])</span>
+            <span class="o">.</span><span class="n">size</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">unstack</span><span class="p">(</span><span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">interest_dist</span> <span class="o">=</span> <span class="n">interest_dist</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">ordered_labels</span><span class="p">)</span>
+
+        <span class="c1"># 비율로 변환 (각 조가 100%가 되도록)</span>
+        <span class="n">interest_pct</span> <span class="o">=</span> <span class="n">interest_dist</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">interest_dist</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+
+        <span class="c1"># stacked bar chart로 그리기 (각 막대의 높이가 100%)</span>
+        <span class="n">interest_pct</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span>
+            <span class="n">stacked</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">],</span>
+            <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;Set3&#39;</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mf">0.8</span>
+        <span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;조별 관심사 분포 (%)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;조&quot;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;비율 (%)&quot;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;관심사&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.05</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">plot_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># ===== 3. 조별 평균점수 분포 =====</span>
+    <span class="k">if</span> <span class="n">has_score</span> <span class="ow">and</span> <span class="n">has_avg</span><span class="p">:</span>
+        <span class="n">avg_by_group</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;조&#39;</span><span class="p">)[</span><span class="s1">&#39;평균점수&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;std&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="s1">&#39;조&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">avg_by_group</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;조&#39;</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">],</span> <span class="n">palette</span><span class="o">=</span><span class="s1">&#39;coolwarm&#39;</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">errorbar</span><span class="o">=</span><span class="s1">&#39;sd&#39;</span><span class="p">,</span> <span class="n">err_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;linewidth&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;조별 평균점수 분포 (±1 std)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;조&quot;</span><span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;평균점수&quot;</span><span class="p">)</span>
+
+        <span class="c1"># ylim 조정: 최소값-5%, 최대값+5%</span>
+        <span class="n">all_means</span> <span class="o">=</span> <span class="n">avg_by_group</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
+        <span class="n">y_min</span> <span class="o">=</span> <span class="n">all_means</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.95</span>
+        <span class="n">y_max</span> <span class="o">=</span> <span class="n">all_means</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mf">1.05</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">avg_by_group</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.02</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">plot_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.classroom.report_kde" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">report_kde</span>
+
+
+<a href="#hossam.classroom.report_kde" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">report_kde</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>조별 점수 분포를 KDE(Kernel Density Estimation)로 시각화하는 함수</p>
+<h5 id="hossam.classroom.report_kde--parameters">Parameters<a class="headerlink" href="#hossam.classroom.report_kde--parameters" title="Permanent link">&para;</a></h5>
+<p>df : DataFrame
+    cluster_students 함수의 반환 결과 데이터프레임</p>
+
+
+<details class="metric-" open>
+  <summary>str, optional</summary>
+  <p>점수 기준 선택 ('total' 또는 'average')
+'total'이면 총점 KDE, 'average'이면 평균점수 KDE를 그립니다
+기본값: 'average'</p>
+</details>
+
+<details class="figsize-" open>
+  <summary>tuple, optional</summary>
+  <p>그래프 크기 (width, height)
+기본값: (20, 12)</p>
+</details>
+
+<details class="dpi-" open>
+  <summary>int, optional</summary>
+  <p>그래프 해상도
+기본값: None (my_dpi 사용)</p>
+</details>        <h5 id="hossam.classroom.report_kde--returns">Returns<a class="headerlink" href="#hossam.classroom.report_kde--returns" title="Permanent link">&para;</a></h5>
+<p>None
+    그래프를 화면에 출력합니다</p>
+<h5 id="hossam.classroom.report_kde--examples">Examples<a class="headerlink" href="#hossam.classroom.report_kde--examples" title="Permanent link">&para;</a></h5>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>from hossam.classroom import cluster_students, report_kde
+df_result = cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
+report_kde(df_result, metric='average')</p>
+</blockquote>
+</blockquote>
+</blockquote>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/classroom.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span>
+<span class="normal">562</span>
+<span class="normal">563</span>
+<span class="normal">564</span>
+<span class="normal">565</span>
+<span class="normal">566</span>
+<span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span>
+<span class="normal">575</span>
+<span class="normal">576</span>
+<span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span>
+<span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span>
+<span class="normal">614</span>
+<span class="normal">615</span>
+<span class="normal">616</span>
+<span class="normal">617</span>
+<span class="normal">618</span>
+<span class="normal">619</span>
+<span class="normal">620</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span>
+<span class="normal">629</span>
+<span class="normal">630</span>
+<span class="normal">631</span>
+<span class="normal">632</span>
+<span class="normal">633</span>
+<span class="normal">634</span>
+<span class="normal">635</span>
+<span class="normal">636</span>
+<span class="normal">637</span>
+<span class="normal">638</span>
+<span class="normal">639</span>
+<span class="normal">640</span>
+<span class="normal">641</span>
+<span class="normal">642</span>
+<span class="normal">643</span>
+<span class="normal">644</span>
+<span class="normal">645</span>
+<span class="normal">646</span>
+<span class="normal">647</span>
+<span class="normal">648</span>
+<span class="normal">649</span>
+<span class="normal">650</span>
+<span class="normal">651</span>
+<span class="normal">652</span>
+<span class="normal">653</span>
+<span class="normal">654</span>
+<span class="normal">655</span>
+<span class="normal">656</span>
+<span class="normal">657</span>
+<span class="normal">658</span>
+<span class="normal">659</span>
+<span class="normal">660</span>
+<span class="normal">661</span>
+<span class="normal">662</span>
+<span class="normal">663</span>
+<span class="normal">664</span>
+<span class="normal">665</span>
+<span class="normal">666</span>
+<span class="normal">667</span>
+<span class="normal">668</span>
+<span class="normal">669</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_kde</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    조별 점수 분포를 KDE(Kernel Density Estimation)로 시각화하는 함수</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : DataFrame</span>
+<span class="sd">        cluster_students 함수의 반환 결과 데이터프레임</span>
+
+<span class="sd">    metric : str, optional</span>
+<span class="sd">        점수 기준 선택 (&#39;total&#39; 또는 &#39;average&#39;)</span>
+<span class="sd">        &#39;total&#39;이면 총점 KDE, &#39;average&#39;이면 평균점수 KDE를 그립니다</span>
+<span class="sd">        기본값: &#39;average&#39;</span>
+
+<span class="sd">    figsize : tuple, optional</span>
+<span class="sd">        그래프 크기 (width, height)</span>
+<span class="sd">        기본값: (20, 12)</span>
+
+<span class="sd">    dpi : int, optional</span>
+<span class="sd">        그래프 해상도</span>
+<span class="sd">        기본값: None (my_dpi 사용)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        그래프를 화면에 출력합니다</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from hossam.classroom import cluster_students, report_kde</span>
+<span class="sd">    &gt;&gt;&gt; df_result = cluster_students(df, n_groups=5, score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; report_kde(df_result, metric=&#39;average&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">dpi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dpi</span> <span class="o">=</span> <span class="n">my_dpi</span>
+
+    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;데이터프레임이 비어있습니다&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="s1">&#39;조&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;데이터프레임에 &#39;조&#39; 컬럼이 없습니다&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># 필요한 컬럼 확인</span>
+    <span class="n">has_score</span> <span class="o">=</span> <span class="s1">&#39;총점&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+    <span class="n">has_avg</span> <span class="o">=</span> <span class="s1">&#39;평균점수&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">has_score</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;점수 데이터가 없습니다&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># 혼합 타입 안전 정렬 라벨 준비</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;조&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sort_key</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+    <span class="n">ordered_labels</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">_sort_key</span><span class="p">)</span>
+
+    <span class="n">n_groups</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ordered_labels</span><span class="p">)</span>
+
+    <span class="c1"># 레이아웃 결정 (3열 기준)</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_groups</span> <span class="o">+</span> <span class="n">cols</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">cols</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+
+    <span class="c1"># axes를 1D 배열로 평탄화</span>
+    <span class="k">if</span> <span class="n">rows</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">cols</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">axes</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">rows</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">cols</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+    <span class="n">plot_idx</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># 메트릭 컬럼 결정</span>
+    <span class="n">metric_col</span> <span class="o">=</span> <span class="s1">&#39;평균점수&#39;</span> <span class="k">if</span> <span class="p">(</span><span class="n">metric</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;average&#39;</span> <span class="k">else</span> <span class="s1">&#39;총점&#39;</span>
+    <span class="k">if</span> <span class="n">metric_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">metric_col</span><span class="si">}</span><span class="s2">&#39; 컬럼이 없습니다&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># ===== 각 조별 KDE =====</span>
+    <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">ordered_labels</span><span class="p">:</span>
+        <span class="n">group_series</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;조&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">group</span><span class="p">][</span><span class="n">metric_col</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">group_series</span><span class="o">.</span><span class="n">size</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">ax_kde</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">plot_idx</span><span class="p">]</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">group_series</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax_kde</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># 평균선 및 95% 신뢰구간(평균에 대한) 표시</span>
+        <span class="n">mean_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">group_series</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+        <span class="n">std_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">group_series</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)</span>
+        <span class="n">se</span> <span class="o">=</span> <span class="p">(</span><span class="n">std_val</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">))</span> <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">std_val</span> <span class="o">==</span> <span class="n">std_val</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">se</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ci_low</span> <span class="o">=</span> <span class="n">mean_val</span> <span class="o">-</span> <span class="mf">1.96</span> <span class="o">*</span> <span class="n">se</span>
+            <span class="n">ci_high</span> <span class="o">=</span> <span class="n">mean_val</span> <span class="o">+</span> <span class="mf">1.96</span> <span class="o">*</span> <span class="n">se</span>
+            <span class="n">ax_kde</span><span class="o">.</span><span class="n">axvspan</span><span class="p">(</span><span class="n">ci_low</span><span class="p">,</span> <span class="n">ci_high</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.12</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;95% CI&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+        <span class="c1"># 평균 세로선 (최상위로)</span>
+        <span class="n">ax_kde</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">mean_val</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Mean&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="c1"># 제목/레이블</span>
+        <span class="n">ax_kde</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">group</span><span class="si">}</span><span class="s2">조 </span><span class="si">{</span><span class="n">metric_col</span><span class="si">}</span><span class="s2"> KDE&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+        <span class="n">ax_kde</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">metric_col</span><span class="p">)</span>
+        <span class="n">ax_kde</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;밀도&quot;</span><span class="p">)</span>
+
+        <span class="c1"># 범례 표시 (Mean/CI가 있으면 노출)</span>
+        <span class="n">handles</span><span class="p">,</span> <span class="n">labels_</span> <span class="o">=</span> <span class="n">ax_kde</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">handles</span><span class="p">:</span>
+            <span class="n">ax_kde</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+
+        <span class="n">plot_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># 불필요한 서브플롯 제거</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">plot_idx</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)):</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">delaxes</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.classroom.group_summary" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">group_summary</span>
+
+
+<a href="#hossam.classroom.group_summary" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">group_summary</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">name_col</span><span class="o">=</span><span class="s1">&#39;학생번호&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>조별로 학생 목록과 평균 점수를 요약하는 함수</p>
+<h5 id="hossam.classroom.group_summary--parameters">Parameters<a class="headerlink" href="#hossam.classroom.group_summary--parameters" title="Permanent link">&para;</a></h5>
+<p>df : DataFrame
+    cluster_students 함수의 반환 결과 데이터프레임
+    '조' 컬럼이 필수로 포함되어야 함</p>
+
+
+<details class="name_col-" open>
+  <summary>str, optional</summary>
+  <p>학생 이름이 들어있는 컬럼명
+기본값: '학생번호'</p>
+</details>        <h5 id="hossam.classroom.group_summary--returns">Returns<a class="headerlink" href="#hossam.classroom.group_summary--returns" title="Permanent link">&para;</a></h5>
+<p>DataFrame
+    조별 요약 정보가 담긴 데이터프레임
+    컬럼: '조', '학생', '총점평균', '평균점수평균'</p>
+<h5 id="hossam.classroom.group_summary--examples">Examples<a class="headerlink" href="#hossam.classroom.group_summary--examples" title="Permanent link">&para;</a></h5>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>from hossam.classroom import cluster_students, group_summary
+df_result = cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
+summary = group_summary(df_result, name_col='이름')
+print(summary)</p>
+</blockquote>
+</blockquote>
+</blockquote>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/classroom.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span>
+<span class="normal">675</span>
+<span class="normal">676</span>
+<span class="normal">677</span>
+<span class="normal">678</span>
+<span class="normal">679</span>
+<span class="normal">680</span>
+<span class="normal">681</span>
+<span class="normal">682</span>
+<span class="normal">683</span>
+<span class="normal">684</span>
+<span class="normal">685</span>
+<span class="normal">686</span>
+<span class="normal">687</span>
+<span class="normal">688</span>
+<span class="normal">689</span>
+<span class="normal">690</span>
+<span class="normal">691</span>
+<span class="normal">692</span>
+<span class="normal">693</span>
+<span class="normal">694</span>
+<span class="normal">695</span>
+<span class="normal">696</span>
+<span class="normal">697</span>
+<span class="normal">698</span>
+<span class="normal">699</span>
+<span class="normal">700</span>
+<span class="normal">701</span>
+<span class="normal">702</span>
+<span class="normal">703</span>
+<span class="normal">704</span>
+<span class="normal">705</span>
+<span class="normal">706</span>
+<span class="normal">707</span>
+<span class="normal">708</span>
+<span class="normal">709</span>
+<span class="normal">710</span>
+<span class="normal">711</span>
+<span class="normal">712</span>
+<span class="normal">713</span>
+<span class="normal">714</span>
+<span class="normal">715</span>
+<span class="normal">716</span>
+<span class="normal">717</span>
+<span class="normal">718</span>
+<span class="normal">719</span>
+<span class="normal">720</span>
+<span class="normal">721</span>
+<span class="normal">722</span>
+<span class="normal">723</span>
+<span class="normal">724</span>
+<span class="normal">725</span>
+<span class="normal">726</span>
+<span class="normal">727</span>
+<span class="normal">728</span>
+<span class="normal">729</span>
+<span class="normal">730</span>
+<span class="normal">731</span>
+<span class="normal">732</span>
+<span class="normal">733</span>
+<span class="normal">734</span>
+<span class="normal">735</span>
+<span class="normal">736</span>
+<span class="normal">737</span>
+<span class="normal">738</span>
+<span class="normal">739</span>
+<span class="normal">740</span>
+<span class="normal">741</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">group_summary</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">name_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;학생번호&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    조별로 학생 목록과 평균 점수를 요약하는 함수</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : DataFrame</span>
+<span class="sd">        cluster_students 함수의 반환 결과 데이터프레임</span>
+<span class="sd">        &#39;조&#39; 컬럼이 필수로 포함되어야 함</span>
+
+<span class="sd">    name_col : str, optional</span>
+<span class="sd">        학생 이름이 들어있는 컬럼명</span>
+<span class="sd">        기본값: &#39;학생번호&#39;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataFrame</span>
+<span class="sd">        조별 요약 정보가 담긴 데이터프레임</span>
+<span class="sd">        컬럼: &#39;조&#39;, &#39;학생&#39;, &#39;총점평균&#39;, &#39;평균점수평균&#39;</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from hossam.classroom import cluster_students, group_summary</span>
+<span class="sd">    &gt;&gt;&gt; df_result = cluster_students(df, n_groups=5, score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; summary = group_summary(df_result, name_col=&#39;이름&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; print(summary)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;데이터프레임이 비어있습니다&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">DataFrame</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="s1">&#39;조&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;데이터프레임에 &#39;조&#39; 컬럼이 없습니다&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">DataFrame</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">name_col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;데이터프레임에 &#39;</span><span class="si">{</span><span class="n">name_col</span><span class="si">}</span><span class="s2">&#39; 컬럼이 없습니다&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">DataFrame</span><span class="p">()</span>
+
+    <span class="c1"># 혼합 타입 안전 정렬</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sort_key</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+
+    <span class="c1"># 조별로 그룹화하여 정보 수집</span>
+    <span class="n">result_data</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;조&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">_sort_key</span><span class="p">):</span>
+        <span class="n">group_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;조&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">group_name</span><span class="p">]</span>
+
+        <span class="c1"># 학생 이름들을 콤마로 구분하여 결합</span>
+        <span class="n">students</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">group_df</span><span class="p">[</span><span class="n">name_col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+        <span class="c1"># 총점과 평균점수가 있는지 확인하고 평균 계산</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;조&#39;</span><span class="p">:</span> <span class="n">group_name</span><span class="p">,</span> <span class="s1">&#39;학생&#39;</span><span class="p">:</span> <span class="n">students</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="s1">&#39;총점&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;총점평균&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">group_df</span><span class="p">[</span><span class="s1">&#39;총점&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;평균점수&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">row</span><span class="p">[</span><span class="s1">&#39;평균점수평균&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">group_df</span><span class="p">[</span><span class="s1">&#39;평균점수&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">result_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="n">result_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">result_data</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result_df</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.classroom.analyze_classroom" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">analyze_classroom</span>
+
+
+<a href="#hossam.classroom.analyze_classroom" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">analyze_classroom</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="n">n_groups</span><span class="p">,</span>
+    <span class="n">score_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">interest_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_iter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">score_metric</span><span class="o">=</span><span class="s2">&quot;average&quot;</span><span class="p">,</span>
+    <span class="n">name_col</span><span class="o">=</span><span class="s2">&quot;학생번호&quot;</span><span class="p">,</span>
+    <span class="n">show_summary</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_kde</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>학생 조 편성부터 시각화까지 전체 프로세스를 일괄 실행하는 함수</p>
+<p>이 함수는 다음 순서로 실행됩니다:
+1. cluster_students: 학생들을 균형잡힌 조로 편성
+2. group_summary: 조별 학생 목록과 평균 점수 요약
+3. report_summary: 조 편성 결과 요약 시각화 (선택적)
+4. report_kde: 조별 점수 분포 KDE 시각화 (선택적)</p>
+<h5 id="hossam.classroom.analyze_classroom--parameters">Parameters<a class="headerlink" href="#hossam.classroom.analyze_classroom--parameters" title="Permanent link">&para;</a></h5>
+<p>df : DataFrame or str
+    학생 정보를 담은 데이터프레임 또는 파일 경로</p>
+
+
+<details class="n_groups-" open>
+  <summary>int</summary>
+  <p>목표 조의 개수</p>
+</details>
+
+<details class="score_cols-" open>
+  <summary>list, optional</summary>
+  <p>성적 계산에 사용할 점수 컬럼명 리스트
+기본값: None</p>
+</details>
+
+<details class="interest_col-" open>
+  <summary>str, optional</summary>
+  <p>관심사 정보가 있는 컬럼명
+기본값: None</p>
+</details>
+
+<details class="max_iter-" open>
+  <summary>int, optional</summary>
+  <p>균형 조정 최대 반복 횟수
+기본값: 200</p>
+</details>
+
+<details class="score_metric-" open>
+  <summary>str, optional</summary>
+  <p>점수 기준 선택 ('total' 또는 'average')
+기본값: 'average'</p>
+</details>
+
+<details class="name_col-" open>
+  <summary>str, optional</summary>
+  <p>학생 이름 컬럼명
+기본값: '학생번호'</p>
+</details>
+
+<details class="show_summary-" open>
+  <summary>bool, optional</summary>
+  <p>요약 시각화 표시 여부
+기본값: True</p>
+</details>
+
+<details class="show_kde-" open>
+  <summary>bool, optional</summary>
+  <p>KDE 시각화 표시 여부
+기본값: True</p>
+</details>        <h5 id="hossam.classroom.analyze_classroom--returns">Returns<a class="headerlink" href="#hossam.classroom.analyze_classroom--returns" title="Permanent link">&para;</a></h5>
+<p>DataFrame
+    조별 요약 정보 (group_summary의 결과)</p>
+<h5 id="hossam.classroom.analyze_classroom--examples">Examples<a class="headerlink" href="#hossam.classroom.analyze_classroom--examples" title="Permanent link">&para;</a></h5>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>from hossam.classroom import analyze_classroom</p>
+<h4 id="hossam.classroom.analyze_classroom--_1">모든 과정을 한 번에 실행<a class="headerlink" href="#hossam.classroom.analyze_classroom--_1" title="Permanent link">&para;</a></h4>
+<p>summary = analyze_classroom(
+...     df='students.csv',
+...     n_groups=5,
+...     score_cols=['국어', '영어', '수학'],
+...     interest_col='관심사',
+...     name_col='이름'
+... )
+print(summary)</p>
+</blockquote>
+</blockquote>
+</blockquote>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/classroom.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">744</span>
+<span class="normal">745</span>
+<span class="normal">746</span>
+<span class="normal">747</span>
+<span class="normal">748</span>
+<span class="normal">749</span>
+<span class="normal">750</span>
+<span class="normal">751</span>
+<span class="normal">752</span>
+<span class="normal">753</span>
+<span class="normal">754</span>
+<span class="normal">755</span>
+<span class="normal">756</span>
+<span class="normal">757</span>
+<span class="normal">758</span>
+<span class="normal">759</span>
+<span class="normal">760</span>
+<span class="normal">761</span>
+<span class="normal">762</span>
+<span class="normal">763</span>
+<span class="normal">764</span>
+<span class="normal">765</span>
+<span class="normal">766</span>
+<span class="normal">767</span>
+<span class="normal">768</span>
+<span class="normal">769</span>
+<span class="normal">770</span>
+<span class="normal">771</span>
+<span class="normal">772</span>
+<span class="normal">773</span>
+<span class="normal">774</span>
+<span class="normal">775</span>
+<span class="normal">776</span>
+<span class="normal">777</span>
+<span class="normal">778</span>
+<span class="normal">779</span>
+<span class="normal">780</span>
+<span class="normal">781</span>
+<span class="normal">782</span>
+<span class="normal">783</span>
+<span class="normal">784</span>
+<span class="normal">785</span>
+<span class="normal">786</span>
+<span class="normal">787</span>
+<span class="normal">788</span>
+<span class="normal">789</span>
+<span class="normal">790</span>
+<span class="normal">791</span>
+<span class="normal">792</span>
+<span class="normal">793</span>
+<span class="normal">794</span>
+<span class="normal">795</span>
+<span class="normal">796</span>
+<span class="normal">797</span>
+<span class="normal">798</span>
+<span class="normal">799</span>
+<span class="normal">800</span>
+<span class="normal">801</span>
+<span class="normal">802</span>
+<span class="normal">803</span>
+<span class="normal">804</span>
+<span class="normal">805</span>
+<span class="normal">806</span>
+<span class="normal">807</span>
+<span class="normal">808</span>
+<span class="normal">809</span>
+<span class="normal">810</span>
+<span class="normal">811</span>
+<span class="normal">812</span>
+<span class="normal">813</span>
+<span class="normal">814</span>
+<span class="normal">815</span>
+<span class="normal">816</span>
+<span class="normal">817</span>
+<span class="normal">818</span>
+<span class="normal">819</span>
+<span class="normal">820</span>
+<span class="normal">821</span>
+<span class="normal">822</span>
+<span class="normal">823</span>
+<span class="normal">824</span>
+<span class="normal">825</span>
+<span class="normal">826</span>
+<span class="normal">827</span>
+<span class="normal">828</span>
+<span class="normal">829</span>
+<span class="normal">830</span>
+<span class="normal">831</span>
+<span class="normal">832</span>
+<span class="normal">833</span>
+<span class="normal">834</span>
+<span class="normal">835</span>
+<span class="normal">836</span>
+<span class="normal">837</span>
+<span class="normal">838</span>
+<span class="normal">839</span>
+<span class="normal">840</span>
+<span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span>
+<span class="normal">844</span>
+<span class="normal">845</span>
+<span class="normal">846</span>
+<span class="normal">847</span>
+<span class="normal">848</span>
+<span class="normal">849</span>
+<span class="normal">850</span>
+<span class="normal">851</span>
+<span class="normal">852</span>
+<span class="normal">853</span>
+<span class="normal">854</span>
+<span class="normal">855</span>
+<span class="normal">856</span>
+<span class="normal">857</span>
+<span class="normal">858</span>
+<span class="normal">859</span>
+<span class="normal">860</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span>
+<span class="normal">865</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">analyze_classroom</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">,</span>
+    <span class="n">n_groups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">score_cols</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">interest_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
+    <span class="n">score_metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;average&#39;</span><span class="p">,</span>
+    <span class="n">name_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;학생번호&#39;</span><span class="p">,</span>
+    <span class="n">show_summary</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_kde</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    학생 조 편성부터 시각화까지 전체 프로세스를 일괄 실행하는 함수</span>
+
+<span class="sd">    이 함수는 다음 순서로 실행됩니다:</span>
+<span class="sd">    1. cluster_students: 학생들을 균형잡힌 조로 편성</span>
+<span class="sd">    2. group_summary: 조별 학생 목록과 평균 점수 요약</span>
+<span class="sd">    3. report_summary: 조 편성 결과 요약 시각화 (선택적)</span>
+<span class="sd">    4. report_kde: 조별 점수 분포 KDE 시각화 (선택적)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : DataFrame or str</span>
+<span class="sd">        학생 정보를 담은 데이터프레임 또는 파일 경로</span>
+
+<span class="sd">    n_groups : int</span>
+<span class="sd">        목표 조의 개수</span>
+
+<span class="sd">    score_cols : list, optional</span>
+<span class="sd">        성적 계산에 사용할 점수 컬럼명 리스트</span>
+<span class="sd">        기본값: None</span>
+
+<span class="sd">    interest_col : str, optional</span>
+<span class="sd">        관심사 정보가 있는 컬럼명</span>
+<span class="sd">        기본값: None</span>
+
+<span class="sd">    max_iter : int, optional</span>
+<span class="sd">        균형 조정 최대 반복 횟수</span>
+<span class="sd">        기본값: 200</span>
+
+<span class="sd">    score_metric : str, optional</span>
+<span class="sd">        점수 기준 선택 (&#39;total&#39; 또는 &#39;average&#39;)</span>
+<span class="sd">        기본값: &#39;average&#39;</span>
+
+<span class="sd">    name_col : str, optional</span>
+<span class="sd">        학생 이름 컬럼명</span>
+<span class="sd">        기본값: &#39;학생번호&#39;</span>
+
+<span class="sd">    show_summary : bool, optional</span>
+<span class="sd">        요약 시각화 표시 여부</span>
+<span class="sd">        기본값: True</span>
+
+<span class="sd">    show_kde : bool, optional</span>
+<span class="sd">        KDE 시각화 표시 여부</span>
+<span class="sd">        기본값: True</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataFrame</span>
+<span class="sd">        조별 요약 정보 (group_summary의 결과)</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from hossam.classroom import analyze_classroom</span>
+<span class="sd">    &gt;&gt;&gt; # 모든 과정을 한 번에 실행</span>
+<span class="sd">    &gt;&gt;&gt; summary = analyze_classroom(</span>
+<span class="sd">    ...     df=&#39;students.csv&#39;,</span>
+<span class="sd">    ...     n_groups=5,</span>
+<span class="sd">    ...     score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;],</span>
+<span class="sd">    ...     interest_col=&#39;관심사&#39;,</span>
+<span class="sd">    ...     name_col=&#39;이름&#39;</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; print(summary)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;1. 학생 조 편성 중...&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+    <span class="c1"># 1. 조 편성</span>
+    <span class="n">df_result</span> <span class="o">=</span> <span class="n">cluster_students</span><span class="p">(</span>
+        <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+        <span class="n">n_groups</span><span class="o">=</span><span class="n">n_groups</span><span class="p">,</span>
+        <span class="n">score_cols</span><span class="o">=</span><span class="n">score_cols</span><span class="p">,</span>
+        <span class="n">interest_col</span><span class="o">=</span><span class="n">interest_col</span><span class="p">,</span>
+        <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span>
+        <span class="n">score_metric</span><span class="o">=</span><span class="n">score_metric</span>
+    <span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">✓ 조 편성 완료: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_result</span><span class="p">)</span><span class="si">}</span><span class="s2">명의 학생을 </span><span class="si">{</span><span class="n">n_groups</span><span class="si">}</span><span class="s2">개 조로 배정</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;2. 조별 요약 생성 중...&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+    <span class="c1"># 2. 조별 요약</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="n">group_summary</span><span class="p">(</span><span class="n">df_result</span><span class="p">,</span> <span class="n">name_col</span><span class="o">=</span><span class="n">name_col</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">✓ 조별 요약:&quot;</span><span class="p">)</span>
+    <span class="n">hs_pretty_table</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;pretty&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+
+    <span class="c1"># 3. 요약 시각화</span>
+    <span class="k">if</span> <span class="n">show_summary</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;3. 조 편성 요약 시각화 중...&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="n">report_summary</span><span class="p">(</span><span class="n">df_result</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">✓ 요약 시각화 완료</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 4. KDE 시각화</span>
+    <span class="k">if</span> <span class="n">show_kde</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;4. 조별 </span><span class="si">{</span><span class="n">score_metric</span><span class="si">}</span><span class="s2"> KDE 시각화 중...&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="n">report_kde</span><span class="p">(</span><span class="n">df_result</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">score_metric</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">✓ KDE 시각화 완료</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;전체 분석 완료!&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">summary</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.expand", "content.code.copy", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+        <script src="../../assets/javascripts/mermaid-init.js"></script>
+      
+    
+  </body>
+</html>
