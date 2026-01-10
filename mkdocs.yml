@@ -75,12 +75,10 @@ markdown_extensions:
 
 nav:
   - Overview: index.md
-  - Guides:
-      - guides/workflow.md
-  - Architecture: overview/architecture.md
   - API Reference:
       - Package: api/hossam.md
       - analysis: api/analysis.md
+      - classroom: api/classroom.md
       - data_loader: api/data_loader.md
       - gis: api/gis.md
       - plot: api/plot.md
