@@ -2,6 +2,10 @@
 requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "hossam"
+dynamic = ["version", "description", "authors", "license", "dependencies", "readme", "classifiers", "keywords", "requires-python"]
+
 [tool.setuptools]
 include-package-data = true
 
