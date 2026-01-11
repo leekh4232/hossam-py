@@ -19,7 +19,10 @@ from statannotations.Annotator import Annotator
 # -------------------------------------------------------------
 from sklearn.metrics import (
     mean_squared_error,
-    ConfusionMatrixDisplay
+    ConfusionMatrixDisplay,
+    roc_curve,
+    auc,
+    confusion_matrix
 )
 
 # -------------------------------------------------------------
@@ -1067,7 +1070,6 @@ def hs_pvalue1_anotation(
         outparams = True
 
     sb.boxplot(data=data, x=hue, y=target, ax=ax)
-
     annotator = Annotator(ax, data=data, x=hue, y=target, pairs=pairs)
     annotator.configure(test=test, text_format=text_format, loc=loc)
     annotator.apply_and_annotate()
@@ -1161,7 +1163,7 @@ def hs_residplot(
             ax.axhline(mse_sq * (i + 1), color=c, linestyle="--", linewidth=0.5)
             ax.axhline(mse_sq * (-(i + 1)), color=c, linestyle="--", linewidth=0.5)
 
-        target = [68, 95, 99]
+        target = [68, 95, 99.7]
         for i, c in enumerate(["red", "green", "blue"]):
             ax.text(
                 s=f"{i+1} sqrt(MSE) = {mse_r[i]:.2f}% ({mse_r[i] - target[i]:.2f}%)",
@@ -1216,60 +1218,6 @@ def hs_qqplot(
     sb.scatterplot(x=x, y=y, ax=ax, **params)
     sb.lineplot(x=[-k, k], y=[-k, k], color="red", linestyle="--", ax=ax)
     ax.grid()
-    _finalize_plot(ax, callback, outparams)
-
-
-# -------------------------------------------------------------
-def hs_confusion_matrix(
-    y: np.ndarray,
-    y_pred: np.ndarray,
-    cmap: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
-    callback: any = None,
-    ax: Axes = None,
-    **params,
-) -> None:
-    """예측 결과에 대한 혼동행렬을 표시한다.
-
-    Args:
-        y (ndarray|Series): 실제 레이블.
-        y_pred (ndarray|Series): 예측 레이블.
-        cmap (str|None): 컬러맵 이름.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        dpi (int): 그림 크기 및 해상도.
-        callback (Callable|None): Axes 후처리 콜백.
-        ax (Axes|None): 외부에서 전달한 Axes.
-        **params: ConfusionMatrixDisplay.from_predictions 추가 인자.
-
-    Returns:
-        None
-    """
-    outparams = False
-
-    if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
-        outparams = True
-
-    # 이진분류인지 다항분류인지 구분
-    if hasattr(y, "unique"):
-        labels = sorted(list(y.unique()))
-    else:
-        labels = sorted(list(set(y)))
-
-    # 다중 로지스틱을 살펴볼 때 함수 파라미터 설정이 변경될 수 있다.
-    ConfusionMatrixDisplay.from_predictions(
-        y,  # 관측치
-        y_pred,  # 예측치
-        display_labels=labels,
-        cmap=cmap,
-        text_kw={"fontsize": 24, "weight": "bold"},
-        ax=ax,
-        **params,
-    )
-
     _finalize_plot(ax, callback, outparams)
 
 
@@ -1420,3 +1368,117 @@ def hs_scatter_by_class(
     else:
         for i, v in enumerate(group):
             hs_scatterplot(data, v[0], v[1], hue, palette, width, height, dpi, callback)
+
+
+# -------------------------------------------------------------
+def hs_roc_curve(
+    fit,
+    y: np.ndarray | pd.Series = None,
+    X: pd.DataFrame | np.ndarray = None,
+    width: int = 1280,
+    height: int = 720,
+    dpi: int = 200,
+    callback: any = None,
+    ax: Axes = None,
+) -> None:
+    """로지스틱 회귀 적합 결과의 ROC 곡선을 시각화한다.
+
+    Args:
+        fit: statsmodels Logit 결과 객체 (`fit.predict()`로 예측 확률을 계산 가능해야 함).
+        y (array-like|None): 외부 데이터의 실제 레이블. 제공 시 이를 실제값으로 사용.
+        X (array-like|None): 외부 데이터의 설계행렬(독립변수). 제공 시 해당 데이터로 예측 확률 계산.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 해상도.
+        callback (Callable|None): Axes 후처리 콜백.
+        ax (Axes|None): 외부에서 전달한 Axes. None이면 새로 생성.
+
+    Notes:
+        - 실제값: `y`가 주어지면 이를 사용, 없으면 `fit.model.endog`를 사용합니다.
+        - 예측 확률: `X`가 주어지면 `fit.predict(X)`를 사용, 없으면 `fit.predict(fit.model.exog)`를 사용합니다.
+
+    Returns:
+        None
+    """
+    outparams = False
+    if ax is None:
+        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        outparams = True
+
+    # 실제값(y_true) 결정
+    if y is not None:
+        y_true = np.asarray(y)
+    else:
+        # 학습 데이터의 종속변수 사용
+        y_true = np.asarray(fit.model.endog)
+
+    # 예측 확률 결정
+    if X is not None:
+        y_pred_proba = np.asarray(fit.predict(X))
+    else:
+        y_pred_proba = np.asarray(fit.predict(fit.model.exog))
+
+    # ROC 곡선 계산
+    fpr, tpr, thresholds = roc_curve(y_true, y_pred_proba)
+    roc_auc = auc(fpr, tpr)
+
+    # ROC 곡선 그리기
+    ax.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {roc_auc:.4f})')
+    ax.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random Classifier')
+
+    ax.set_xlim([0.0, 1.0])
+    ax.set_ylim([0.0, 1.05])
+    ax.set_xlabel('위양성율 (False Positive Rate)', fontsize=12)
+    ax.set_ylabel('재현율 (True Positive Rate)', fontsize=12)
+    ax.set_title('ROC 곡선', fontsize=14, fontweight='bold')
+    ax.legend(loc="lower right", fontsize=11)
+    ax.grid(True, alpha=0.3)
+
+    _finalize_plot(ax, callback, outparams)
+
+
+# -------------------------------------------------------------
+def hs_confusion_matrix_plot(
+    fit,
+    threshold: float = 0.5,
+    width: int = 1280,
+    height: int = 720,
+    dpi: int = 200,
+    callback: any = None,
+    ax: Axes = None,
+) -> None:
+    """로지스틱 회귀 적합 결과의 혼동행렬을 시각화한다.
+
+    Args:
+        fit: statsmodels Logit 결과 객체 (`fit.predict()`로 예측 확률을 계산 가능해야 함).
+        threshold (float): 예측 확률을 이진 분류로 변환할 임계값. 기본값 0.5.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 해상도.
+        callback (Callable|None): Axes 후처리 콜백.
+        ax (Axes|None): 외부에서 전달한 Axes. None이면 새로 생성.
+
+    Returns:
+        None
+    """
+    outparams = False
+    if ax is None:
+        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        outparams = True
+
+    # 학습 데이터 기반 실제값/예측 확률 결정
+    y_true = np.asarray(fit.model.endog)
+    y_pred_proba = np.asarray(fit.predict(fit.model.exog))
+    y_pred = (y_pred_proba >= threshold).astype(int)
+
+    # 혼동행렬 계산
+    cm = confusion_matrix(y_true, y_pred)
+
+    # 혼동행렬 시각화
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['음성', '양성'])
+    # 가독성을 위해 텍스트 크기/굵기 조정
+    disp.plot(ax=ax, cmap='Blues', values_format='d', text_kw={"fontsize": 24, "weight": "bold"})
+
+    ax.set_title(f'혼동행렬 (임계값: {threshold})', fontsize=14, fontweight='bold')
+
+    _finalize_plot(ax, callback, outparams)

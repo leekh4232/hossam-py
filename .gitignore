@@ -7,8 +7,10 @@ __pycache__/
 *.py[codz]
 *$py.class
 .DS_Store
+
 *.csv
 *.xlsx
+*.ipynb
 
 # C extensions
 *.so

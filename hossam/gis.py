@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 # -------------------------------------------------------------
+import os
+import time
+import warnings
 import requests
 import concurrent.futures as futures
-from pandas import DataFrame
-import pandas as pd
+
+from pandas import DataFrame, to_numeric
 from tqdm.auto import tqdm
-import time
-from geopandas import GeoDataFrame, read_file
-import geopandas as gpd
+from geopandas import GeoDataFrame, read_file, points_from_xy
 from pyproj import CRS
-import os
-import warnings
 
 from .util import hs_pretty_table
 
@@ -249,8 +248,8 @@ def hs_save_shape(
 
         df = gdf.copy()
         # 숫자 변환 및 결측 제거
-        df[lat_col] = pd.to_numeric(df[lat_col], errors="coerce")
-        df[lon_col] = pd.to_numeric(df[lon_col], errors="coerce")
+        df[lat_col] = to_numeric(df[lat_col], errors="coerce")
+        df[lon_col] = to_numeric(df[lon_col], errors="coerce")
         df = df.dropna(subset=[lat_col, lon_col])
 
         if df.empty:
@@ -258,8 +257,8 @@ def hs_save_shape(
                 "⚠️[ValueError] 유효한 위경도 값이 없어 Shapefile을 생성할 수 없습니다."
             )
 
-        geometry = gpd.points_from_xy(x=df[lon_col], y=df[lat_col])
-        gdf = gpd.GeoDataFrame(df, geometry=geometry, crs=target_crs)
+        geometry = points_from_xy(x=df[lon_col], y=df[lat_col])
+        gdf = GeoDataFrame(df, geometry=geometry, crs=target_crs)
     else:
         # GeoDataFrame의 CRS 처리: 존재하면 유지, 없으면만 설정
         if gdf.crs is None:

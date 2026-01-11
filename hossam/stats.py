@@ -353,7 +353,7 @@ def hs_ttest_1samp(data: DataFrame, columns: list | str | None = None, mean_valu
                     "field": c,
                     "alternative": a,
                     "statistic": round(s, 3),
-                    "p-value": round(p, 3),
+                    "p-value": round(p, 4),
                     "H0": p > 0.05,
                     "H1": p <= 0.05,
                     "interpretation": itp,
@@ -456,7 +456,7 @@ def hs_ttest_ind(
                 "test": n,
                 "alternative": a,
                 "statistic": round(s, 3),
-                "p-value": round(p, 3),
+                "p-value": round(p, 4),
                 "H0": p > 0.05,
                 "H1": p <= 0.05,
                 "interpretation": itp,
@@ -482,7 +482,7 @@ def hs_ttest_ind(
 # -------------------------------------------------------------
 
 def hs_ttest_rel(
-    data: DataFrame, xname: str, yname: str, equal_var: bool | None = None
+    data: DataFrame, xname: str, yname: str, parametric: bool | None = None
 ) -> DataFrame:
     """대응표본 t-검정 또는 Wilcoxon signed-rank test를 수행한다.
 
@@ -493,10 +493,10 @@ def hs_ttest_rel(
         data (DataFrame): 검정 대상 데이터를 포함한 데이터프레임.
         xname (str): 첫 번째 측정값의 컬럼명.
         yname (str): 두 번째 측정값의 컬럼명.
-        equal_var (bool | None, optional): 정규성/등분산성 가정 여부.
-            - True: 대응표본 t-검정 (정규분포 가정)
+        parametric (bool | None, optional): 정규성 가정 여부.
+            - True: 대응표본 t-검정 (차이의 정규분포 가정)
             - False: Wilcoxon signed-rank test (비모수 검정, 더 강건함)
-            - None: hs_equal_var_test()로 자동 판별
+            - None: 차이의 정규성을 자동으로 검정하여 판별
             기본값은 None.
 
     Returns:
@@ -531,12 +531,23 @@ def hs_ttest_rel(
     if len(x_data) < 2:
         raise ValueError(f"최소 2개 이상의 대응 데이터가 필요합니다. 현재: {len(x_data)}")
 
-    # equal_var가 None이면 자동으로 등분산성 판별
+    # parametric이 None이면 차이의 정규성을 자동으로 검정
     var_checked = False
-    if equal_var is None:
+    if parametric is None:
         var_checked = True
-        var_result = hs_equal_var_test(data[[xname, yname]])
-        equal_var = var_result["is_equal_var"].iloc[0]
+        # 대응표본의 차이 계산 및 정규성 검정
+        diff = x_data - y_data
+        try:
+            _, p_normal = shapiro(diff)  # 표본 크기 5000 이하일 때 권장
+            parametric = p_normal > 0.05  # p > 0.05면 정규분포 따름
+        except Exception:
+            # shapiro 실패 시 normaltest 사용
+            try:
+                _, p_normal = normaltest(diff)
+                parametric = p_normal > 0.05
+            except Exception:
+                # 둘 다 실패하면 기본값으로 비모수 검정 사용
+                parametric = False
 
     alternative: list = ["two-sided", "less", "greater"]
     result: list = []
@@ -544,7 +555,7 @@ def hs_ttest_rel(
 
     for a in alternative:
         try:
-            if equal_var:
+            if parametric:
                 s, p = ttest_rel(x_data, y_data, alternative=a)
                 n = "t-test_paired"
             else:
@@ -565,22 +576,22 @@ def hs_ttest_rel(
                 "test": n,
                 "alternative": a,
                 "statistic": round(s, 3) if not np.isnan(s) else s,
-                "p-value": round(p, 3) if not np.isnan(p) else p,
+                "p-value": round(p, 4) if not np.isnan(p) else p,
                 "H0": p > 0.05,
                 "H1": p <= 0.05,
                 "interpretation": itp,
-                "equal_var_checked": var_checked
+                "normality_checked": var_checked
             })
         except Exception as e:
             result.append({
-                "test": "t-test_paired" if equal_var else "Wilcoxon signed-rank",
+                "test": "t-test_paired" if parametric else "Wilcoxon signed-rank",
                 "alternative": a,
                 "statistic": np.nan,
                 "p-value": np.nan,
                 "H0": False,
                 "H1": False,
                 "interpretation": f"검정 실패: {str(e)}",
-                "equal_var_checked": var_checked
+                "normality_checked": var_checked
             })
 
     rdf = DataFrame(result)
@@ -732,31 +743,37 @@ def hs_trend(x: any, y: any, degree: int = 1, value_count: int = 100) -> Tuple[n
 
 
 # -------------------------------------------------------------
-def hs_linear_report(fit, data):
+def hs_linear_report(fit, data, full=False):
     """선형회귀 적합 결과를 요약 리포트로 변환한다.
 
     Args:
         fit: statsmodels OLS 등 선형회귀 결과 객체 (`fit.summary()`를 지원해야 함).
         data: 종속변수와 독립변수를 모두 포함한 DataFrame.
+        full: True이면 5개 값 반환, False이면 회귀계수 테이블(rdf)만 반환. 기본값 True.
 
     Returns:
-        tuple: 다음 요소를 포함한다.
+        tuple: full=True일 때 다음 요소를 포함한다.
             - 회귀계수 표 (`rdf`, DataFrame): 변수별 B, 표준오차, Beta, t, p-value, 공차, VIF.
             - 적합도 요약 (`result_report`, str): R, R², F, p-value, Durbin-Watson 등 핵심 지표 문자열.
             - 모형 보고 문장 (`model_report`, str): F-검정 유의성에 기반한 서술형 문장.
             - 변수별 보고 리스트 (`variable_reports`, list[str]): 각 예측변수에 대한 서술형 문장.
             - 회귀식 문자열 (`equation_text`, str): 상수항과 계수를 포함한 회귀식 표현.
 
+        full=False일 때:
+            - 회귀계수 표 (`rdf`, DataFrame)
+
     Examples:
         >>> import statsmodels.api as sm
         >>> y = data['target']
         >>> X = sm.add_constant(data[['x1', 'x2']])
         >>> fit = sm.OLS(y, X).fit()
+        >>> # 전체 리포트
         >>> rdf, result_report, model_report, variable_reports, eq = hs_linear_report(fit, data)
-        >>> print(eq)
+        >>> # 간단한 버전 (회귀계수 테이블만)
+        >>> rdf = hs_linear_report(fit, data, full=False)
     """
 
-    tbl = fit.summary()
+    tbl = fit.summary2()
 
     # 종속변수 이름
     yname = fit.model.endog_names
@@ -769,35 +786,41 @@ def hs_linear_report(fit, data):
 
     # 독립변수 결과를 누적
     variables = []
-    for i, v in enumerate(tbl.tables[1].data):
-        # 한 행의 변수명 추출 후 목록에 있는지 확인
-        name = v[0].strip()
+
+    # VIF 계산 (상수항 포함 설계행렬 사용)
+    vif_dict = {}
+    indi_df_const = sm.add_constant(indi_df, has_constant="add")
+    for i, col in enumerate(indi_df.columns, start=1):  # 상수항이 0이므로 1부터 시작
+        vif_dict[col] = variance_inflation_factor(indi_df_const.values, i)
+
+    for idx, row in tbl.iterrows():
+        name = idx
         if name not in xnames:
             continue
 
-        # VIF 계산: 상수항을 포함한 설계행렬에서 대상 변수의 열 인덱스를 사용
-        indi_df_const = sm.add_constant(indi_df, has_constant="add")
-        j = list(indi_df_const.columns).index(name)
-        vif = variance_inflation_factor(indi_df_const.values, j)
+        b = float(row['Coef.'])
+        se = float(row['Std.Err.'])
+        t = float(row['t'])
+        p = float(row['P>|t|'])
 
-        # 유의확률과 별표 표시 함수
-        p = float(v[4].strip())
-        stars = lambda p: (
-            "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else ""
-        )
+        # 표준화 회귀계수(β) 계산
+        beta = b * (data[name].std(ddof=1) / data[yname].std(ddof=1))
+
+        # VIF 값
+        vif = vif_dict.get(name, np.nan)
+
+        # 유의확률과 별표 표시
+        stars = "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else ""
 
         # 한 변수에 대한 보고 정보 추가
         variables.append(
             {
                 "종속변수": yname,  # 종속변수 이름
                 "독립변수": name,  # 독립변수 이름
-                "B": v[1].strip(),  # 비표준화 회귀계수(B)
-                "표준오차": v[2].strip(),  # 계수 표준오차
-                "Beta": float(fit.params[name])
-                * (
-                    data[name].std(ddof=1) / data[yname].std(ddof=1)
-                ),  # 표준화 회귀계수(β)
-                "t": "%s%s" % (v[3].strip(), stars(p)),  # t-통계량(+별표)
+                "B": f"{b:.6f}",  # 비표준화 회귀계수(B)
+                "표준오차": f"{se:.6f}",  # 계수 표준오차
+                "Beta": beta,  # 표준화 회귀계수(β)
+                "t": f"{t:.3f}{stars}",  # t-통계량(+별표)
                 "p-value": p,  # 계수 유의확률
                 "공차": 1 / vif,  # 공차(Tolerance = 1/VIF)
                 "vif": vif,  # 분산팽창계수
@@ -808,8 +831,9 @@ def hs_linear_report(fit, data):
 
     # summary 표에서 적합도 정보를 key-value로 추출
     result_dict = {}
+    summary_obj = fit.summary()
     for i in [0, 2]:
-        for item in tbl.tables[i].data:
+        for item in summary_obj.tables[i].data:
             n = len(item)
             for i in range(0, n, 2):
                 key = item[i].strip()[:-1]
@@ -867,33 +891,99 @@ def hs_linear_report(fit, data):
 
     equation_text = f"{yname} = {intercept:.3f}" + "".join(terms)
 
-    return rdf, result_report, model_report, variable_reports, equation_text
+    if full:
+        return rdf, result_report, model_report, variable_reports, equation_text
+    else:
+        return rdf
+
 
 
 # -------------------------------------------------------------
-def hs_logit_report(fit, data, threshold=0.5):
+def hs_linear(df: DataFrame, yname: str, report: bool = False):
+    """선형회귀분석을 수행하고 적합 결과를 반환한다.
+
+    OLS(Ordinary Least Squares) 선형회귀분석을 실시한다.
+    필요시 상세한 통계 보고서를 함께 제공한다.
+
+    Args:
+        df (DataFrame): 종속변수와 독립변수를 모두 포함한 데이터프레임.
+        yname (str): 종속변수 컬럼명.
+        report (bool, optional): True일 경우 hs_linear_report() 결과를 함께 반환.
+            기본값은 False.
+
+    Returns:
+        statsmodels.regression.linear_model.RegressionResultsWrapper: report=False일 때.
+            선형회귀 적합 결과 객체. fit.summary()로 상세 결과 확인 가능.
+        tuple: report=True일 때.
+            (fit, rdf, result_report, model_report, variable_reports, equation_text) 형태로:
+            - fit: 선형회귀 적합 결과 객체
+            - rdf: 회귀계수 표 (DataFrame)
+            - result_report: 적합도 요약 (str)
+            - model_report: 모형 보고 문장 (str)
+            - variable_reports: 변수별 보고 문장 리스트 (list[str])
+            - equation_text: 회귀식 문자열 (str)
+
+    Examples:
+        >>> from hossam.analysis import hs_linear
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>> df = pd.DataFrame({
+        ...     'target': np.random.normal(100, 10, 100),
+        ...     'x1': np.random.normal(0, 1, 100),
+        ...     'x2': np.random.normal(0, 1, 100)
+        ... })
+        >>> # 적합 결과만 반환
+        >>> fit = hs_linear(df, 'target')
+        >>> print(fit.summary())
+        >>> # 상세 보고서 함께 반환
+        >>> fit, rdf, result_report, model_report, var_reports, eq = hs_linear(df, 'target', report=True)
+        >>> print(model_report)
+    """
+    x = df.drop(yname, axis=1)
+    y = df[yname]
+
+    X_const = sm.add_constant(x)
+    linear_model = sm.OLS(y, X_const)
+    linear_fit = linear_model.fit()
+
+    if report:
+        rdf, result_report, model_report, variable_reports, equation_text = hs_linear_report(linear_fit, df)
+        return linear_fit, rdf, result_report, model_report, variable_reports, equation_text
+    else:
+        return linear_fit
+
+
+def hs_logit_report(fit, data, threshold=0.5, full=False):
     """로지스틱 회귀 적합 결과를 상세 리포트로 변환한다.
 
     Args:
         fit: statsmodels Logit 결과 객체 (`fit.summary()`와 예측 확률을 지원해야 함).
         data: 종속변수와 독립변수를 모두 포함한 DataFrame.
         threshold: 예측 확률을 이진 분류로 변환할 임계값. 기본값 0.5.
+        full: True이면 5개 값 반환, False이면 주요 2개(cdf, rdf)만 반환. 기본값 True.
 
     Returns:
-        tuple: 다음 요소를 포함한다.
+        tuple: full=True일 때 다음 요소를 포함한다.
             - 성능 지표 표 (`cdf`, DataFrame): McFadden Pseudo R², Accuracy, Precision, Recall, FPR, TNR, AUC, F1.
             - 회귀계수 표 (`rdf`, DataFrame): B, 표준오차, z, p-value, OR, 95% CI, VIF 등.
             - 적합도 및 예측 성능 요약 (`result_report`, str): Pseudo R², LLR χ², p-value, Accuracy, AUC.
             - 모형 보고 문장 (`model_report`, str): LLR p-value에 기반한 서술형 문장.
             - 변수별 보고 리스트 (`variable_reports`, list[str]): 각 예측변수의 오즈비 해석 문장.
+            - 혼동행렬 (`cm`, ndarray): 예측 결과와 실제값의 혼동행렬 [[TN, FP], [FN, TP]].
+
+        full=False일 때:
+            - 성능 지표 표 (`cdf`, DataFrame)
+            - 회귀계수 표 (`rdf`, DataFrame)
 
     Examples:
         >>> import statsmodels.api as sm
         >>> y = data['target']
         >>> X = sm.add_constant(data[['x1', 'x2']])
         >>> fit = sm.Logit(y, X).fit(disp=0)
-        >>> cdf, rdf, result_report, model_report, variable_reports = hs_logit_report(fit, data, threshold=0.5)
-        >>> print(variable_reports[0])
+        >>> # 전체 리포트
+        >>> cdf, rdf, result_report, model_report, variable_reports, cm = hs_logit_report(fit, data)
+        >>> # 간단한 버전 (주요 테이블만)
+        >>> cdf, rdf = hs_logit_report(fit, data, full=False)
     """
 
     # -----------------------------
@@ -932,7 +1022,7 @@ def hs_logit_report(fit, data, threshold=0.5):
     # -----------------------------
     # 회귀계수 표 구성 (OR 중심)
     # -----------------------------
-    tbl = fit.summary()
+    tbl = fit.summary2().tables[1]
 
     # 독립변수 이름(상수항 제외)
     xnames = [n for n in fit.model.exog_names if n != "const"]
@@ -945,19 +1035,18 @@ def hs_logit_report(fit, data, threshold=0.5):
     # VIF 계산 (상수항 포함 설계행렬 사용)
     vif_dict = {}
     x_const = sm.add_constant(x, has_constant="add")
-    for col in x.columns:
-        col_idx = list(x_const.columns).index(col)
-        vif_dict[col] = variance_inflation_factor(x_const.values, col_idx)
+    for i, col in enumerate(x.columns, start=1):  # 상수항이 0이므로 1부터 시작
+        vif_dict[col] = variance_inflation_factor(x_const.values, i)
 
-    for v in tbl.tables[1].data:
-        name = v[0].strip()
+    for idx, row in tbl.iterrows():
+        name = idx
         if name not in xnames:
             continue
 
-        beta = float(v[1])
-        se = float(v[2])
-        z = float(v[3])
-        p = float(v[4])
+        beta = float(row['Coef.'])
+        se = float(row['Std.Err.'])
+        z = float(row['z'])
+        p = float(row['P>|z|'])
 
         or_val = np.exp(beta)
         ci_low = np.exp(beta - 1.96 * se)
@@ -1034,4 +1123,61 @@ def hs_logit_report(fit, data, threshold=0.5):
             )
         )
 
-    return cdf, rdf, result_report, model_report, variable_reports
+    if full:
+        return cdf, rdf, result_report, model_report, variable_reports, cm
+    else:
+        return cdf, rdf
+
+
+def hs_logit(df: DataFrame, yname: str, report: bool = False):
+    """로지스틱 회귀분석을 수행하고 적합 결과를 반환한다.
+
+    종속변수가 이항(binary) 형태일 때 로지스틱 회귀분석을 실시한다.
+    필요시 상세한 통계 보고서를 함께 제공한다.
+
+    Args:
+        df (DataFrame): 종속변수와 독립변수를 모두 포함한 데이터프레임.
+        yname (str): 종속변수 컬럼명. 이항 변수여야 한다.
+        report (bool, optional): True일 경우 hs_logit_report() 결과를 함께 반환.
+            기본값은 False.
+
+    Returns:
+        statsmodels.genmod.generalized_linear_model.BinomialResults: report=False일 때.
+            로지스틱 회귀 적합 결과 객체. fit.summary()로 상세 결과 확인 가능.
+        tuple: report=True일 때.
+            (fit, cdf, rdf, result_report, model_report, variable_reports) 형태로:
+            - fit: 로지스틱 회귀 적합 결과 객체
+            - cdf: 성능 지표 표 (DataFrame)
+            - rdf: 회귀계수 표 (DataFrame)
+            - result_report: 적합도 및 예측 성능 요약 (str)
+            - model_report: 모형 보고 문장 (str)
+            - variable_reports: 변수별 보고 문장 리스트 (list[str])
+
+    Examples:
+        >>> from hossam.analysis import hs_logit
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>> df = pd.DataFrame({
+        ...     'target': np.random.binomial(1, 0.5, 100),
+        ...     'x1': np.random.normal(0, 1, 100),
+        ...     'x2': np.random.normal(0, 1, 100)
+        ... })
+        >>> # 적합 결과만 반환
+        >>> fit = hs_logit(df, 'target')
+        >>> print(fit.summary())
+        >>> # 상세 보고서 함께 반환
+        >>> fit, cdf, rdf, result_report, model_report, var_reports = hs_logit(df, 'target', report=True)
+        >>> print(model_report)
+    """
+    x = df.drop(yname, axis=1)
+    y = df[yname]
+
+    X_const = sm.add_constant(x)
+    logit_model = sm.Logit(y, X_const)
+    logit_fit = logit_model.fit(disp=False)
+
+    if report:
+        cdf, rdf, result_report, model_report, variable_reports = hs_logit_report(logit_fit, df, threshold=0.5)
+        return logit_fit, cdf, rdf, result_report, model_report, variable_reports
+    else:
+        return logit_fit

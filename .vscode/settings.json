@@ -1,0 +1,11 @@
+{
+  "outline.showVariables": false,
+  "outline.showFields": false,
+  "outline.showProperties": true,
+  "outline.showFunctions": true,
+  "outline.showMethods": true,
+  "outline.showClasses": true,
+  "outline.sortOrder": "position",
+  "outline.badges": false,
+  "outline.problems.enabled": false
+}
