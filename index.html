@@ -480,62 +480,6 @@
   
   
     <li class="md-nav__item">
-      <a href="api/analysis.md" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    analysis
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="api/classroom/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    classroom
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="api/data_loader/" class="md-nav__link">
         
   
@@ -564,14 +508,14 @@
   
   
     <li class="md-nav__item">
-      <a href="api/gis/" class="md-nav__link">
+      <a href="api/hs_classroom/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    gis
+    hs_classroom
   
 
     
@@ -592,14 +536,14 @@
   
   
     <li class="md-nav__item">
-      <a href="api/plot/" class="md-nav__link">
+      <a href="api/hs_gis/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    plot
+    hs_gis
   
 
     
@@ -620,14 +564,14 @@
   
   
     <li class="md-nav__item">
-      <a href="api/prep/" class="md-nav__link">
+      <a href="api/hs_plot/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    prep
+    hs_plot
   
 
     
@@ -648,14 +592,70 @@
   
   
     <li class="md-nav__item">
-      <a href="api/util/" class="md-nav__link">
+      <a href="api/hs_prep/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    util
+    hs_prep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="api/hs_stats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hs_stats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="api/hs_util/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hs_util
   
 
     
@@ -744,20 +744,20 @@
 <h1 id="hossam">HOSSAM 패키지 개요<a class="headerlink" href="#hossam" title="Permanent link">&para;</a></h1>
 <p>HOSSAM은 데이터 로딩/전처리/분석/시각화 및 GIS 유틸리티를 제공하는 파이썬 패키지입니다.</p>
 <h2 id="_1">빠른 시작<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">util</span><span class="p">,</span> <span class="n">data_loader</span><span class="p">,</span> <span class="n">prep</span><span class="p">,</span> <span class="n">analysis</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">gis</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">hs_util</span><span class="p">,</span> <span class="n">data_loader</span><span class="p">,</span> <span class="n">hs_prep</span><span class="p">,</span> <span class="n">hs_stats</span><span class="p">,</span> <span class="n">hs_plot</span><span class="p">,</span> <span class="n">hs_gis</span>
 
 <span class="c1"># 예: 데이터 로드 후 정보 출력</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">data_loader</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="s2">&quot;sample_key&quot;</span><span class="p">)</span>
-<span class="n">util</span><span class="o">.</span><span class="n">hs_pretty_table</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+<span class="n">hs_util</span><span class="o">.</span><span class="n">pretty_table</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </code></pre></div>
 <h2 id="_2">주요 모듈<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <ul>
 <li><code>hossam.data_loader</code>: 원격/로컬 데이터 조회 및 로딩</li>
-<li><code>hossam.prep</code>: 스케일링, 결측치 처리 등 전처리 유틸</li>
-<li><code>hossam.analysis</code>: 통계 분석 유틸 (VIF 필터, 추세선 계산 등)</li>
-<li><code>hossam.plot</code>: 다양한 시각화 함수(kde, box, scatter 등)</li>
-<li><code>hossam.gis</code>: 지오코딩 및 쉐이프 로드/저장</li>
-<li><code>hossam.util</code>: 표 예쁘게 출력, 샘플 데이터 생성 등 공용 유틸</li>
+<li><code>hossam.hs_prep</code>: 스케일링, 결측치 처리 등 전처리 유틸</li>
+<li><code>hossam.hs_stats</code>: 통계 분석 유틸 (VIF 필터, 추세선 계산 등)</li>
+<li><code>hossam.hs_plot</code>: 다양한 시각화 함수(kde, box, scatter 등)</li>
+<li><code>hossam.hs_gis</code>: 지오코딩 및 쉐이프 로드/저장</li>
+<li><code>hossam.hs_util</code>: 표 예쁘게 출력, 샘플 데이터 생성 등 공용 유틸</li>
 </ul>
 <p>더 자세한 내용은 API 레퍼런스를 참고하세요.</p>
 

@@ -407,62 +407,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/analysis.md" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    analysis
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../api/classroom/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    classroom
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../api/data_loader/" class="md-nav__link">
         
   
@@ -491,14 +435,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/gis/" class="md-nav__link">
+      <a href="../../api/hs_classroom/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    gis
+    hs_classroom
   
 
     
@@ -519,14 +463,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/plot/" class="md-nav__link">
+      <a href="../../api/hs_gis/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    plot
+    hs_gis
   
 
     
@@ -547,14 +491,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/prep/" class="md-nav__link">
+      <a href="../../api/hs_plot/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    prep
+    hs_plot
   
 
     
@@ -575,14 +519,70 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/util/" class="md-nav__link">
+      <a href="../../api/hs_prep/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    util
+    hs_prep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/hs_stats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hs_stats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/hs_util/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hs_util
   
 
     
@@ -715,55 +715,55 @@
 <h1 id="gis">실전 워크플로: 로드 → 전처리 → 분석 → 시각화 → GIS<a class="headerlink" href="#gis" title="Permanent link">&para;</a></h1>
 <p>아래는 HOSSAM을 활용한 대표적인 작업 흐름 예시입니다.</p>
 <h2 id="1">1) 데이터 로드<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">util</span><span class="p">,</span> <span class="n">data_loader</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">hs_util</span><span class="p">,</span> <span class="n">data_loader</span>
 
 <span class="c1"># 키 목록/설명 확인 (원격 메타데이터)</span>
 <span class="n">info</span> <span class="o">=</span> <span class="n">data_loader</span><span class="o">.</span><span class="n">load_info</span><span class="p">()</span>
-<span class="n">util</span><span class="o">.</span><span class="n">hs_pretty_table</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+<span class="n">hs_util</span><span class="o">.</span><span class="n">pretty_table</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 
 <span class="c1"># 키로 데이터 로드</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">data_loader</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="s2">&quot;AD_SALES&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="2">2) 전처리<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">prep</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">hs_prep</span>
 
 <span class="c1"># 카테고리 지정</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrame</span>
 <span class="c1"># df[&quot;category&quot;] = df[&quot;category&quot;].astype(&quot;category&quot;)  # 혹은 아래 헬퍼 사용</span>
-<span class="n">prep</span><span class="o">.</span><span class="n">hs_set_category</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;category&quot;</span><span class="p">)</span>
+<span class="n">hs_prep</span><span class="o">.</span><span class="n">set_category</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;category&quot;</span><span class="p">)</span>
 
 <span class="c1"># 결측치 대체</span>
-<span class="n">df2</span> <span class="o">=</span> <span class="n">prep</span><span class="o">.</span><span class="n">hs_replace_missing_value</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s2">&quot;number&quot;</span><span class="p">),</span> <span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+<span class="n">df2</span> <span class="o">=</span> <span class="n">hs_prep</span><span class="o">.</span><span class="n">replace_missing_value</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s2">&quot;number&quot;</span><span class="p">),</span> <span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
 
 <span class="c1"># 스케일링(Standard)</span>
-<span class="n">scaled</span> <span class="o">=</span> <span class="n">prep</span><span class="o">.</span><span class="n">hs_standard_scaler</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">yname</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="s2">&quot;std.pkl&quot;</span><span class="p">)</span>
+<span class="n">scaled</span> <span class="o">=</span> <span class="n">hs_prep</span><span class="o">.</span><span class="n">standard_scaler</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">yname</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="s2">&quot;std.pkl&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="3">3) 분석<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">stats</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">hs_stats</span>
 
 <span class="c1"># 다중공선성 제거(VIF)</span>
-<span class="n">filtered</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">hs_vif_filter</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">yname</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+<span class="n">filtered</span> <span class="o">=</span> <span class="n">hs_stats</span><span class="o">.</span><span class="n">vif_filter</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">yname</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
 
 <span class="c1"># 추세선 계산</span>
 <span class="n">x</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-<span class="n">vx</span><span class="p">,</span> <span class="n">vy</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">hs_trend</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">vx</span><span class="p">,</span> <span class="n">vy</span> <span class="o">=</span> <span class="n">hs_stats</span><span class="o">.</span><span class="n">trend</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="4">4) 시각화<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot</span> <span class="k">as</span> <span class="n">hs_plot</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">hs_plot</span>
 
-<span class="n">hs_plot</span><span class="o">.</span><span class="n">hs_scatterplot</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">xname</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">yname</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;Set1&quot;</span><span class="p">)</span>
-<span class="n">hs_plot</span><span class="o">.</span><span class="n">hs_kdeplot</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">xname</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">hs_plot</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">xname</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">yname</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;Set1&quot;</span><span class="p">)</span>
+<span class="n">hs_plot</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">xname</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="5-gis">5) GIS<a class="headerlink" href="#5-gis" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">gis</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">hs_gis</span>
 
 <span class="c1"># 지오코딩 (VWorld API 키 필요)</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">gis</span><span class="o">.</span><span class="n">hs_geocode</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">addr</span><span class="o">=</span><span class="s2">&quot;address&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;YOUR_VWORLD_KEY&quot;</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">hs_gis</span><span class="o">.</span><span class="n">geocode</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">addr</span><span class="o">=</span><span class="s2">&quot;address&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;YOUR_VWORLD_KEY&quot;</span><span class="p">)</span>
 
 <span class="c1"># Shapefile 로드/저장</span>
-<span class="n">gdf</span> <span class="o">=</span> <span class="n">gis</span><span class="o">.</span><span class="n">hs_load_shape</span><span class="p">(</span><span class="s2">&quot;path/to/file.shp&quot;</span><span class="p">)</span>
-<span class="n">gis</span><span class="o">.</span><span class="n">hs_save_shape</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="s2">&quot;out.gpkg&quot;</span><span class="p">)</span>
+<span class="n">gdf</span> <span class="o">=</span> <span class="n">hs_gis</span><span class="o">.</span><span class="n">load_shape</span><span class="p">(</span><span class="s2">&quot;path/to/file.shp&quot;</span><span class="p">)</span>
+<span class="n">hs_gis</span><span class="o">.</span><span class="n">save_shape</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="s2">&quot;out.gpkg&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="_1">참고<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <ul>

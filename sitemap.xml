@@ -5,15 +5,7 @@
          <lastmod>2026-01-11</lastmod>
     </url>
     <url>
-         <loc>https://py.hossam.kr/api/classroom/</loc>
-         <lastmod>2026-01-11</lastmod>
-    </url>
-    <url>
          <loc>https://py.hossam.kr/api/data_loader/</loc>
-         <lastmod>2026-01-11</lastmod>
-    </url>
-    <url>
-         <loc>https://py.hossam.kr/api/gis/</loc>
          <lastmod>2026-01-11</lastmod>
     </url>
     <url>
@@ -21,19 +13,27 @@
          <lastmod>2026-01-11</lastmod>
     </url>
     <url>
-         <loc>https://py.hossam.kr/api/plot/</loc>
+         <loc>https://py.hossam.kr/api/hs_classroom/</loc>
          <lastmod>2026-01-11</lastmod>
     </url>
     <url>
-         <loc>https://py.hossam.kr/api/prep/</loc>
+         <loc>https://py.hossam.kr/api/hs_gis/</loc>
          <lastmod>2026-01-11</lastmod>
     </url>
     <url>
-         <loc>https://py.hossam.kr/api/stats/</loc>
+         <loc>https://py.hossam.kr/api/hs_plot/</loc>
          <lastmod>2026-01-11</lastmod>
     </url>
     <url>
-         <loc>https://py.hossam.kr/api/util/</loc>
+         <loc>https://py.hossam.kr/api/hs_prep/</loc>
+         <lastmod>2026-01-11</lastmod>
+    </url>
+    <url>
+         <loc>https://py.hossam.kr/api/hs_stats/</loc>
+         <lastmod>2026-01-11</lastmod>
+    </url>
+    <url>
+         <loc>https://py.hossam.kr/api/hs_util/</loc>
          <lastmod>2026-01-11</lastmod>
     </url>
     <url>

@@ -407,62 +407,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/analysis.md" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    analysis
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../api/classroom/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    classroom
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../api/data_loader/" class="md-nav__link">
         
   
@@ -491,14 +435,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/gis/" class="md-nav__link">
+      <a href="../../api/hs_classroom/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    gis
+    hs_classroom
   
 
     
@@ -519,14 +463,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/plot/" class="md-nav__link">
+      <a href="../../api/hs_gis/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    plot
+    hs_gis
   
 
     
@@ -547,14 +491,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/prep/" class="md-nav__link">
+      <a href="../../api/hs_plot/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    prep
+    hs_plot
   
 
     
@@ -575,14 +519,70 @@
   
   
     <li class="md-nav__item">
-      <a href="../../api/util/" class="md-nav__link">
+      <a href="../../api/hs_prep/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    util
+    hs_prep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/hs_stats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hs_stats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/hs_util/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hs_util
   
 
     
@@ -643,11 +643,11 @@
 <pre class="mermaid"><code>flowchart LR
     subgraph HOSSAM
       DL[data_loader]
-      PR[prep]
-      UT[util]
-      AN[analysis]
-      PL[plot]
-      GI[gis]
+      PR[hs_prep]
+      UT[hs_util]
+      AN[hs_stats]
+      PL[hs_plot]
+      GI[hs_gis]
     end
 
     UT --&gt; DL
@@ -659,10 +659,10 @@
     AN --- UT
     PL --- UT</code></pre>
 <p>설명:
-- <code>util</code> ↔ <code>data_loader</code>: 상호 참조 관계 (표 출력/데이터 로딩)
-- <code>util</code> → <code>prep</code>: 카테고리 설정 유틸 사용
-- <code>gis</code>, <code>prep</code> → <code>util</code>: 테이블 출력 유틸 사용
-- <code>analysis</code>, <code>plot</code>: 주로 외부 라이브러리 의존, 공용 유틸과 느슨한 결합</p>
+- <code>hs_util</code> ↔ <code>data_loader</code>: 상호 참조 관계 (표 출력/데이터 로딩)
+- <code>hs_util</code> → <code>hs_prep</code>: 카테고리 설정 유틸 사용
+- <code>hs_gis</code>, <code>hs_prep</code> → <code>hs_util</code>: 테이블 출력 유틸 사용
+- <code>hs_stats</code>, <code>hs_plot</code>: 주로 외부 라이브러리 의존, 공용 유틸과 느슨한 결합</p>
 <blockquote>
 <p>참고: 상호 의존(양방향)은 초기화/실행 타이밍에 주의가 필요합니다.</p>
 </blockquote>
