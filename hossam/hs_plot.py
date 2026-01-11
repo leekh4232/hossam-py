@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 # -------------------------------------------------------------
 import numpy as np
 import pandas as pd
@@ -7,6 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import Axes
 from math import sqrt
 from pandas import DataFrame
+from . import hs_dpi, hs_fig_width, hs_fig_height
 
 # -------------------------------------------------------------
 from scipy.stats import t
@@ -31,7 +34,7 @@ if pd.__version__ > "2.0.0":
 
 
 # -------------------------------------------------------------
-def __get_default_ax(width: int = 1280, height: int = 720, rows: int = 1, cols: int = 1, dpi: int = 200):
+def get_default_ax(width: int = hs_fig_width, height: int = hs_fig_height, rows: int = 1, cols: int = 1, dpi: int = hs_dpi, flatten: bool = False, ws: int | None = None, hs: int | None = None):
     """기본 크기의 Figure와 Axes를 생성한다.
 
     Args:
@@ -44,13 +47,20 @@ def __get_default_ax(width: int = 1280, height: int = 720, rows: int = 1, cols: 
     Returns:
         tuple[Figure, Axes]: 생성된 matplotlib Figure와 Axes 객체.
     """
-    figsize = (width / dpi, height / dpi)
+    figsize = (width * cols / dpi, height * rows / dpi)
     fig, ax = plt.subplots(rows, cols, figsize=figsize, dpi=dpi)
+
+    if (rows > 1 or cols > 1) and (ws != None and hs != None):
+        fig.subplots_adjust(wspace=ws, hspace=hs)
+
+    if flatten == True:
+        ax = ax.flatten()
+
     return fig, ax
 
 
 # -------------------------------------------------------------
-def _finalize_plot(ax: Axes, callback: any, outparams: bool) -> None:
+def finalize_plot(ax: Axes, callback: any = None, outparams: bool = False) -> None:
     """공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
 
     Args:
@@ -71,16 +81,16 @@ def _finalize_plot(ax: Axes, callback: any, outparams: bool) -> None:
 
 
 # -------------------------------------------------------------
-def hs_lineplot(
+def lineplot(
     df: DataFrame,
     xname: str = None,
     yname: str = None,
     hue: str = None,
     marker: str = None,
     palette: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -107,33 +117,41 @@ def hs_lineplot(
     outparams = False
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
-    sb.lineplot(
-        data=df,
-        x=xname,
-        y=yname,
-        hue=hue,
-        marker=marker,
-        palette=palette,
-        ax=ax,
-        **params,
-    )
-    ax.grid()
-    _finalize_plot(ax, callback, outparams)
+    # hue가 있을 때만 palette 사용, 없으면 color 사용
+    lineplot_kwargs = {
+        "data": df,
+        "x": xname,
+        "y": yname,
+        "hue": hue,
+        "marker": marker,
+        "ax": ax,
+    }
+
+    if hue is not None and palette is not None:
+        lineplot_kwargs["palette"] = palette
+    elif hue is None and palette is not None:
+        lineplot_kwargs["color"] = sb.color_palette(palette)[0]
+
+    lineplot_kwargs.update(params)
+
+    sb.lineplot(**lineplot_kwargs)
+    ax.grid(True, alpha=0.3)
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_boxplot(
+def boxplot(
     df: DataFrame,
     xname: str = None,
     yname: str = None,
     orient: str = "v",
     palette: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -159,22 +177,37 @@ def hs_boxplot(
     outparams = False
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
     if xname is not None and yname is not None:
-        sb.boxplot(
-            data=df, x=xname, y=yname, orient=orient, palette=palette, ax=ax, **params
-        )
+        boxplot_kwargs = {
+            "data": df,
+            "x": xname,
+            "y": yname,
+            "orient": orient,
+            "ax": ax,
+        }
+
+        # hue 파라미터 확인 (params에 있을 수 있음)
+        hue_value = params.get("hue", None)
+
+        if hue_value is not None and palette is not None:
+            boxplot_kwargs["palette"] = palette
+        elif hue_value is None and palette is not None:
+            boxplot_kwargs["color"] = sb.color_palette(palette)[0]
+
+        boxplot_kwargs.update(params)
+        sb.boxplot(**boxplot_kwargs)
     else:
         sb.boxplot(data=df, orient=orient, ax=ax, **params)
 
-    ax.grid()
-    _finalize_plot(ax, callback, outparams)
+    ax.grid(True, alpha=0.3)
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_kdeplot(
+def kdeplot(
     df: DataFrame,
     xname: str = None,
     yname: str = None,
@@ -183,9 +216,9 @@ def hs_kdeplot(
     fill: bool = False,
     fill_alpha: float = 0.3,
     linewidth: float = 1,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -214,7 +247,7 @@ def hs_kdeplot(
     outparams = False
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
     # 기본 kwargs 설정
@@ -245,21 +278,21 @@ def hs_kdeplot(
     sb.kdeplot(**kdeplot_kwargs)
 
     # plt.grid()
-    ax.grid()
-    _finalize_plot(ax, callback, outparams)
+    ax.grid(True, alpha=0.3)
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_histplot(
+def histplot(
     df: DataFrame,
     xname: str,
     hue=None,
     bins=None,
     kde: bool = True,
     palette: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -286,38 +319,56 @@ def hs_histplot(
     outparams = False
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
     if bins:
-        sb.histplot(
-            data=df,
-            x=xname,
-            hue=hue,
-            kde=kde,
-            bins=bins,
-            palette=palette,
-            ax=ax,
-            **params,
-        )
-    else:
-        sb.histplot(
-            data=df, x=xname, hue=hue, kde=kde, palette=palette, ax=ax, **params
-        )
+        histplot_kwargs = {
+            "data": df,
+            "x": xname,
+            "hue": hue,
+            "kde": kde,
+            "bins": bins,
+            "ax": ax,
+        }
 
-    # plt.grid()
-    _finalize_plot(ax, callback, outparams)
+        if hue is not None and palette is not None:
+            histplot_kwargs["palette"] = palette
+        elif hue is None and palette is not None:
+            histplot_kwargs["color"] = sb.color_palette(palette)[0]
+
+        histplot_kwargs.update(params)
+        sb.histplot(**histplot_kwargs)
+    else:
+        histplot_kwargs = {
+            "data": df,
+            "x": xname,
+            "hue": hue,
+            "kde": kde,
+            "ax": ax,
+        }
+
+        if hue is not None and palette is not None:
+            histplot_kwargs["palette"] = palette
+        elif hue is None and palette is not None:
+            histplot_kwargs["color"] = sb.color_palette(palette)[0]
+
+        histplot_kwargs.update(params)
+        sb.histplot(**histplot_kwargs)
+
+    ax.grid(True, alpha=0.3)
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_stackplot(
+def stackplot(
     df: DataFrame,
     xname: str,
     hue: str,
     palette: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -342,24 +393,30 @@ def hs_stackplot(
     outparams = False
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
     df2 = df[[xname, hue]].copy()
     df2[xname] = df2[xname].astype(str)
 
-    sb.histplot(
-        data=df2,
-        x=xname,
-        hue=hue,
-        palette=palette,
-        linewidth=0.5,
-        stat="probability",  # 전체에서의 비율로 그리기
-        multiple="fill",  # 전체를 100%로 그리기
-        shrink=0.8,  # 막대의 폭
-        ax=ax,
-        **params,
-    )
+    # stackplot은 hue가 필수이므로 palette를 그대로 사용
+    stackplot_kwargs = {
+        "data": df2,
+        "x": xname,
+        "hue": hue,
+        "linewidth": 0.5,
+        "stat": "probability",  # 전체에서의 비율로 그리기
+        "multiple": "fill",  # 전체를 100%로 그리기
+        "shrink": 0.8,  # 막대의 폭
+        "ax": ax,
+    }
+
+    if palette is not None:
+        stackplot_kwargs["palette"] = palette
+
+    stackplot_kwargs.update(params)
+
+    sb.histplot(**stackplot_kwargs)
 
     # 그래프의 x축 항목 수 만큼 반복
     for p in ax.patches:
@@ -380,19 +437,19 @@ def hs_stackplot(
         ax.set_xticks(xticks)
         ax.set_xticklabels(xticks)
 
-    _finalize_plot(ax, callback, outparams)
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_scatterplot(
+def scatterplot(
     df: DataFrame,
     xname: str,
     yname: str,
     hue=None,
     palette: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -418,24 +475,40 @@ def hs_scatterplot(
     outparams = False
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
-    sb.scatterplot(data=df, x=xname, y=yname, hue=hue, palette=palette, ax=ax, **params)
-    ax.grid()
+    # hue가 있을 때만 palette 사용, 없으면 color 사용
+    scatterplot_kwargs = {
+        "data": df,
+        "x": xname,
+        "y": yname,
+        "hue": hue,
+        "ax": ax,
+    }
 
-    _finalize_plot(ax, callback, outparams)
+    if hue is not None and palette is not None:
+        scatterplot_kwargs["palette"] = palette
+    elif hue is None and palette is not None:
+        scatterplot_kwargs["color"] = sb.color_palette(palette)[0]
+
+    scatterplot_kwargs.update(params)
+
+    sb.scatterplot(**scatterplot_kwargs)
+    ax.grid(True, alpha=0.3)
+
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_regplot(
+def regplot(
     df: DataFrame,
     xname: str,
     yname: str,
     palette: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -460,30 +533,45 @@ def hs_regplot(
     outparams = False
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
-    sb.regplot(data=df, x=xname, y=yname, scatter_kws={"color": palette},
-                line_kws={
-                    "color": "red",
-                    "linestyle": "--",
-                    "linewidth": 2
-                }, ax=ax, **params)
-    ax.grid()
+    # regplot은 hue를 지원하지 않으므로 palette를 color로 변환
+    scatter_color = None
+    if palette is not None:
+        scatter_color = sb.color_palette(palette)[0]
 
-    _finalize_plot(ax, callback, outparams)
+    regplot_kwargs = {
+        "data": df,
+        "x": xname,
+        "y": yname,
+        "scatter_kws": {"color": scatter_color} if scatter_color else {},
+        "line_kws": {
+            "color": "red",
+            "linestyle": "--",
+            "linewidth": 2
+        },
+        "ax": ax,
+    }
+
+    regplot_kwargs.update(params)
+
+    sb.regplot(**regplot_kwargs)
+    ax.grid(True, alpha=0.3)
+
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_lmplot(
+def lmplot(
     df: DataFrame,
     xname: str,
     yname: str,
     hue=None,
     palette: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     **params,
 ) -> None:
     """seaborn lmplot으로 선형 모델 시각화를 수행한다.
@@ -502,24 +590,39 @@ def hs_lmplot(
     Returns:
         None
     """
-    g = sb.lmplot(data=df, x=xname, y=yname, hue=hue, palette=palette, **params)
+    # hue가 있을 때만 palette 사용, 없으면 scatter_kws에 color 설정
+    lmplot_kwargs = {
+        "data": df,
+        "x": xname,
+        "y": yname,
+        "hue": hue,
+    }
+
+    if hue is not None and palette is not None:
+        lmplot_kwargs["palette"] = palette
+    elif hue is None and palette is not None:
+        lmplot_kwargs["scatter_kws"] = {"color": sb.color_palette(palette)[0]}
+
+    lmplot_kwargs.update(params)
+
+    g = sb.lmplot(**lmplot_kwargs)
     g.fig.set_size_inches(width / dpi, height / dpi)
     g.fig.set_dpi(dpi)
-    g.ax.grid()
+    g.ax.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.show()
     plt.close()
 
 
 # -------------------------------------------------------------
-def hs_pairplot(
+def pairplot(
     df: DataFrame,
     diag_kind: str = "kde",
     hue=None,
     palette: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     **params,
 ) -> None:
     """모든 숫자형/지정 컬럼 쌍에 대한 관계를 그린다.
@@ -537,7 +640,20 @@ def hs_pairplot(
     Returns:
         None
     """
-    g = sb.pairplot(data=df, hue=hue, diag_kind=diag_kind, palette=palette, **params)
+    # hue가 있을 때만 palette 사용
+    pairplot_kwargs = {
+        "data": df,
+        "hue": hue,
+        "diag_kind": diag_kind,
+    }
+
+    if hue is not None and palette is not None:
+        pairplot_kwargs["palette"] = palette
+    # pairplot은 hue 없이 palette만 쓰는 경우가 드물어서 color로 변환 불필요
+
+    pairplot_kwargs.update(params)
+
+    g = sb.pairplot(**pairplot_kwargs)
     scale = len(df.columns)
     g.fig.set_size_inches(w=(width / dpi) * scale, h=(height / dpi) * scale)
     g.fig.set_dpi(dpi)
@@ -549,15 +665,15 @@ def hs_pairplot(
 
 
 # -------------------------------------------------------------
-def hs_countplot(
+def countplot(
     df: DataFrame,
     xname: str,
     hue=None,
     palette: str = None,
     order: int = 1,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -589,27 +705,42 @@ def hs_countplot(
             sort = sorted(list(df[xname].value_counts().index))
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
-    sb.countplot(
-        data=df, x=xname, hue=hue, palette=palette, order=sort, ax=ax, **params
-    )
-    ax.grid()
+    # hue가 있을 때만 palette 사용, 없으면 color 사용
+    countplot_kwargs = {
+        "data": df,
+        "x": xname,
+        "hue": hue,
+        "order": sort,
+        "ax": ax,
+    }
 
-    _finalize_plot(ax, callback, outparams)
+    if hue is not None and palette is not None:
+        countplot_kwargs["palette"] = palette
+    elif hue is None and palette is not None:
+        # palette의 첫 번째 색상을 color로 사용
+        countplot_kwargs["color"] = sb.color_palette(palette)[0]
+
+    countplot_kwargs.update(params)
+
+    sb.countplot(**countplot_kwargs)
+    ax.grid(True, alpha=0.3)
+
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_barplot(
+def barplot(
     df: DataFrame,
     xname: str,
     yname: str,
     hue=None,
     palette: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -635,25 +766,41 @@ def hs_barplot(
     outparams = False
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
-    sb.barplot(data=df, x=xname, y=yname, hue=hue, palette=palette, ax=ax, **params)
-    ax.grid()
+    # hue가 있을 때만 palette 사용, 없으면 color 사용
+    barplot_kwargs = {
+        "data": df,
+        "x": xname,
+        "y": yname,
+        "hue": hue,
+        "ax": ax,
+    }
 
-    _finalize_plot(ax, callback, outparams)
+    if hue is not None and palette is not None:
+        barplot_kwargs["palette"] = palette
+    elif hue is None and palette is not None:
+        barplot_kwargs["color"] = sb.color_palette(palette)[0]
+
+    barplot_kwargs.update(params)
+
+    sb.barplot(**barplot_kwargs)
+    ax.grid(True, alpha=0.3)
+
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_boxenplot(
+def boxenplot(
     df: DataFrame,
     xname: str,
     yname: str,
     hue=None,
     palette: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -679,7 +826,7 @@ def hs_boxenplot(
     outparams = False
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
     # palette은 hue가 있을 때만 사용
@@ -697,21 +844,21 @@ def hs_boxenplot(
     boxenplot_kwargs.update(params)
 
     sb.boxenplot(**boxenplot_kwargs)
-    ax.grid()
+    ax.grid(True, alpha=0.3)
 
-    _finalize_plot(ax, callback, outparams)
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_violinplot(
+def violinplot(
     df: DataFrame,
     xname: str,
     yname: str,
     hue=None,
     palette: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -737,7 +884,7 @@ def hs_violinplot(
     outparams = False
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
     # palette은 hue가 있을 때만 사용
@@ -755,21 +902,21 @@ def hs_violinplot(
     violinplot_kwargs.update(params)
 
     sb.violinplot(**violinplot_kwargs)
-    ax.grid()
+    ax.grid(True, alpha=0.3)
 
-    _finalize_plot(ax, callback, outparams)
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_pointplot(
+def pointplot(
     df: DataFrame,
     xname: str,
     yname: str,
     hue=None,
     palette: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -795,25 +942,41 @@ def hs_pointplot(
     outparams = False
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
-    sb.pointplot(data=df, x=xname, y=yname, hue=hue, palette=palette, ax=ax, **params)
-    ax.grid()
+    # hue가 있을 때만 palette 사용, 없으면 color 사용
+    pointplot_kwargs = {
+        "data": df,
+        "x": xname,
+        "y": yname,
+        "hue": hue,
+        "ax": ax,
+    }
 
-    _finalize_plot(ax, callback, outparams)
+    if hue is not None and palette is not None:
+        pointplot_kwargs["palette"] = palette
+    elif hue is None and palette is not None:
+        pointplot_kwargs["color"] = sb.color_palette(palette)[0]
+
+    pointplot_kwargs.update(params)
+
+    sb.pointplot(**pointplot_kwargs)
+    ax.grid(True, alpha=0.3)
+
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_jointplot(
+def jointplot(
     df: DataFrame,
     xname: str,
     yname: str,
     hue=None,
     palette: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     **params,
 ) -> None:
     """공동 분포(joint) 플롯을 그린다.
@@ -832,7 +995,21 @@ def hs_jointplot(
     Returns:
         None
     """
-    g = sb.jointplot(data=df, x=xname, y=yname, hue=hue, palette=palette, **params)
+    # hue가 있을 때만 palette 사용
+    jointplot_kwargs = {
+        "data": df,
+        "x": xname,
+        "y": yname,
+        "hue": hue,
+    }
+
+    if hue is not None and palette is not None:
+        jointplot_kwargs["palette"] = palette
+    # jointplot은 hue 없이 palette만 쓰는 경우가 드물어서 color로 변환 불필요
+
+    jointplot_kwargs.update(params)
+
+    g = sb.jointplot(**jointplot_kwargs)
     g.fig.set_size_inches(width / dpi, height / dpi)
     g.fig.set_dpi(dpi)
 
@@ -847,12 +1024,12 @@ def hs_jointplot(
 
 
 # -------------------------------------------------------------
-def hs_heatmap(
+def heatmap(
     data: DataFrame,
     palette: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -875,24 +1052,25 @@ def hs_heatmap(
     outparams = False
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
+    # heatmap은 hue를 지원하지 않으므로 cmap에 palette 사용
     sb.heatmap(data, annot=True, cmap=palette, fmt=".2f", ax=ax, **params)
 
-    _finalize_plot(ax, callback, outparams)
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_convex_hull(
+def convex_hull(
     data: DataFrame,
     xname: str,
     yname: str,
     hue: str,
     palette: str = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -918,7 +1096,7 @@ def hs_convex_hull(
     outparams = False
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
     # 군집별 값의 종류별로 반복 수행
@@ -943,20 +1121,21 @@ def hs_convex_hull(
         except:
             pass
 
+    # convex_hull은 hue가 필수이므로 palette를 그대로 사용
     sb.scatterplot(
         data=data, x=xname, y=yname, hue=hue, palette=palette, ax=ax, **params
     )
-    ax.grid()
-    _finalize_plot(ax, callback, outparams)
+    ax.grid(True, alpha=0.3)
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_kde_confidence_interval(
+def kde_confidence_interval(
     data: DataFrame,
     clevel=0.95,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
 ) -> None:
@@ -978,7 +1157,7 @@ def hs_kde_confidence_interval(
     y_min, y_max = None, None
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
     # 데이터 프레임의 컬럼이 여러 개인 경우 처리
@@ -1025,12 +1204,12 @@ def hs_kde_confidence_interval(
 
     if y_min is not None and y_max is not None:
         ax.set_ylim([y_min, y_max * 1.1])
-    ax.grid()
-    _finalize_plot(ax, callback, outparams)
+    ax.grid(True, alpha=0.3)
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_pvalue1_anotation(
+def pvalue1_anotation(
     data: DataFrame,
     target: str,
     hue: str,
@@ -1038,11 +1217,12 @@ def hs_pvalue1_anotation(
     test: str = "t-test_ind",
     text_format: str = "star",
     loc: str = "outside",
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
+    **params
 ) -> None:
     """statannotations를 이용해 상자그림에 p-value 주석을 추가한다.
 
@@ -1066,29 +1246,47 @@ def hs_pvalue1_anotation(
     outparams = False
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
-    sb.boxplot(data=data, x=hue, y=target, ax=ax)
+    # params에서 palette 추출 (있으면)
+    palette_value = params.pop("palette", None)
+
+    # boxplot kwargs 구성
+    boxplot_kwargs = {
+        "data": data,
+        "x": hue,
+        "y": target,
+        "ax": ax,
+    }
+
+    # palette가 있으면 추가 (hue는 x에 이미 할당됨)
+    if palette_value is not None:
+        boxplot_kwargs["palette"] = palette_value
+
+    boxplot_kwargs.update(params)
+
+    sb.boxplot(**boxplot_kwargs)
     annotator = Annotator(ax, data=data, x=hue, y=target, pairs=pairs)
     annotator.configure(test=test, text_format=text_format, loc=loc)
     annotator.apply_and_annotate()
 
     sb.despine()
 
-    _finalize_plot(ax, callback, outparams)
+    ax.grid(True, alpha=0.3)
+    finalize_plot(ax, callback, outparams)
 
 
 
 # -------------------------------------------------------------
-def hs_residplot(
+def residplot(
     y,
     y_pred,
     lowess: bool = False,
     mse: bool = False,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -1114,7 +1312,7 @@ def hs_residplot(
     resid = y - y_pred
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
     sb.residplot(
@@ -1177,16 +1375,16 @@ def hs_residplot(
                 y=-(i + 1) * mse_sq,
                 color=c,
             )
-    ax.grid()
-    _finalize_plot(ax, callback, outparams)
+    ax.grid(True, alpha=0.3)
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_qqplot(
+def qqplot(
     y_pred,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
     **params,
@@ -1208,7 +1406,7 @@ def hs_qqplot(
     outparams = False
 
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
     # probplot은 내부적으로 정규화를 수행하므로 zscore를 미리 적용하면 안됨
@@ -1217,12 +1415,12 @@ def hs_qqplot(
 
     sb.scatterplot(x=x, y=y, ax=ax, **params)
     sb.lineplot(x=[-k, k], y=[-k, k], color="red", linestyle="--", ax=ax)
-    ax.grid()
-    _finalize_plot(ax, callback, outparams)
+    ax.grid(True, alpha=0.3)
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_distribution_by_class(
+def distribution_by_class(
     data: DataFrame,
     xnames: list = None,
     hue: str = None,
@@ -1230,9 +1428,9 @@ def hs_distribution_by_class(
     bins: any = 5,
     palette: str = None,
     fill: bool = False,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
 ) -> None:
     """클래스별로 각 숫자형 특징의 분포를 KDE 또는 히스토그램으로 그린다.
@@ -1269,7 +1467,7 @@ def hs_distribution_by_class(
             continue
 
         if type == "kde":
-            hs_kdeplot(
+            kdeplot(
                 df=data,
                 xname=v,
                 hue=hue,
@@ -1281,7 +1479,7 @@ def hs_distribution_by_class(
                 callback=callback,
             )
         elif type == "hist":
-            hs_histplot(
+            histplot(
                 df=data,
                 xname=v,
                 hue=hue,
@@ -1294,7 +1492,7 @@ def hs_distribution_by_class(
                 callback=callback,
             )
         elif type == "histkde":
-            hs_histplot(
+            histplot(
                 df=data,
                 xname=v,
                 hue=hue,
@@ -1309,15 +1507,15 @@ def hs_distribution_by_class(
 
 
 # -------------------------------------------------------------
-def hs_scatter_by_class(
+def scatter_by_class(
     data: DataFrame,
     group: list = None,
     hue: str = None,
     palette: str = None,
     outline: bool = False,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
 ) -> None:
     """클래스별로 특징 쌍을 산점도 또는 볼록 껍질로 시각화한다.
@@ -1364,20 +1562,20 @@ def hs_scatter_by_class(
 
     if outline:
         for i, v in enumerate(group):
-            hs_convex_hull(data, v[0], v[1], hue, palette, width, height, dpi, callback)
+            convex_hull(data, v[0], v[1], hue, palette, width, height, dpi, callback)
     else:
         for i, v in enumerate(group):
-            hs_scatterplot(data, v[0], v[1], hue, palette, width, height, dpi, callback)
+            scatterplot(data, v[0], v[1], hue, palette, width, height, dpi, callback)
 
 
 # -------------------------------------------------------------
-def hs_roc_curve(
+def roc_curve(
     fit,
     y: np.ndarray | pd.Series = None,
     X: pd.DataFrame | np.ndarray = None,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
 ) -> None:
@@ -1402,7 +1600,7 @@ def hs_roc_curve(
     """
     outparams = False
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
     # 실제값(y_true) 결정
@@ -1434,16 +1632,16 @@ def hs_roc_curve(
     ax.legend(loc="lower right", fontsize=11)
     ax.grid(True, alpha=0.3)
 
-    _finalize_plot(ax, callback, outparams)
+    finalize_plot(ax, callback, outparams)
 
 
 # -------------------------------------------------------------
-def hs_confusion_matrix_plot(
+def confusion_matrix_plot(
     fit,
     threshold: float = 0.5,
-    width: int = 1280,
-    height: int = 720,
-    dpi: int = 200,
+    width: int = hs_fig_width,
+    height: int = hs_fig_height,
+    dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
 ) -> None:
@@ -1463,7 +1661,7 @@ def hs_confusion_matrix_plot(
     """
     outparams = False
     if ax is None:
-        fig, ax = __get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)
         outparams = True
 
     # 학습 데이터 기반 실제값/예측 확률 결정
@@ -1481,4 +1679,4 @@ def hs_confusion_matrix_plot(
 
     ax.set_title(f'혼동행렬 (임계값: {threshold})', fontsize=14, fontweight='bold')
 
-    _finalize_plot(ax, callback, outparams)
+    finalize_plot(ax, callback, outparams)

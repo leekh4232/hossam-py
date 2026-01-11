@@ -10,10 +10,12 @@ try:
 except Exception:
     __version__ = "develop"
 
-__all__ = ["load_data", "load_info"]
+hs_dpi = 200  # 이미지 선명도(100~300)
+hs_fig_width = 1280
+hs_fig_height = 640
+hs_font_size = 6
 
-my_dpi = 200  # 이미지 선명도(100~300)
-default_font_size = 6
+__all__ = ["load_data", "load_info", "hs_classroom", "hs_gis", "hs_plot", "hs_prep", "hs_stats", "hs_timeserise", "hs_util", "hs_dpi", "hs_fig_width", "hs_fig_height"]
 
 
 def _init_korean_font():
@@ -28,7 +30,7 @@ def _init_korean_font():
             fprop = fm.FontProperties(fname=str(font_path))
             fname = fprop.get_name()
             plt.rcParams["font.family"] = fname
-            plt.rcParams["font.size"] = default_font_size
+            plt.rcParams["font.size"] = hs_font_size
             plt.rcParams["axes.unicode_minus"] = False
             print(
                 "\n✅ 시각화를 위한 한글 글꼴(NotoSansKR-Regular)이 자동 적용되었습니다."
@@ -39,21 +41,6 @@ def _init_korean_font():
 
 
 def _init():
-    # Jupyter Notebook 환경에서 로고 이미지 표시
-    try:
-        # IPython 환경인지 확인
-        get_ipython()
-        # Jupyter Notebook 환경
-        from IPython.display import display, Image
-
-        try:
-            with as_file(files("hossam") / "leekh.png") as img_path:
-                display(Image(filename=str(img_path)))
-        except Exception:
-            pass  # 이미지 로드 실패 시 무시하고 메시지만 출력
-    except NameError:
-        # IPython이 아닌 환경 (일반 Python 스크립트)
-        pass
 
     # 안내 메시지 (블릿 리스트)
     messages = [

@@ -77,10 +77,10 @@ nav:
   - Overview: index.md
   - API Reference:
       - Package: api/hossam.md
-      - analysis: api/analysis.md
-      - classroom: api/classroom.md
       - data_loader: api/data_loader.md
-      - gis: api/gis.md
-      - plot: api/plot.md
-      - prep: api/prep.md
-      - util: api/util.md
+      - hs_classroom: api/hs_classroom.md
+      - hs_gis: api/hs_gis.md
+      - hs_plot: api/hs_plot.md
+      - hs_prep: api/hs_prep.md
+      - hs_stats: api/hs_stats.md
+      - hs_util: api/hs_util.md

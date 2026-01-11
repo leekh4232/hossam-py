@@ -9,10 +9,10 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.impute import SimpleImputer
 
 # -------------------------------------------------------------
-from .util import hs_pretty_table
+from .hs_util import pretty_table
 
 # -------------------------------------------------------------
-def hs_standard_scaler(
+def standard_scaler(
     data: any, yname: str | None = None, save_path: str | None = None, load_path: str | None = None
 ) -> DataFrame:
     """연속형 변수에 대해 Standard Scaling을 수행한다.
@@ -31,7 +31,7 @@ def hs_standard_scaler(
         DataFrame | ndarray: 스케일링된 데이터(입력 타입과 동일).
 
     Examples:
-        >>> from hossam.prep import hs_standard_scaler
+        >>> from hossam.prep import standard_scaler
         >>> std_df = hs_standard_scaler(df, yname="y", save_path="std.pkl")
     """
 
@@ -79,7 +79,7 @@ def hs_standard_scaler(
 
 
 # -------------------------------------------------------------
-def hs_minmax_scaler(
+def minmax_scaler(
     data: any, yname: str | None = None, save_path: str | None = None, load_path: str | None = None
 ) -> DataFrame:
     """연속형 변수에 대해 MinMax Scaling을 수행한다.
@@ -97,7 +97,7 @@ def hs_minmax_scaler(
         DataFrame | ndarray: 스케일링된 데이터(입력 타입과 동일).
 
     Examples:
-        >>> from hossam.prep import hs_minmax_scaler
+        >>> from hossam.prep import minmax_scaler
         >>> mm_df = hs_minmax_scaler(df, yname="y")
     """
 
@@ -144,7 +144,7 @@ def hs_minmax_scaler(
 
 
 # -------------------------------------------------------------
-def hs_set_category(data: DataFrame, *args: str) -> DataFrame:
+def set_category(data: DataFrame, *args: str) -> DataFrame:
     """카테고리 데이터를 설정한다.
 
     Args:
@@ -163,7 +163,7 @@ def hs_set_category(data: DataFrame, *args: str) -> DataFrame:
 
 
 # -------------------------------------------------------------
-def hs_unmelt(
+def unmelt(
     data: DataFrame, id_vars: str = "class", value_vars: str = "values"
 ) -> DataFrame:
     """두 개의 컬럼으로 구성된 데이터프레임에서 하나는 명목형, 나머지는 연속형일 경우
@@ -187,7 +187,7 @@ def hs_unmelt(
 
 
 # -------------------------------------------------------------
-def hs_replace_missing_value(data: DataFrame, strategy: str = "mean") -> DataFrame:
+def replace_missing_value(data: DataFrame, strategy: str = "mean") -> DataFrame:
     """SimpleImputer로 결측치를 대체한다.
 
     Args:
@@ -198,7 +198,7 @@ def hs_replace_missing_value(data: DataFrame, strategy: str = "mean") -> DataFra
         DataFrame: 결측치가 대체된 데이터프레임
 
     Examples:
-        >>> from hossam.prep import hs_replace_missing_value
+        >>> from hossam.prep import replace_missing_value
         >>> out = hs_replace_missing_value(df.select_dtypes(include="number"), strategy="median")
     """
 
@@ -212,7 +212,7 @@ def hs_replace_missing_value(data: DataFrame, strategy: str = "mean") -> DataFra
 
 
 # -------------------------------------------------------------
-def hs_outlier_table(data: DataFrame, *fields: str) -> DataFrame:
+def outlier_table(data: DataFrame, *fields: str) -> DataFrame:
     """수치형 컬럼에 대한 사분위수 및 IQR 기반 이상치 경계를 계산한다.
 
     전달된 `fields`가 없으면 데이터프레임의 모든 수치형 컬럼을 대상으로 한다.
@@ -226,8 +226,8 @@ def hs_outlier_table(data: DataFrame, *fields: str) -> DataFrame:
         DataFrame: Q1, Q2(중앙값), Q3, IQR, 하한, 상한을 포함한 통계표.
 
     Examples:
-        >>> from hossam.prep import hs_outlier_table
-        >>> hs_outlier_table(df, "value")
+        >>> from hossam.prep import outlier_table
+        >>> outlier_table(df, "value")
     """
 
     target_fields = list(fields) if fields else list(data.select_dtypes(include=[np.number]).columns)
@@ -264,7 +264,7 @@ def hs_outlier_table(data: DataFrame, *fields: str) -> DataFrame:
 
 
 # -------------------------------------------------------------
-def hs_replace_outliner(data: DataFrame, method: str = "nan", *fields: str) -> DataFrame:
+def replace_outliner(data: DataFrame, method: str = "nan", *fields: str) -> DataFrame:
     """이상치 경계값을 넘어가는 데이터를 경계값으로 대체한다.
 
     Args:
@@ -294,7 +294,7 @@ def hs_replace_outliner(data: DataFrame, method: str = "nan", *fields: str) -> D
     df = df.drop(category_fields, axis=1)
 
     # 이상치 경계값을 구한다.
-    outliner_table = hs_outlier_table(df, *fields)
+    outliner_table = outlier_table(df, *fields)
 
     if outliner_table.empty:
         return data.copy()
@@ -324,7 +324,7 @@ def hs_replace_outliner(data: DataFrame, method: str = "nan", *fields: str) -> D
     return df
 
 # -------------------------------------------------------------
-def hs_drop_outliner(data: DataFrame, *fields: str) -> DataFrame:
+def drop_outliner(data: DataFrame, *fields: str) -> DataFrame:
     """이상치를 결측치로 변환한 후 모두 삭제한다.
 
     Args:
@@ -335,12 +335,12 @@ def hs_drop_outliner(data: DataFrame, *fields: str) -> DataFrame:
         DataFrame: 이상치가 삭제된 데이터프레임
     """
 
-    df = hs_replace_outliner(data, "nan", *fields)
+    df = replace_outliner(data, "nan", *fields)
     return df.dropna()
 
 
 # -------------------------------------------------------------
-def hs_dummies(data: DataFrame, drop_first=True, dtype="int", *args: str) -> DataFrame:
+def dummies(data: DataFrame, drop_first=True, dtype="int", *args: str) -> DataFrame:
     """명목형 변수를 더미 변수로 변환한다.
 
     Args:
@@ -363,7 +363,7 @@ def hs_dummies(data: DataFrame, drop_first=True, dtype="int", *args: str) -> Dat
 
 
 # -------------------------------------------------------------
-def hs_labelling(data: DataFrame, *fields: str) -> DataFrame:
+def labelling(data: DataFrame, *fields: str) -> DataFrame:
     """명목형 변수를 라벨링한다.
 
     Args:
@@ -389,6 +389,6 @@ def hs_labelling(data: DataFrame, *fields: str) -> DataFrame:
 
         label_df = DataFrame({"label": v}, index=i)
         label_df.index.name = f
-        hs_pretty_table(label_df)
+        pretty_table(label_df)
 
     return df

@@ -10,11 +10,11 @@ title: Module Architecture
 flowchart LR
     subgraph HOSSAM
       DL[data_loader]
-      PR[prep]
-      UT[util]
-      AN[analysis]
-      PL[plot]
-      GI[gis]
+      PR[hs_prep]
+      UT[hs_util]
+      AN[hs_stats]
+      PL[hs_plot]
+      GI[hs_gis]
     end
 
     UT --> DL
@@ -28,9 +28,9 @@ flowchart LR
 ```
 
 설명:
-- `util` ↔ `data_loader`: 상호 참조 관계 (표 출력/데이터 로딩)
-- `util` → `prep`: 카테고리 설정 유틸 사용
-- `gis`, `prep` → `util`: 테이블 출력 유틸 사용
-- `analysis`, `plot`: 주로 외부 라이브러리 의존, 공용 유틸과 느슨한 결합
+- `hs_util` ↔ `data_loader`: 상호 참조 관계 (표 출력/데이터 로딩)
+- `hs_util` → `hs_prep`: 카테고리 설정 유틸 사용
+- `hs_gis`, `hs_prep` → `hs_util`: 테이블 출력 유틸 사용
+- `hs_stats`, `hs_plot`: 주로 외부 라이브러리 의존, 공용 유틸과 느슨한 결합
 
 > 참고: 상호 의존(양방향)은 초기화/실행 타이밍에 주의가 필요합니다.

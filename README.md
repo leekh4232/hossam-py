@@ -83,7 +83,7 @@ print(df.head())
 ### 간단한 시각화
 
 ```python
-from hossam import plot as hs_plot
+from hossam import hs_plot
 import pandas as pd
 import numpy as np
 
@@ -95,13 +95,13 @@ df = pd.DataFrame({
 })
 
 # 산점도 그리기
-hs_plot.hs_scatterplot(df=df, xname='x', yname='y', hue='category', palette='Set1')
+hs_plot.scatterplot(df=df, xname='x', yname='y', hue='category', palette='Set1')
 
 # 박스플롯 그리기
-hs_plot.hs_boxplot(df=df, xname='category', yname='x', palette='pastel')
+hs_plot.boxplot(df=df, xname='category', yname='x', palette='pastel')
 
 # KDE 플롯 그리기
-hs_plot.hs_kdeplot(df=df, xname='x', hue='category', fill=True, fill_alpha=0.3)
+hs_plot.kdeplot(df=df, xname='x', hue='category', fill=True, fill_alpha=0.3)
 ```
 
 ---
@@ -131,15 +131,15 @@ df = load_data('DATASET_NAME')
 
 ---
 
-### 2. 시각화 모듈 (`hossam.plot`)
+### 2. 시각화 모듈 (`hossam.hs_plot`)
 
 #### 기본 플롯
 
 ##### 선 그래프 (Line Plot)
 ```python
-from hossam import plot as hs_plot
+from hossam import hs_plot
 
-hs_plot.hs_lineplot(
+hs_plot.lineplot(
     df=df,
     xname='time',
     yname='value',
@@ -151,7 +151,7 @@ hs_plot.hs_lineplot(
 
 ##### 산점도 (Scatter Plot)
 ```python
-hs_plot.hs_scatterplot(
+hs_plot.scatterplot(
     df=df,
     xname='x',
     yname='y',
@@ -162,7 +162,7 @@ hs_plot.hs_scatterplot(
 
 ##### 히스토그램 (Histogram)
 ```python
-hs_plot.hs_histplot(
+hs_plot.histplot(
     df=df,
     xname='value',
     hue='category',
@@ -176,7 +176,7 @@ hs_plot.hs_histplot(
 
 ##### 박스플롯 (Box Plot)
 ```python
-hs_plot.hs_boxplot(
+hs_plot.boxplot(
     df=df,
     xname='category',
     yname='value',
@@ -187,7 +187,7 @@ hs_plot.hs_boxplot(
 
 ##### 바이올린 플롯 (Violin Plot)
 ```python
-hs_plot.hs_violinplot(
+hs_plot.violinplot(
     df=df,
     xname='category',
     yname='value',
@@ -198,7 +198,7 @@ hs_plot.hs_violinplot(
 ##### KDE 플롯 (Kernel Density Estimation)
 ```python
 # 1차원 KDE
-hs_plot.hs_kdeplot(
+hs_plot.kdeplot(
     df=df,
     xname='value',
     hue='category',
@@ -208,7 +208,7 @@ hs_plot.hs_kdeplot(
 )
 
 # 2차원 KDE
-hs_plot.hs_kdeplot(
+hs_plot.kdeplot(
     df=df,
     xname='x',
     yname='y',
@@ -220,7 +220,7 @@ hs_plot.hs_kdeplot(
 
 ##### 회귀선이 포함된 산점도 (Regression Plot)
 ```python
-hs_plot.hs_regplot(
+hs_plot.regplot(
     df=df,
     xname='x',
     yname='y',
@@ -230,7 +230,7 @@ hs_plot.hs_regplot(
 
 ##### 선형 모델 플롯 (LM Plot)
 ```python
-hs_plot.hs_lmplot(
+hs_plot.lmplot(
     df=df,
     xname='x',
     yname='y',
@@ -248,7 +248,7 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 
 # 잔차 플롯
-hs_plot.hs_residplot(
+hs_plot.residplot(
     y=y_test,
     y_pred=y_pred,
     lowess=True,  # LOWESS 평활화
@@ -259,12 +259,12 @@ hs_plot.hs_residplot(
 ##### Q-Q 플롯 (Quantile-Quantile Plot)
 ```python
 residuals = y_test - y_pred
-hs_plot.hs_qqplot(y_pred=residuals)
+hs_plot.qqplot(y_pred=residuals)
 ```
 
 ##### 혼동 행렬 (Confusion Matrix)
 ```python
-hs_plot.hs_confusion_matrix(
+hs_plot.confusion_matrix(
     y=y_test,
     y_pred=y_pred,
     cmap='Blues'
@@ -275,7 +275,7 @@ hs_plot.hs_confusion_matrix(
 
 ##### 쌍 관계 플롯 (Pair Plot)
 ```python
-hs_plot.hs_pairplot(
+hs_plot.pairplot(
     df=df,
     diag_kind='kde',
     hue='category',
@@ -285,7 +285,7 @@ hs_plot.hs_pairplot(
 
 ##### 공동 분포 플롯 (Joint Plot)
 ```python
-hs_plot.hs_jointplot(
+hs_plot.jointplot(
     df=df,
     xname='x',
     yname='y',
@@ -297,7 +297,7 @@ hs_plot.hs_jointplot(
 ```python
 # 상관계수 행렬
 corr_matrix = df.corr()
-hs_plot.hs_heatmap(
+hs_plot.heatmap(
     data=corr_matrix,
     palette='coolwarm'
 )
@@ -307,7 +307,7 @@ hs_plot.hs_heatmap(
 
 ##### 볼록 껍질 산점도 (Convex Hull)
 ```python
-hs_plot.hs_convex_hull(
+hs_plot.convex_hull(
     data=df,
     xname='x',
     yname='y',
@@ -318,7 +318,7 @@ hs_plot.hs_convex_hull(
 
 ##### 100% 누적 막대 그래프 (Stacked Bar)
 ```python
-hs_plot.hs_stackplot(
+hs_plot.stackplot(
     df=df,
     xname='category',
     hue='subcategory',
@@ -328,7 +328,7 @@ hs_plot.hs_stackplot(
 
 ##### P-Value 주석 박스플롯
 ```python
-hs_plot.hs_pvalue1_anotation(
+hs_plot.pvalue1_anotation(
     data=df,
     target='value',
     hue='group',
@@ -340,7 +340,7 @@ hs_plot.hs_pvalue1_anotation(
 
 ##### 클래스별 분포 (Distribution by Class)
 ```python
-hs_plot.hs_distribution_by_class(
+hs_plot.distribution_by_class(
     data=df,
     xnames=['feature1', 'feature2'],
     hue='target',
@@ -352,7 +352,7 @@ hs_plot.hs_distribution_by_class(
 
 ##### 클래스별 산점도 (Scatter by Class)
 ```python
-hs_plot.hs_scatter_by_class(
+hs_plot.scatter_by_class(
     data=df,
     group=[['x', 'y'], ['x', 'z']],
     hue='target',
@@ -376,7 +376,7 @@ hs_plot.hs_scatter_by_class(
 
 ```python
 # 고해상도 큰 차트
-hs_plot.hs_scatterplot(
+hs_plot.scatterplot(
     df=df,
     xname='x',
     yname='y',
@@ -393,10 +393,10 @@ import matplotlib.pyplot as plt
 
 fig, axes = plt.subplots(2, 2, figsize=(12, 10))
 
-hs_plot.hs_boxplot(df=df, xname='cat', yname='val', ax=axes[0, 0])
-hs_plot.hs_violinplot(df=df, xname='cat', yname='val', ax=axes[0, 1])
-hs_plot.hs_histplot(df=df, xname='val', ax=axes[1, 0])
-hs_plot.hs_kdeplot(df=df, xname='val', ax=axes[1, 1])
+hs_plot.boxplot(df=df, xname='cat', yname='val', ax=axes[0, 0])
+hs_plot.violinplot(df=df, xname='cat', yname='val', ax=axes[0, 1])
+hs_plot.histplot(df=df, xname='val', ax=axes[1, 0])
+hs_plot.kdeplot(df=df, xname='val', ax=axes[1, 1])
 
 plt.tight_layout()
 plt.show()
@@ -411,7 +411,7 @@ def custom_style(ax):
     ax.set_ylabel('Y축 레이블', fontsize=12)
     ax.grid(True, alpha=0.3, linestyle='--')
 
-hs_plot.hs_scatterplot(
+hs_plot.scatterplot(
     df=df,
     xname='x',
     yname='y',
@@ -421,7 +421,7 @@ hs_plot.hs_scatterplot(
 
 ---
 
-### 3. 분석 모듈 (`hossam.analysis`)
+### 3. 분석 모듈 (`hossam.hs_stats`)
 
 데이터 분석을 위한 통계 기능들을 제공합니다.
 
@@ -437,7 +437,7 @@ from hossam import analysis as hs_analysis
 
 ---
 
-### 4. 전처리 모듈 (`hossam.prep`)
+### 4. 전처리 모듈 (`hossam.hs_prep`)
 
 데이터 전처리 및 정제를 위한 유틸리티입니다.
 
@@ -452,7 +452,7 @@ from hossam import prep as hs_prep
 
 ---
 
-### 5. 유틸리티 모듈 (`hossam.util`)
+### 5. 유틸리티 모듈 (`hossam.hs_util`)
 
 기타 편의 기능들을 제공합니다.
 
@@ -513,27 +513,27 @@ Hossam은 다음 라이브러리들을 사용합니다:
 from hossam import load_data, plot as hs_plot
 
 df = load_data('SAMPLE_DATA')
-hs_plot.hs_pairplot(df=df, hue='target', palette='Set1')
+hs_plot.pairplot(df=df, hue='target', palette='Set1')
 ```
 
 ### 데이터 탐색
 
 ```python
 # 빠른 EDA (탐색적 데이터 분석)
-from hossam import plot as hs_plot
+from hossam import hs_plot
 
 # 분포 확인
-hs_plot.hs_distribution_by_class(
+hs_plot.distribution_by_class(
     data=df,
     hue='target',
     type='histkde'
 )
 
 # 상관관계 확인
-hs_plot.hs_heatmap(data=df.corr(), palette='coolwarm')
+hs_plot.heatmap(data=df.corr(), palette='coolwarm')
 
 # 특징 관계 확인
-hs_plot.hs_scatter_by_class(
+hs_plot.scatter_by_class(
     data=df,
     hue='target',
     outline=True
@@ -544,7 +544,7 @@ hs_plot.hs_scatter_by_class(
 
 ```python
 from sklearn.linear_model import LinearRegression
-from hossam import plot as hs_plot
+from hossam import hs_plot
 
 # 모델 학습
 model = LinearRegression()
@@ -552,10 +552,10 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 
 # 잔차 분석
-hs_plot.hs_residplot(y=y_test, y_pred=y_pred, lowess=True, mse=True)
+hs_plot.residplot(y=y_test, y_pred=y_pred, lowess=True, mse=True)
 
 # 정규성 검증
-hs_plot.hs_qqplot(y_pred=y_test - y_pred)
+hs_plot.qqplot(y_pred=y_test - y_pred)
 ```
 
 ---

@@ -12,8 +12,8 @@ from pandas import DataFrame, qcut, concat, to_numeric
 from kmodes.kmodes import KModes
 from matplotlib import pyplot as plt
 import seaborn as sns
-from hossam import my_dpi
-from hossam.util import hs_load_data, hs_pretty_table
+from hossam import hs_dpi
+from hossam.hs_util import load_data, pretty_table
 
 
 def cluster_students(
@@ -63,7 +63,7 @@ def cluster_students(
 
     # 파일 경로인 경우 데이터프레임으로 로드
     if isinstance(df, str):
-        df = hs_load_data(df, info=False)
+        df = load_data(df, info=False)
 
     # 입력 검증
     if df is None or len(df) == 0:
@@ -735,7 +735,7 @@ def analyze_classroom(
     # 2. 조별 요약
     summary = group_summary(df_result, name_col=name_col)
     print("\n✓ 조별 요약:")
-    hs_pretty_table(summary, tablefmt="pretty")
+    pretty_table(summary, tablefmt="pretty")
     print()
 
     # 3. 요약 시각화

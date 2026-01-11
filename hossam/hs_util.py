@@ -7,10 +7,10 @@ from pandas import DataFrame, DatetimeIndex, read_csv, read_excel
 from scipy.stats import normaltest
 from tabulate import tabulate
 
-from .data_loader import load_data
+from .data_loader import load_data as _load_data_remote
 
 # -------------------------------------------------------------
-def hs_make_normalize_values(
+def make_normalize_values(
     mean: float, std: float, size: int = 100, round: int = 2
 ) -> np.ndarray:
     """정규분포를 따르는 데이터를 생성한다.
@@ -25,8 +25,8 @@ def hs_make_normalize_values(
         np.ndarray: 정규분포를 따르는 데이터
 
     Examples:
-        >>> from hossam.util import hs_make_normalize_values
-        >>> x = hs_make_normalize_values(mean=0.0, std=1.0, size=100)
+        >>> from hossam.util import make_normalize_values
+        >>> x = make_normalize_values(mean=0.0, std=1.0, size=100)
         >>> x.shape
         (100,)
     """
@@ -43,7 +43,7 @@ def hs_make_normalize_values(
 
 
 # -------------------------------------------------------------
-def hs_make_normalize_data(
+def make_normalize_data(
     means: list | None = None,
     stds: list | None = None,
     sizes: list | None = None,
@@ -69,7 +69,7 @@ def hs_make_normalize_data(
 
     data = {}
     for i in range(len(means)):
-        data[f"X{i+1}"] = hs_make_normalize_values(
+        data[f"X{i+1}"] = make_normalize_values(
             means[i], stds[i], sizes[i], rounds
         )
 
@@ -77,7 +77,7 @@ def hs_make_normalize_data(
 
 
 # -------------------------------------------------------------
-def hs_pretty_table(data: DataFrame, tablefmt="simple", headers: str = "keys") -> None:
+def pretty_table(data: DataFrame, tablefmt="simple", headers: str = "keys") -> None:
     """`tabulate`를 사용해 DataFrame을 단순 표 형태로 출력한다.
 
     Args:
@@ -89,9 +89,9 @@ def hs_pretty_table(data: DataFrame, tablefmt="simple", headers: str = "keys") -
         None
 
     Examples:
-        >>> from hossam.util import hs_pretty_table
+        >>> from hossam.util import pretty_table
         >>> from pandas import DataFrame
-        >>> hs_pretty_table(DataFrame({"a":[1,2],"b":[3,4]}))
+        >>> pretty_table(DataFrame({"a":[1,2],"b":[3,4]}))
     """
 
     tabulate.WIDE_CHARS_MODE = False
@@ -132,23 +132,23 @@ def __data_info(
         data.index = DatetimeIndex(data.index)
 
     if categories:
-        from .prep import hs_set_category  # type: ignore
-        data = hs_set_category(data, *categories)
+        from .hs_prep import hs_set_category  # type: ignore
+        data = set_category(data, *categories)
 
     if info:
         print("\n✅ 테이블 정보")
-        hs_pretty_table(data.info(), tablefmt="pretty")
+        pretty_table(data.info(), tablefmt="pretty")
 
         print("\n✅ 상위 5개 행")
-        hs_pretty_table(data.head(), tablefmt="pretty")
+        pretty_table(data.head(), tablefmt="pretty")
 
         print("\n✅ 하위 5개 행")
-        hs_pretty_table(data.tail(), tablefmt="pretty")
+        pretty_table(data.tail(), tablefmt="pretty")
 
         print("\n📊 기술통계")
         desc = data.describe().T
         desc["nan"] = data.isnull().sum()
-        hs_pretty_table(desc, tablefmt="pretty")
+        pretty_table(desc, tablefmt="pretty")
 
         # 전달된 필드 이름 리스트가 있다면 반복
         if categories:
@@ -156,13 +156,13 @@ def __data_info(
             for c in categories:
                 d = DataFrame({"count": data[c].value_counts()})
                 d.index.name = c
-                hs_pretty_table(d, tablefmt="pretty")
+                pretty_table(d, tablefmt="pretty")
 
     return data
 
 
 # -------------------------------------------------------------
-def hs_load_data(key: str,
+def load_data(key: str,
                 index_col: str = None,
                 timeindex: bool = False,
                 info: bool = True,
@@ -182,8 +182,8 @@ def hs_load_data(key: str,
         DataFrame: 전처리(인덱스 설정, 카테고리 변환)가 완료된 데이터프레임
 
     Examples:
-        >>> from hossam.util import hs_load_data
-        >>> df = hs_load_data("AD_SALES", index_col=None, timeindex=False, info=False)
+        >>> from hossam.util import load_data
+        >>> df = load_data("AD_SALES", index_col=None, timeindex=False, info=False)
         >>> isinstance(df.columns, object)
         True
     """
@@ -195,6 +195,6 @@ def hs_load_data(key: str,
     elif k.endswith(".csv"):
         origin = read_csv(key)
     else:
-        origin = load_data(key, local)
+        origin = _load_data_remote(key, local)
 
     return __data_info(origin, index_col, timeindex, info, categories)

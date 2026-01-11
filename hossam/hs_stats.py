@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
+
 # -------------------------------------------------------------
 import numpy as np
 from typing import Tuple
@@ -22,7 +24,9 @@ from scipy.stats import (
     ttest_1samp,
     ttest_ind,
     ttest_rel,
-    wilcoxon
+    wilcoxon,
+    spearmanr,
+    pearsonr
 )
 
 import statsmodels.api as sm
@@ -30,7 +34,95 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 # -------------------------------------------------------------
 
-def hs_normal_test(data: DataFrame, columns: list | str | None = None, method: str = "n") -> DataFrame:
+def outlier_table(data: DataFrame, *fields: str):
+    """데이터프레임의 사분위수와 이상치 경계값, 왜도를 구한다.
+
+    Tukey의 방법을 사용하여 각 숫자형 컬럼에 대한 사분위수(Q1, Q2, Q3)와
+    이상치 판단을 위한 하한(DOWN)과 상한(UP) 경계값을 계산한다.
+    함수 호출 전 상자그림을 통해 이상치가 확인된 필드에 대해서만 처리하는 것이 좋다.
+
+    Args:
+        data (DataFrame): 분석 대상 데이터프레임.
+        *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 숫자형 컬럼을 처리.
+
+    Returns:
+        DataFrame: 각 필드별 사분위수 및 이상치 경계값을 포함한 데이터프레임.
+            인덱스는 FIELD(컬럼명)이며, 다음 컬럼을 포함:
+
+            - q1 (float): 제1사분위수 (25th percentile)
+            - q2 (float): 제2사분위수 (중앙값, 50th percentile)
+            - q3 (float): 제3사분위수 (75th percentile)
+            - iqr (float): 사분위 범위 (q3 - q1)
+            - up (float): 이상치 상한 경계값 (q3 + 1.5 * iqr)
+            - down (float): 이상치 하한 경계값 (q1 - 1.5 * iqr)
+            - skew (float): 왜도
+
+    Examples:
+        전체 숫자형 컬럼에 대한 이상치 경계 확인:
+
+        >>> from hossam import outlier_table
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({'x': [1, 2, 3, 100], 'y': [10, 20, 30, 40]})
+        >>> result = outlier_table(df)
+        >>> print(result)
+
+        특정 컬럼만 분석:
+
+        >>> result = outlier_table(df, 'x', 'y')
+        >>> print(result[['Q1', 'Q3', 'UP', 'DOWN']])
+
+    Notes:
+        - DOWN 미만이거나 UP 초과인 값은 이상치(outlier)로 간주됩니다.
+        - 숫자형이 아닌 컬럼은 자동으로 제외됩니다.
+        - Tukey의 1.5 * IQR 규칙을 사용합니다 (상자그림의 표준 방법).
+    """
+    if not fields:
+        fields = data.columns
+
+    result = []
+    for f in fields:
+        # 숫자 타입이 아니라면 건너뜀
+        if data[f].dtypes not in [
+            "int",
+            "int32",
+            "int64",
+            "float",
+            "float32",
+            "float64",
+        ]:
+            continue
+
+        # 사분위수
+        q1 = data[f].quantile(q=0.25)
+        q2 = data[f].quantile(q=0.5)
+        q3 = data[f].quantile(q=0.75)
+
+        # 이상치 경계 (Tukey's fences)
+        iqr = q3 - q1
+        down = q1 - 1.5 * iqr
+        up = q3 + 1.5 * iqr
+
+        # 왜도
+        skew = data[f].skew()
+
+        iq = {
+            "field": f,
+            "q1": q1,
+            "q2": q2,
+            "q3": q3,
+            "iqr": iqr,
+            "up": up,
+            "down": down,
+            "skew": skew
+        }
+
+        result.append(iq)
+
+    return DataFrame(result).set_index("field")
+
+# -------------------------------------------------------------
+
+def normal_test(data: DataFrame, columns: list | str | None = None, method: str = "n") -> DataFrame:
     """지정된 컬럼(또는 모든 수치형 컬럼)에 대해 정규성 검정을 수행하고 결과를 DataFrame으로 반환한다.
 
     정규성 검정의 귀무가설은 "데이터가 정규분포를 따른다"이므로, p-value > 0.05일 때
@@ -60,7 +152,7 @@ def hs_normal_test(data: DataFrame, columns: list | str | None = None, method: s
         ValueError: 메서드가 "n" 또는 "s"가 아닐 경우.
 
     Examples:
-        >>> from hossam.analysis import hs_normal_test
+        >>> from hossam.analysis import normal_test
         >>> import pandas as pd
         >>> import numpy as np
         >>> df = pd.DataFrame({
@@ -68,11 +160,11 @@ def hs_normal_test(data: DataFrame, columns: list | str | None = None, method: s
         ...     'y': np.random.exponential(2, 100)
         ... })
         >>> # 모든 수치형 컬럼 검정
-        >>> result = hs_normal_test(df, method='n')
+        >>> result = normal_test(df, method='n')
         >>> # 특정 컬럼만 검정 (리스트)
-        >>> result = hs_normal_test(df, columns=['x'], method='n')
+        >>> result = normal_test(df, columns=['x'], method='n')
         >>> # 특정 컬럼만 검정 (문자열)
-        >>> result = hs_normal_test(df, columns='x, y', method='n')
+        >>> result = normal_test(df, columns='x, y', method='n')
     """
     if method not in ["n", "s"]:
         raise ValueError(f"method는 'n' 또는 's'여야 합니다. 입력값: {method}")
@@ -137,7 +229,7 @@ def hs_normal_test(data: DataFrame, columns: list | str | None = None, method: s
 
 # -------------------------------------------------------------
 
-def hs_equal_var_test(data: DataFrame, columns: list | str | None = None, normal_dist: bool | None = None) -> DataFrame:
+def equal_var_test(data: DataFrame, columns: list | str | None = None, normal_dist: bool | None = None) -> DataFrame:
     """수치형 컬럼들의 분산이 같은지 검정하고 결과를 DataFrame으로 반환한다.
 
     등분산성 검정의 귀무가설은 "모든 그룹의 분산이 같다"이므로, p-value > 0.05일 때
@@ -153,7 +245,7 @@ def hs_equal_var_test(data: DataFrame, columns: list | str | None = None, normal
         normal_dist (bool | None, optional): 등분산성 검정 방법.
             - True: Bartlett 검정 (데이터가 정규분포를 따를 때, 모든 표본이 같은 크기일 때 권장)
             - False: Levene 검정 (정규분포를 따르지 않을 때 더 강건함)
-            - None: hs_normal_test()를 이용하여 자동으로 정규성을 판별 후 적절한 검정 방법 선택.
+            - None: normal_test()를 이용하여 자동으로 정규성을 판별 후 적절한 검정 방법 선택.
               모든 컬럼이 정규분포를 따르면 Bartlett, 하나라도 따르지 않으면 Levene 사용.
             기본값은 None.
 
@@ -171,7 +263,7 @@ def hs_equal_var_test(data: DataFrame, columns: list | str | None = None, normal
         ValueError: 수치형 컬럼이 2개 미만일 경우 (검정에 최소 2개 필요).
 
     Examples:
-        >>> from hossam.analysis import hs_equal_var_test
+        >>> from hossam.analysis import equal_var_test
         >>> import pandas as pd
         >>> import numpy as np
         >>> df = pd.DataFrame({
@@ -180,13 +272,13 @@ def hs_equal_var_test(data: DataFrame, columns: list | str | None = None, normal
         ...     'z': np.random.normal(0, 2, 100)
         ... })
         >>> # 모든 수치형 컬럼 자동 판별
-        >>> result = hs_equal_var_test(df)
+        >>> result = equal_var_test(df)
         >>> # 특정 컬럼만 검정 (리스트)
-        >>> result = hs_equal_var_test(df, columns=['x', 'y'])
+        >>> result = equal_var_test(df, columns=['x', 'y'])
         >>> # 특정 컬럼만 검정 (문자열)
-        >>> result = hs_equal_var_test(df, columns='x, y')
+        >>> result = equal_var_test(df, columns='x, y')
         >>> # 명시적 지정
-        >>> result = hs_equal_var_test(df, normal_dist=True)
+        >>> result = equal_var_test(df, normal_dist=True)
     """
     # columns가 문자열인 경우 리스트로 변환
     if isinstance(columns, str):
@@ -218,7 +310,7 @@ def hs_equal_var_test(data: DataFrame, columns: list | str | None = None, normal
     normality_checked = False
     if normal_dist is None:
         normality_checked = True
-        normality_result = hs_normal_test(data[numeric_cols], method="n")
+        normality_result = normal_test(data[numeric_cols], method="n")
         # 모든 컬럼이 정규분포를 따르는지 확인
         all_normal = normality_result["is_normal"].all()
         normal_dist = all_normal
@@ -260,7 +352,7 @@ def hs_equal_var_test(data: DataFrame, columns: list | str | None = None, normal
 
 # -------------------------------------------------------------
 
-def hs_ttest_1samp(data: DataFrame, columns: list | str | None = None, mean_value: float = 0.0) -> DataFrame:
+def ttest_1samp(data: DataFrame, columns: list | str | None = None, mean_value: float = 0.0) -> DataFrame:
     """지정된 컬럼(또는 모든 수치형 컬럼)에 대해 일표본 t-검정을 수행하고 결과를 반환한다.
 
     일표본 t-검정은 표본 평균이 특정 값(mean_value)과 같은지를 검정한다.
@@ -288,7 +380,7 @@ def hs_ttest_1samp(data: DataFrame, columns: list | str | None = None, mean_valu
             - interpretation (str): 검정 결과 해석 문자열
 
     Examples:
-        >>> from hossam.analysis import hs_ttest_1samp
+        >>> from hossam.analysis import ttest_1samp
         >>> import pandas as pd
         >>> import numpy as np
         >>> df = pd.DataFrame({
@@ -377,7 +469,7 @@ def hs_ttest_1samp(data: DataFrame, columns: list | str | None = None, mean_valu
 
 # -------------------------------------------------------------
 
-def hs_ttest_ind(
+def ttest_ind(
     data: DataFrame, xname: str, yname: str, equal_var: bool | None = None
 ) -> DataFrame:
     """두 독립 집단의 평균 차이를 검정한다 (독립표본 t-검정 또는 Welch's t-test).
@@ -392,7 +484,7 @@ def hs_ttest_ind(
         equal_var (bool | None, optional): 등분산성 가정 여부.
             - True: 독립표본 t-검정 (등분산 가정)
             - False: Welch's t-test (등분산 가정하지 않음, 더 강건함)
-            - None: hs_equal_var_test()로 자동 판별
+            - None: equal_var_test()로 자동 판별
             기본값은 None.
 
     Returns:
@@ -406,7 +498,7 @@ def hs_ttest_ind(
             - interpretation (str): 검정 결과 해석
 
     Examples:
-        >>> from hossam.analysis import hs_ttest_ind
+        >>> from hossam.analysis import ttest_ind
         >>> import pandas as pd
         >>> import numpy as np
         >>> df = pd.DataFrame({
@@ -430,7 +522,7 @@ def hs_ttest_ind(
     var_checked = False
     if equal_var is None:
         var_checked = True
-        var_result = hs_equal_var_test(data[[xname, yname]])
+        var_result = equal_var_test(data[[xname, yname]])
         equal_var = var_result["is_equal_var"].iloc[0]
 
     alternative: list = ["two-sided", "less", "greater"]
@@ -481,7 +573,7 @@ def hs_ttest_ind(
 
 # -------------------------------------------------------------
 
-def hs_ttest_rel(
+def ttest_rel(
     data: DataFrame, xname: str, yname: str, parametric: bool | None = None
 ) -> DataFrame:
     """대응표본 t-검정 또는 Wilcoxon signed-rank test를 수행한다.
@@ -510,7 +602,7 @@ def hs_ttest_rel(
             - interpretation (str): 검정 결과 해석
 
     Examples:
-        >>> from hossam.analysis import hs_ttest_rel
+        >>> from hossam.analysis import ttest_rel
         >>> import pandas as pd
         >>> import numpy as np
         >>> df = pd.DataFrame({
@@ -601,7 +693,7 @@ def hs_ttest_rel(
 
 
 # -------------------------------------------------------------
-def hs_vif_filter(
+def vif_filter(
     data: DataFrame,
     yname: str = None,
     ignore: list | None = None,
@@ -623,7 +715,7 @@ def hs_vif_filter(
     Examples:
         기본 사용 예:
 
-        >>> from hossam.analysis import hs_vif_filter
+        >>> from hossam.analysis import vif_filter
         >>> filtered = hs_vif_filter(df, yname="target", ignore=["id"], threshold=10.0)
         >>> filtered.head()
     """
@@ -703,7 +795,7 @@ def hs_vif_filter(
 
 
 # -------------------------------------------------------------
-def hs_trend(x: any, y: any, degree: int = 1, value_count: int = 100) -> Tuple[np.ndarray, np.ndarray]:
+def trend(x: any, y: any, degree: int = 1, value_count: int = 100) -> Tuple[np.ndarray, np.ndarray]:
     """x, y 데이터에 대한 추세선을 구한다.
 
     Args:
@@ -718,7 +810,7 @@ def hs_trend(x: any, y: any, degree: int = 1, value_count: int = 100) -> Tuple[n
     Examples:
         2차 다항 회귀 추세선:
 
-        >>> from hossam.analysis import hs_trend
+        >>> from hossam.analysis import trend
         >>> vx, vy = hs_trend(x, y, degree=2, value_count=200)
         >>> len(vx), len(vy)
         (200, 200)
@@ -743,7 +835,7 @@ def hs_trend(x: any, y: any, degree: int = 1, value_count: int = 100) -> Tuple[n
 
 
 # -------------------------------------------------------------
-def hs_linear_report(fit, data, full=False):
+def linear_report(fit, data, full=False):
     """선형회귀 적합 결과를 요약 리포트로 변환한다.
 
     Args:
@@ -899,7 +991,7 @@ def hs_linear_report(fit, data, full=False):
 
 
 # -------------------------------------------------------------
-def hs_linear(df: DataFrame, yname: str, report: bool = False):
+def linear(df: DataFrame, yname: str, report: bool = False):
     """선형회귀분석을 수행하고 적합 결과를 반환한다.
 
     OLS(Ordinary Least Squares) 선형회귀분석을 실시한다.
@@ -924,7 +1016,7 @@ def hs_linear(df: DataFrame, yname: str, report: bool = False):
             - equation_text: 회귀식 문자열 (str)
 
     Examples:
-        >>> from hossam.analysis import hs_linear
+        >>> from hossam.analysis import linear
         >>> import pandas as pd
         >>> import numpy as np
         >>> df = pd.DataFrame({
@@ -953,7 +1045,7 @@ def hs_linear(df: DataFrame, yname: str, report: bool = False):
         return linear_fit
 
 
-def hs_logit_report(fit, data, threshold=0.5, full=False):
+def logit_report(fit, data, threshold=0.5, full=False):
     """로지스틱 회귀 적합 결과를 상세 리포트로 변환한다.
 
     Args:
@@ -1129,7 +1221,7 @@ def hs_logit_report(fit, data, threshold=0.5, full=False):
         return cdf, rdf
 
 
-def hs_logit(df: DataFrame, yname: str, report: bool = False):
+def logit(df: DataFrame, yname: str, report: bool = False):
     """로지스틱 회귀분석을 수행하고 적합 결과를 반환한다.
 
     종속변수가 이항(binary) 형태일 때 로지스틱 회귀분석을 실시한다.
@@ -1154,7 +1246,7 @@ def hs_logit(df: DataFrame, yname: str, report: bool = False):
             - variable_reports: 변수별 보고 문장 리스트 (list[str])
 
     Examples:
-        >>> from hossam.analysis import hs_logit
+        >>> from hossam.analysis import logit
         >>> import pandas as pd
         >>> import numpy as np
         >>> df = pd.DataFrame({
@@ -1181,3 +1273,86 @@ def hs_logit(df: DataFrame, yname: str, report: bool = False):
         return logit_fit, cdf, rdf, result_report, model_report, variable_reports
     else:
         return logit_fit
+
+
+# -------------------------------------------------------------
+def corr(data: DataFrame, *fields: str) -> tuple[DataFrame, DataFrame]:
+    """데이터프레임의 연속형 변수들에 대한 상관계수 히트맵과 상관계수 종류를 반환한다.
+
+    정규성 검정을 통해 피어슨 또는 스피어만 상관계수를 자동 선택하여 계산한다.
+    선택된 상관계수 종류를 별도의 데이터프레임으로 교차표(행렬) 형태로 반환한다.
+
+    Args:
+        data (DataFrame): 분석 대상 데이터프레임.
+        *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 숫자형 컬럼을 사용.
+
+    Returns:
+        tuple[DataFrame, DataFrame]: 상관계수 행렬과 사용된 상관계수 종류 정보를 포함한 두 개의 데이터프레임.
+
+            - 첫 번째 DataFrame: 상관계수 행렬 (각 변수 쌍의 상관계수 값)
+            - 두 번째 DataFrame: 상관계수 종류 (교차표 형태)
+                - 행과 열: 변수명
+                - 셀의 값: 각 변수 쌍에 사용된 상관계수 종류 ('Pearson' 또는 'Spearman')
+
+    Examples:
+        >>> import pandas as pd
+        >>> import numpy as np
+        >>> df = pd.DataFrame({
+        ...     'x1': np.random.normal(0, 1, 100),
+        ...     'x2': np.random.normal(0, 1, 100),
+        ...     'x3': np.random.normal(0, 1, 100),
+        ... })
+        >>> # 모든 연속형 변수에 대해 상관계수 계산
+        >>> corr_matrix, corr_types = corr(df)
+        >>> print(corr_matrix)
+        >>>     x1   x2   x3
+        >>> x1 1.00 0.12 -0.05
+        >>> x2 0.12 1.00  0.08
+        >>> x3 -0.05 0.08 1.00
+        >>> print(corr_types)
+        >>>       x1       x2       x3
+        >>> x1  Pearson Pearson Pearson
+        >>> x2  Pearson Pearson Pearson
+        >>> x3  Pearson Pearson Pearson
+
+        >>> # 특정 컬럼만 분석
+        >>> corr_matrix, corr_info = corr(df, 'x1', 'x2')
+        >>> print(corr_matrix)
+    """
+    # 분석 대상 컬럼 결정
+    if fields:
+        # 지정된 컬럼만 사용
+        numeric_cols = list(fields)
+    else:
+        # 모든 숫자형 컬럼 선택
+        numeric_cols = data.select_dtypes(include=[np.number]).columns.tolist()
+
+    # 분석 데이터 추출
+    analysis_data = data[numeric_cols].copy()
+
+    # 샘플 크기에 따라 자동으로 shapiro 또는 normaltest 선택
+    test_method = 's' if len(analysis_data) <= 5000 else 'n'
+    normality_results = normal_test(analysis_data, columns=numeric_cols, method=test_method)
+
+    # 정규성 결과를 딕셔너리로 변환
+    normality_info = dict(zip(normality_results['column'], normality_results['is_normal']))
+
+    # 상관계수 계산: 모든 변수가 정규분포를 따르면 Pearson, 하나라도 아니면 Spearman 사용
+    all_normal = all(normality_info.values())
+    if all_normal:
+        # Pearson 상관계수
+        corr_matrix = analysis_data.corr(method='pearson')
+        selected_corr_type = 'Pearson'
+    else:
+        # Spearman 상관계수
+        corr_matrix = analysis_data.corr(method='spearman')
+        selected_corr_type = 'Spearman'
+
+    # 상관계수 정보 데이터프레임 생성 (교차표 형태 - 상관행렬과 동일한 구조)
+    corr_info_df = DataFrame(
+        selected_corr_type,
+        index=numeric_cols,
+        columns=numeric_cols
+    )
+
+    return corr_matrix, corr_info_df

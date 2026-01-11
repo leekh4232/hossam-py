@@ -11,7 +11,7 @@ from tqdm.auto import tqdm
 from geopandas import GeoDataFrame, read_file, points_from_xy
 from pyproj import CRS
 
-from .util import hs_pretty_table
+from .hs_util import pretty_table
 
 # -------------------------------------------------------------
 def __geocode_item(session: requests.Session, index: int, addr: str, key: str) -> tuple[float, float]:
@@ -79,7 +79,7 @@ def __geocode_item(session: requests.Session, index: int, addr: str, key: str) -
     return result
 
 # -------------------------------------------------------------
-def hs_geocode(df: DataFrame, addr: str, key: str) -> DataFrame:
+def geocode(df: DataFrame, addr: str, key: str) -> DataFrame:
     """주소 컬럼을 일괄 지오코딩하여 위도/경도 컬럼을 추가합니다.
 
     Args:
@@ -149,7 +149,7 @@ def hs_geocode(df: DataFrame, addr: str, key: str) -> DataFrame:
     return data
 
 # -------------------------------------------------------------
-def hs_load_shape(path: str, info: bool = True) -> GeoDataFrame:
+def load_shape(path: str, info: bool = True) -> GeoDataFrame:
     """Shapefile을 읽어 `GeoDataFrame`으로 로드합니다.
 
     Args:
@@ -163,7 +163,7 @@ def hs_load_shape(path: str, info: bool = True) -> GeoDataFrame:
         FileNotFoundError: 파일이 존재하지 않는 경우.
 
     Examples:
-        >>> from hossam.gis import hs_load_shape
+        >>> from hossam.gis import load_shape
         >>> gdf = hs_load_shape("path/to/file.shp", info=False)
     """
     if not os.path.exists(path):
@@ -173,23 +173,23 @@ def hs_load_shape(path: str, info: bool = True) -> GeoDataFrame:
 
     if info:
         print("\n✅ 테이블 정보")
-        hs_pretty_table(data.info(), tablefmt="pretty")
+        pretty_table(data.info(), tablefmt="pretty")
 
         print("\n✅ 상위 5개 행")
-        hs_pretty_table(data.head(), tablefmt="pretty")
+        pretty_table(data.head(), tablefmt="pretty")
 
         print("\n✅ 하위 5개 행")
-        hs_pretty_table(data.tail(), tablefmt="pretty")
+        pretty_table(data.tail(), tablefmt="pretty")
 
         print("\n📊 기술통계")
         desc = data.describe().T
         desc["nan"] = data.isnull().sum()
-        hs_pretty_table(desc, tablefmt="pretty")
+        pretty_table(desc, tablefmt="pretty")
 
     return data
 
 # -------------------------------------------------------------
-def hs_save_shape(
+def save_shape(
     gdf: GeoDataFrame | DataFrame,
     path: str,
     crs: str | None = None,
