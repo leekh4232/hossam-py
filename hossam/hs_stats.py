@@ -24,13 +24,61 @@ from scipy.stats import (
     ttest_1samp,
     ttest_ind,
     ttest_rel,
-    wilcoxon,
-    spearmanr,
-    pearsonr
+    wilcoxon
 )
 
 import statsmodels.api as sm
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+# -------------------------------------------------------------
+
+def missing_values(data: DataFrame, *fields: str):
+    """데이터프레임의 결측치 정보를 컬럼 단위로 반환한다.
+
+    각 컬럼의 결측치 수와 전체 대비 비율을 계산하여 데이터프레임으로 반환한다.
+
+    Args:
+        data (DataFrame): 분석 대상 데이터프레임.
+        *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 컬럼을 처리.
+
+    Returns:
+        DataFrame: 각 컬럼별 결측치 정보를 포함한 데이터프레임.
+            인덱스는 FIELD(컬럼명)이며, 다음 컬럼을 포함:
+
+            - missing_count (int): 결측치의 수
+            - missing_rate (float): 전체 행에서 결측치의 비율(%)
+
+    Examples:
+        전체 컬럼에 대한 결측치 확인:
+
+        >>> from hossam import missing_values
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({'x': [1, 2, None, 4], 'y': [10, None, None, 40]})
+        >>> result = missing_values(df)
+        >>> print(result)
+
+        특정 컬럼만 분석:
+
+        >>> result = missing_values(df, 'x', 'y')
+        >>> print(result)
+    """
+    if not fields:
+        fields = data.columns
+
+    result = []
+    for f in fields:
+        missing_count = data[f].isna().sum()
+        missing_rate = (missing_count / len(data)) * 100
+
+        iq = {
+            "field": f,
+            "missing_count": missing_count,
+            "missing_rate": missing_rate
+        }
+
+        result.append(iq)
+
+    return DataFrame(result).set_index("field")
 
 # -------------------------------------------------------------
 
@@ -55,6 +103,8 @@ def outlier_table(data: DataFrame, *fields: str):
             - iqr (float): 사분위 범위 (q3 - q1)
             - up (float): 이상치 상한 경계값 (q3 + 1.5 * iqr)
             - down (float): 이상치 하한 경계값 (q1 - 1.5 * iqr)
+            - min (float): 최소값
+            - max (float): 최대값
             - skew (float): 왜도
 
     Examples:
@@ -96,6 +146,8 @@ def outlier_table(data: DataFrame, *fields: str):
         q1 = data[f].quantile(q=0.25)
         q2 = data[f].quantile(q=0.5)
         q3 = data[f].quantile(q=0.75)
+        min_value = data[f].min()
+        max_value = data[f].max()
 
         # 이상치 경계 (Tukey's fences)
         iqr = q3 - q1
@@ -113,6 +165,8 @@ def outlier_table(data: DataFrame, *fields: str):
             "iqr": iqr,
             "up": up,
             "down": down,
+            "min": min_value,
+            "max": max_value,
             "skew": skew
         }
 

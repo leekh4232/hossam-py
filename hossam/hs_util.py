@@ -132,7 +132,7 @@ def __data_info(
         data.index = DatetimeIndex(data.index)
 
     if categories:
-        from .hs_prep import hs_set_category  # type: ignore
+        from .hs_prep import set_category  # type: ignore
         data = set_category(data, *categories)
 
     if info:

@@ -36,7 +36,8 @@ dependencies = [
 	"geopandas",
 	"kmodes",
     "pmdarima",
-    "prophet"
+    "prophet",
+    "plotly"
 ]
 
 [project.urls]
