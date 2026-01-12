@@ -47,14 +47,18 @@ def get_default_ax(width: int = hs_fig_width, height: int = hs_fig_height, rows:
     Returns:
         tuple[Figure, Axes]: 생성된 matplotlib Figure와 Axes 객체.
     """
-    figsize = (width * cols / dpi, height * rows / dpi)
+    figsize = (width * cols / 100, height * rows / 100)
     fig, ax = plt.subplots(rows, cols, figsize=figsize, dpi=dpi)
 
     if (rows > 1 or cols > 1) and (ws != None and hs != None):
         fig.subplots_adjust(wspace=ws, hspace=hs)
 
     if flatten == True:
-        ax = ax.flatten()
+        # 단일 Axes인 경우 리스트로 변환
+        if rows == 1 and cols == 1:
+            ax = [ax]
+        else:
+            ax = ax.flatten()
 
     return fig, ax
 
@@ -90,6 +94,7 @@ def lineplot(
     palette: str = None,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -137,7 +142,7 @@ def lineplot(
 
     lineplot_kwargs.update(params)
 
-    sb.lineplot(**lineplot_kwargs)
+    sb.lineplot(**lineplot_kwargs, linewidth=linewidth)
     ax.grid(True, alpha=0.3)
     finalize_plot(ax, callback, outparams)
 
@@ -151,6 +156,7 @@ def boxplot(
     palette: str = None,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -198,9 +204,9 @@ def boxplot(
             boxplot_kwargs["color"] = sb.color_palette(palette)[0]
 
         boxplot_kwargs.update(params)
-        sb.boxplot(**boxplot_kwargs)
+        sb.boxplot(**boxplot_kwargs, linewidth=linewidth)
     else:
-        sb.boxplot(data=df, orient=orient, ax=ax, **params)
+        sb.boxplot(data=df, orient=orient, ax=ax, linewidth=linewidth, **params)
 
     ax.grid(True, alpha=0.3)
     finalize_plot(ax, callback, outparams)
@@ -215,7 +221,8 @@ def kdeplot(
     palette: str = None,
     fill: bool = False,
     fill_alpha: float = 0.3,
-    linewidth: float = 1,
+    linewidth: float = 0.5,
+    quartile_split: bool = False,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
     dpi: int = hs_dpi,
@@ -225,6 +232,9 @@ def kdeplot(
 ) -> None:
     """커널 밀도 추정(KDE) 그래프를 그린다.
 
+    quartile_split=True일 때는 1차원 KDE(xname 지정, yname 없음)를
+    사분위수 구간(Q1~Q4)으로 나누어 4개의 서브플롯에 그린다.
+
     Args:
         df (DataFrame): 시각화할 데이터.
         xname (str|None): x축 컬럼명.
@@ -233,6 +243,7 @@ def kdeplot(
         palette (str|None): 팔레트 이름.
         fill (bool): 면적 채우기 여부.
         fill_alpha (float): 채움 투명도.
+        quartile_split (bool): True면 1D KDE를 사분위수별 서브플롯으로 분할.
         linewidth (float): 선 굵기.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
@@ -245,6 +256,54 @@ def kdeplot(
         None
     """
     outparams = False
+
+    # 사분위수 분할 전용 처리 (1D KDE만 지원)
+    if quartile_split:
+        if yname is not None:
+            raise ValueError("quartile_split은 1차원 KDE(xname)에서만 사용할 수 있습니다.")
+
+        series = df[xname].dropna()
+        if series.empty:
+            return
+
+        q = series.quantile([0.0, 0.25, 0.5, 0.75, 1.0]).values
+        bounds = list(zip(q[:-1], q[1:]))  # [(Q0,Q1),(Q1,Q2),(Q2,Q3),(Q3,Q4)]
+
+        fig, axes = get_default_ax(width, height, len(bounds), 1, dpi, flatten=True)
+        outparams = True
+
+        for idx, (lo, hi) in enumerate(bounds):
+            subset = series[(series >= lo) & (series <= hi)]
+            if subset.empty:
+                continue
+
+            # hue를 지원하려면 원본 데이터에서 해당 인덱스로 슬라이싱
+            cols = [xname]
+            if hue is not None and hue in df.columns:
+                cols.append(hue)
+            df_quartile = df.loc[subset.index, cols].copy()
+
+            kdeplot_kwargs = {
+                "data": df_quartile,
+                "x": xname,
+                "fill": fill,
+                "ax": axes[idx],
+            }
+
+            if hue is not None and hue in df_quartile.columns:
+                kdeplot_kwargs["hue"] = hue
+            if fill:
+                kdeplot_kwargs["alpha"] = fill_alpha
+            if hue is not None and palette is not None:
+                kdeplot_kwargs["palette"] = palette
+            kdeplot_kwargs.update(params)
+
+            sb.kdeplot(**kdeplot_kwargs)
+            axes[idx].set_title(f"Q{idx+1}: [{lo:.3g}, {hi:.3g}]")
+            axes[idx].grid(True, alpha=0.3)
+
+        finalize_plot(axes[0], callback, outparams)
+        return
 
     if ax is None:
         fig, ax = get_default_ax(width, height, 1, 1, dpi)
@@ -292,6 +351,7 @@ def histplot(
     palette: str = None,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -338,7 +398,7 @@ def histplot(
             histplot_kwargs["color"] = sb.color_palette(palette)[0]
 
         histplot_kwargs.update(params)
-        sb.histplot(**histplot_kwargs)
+        sb.histplot(**histplot_kwargs, linewidth=linewidth)
     else:
         histplot_kwargs = {
             "data": df,
@@ -354,7 +414,7 @@ def histplot(
             histplot_kwargs["color"] = sb.color_palette(palette)[0]
 
         histplot_kwargs.update(params)
-        sb.histplot(**histplot_kwargs)
+        sb.histplot(**histplot_kwargs, linewidth=linewidth)
 
     ax.grid(True, alpha=0.3)
     finalize_plot(ax, callback, outparams)
@@ -368,6 +428,7 @@ def stackplot(
     palette: str = None,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.25,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -404,7 +465,7 @@ def stackplot(
         "data": df2,
         "x": xname,
         "hue": hue,
-        "linewidth": 0.5,
+        "linewidth": linewidth,
         "stat": "probability",  # 전체에서의 비율로 그리기
         "multiple": "fill",  # 전체를 100%로 그리기
         "shrink": 0.8,  # 막대의 폭
@@ -449,6 +510,7 @@ def scatterplot(
     palette: str = None,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -494,7 +556,7 @@ def scatterplot(
 
     scatterplot_kwargs.update(params)
 
-    sb.scatterplot(**scatterplot_kwargs)
+    sb.scatterplot(**scatterplot_kwargs, linewidth=linewidth)
     ax.grid(True, alpha=0.3)
 
     finalize_plot(ax, callback, outparams)
@@ -508,6 +570,7 @@ def regplot(
     palette: str = None,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 1.0,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -549,7 +612,7 @@ def regplot(
         "line_kws": {
             "color": "red",
             "linestyle": "--",
-            "linewidth": 2
+            "linewidth": linewidth
         },
         "ax": ax,
     }
@@ -571,6 +634,7 @@ def lmplot(
     palette: str = None,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 1.0,
     dpi: int = hs_dpi,
     **params,
 ) -> None:
@@ -623,6 +687,7 @@ def pairplot(
     palette: str = None,
     width: int = hs_fig_height,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     **params,
 ) -> None:
@@ -702,6 +767,7 @@ def countplot(
     order: int = 1,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -754,7 +820,7 @@ def countplot(
 
     countplot_kwargs.update(params)
 
-    sb.countplot(**countplot_kwargs)
+    sb.countplot(**countplot_kwargs, linewidth=linewidth)
     ax.grid(True, alpha=0.3)
 
     finalize_plot(ax, callback, outparams)
@@ -769,6 +835,7 @@ def barplot(
     palette: str = None,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -814,7 +881,7 @@ def barplot(
 
     barplot_kwargs.update(params)
 
-    sb.barplot(**barplot_kwargs)
+    sb.barplot(**barplot_kwargs, linewidth=linewidth)
     ax.grid(True, alpha=0.3)
 
     finalize_plot(ax, callback, outparams)
@@ -829,6 +896,7 @@ def boxenplot(
     palette: str = None,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -872,7 +940,7 @@ def boxenplot(
 
     boxenplot_kwargs.update(params)
 
-    sb.boxenplot(**boxenplot_kwargs)
+    sb.boxenplot(**boxenplot_kwargs, linewidth=linewidth)
     ax.grid(True, alpha=0.3)
 
     finalize_plot(ax, callback, outparams)
@@ -887,6 +955,7 @@ def violinplot(
     palette: str = None,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -930,7 +999,7 @@ def violinplot(
 
     violinplot_kwargs.update(params)
 
-    sb.violinplot(**violinplot_kwargs)
+    sb.violinplot(**violinplot_kwargs, linewidth=linewidth)
     ax.grid(True, alpha=0.3)
 
     finalize_plot(ax, callback, outparams)
@@ -945,6 +1014,7 @@ def pointplot(
     palette: str = None,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -990,7 +1060,7 @@ def pointplot(
 
     pointplot_kwargs.update(params)
 
-    sb.pointplot(**pointplot_kwargs)
+    sb.pointplot(**pointplot_kwargs, linewidth=linewidth)
     ax.grid(True, alpha=0.3)
 
     finalize_plot(ax, callback, outparams)
@@ -1005,6 +1075,7 @@ def jointplot(
     palette: str = None,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     **params,
 ) -> None:
@@ -1058,6 +1129,7 @@ def heatmap(
     palette: str = None,
     width: int | None = None,
     height: int | None = None,
+    linewidth: float = 0.25,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -1089,9 +1161,8 @@ def heatmap(
         outparams = True
 
     if not params:
-        print("asdfsadf")
         params = {
-            "linewidths": 0.5,
+            "linewidths": linewidth,
             "annot_kws": {"size": 10}
         }
 
@@ -1110,6 +1181,7 @@ def convex_hull(
     palette: str = None,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -1155,7 +1227,7 @@ def convex_hull(
             points = np.append(hull.vertices, hull.vertices[0])
 
             ax.plot(
-                df_c.iloc[points, 0], df_c.iloc[points, 1], linewidth=1, linestyle=":"
+                df_c.iloc[points, 0], df_c.iloc[points, 1], linewidth=linewidth, linestyle=":"
             )
             ax.fill(df_c.iloc[points, 0], df_c.iloc[points, 1], alpha=0.1)
         except:
@@ -1176,6 +1248,7 @@ def kde_confidence_interval(
     clevel=0.95,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 1.0,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -1257,7 +1330,7 @@ def kde_confidence_interval(
         current_ax.fill_between([cmin, cmax], y1=ymin_val, y2=ymax_val, alpha=0.1)
 
         # 평균 그리기
-        current_ax.plot([sample_mean, sample_mean], [0, ymax_val], linestyle="--", linewidth=2)
+        current_ax.plot([sample_mean, sample_mean], [0, ymax_val], linestyle="--", linewidth=linewidth)
 
         current_ax.text(
             x=(cmax - cmin) / 2 + cmin,
@@ -1265,7 +1338,7 @@ def kde_confidence_interval(
             s="[%s] %0.1f ~ %0.1f" % (column.name, cmin, cmax),
             horizontalalignment="center",
             verticalalignment="bottom",
-            fontdict={"size": 7, "color": "red"},
+            fontdict={"color": "red"},
         )
 
         current_ax.grid(True, alpha=0.3)
@@ -1284,6 +1357,7 @@ def pvalue1_anotation(
     loc: str = "outside",
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -1331,7 +1405,7 @@ def pvalue1_anotation(
 
     boxplot_kwargs.update(params)
 
-    sb.boxplot(**boxplot_kwargs)
+    sb.boxplot(**boxplot_kwargs, linewidth=linewidth)
     annotator = Annotator(ax, data=data, x=hue, y=target, pairs=pairs)
     annotator.configure(test=test, text_format=text_format, loc=loc)
     annotator.apply_and_annotate()
@@ -1351,6 +1425,7 @@ def residplot(
     mse: bool = False,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -1384,7 +1459,7 @@ def residplot(
         x=y_pred,
         y=resid,
         lowess=lowess,
-        line_kws={"color": "red", "linewidth": 1},
+        line_kws={"color": "red", "linewidth": linewidth},
         scatter_kws={"edgecolor": "white", "alpha": 0.7},
         ax=ax,
         **params,
@@ -1423,8 +1498,8 @@ def residplot(
 
         # 경계선 그리기
         for i, c in enumerate(["red", "green", "blue"]):
-            ax.axhline(mse_sq * (i + 1), color=c, linestyle="--", linewidth=0.5)
-            ax.axhline(mse_sq * (-(i + 1)), color=c, linestyle="--", linewidth=0.5)
+            ax.axhline(mse_sq * (i + 1), color=c, linestyle="--", linewidth=linewidth/2)
+            ax.axhline(mse_sq * (-(i + 1)), color=c, linestyle="--", linewidth=linewidth/2)
 
         target = [68, 95, 99.7]
         for i, c in enumerate(["red", "green", "blue"]):
@@ -1449,6 +1524,7 @@ def qqplot(
     y_pred,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 1.0,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -1479,7 +1555,7 @@ def qqplot(
     k = (max(x) + 0.5).round()
 
     sb.scatterplot(x=x, y=y, ax=ax, **params)
-    sb.lineplot(x=[-k, k], y=[-k, k], color="red", linestyle="--", ax=ax)
+    sb.lineplot(x=[-k, k], y=[-k, k], color="red", linestyle="--", linewidth=linewidth, ax=ax)
     ax.grid(True, alpha=0.3)
     finalize_plot(ax, callback, outparams)
 
@@ -1495,6 +1571,7 @@ def distribution_by_class(
     fill: bool = False,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     callback: any = None,
 ) -> None:
@@ -1540,6 +1617,7 @@ def distribution_by_class(
                 fill=fill,
                 width=width,
                 height=height,
+                linewidth=linewidth,
                 dpi=dpi,
                 callback=callback,
             )
@@ -1553,6 +1631,7 @@ def distribution_by_class(
                 palette=palette,
                 width=width,
                 height=height,
+                linewidth=linewidth,
                 dpi=dpi,
                 callback=callback,
             )
@@ -1566,6 +1645,7 @@ def distribution_by_class(
                 palette=palette,
                 width=width,
                 height=height,
+                linewidth=linewidth,
                 dpi=dpi,
                 callback=callback,
             )
@@ -1581,6 +1661,7 @@ def scatter_by_class(
     outline: bool = False,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     callback: any = None,
 ) -> None:
@@ -1628,10 +1709,10 @@ def scatter_by_class(
 
     if outline:
         for v in group:
-            convex_hull(data, v[0], v[1], hue, palette, width, height, dpi, callback)
+            convex_hull(data, v[0], v[1], hue, palette, width, height, linewidth, dpi, callback)
     else:
         for v in group:
-            scatterplot(data, v[0], v[1], hue, palette, width, height, dpi, callback)
+            scatterplot(data, v[0], v[1], hue, palette, width, height, linewidth, dpi, callback)
 
 
 # -------------------------------------------------------------
@@ -1644,6 +1725,7 @@ def categorical_target_distribution(
     palette: str | None = None,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     cols: int = 2,
     callback: any = None,
@@ -1697,13 +1779,13 @@ def categorical_target_distribution(
 
         if kind == "violin":
             plot_kwargs.update({"x": col, "y": yname, "palette": palette})
-            sb.violinplot(**plot_kwargs)
+            sb.violinplot(**plot_kwargs, linewidth=linewidth)
         elif kind == "kde":
-            plot_kwargs.update({"x": yname, "hue": col, "palette": palette, "fill": kde_fill, "common_norm": False})
+            plot_kwargs.update({"x": yname, "hue": col, "palette": palette, "fill": kde_fill, "common_norm": False, "linewidth": linewidth})
             sb.kdeplot(**plot_kwargs)
         else:  # box
             plot_kwargs.update({"x": col, "y": yname, "palette": palette})
-            sb.boxplot(**plot_kwargs)
+            sb.boxplot(**plot_kwargs, linewidth=linewidth)
 
         ax.set_title(f"{col} vs {yname}")
         ax.grid(True, alpha=0.3)
@@ -1722,6 +1804,7 @@ def roc_curve_plot(
     X: pd.DataFrame | np.ndarray = None,
     width: int = 800,
     height: int = 800,
+    linewidth: float = 1.0,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,
@@ -1768,8 +1851,8 @@ def roc_curve_plot(
     roc_auc = auc(fpr, tpr)
 
     # ROC 곡선 그리기
-    ax.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC = {roc_auc:.4f})')
-    ax.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random Classifier')
+    ax.plot(fpr, tpr, color='darkorange', lw=linewidth, label=f'ROC curve (AUC = {roc_auc:.4f})')
+    ax.plot([0, 1], [0, 1], color='navy', lw=linewidth, linestyle='--', label='Random Classifier')
 
     ax.set_xlim([0.0, 1.0])
     ax.set_ylim([0.0, 1.05])
@@ -1788,6 +1871,7 @@ def confusion_matrix_plot(
     threshold: float = 0.5,
     width: int = hs_fig_width,
     height: int = hs_fig_height,
+    linewidth: float = 0.5,
     dpi: int = hs_dpi,
     callback: any = None,
     ax: Axes = None,

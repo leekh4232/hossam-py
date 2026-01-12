@@ -4,7 +4,7 @@ from __future__ import annotations
 # -------------------------------------------------------------
 import numpy as np
 from typing import Tuple
-from pandas import DataFrame, Series
+from pandas import DataFrame
 from pandas.api.types import is_bool_dtype
 
 from sklearn.metrics import (
@@ -22,7 +22,7 @@ from scipy.stats import (
     bartlett,
     levene,
     ttest_1samp,
-    ttest_ind as scipy_ttest_ind,
+    ttest_ind,
     ttest_rel,
     wilcoxon
 )
@@ -577,20 +577,26 @@ def equal_var_test(data: DataFrame, columns: list | str | None = None, normal_di
 
 # -------------------------------------------------------------
 
-def ttest_1samp(data, mean_value: float = 0.0) -> DataFrame:
-    """연속형 데이터에 대해 일표본 t-검정을 수행하고 결과를 반환한다.
+def ttest_1samp(data: DataFrame, columns: list | str | None = None, mean_value: float = 0.0) -> DataFrame:
+    """지정된 컬럼(또는 모든 수치형 컬럼)에 대해 일표본 t-검정을 수행하고 결과를 반환한다.
 
     일표본 t-검정은 표본 평균이 특정 값(mean_value)과 같은지를 검정한다.
     귀무가설(H0): 모집단 평균 = mean_value
     대립가설(H1): alternative에 따라 달라짐 (!=, <, >)
 
     Args:
-        data (array-like): 검정 대상 연속형 데이터 (리스트, Series, ndarray 등).
+        data (DataFrame): 검정 대상 데이터를 포함한 데이터프레임.
+        columns (list | str | None, optional): 검정 대상 컬럼명.
+            - None 또는 빈 리스트: 모든 수치형 컬럼에 대해 검정 수행.
+            - 컬럼명 리스트: 지정된 컬럼에 대해서만 검정 수행.
+            - 콤마로 구분된 문자열: "A, B, C" 형식으로 컬럼명 지정 가능.
+            기본값은 None.
         mean_value (float, optional): 귀무가설의 기준값(비교 대상 평균값).
             기본값은 0.0.
 
     Returns:
         DataFrame: 검정 결과를 담은 데이터프레임. 다음 컬럼 포함:
+            - field (str): 컬럼명
             - alternative (str): 대립가설 방향 (two-sided, less, greater)
             - statistic (float): t-통계량
             - p-value (float): 유의확률
@@ -599,37 +605,54 @@ def ttest_1samp(data, mean_value: float = 0.0) -> DataFrame:
             - interpretation (str): 검정 결과 해석 문자열
 
     Examples:
-        >>> from hossam.hs_stats import ttest_1samp
+        >>> from hossam.analysis import ttest_1samp
         >>> import pandas as pd
         >>> import numpy as np
-        >>> # 리스트 데이터로 검정
-        >>> data = [5.1, 4.9, 5.3, 5.0, 4.8]
-        >>> result = ttest_1samp(data, mean_value=5.0)
-        >>> # Series 데이터로 검정
-        >>> s = pd.Series(np.random.normal(5, 1, 100))
-        >>> result = ttest_1samp(s, mean_value=5)
+        >>> df = pd.DataFrame({
+        ...     'x': np.random.normal(5, 1, 100),
+        ...     'y': np.random.normal(0, 1, 100)
+        ... })
+        >>> # 모든 수치형 컬럼에 대해 평균이 0인지 검정
+        >>> result = hs_ttest_1samp(df, mean_value=0)
+        >>> # 특정 컬럼만 검정 (리스트)
+        >>> result = hs_ttest_1samp(df, columns=['x'], mean_value=5)
+        >>> # 특정 컬럼만 검정 (문자열)
+        >>> result = hs_ttest_1samp(df, columns='x, y', mean_value=5)
     """
-    # 데이터를 Series로 변환하고 이름 감지
-    if isinstance(data, Series):
-        col_data = data.dropna()
+    # columns가 문자열인 경우 리스트로 변환
+    if isinstance(columns, str):
+        columns = [col.strip() for col in columns.split(',')]
+
+    # 컬럼 선택: 지정된 컬럼 또는 모든 수치형 컬럼
+    if columns is None or len(columns) == 0:
+        # 모든 수치형 컬럼 선택 (bool 제외)
+        numeric_df = data.select_dtypes(include=[np.number])
+        target_cols = [c for c in numeric_df.columns if not is_bool_dtype(numeric_df[c])]
     else:
-        col_data = Series(data).dropna()
+        # 지정된 컬럼 사용
+        target_cols = columns
 
     alternative: list = ["two-sided", "less", "greater"]
     result: list = []
 
-    # 데이터가 없거나 분산이 0인 경우
-    if len(col_data) == 0 or col_data.std(ddof=1) == 0:
-        for a in alternative:
-            result.append({
-                "alternative": a,
-                "statistic": np.nan,
-                "p-value": np.nan,
-                "H0": False,
-                "H1": False,
-                "interpretation": f"검정 불가 (데이터 부족 또는 분산=0)"
-            })
-    else:
+    for c in target_cols:
+        # NaN 값 제거
+        col_data = data[c].dropna()
+
+        # 데이터가 없거나 분산이 0인 경우 건너뜀
+        if len(col_data) == 0 or col_data.std(ddof=1) == 0:
+            for a in alternative:
+                result.append({
+                    "field": c,
+                    "alternative": a,
+                    "statistic": np.nan,
+                    "p-value": np.nan,
+                    "H0": False,
+                    "H1": False,
+                    "interpretation": f"검정 불가 (데이터 부족 또는 분산=0)"
+                })
+            continue
+
         for a in alternative:
             try:
                 s, p = ttest_1samp(col_data, mean_value, alternative=a)
@@ -644,6 +667,7 @@ def ttest_1samp(data, mean_value: float = 0.0) -> DataFrame:
                     itp = "μ {0} {1}".format("<=" if p > 0.05 else ">", mean_value)
 
                 result.append({
+                    "field": c,
                     "alternative": a,
                     "statistic": round(s, 3),
                     "p-value": round(p, 4),
@@ -653,6 +677,7 @@ def ttest_1samp(data, mean_value: float = 0.0) -> DataFrame:
                 })
             except Exception as e:
                 result.append({
+                    "field": c,
                     "alternative": a,
                     "statistic": np.nan,
                     "p-value": np.nan,
@@ -669,15 +694,18 @@ def ttest_1samp(data, mean_value: float = 0.0) -> DataFrame:
 
 # -------------------------------------------------------------
 
-def ttest_ind(x, y, equal_var: bool | None = None) -> DataFrame:
+def ttest_ind(
+    data: DataFrame, xname: str, yname: str, equal_var: bool | None = None
+) -> DataFrame:
     """두 독립 집단의 평균 차이를 검정한다 (독립표본 t-검정 또는 Welch's t-test).
 
     독립표본 t-검정은 두 독립된 집단의 평균이 같은지를 검정한다.
     귀무가설(H0): μ1 = μ2 (두 집단의 평균이 같다)
 
     Args:
-        x (array-like): 첫 번째 집단의 연속형 데이터 (리스트, Series, ndarray 등).
-        y (array-like): 두 번째 집단의 연속형 데이터 (리스트, Series, ndarray 등).
+        data (DataFrame): 검정 대상 데이터를 포함한 데이터프레임.
+        xname (str): 첫 번째 집단의 컬럼명.
+        yname (str): 두 번째 집단의 컬럼명.
         equal_var (bool | None, optional): 등분산성 가정 여부.
             - True: 독립표본 t-검정 (등분산 가정)
             - False: Welch's t-test (등분산 가정하지 않음, 더 강건함)
@@ -695,60 +723,51 @@ def ttest_ind(x, y, equal_var: bool | None = None) -> DataFrame:
             - interpretation (str): 검정 결과 해석
 
     Examples:
-        >>> from hossam.hs_stats import ttest_ind
+        >>> from hossam.analysis import ttest_ind
         >>> import pandas as pd
         >>> import numpy as np
-        >>> # 리스트로 검정
-        >>> group1 = [5.1, 4.9, 5.3, 5.0, 4.8]
-        >>> group2 = [5.5, 5.7, 5.4, 5.6, 5.8]
-        >>> result = ttest_ind(group1, group2)
-        >>> # Series로 검정
-        >>> s1 = pd.Series(np.random.normal(5, 1, 100))
-        >>> s2 = pd.Series(np.random.normal(5.5, 1, 100))
-        >>> result = ttest_ind(s1, s2, equal_var=False)
+        >>> df = pd.DataFrame({
+        ...     'group1': np.random.normal(5, 1, 100),
+        ...     'group2': np.random.normal(5.5, 1, 100)
+        ... })
+        >>> # 자동 등분산성 판별
+        >>> result = hs_ttest_ind(df, 'group1', 'group2')
+        >>> # 명시적 지정
+        >>> result = hs_ttest_ind(df, 'group1', 'group2', equal_var=False)
     """
-    # 데이터를 Series로 변환
-    if isinstance(x, Series):
-        x_data = x.dropna()
-    else:
-        x_data = Series(x).dropna()
-
-    if isinstance(y, Series):
-        y_data = y.dropna()
-    else:
-        y_data = Series(y).dropna()
+    # NaN 제거
+    x_data = data[xname].dropna()
+    y_data = data[yname].dropna()
 
     # 데이터 유효성 검사
     if len(x_data) < 2 or len(y_data) < 2:
-        raise ValueError(f"각 집단에 최소 2개 이상의 데이터가 필요합니다. x: {len(x_data)}, y: {len(y_data)}")
+        raise ValueError(f"각 집단에 최소 2개 이상의 데이터가 필요합니다. {xname}: {len(x_data)}, {yname}: {len(y_data)}")
 
     # equal_var가 None이면 자동으로 등분산성 판별
     var_checked = False
     if equal_var is None:
         var_checked = True
-        # 두 데이터를 DataFrame으로 구성하여 등분산성 검정
-        temp_df = DataFrame({'x': x_data, 'y': y_data})
-        var_result = equal_var_test(temp_df)
+        var_result = equal_var_test(data[[xname, yname]])
         equal_var = var_result["is_equal_var"].iloc[0]
 
     alternative: list = ["two-sided", "less", "greater"]
     result: list = []
-    fmt: str = "μ(x) {0} μ(y)"
+    fmt: str = "μ({f0}) {0} μ({f1})"
 
     for a in alternative:
         try:
-            s, p = scipy_ttest_ind(x_data, y_data, equal_var=equal_var, alternative=a)
+            s, p = ttest_ind(x_data, y_data, equal_var=equal_var, alternative=a)
             n = "t-test_ind" if equal_var else "Welch's t-test"
 
             # 검정 결과 해석
             itp = None
 
             if a == "two-sided":
-                itp = fmt.format("==" if p > 0.05 else "!=")
+                itp = fmt.format("==" if p > 0.05 else "!=", f0=xname, f1=yname)
             elif a == "less":
-                itp = fmt.format(">=" if p > 0.05 else "<")
+                itp = fmt.format(">=" if p > 0.05 else "<", f0=xname, f1=yname)
             else:
-                itp = fmt.format("<=" if p > 0.05 else ">")
+                itp = fmt.format("<=" if p > 0.05 else ">", f0=xname, f1=yname)
 
             result.append({
                 "test": n,
@@ -779,15 +798,18 @@ def ttest_ind(x, y, equal_var: bool | None = None) -> DataFrame:
 
 # -------------------------------------------------------------
 
-def ttest_rel(x, y, parametric: bool | None = None) -> DataFrame:
+def ttest_rel(
+    data: DataFrame, xname: str, yname: str, parametric: bool | None = None
+) -> DataFrame:
     """대응표본 t-검정 또는 Wilcoxon signed-rank test를 수행한다.
 
     대응표본 t-검정은 동일 개체에서 측정된 두 시점의 평균 차이를 검정한다.
     귀무가설(H0): 두 시점의 평균 차이가 0이다.
 
     Args:
-        x (array-like): 첫 번째 측정값의 연속형 데이터 (리스트, Series, ndarray 등).
-        y (array-like): 두 번째 측정값의 연속형 데이터 (리스트, Series, ndarray 등).
+        data (DataFrame): 검정 대상 데이터를 포함한 데이터프레임.
+        xname (str): 첫 번째 측정값의 컬럼명.
+        yname (str): 두 번째 측정값의 컬럼명.
         parametric (bool | None, optional): 정규성 가정 여부.
             - True: 대응표본 t-검정 (차이의 정규분포 가정)
             - False: Wilcoxon signed-rank test (비모수 검정, 더 강건함)
@@ -805,32 +827,22 @@ def ttest_rel(x, y, parametric: bool | None = None) -> DataFrame:
             - interpretation (str): 검정 결과 해석
 
     Examples:
-        >>> from hossam.hs_stats import ttest_rel
+        >>> from hossam.analysis import ttest_rel
         >>> import pandas as pd
         >>> import numpy as np
-        >>> # 리스트로 검정
-        >>> before = [5.1, 4.9, 5.3, 5.0, 4.8]
-        >>> after = [5.5, 5.2, 5.7, 5.3, 5.1]
-        >>> result = ttest_rel(before, after)
-        >>> # Series로 검정
-        >>> s1 = pd.Series(np.random.normal(5, 1, 100))
-        >>> s2 = pd.Series(np.random.normal(5.3, 1, 100))
-        >>> result = ttest_rel(s1, s2, parametric=False)
+        >>> df = pd.DataFrame({
+        ...     'before': np.random.normal(5, 1, 100),
+        ...     'after': np.random.normal(5.3, 1, 100)
+        ... })
+        >>> # 자동 정규성 판별
+        >>> result = hs_ttest_rel(df, 'before', 'after')
+        >>> # 명시적으로 비모수 검정
+        >>> result = hs_ttest_rel(df, 'before', 'after', equal_var=False)
     """
-    # 데이터를 Series로 변환
-    if isinstance(x, Series):
-        x_data = x.dropna()
-    else:
-        x_data = Series(x).dropna()
-
-    if isinstance(y, Series):
-        y_data = y.dropna()
-    else:
-        y_data = Series(y).dropna()
-
-    # 대응표본이므로 같은 길이여야 함
-    if len(x_data) != len(y_data):
-        raise ValueError(f"대응표본은 같은 길이여야 합니다. x: {len(x_data)}, y: {len(y_data)}")
+    # NaN 제거 (대응표본이므로 행 단위로 제거)
+    valid_idx = data[[xname, yname]].dropna().index
+    x_data = data.loc[valid_idx, xname]
+    y_data = data.loc[valid_idx, yname]
 
     # 데이터 유효성 검사
     if len(x_data) < 2:
@@ -856,7 +868,7 @@ def ttest_rel(x, y, parametric: bool | None = None) -> DataFrame:
 
     alternative: list = ["two-sided", "less", "greater"]
     result: list = []
-    fmt: str = "μ(x) {0} μ(y)"
+    fmt: str = "μ({f0}) {0} μ({f1})"
 
     for a in alternative:
         try:
@@ -871,11 +883,11 @@ def ttest_rel(x, y, parametric: bool | None = None) -> DataFrame:
             itp = None
 
             if a == "two-sided":
-                itp = fmt.format("==" if p > 0.05 else "!=")
+                itp = fmt.format("==" if p > 0.05 else "!=", f0=xname, f1=yname)
             elif a == "less":
-                itp = fmt.format(">=" if p > 0.05 else "<")
+                itp = fmt.format(">=" if p > 0.05 else "<", f0=xname, f1=yname)
             else:
-                itp = fmt.format("<=" if p > 0.05 else ">")
+                itp = fmt.format("<=" if p > 0.05 else ">", f0=xname, f1=yname)
 
             result.append({
                 "test": n,

@@ -11,9 +11,9 @@ except Exception:
     __version__ = "develop"
 
 hs_dpi = 200  # 이미지 선명도(100~300)
-hs_fig_width = 1280
-hs_fig_height = 640
-hs_font_size = 6
+hs_fig_width = 600
+hs_fig_height = 320
+hs_font_size = 5
 
 __all__ = ["load_data", "load_info", "hs_classroom", "hs_gis", "hs_plot", "hs_prep", "hs_stats", "hs_timeserise", "hs_util", "hs_dpi", "hs_fig_width", "hs_fig_height"]
 
@@ -31,6 +31,7 @@ def _init_korean_font():
             fname = fprop.get_name()
             plt.rcParams["font.family"] = fname
             plt.rcParams["font.size"] = hs_font_size
+            plt.rcParams["font.weight"] = "light"
             plt.rcParams["axes.unicode_minus"] = False
             print(
                 "\n✅ 시각화를 위한 한글 글꼴(NotoSansKR-Regular)이 자동 적용되었습니다."
