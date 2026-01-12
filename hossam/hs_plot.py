@@ -54,7 +54,11 @@ def get_default_ax(width: int = hs_fig_width, height: int = hs_fig_height, rows:
         fig.subplots_adjust(wspace=ws, hspace=hs)
 
     if flatten == True:
-        ax = ax.flatten()
+        # 단일 Axes인 경우 리스트로 변환
+        if rows == 1 and cols == 1:
+            ax = [ax]
+        else:
+            ax = ax.flatten()
 
     return fig, ax
 

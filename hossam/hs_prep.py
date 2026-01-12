@@ -392,3 +392,67 @@ def labelling(data: DataFrame, *fields: str) -> DataFrame:
         pretty_table(label_df)
 
     return df
+
+
+# -------------------------------------------------------------
+def log_transform(data: DataFrame, *fields: str) -> DataFrame:
+    """수치형 변수에 대해 로그 변환을 수행한다.
+
+    자연로그(ln)를 사용하여 변환하며, 0 또는 음수 값이 있을 경우
+    최소값을 기준으로 보정(shift)을 적용한다.
+
+    Args:
+        data (DataFrame): 변환할 데이터프레임.
+        *fields (str): 변환할 컬럼명 목록. 지정하지 않으면 모든 수치형 컬럼을 처리.
+
+    Returns:
+        DataFrame: 로그 변환된 데이터프레임.
+
+    Examples:
+        전체 수치형 컬럼에 대한 로그 변환:
+
+        >>> from hossam.prep import log_transform
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({'x': [1, 10, 100], 'y': [2, 20, 200], 'z': ['a', 'b', 'c']})
+        >>> result = log_transform(df)
+        >>> print(result)
+
+        특정 컬럼만 변환:
+
+        >>> result = log_transform(df, 'x', 'y')
+        >>> print(result)
+
+    Notes:
+        - 수치형이 아닌 컬럼은 자동으로 제외됩니다.
+        - 0 또는 음수 값이 있는 경우 자동으로 보정됩니다.
+        - 변환 공식: log(x + shift), 여기서 shift = 1 - min(x) (min(x) <= 0인 경우)
+    """
+    df = data.copy()
+
+    # 대상 컬럼 결정
+    if not fields:
+        # 모든 수치형 컬럼 선택
+        target_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+    else:
+        target_cols = list(fields)
+
+    # 각 컬럼에 대해 로그 변환 수행
+    for col in target_cols:
+        # 컬럼이 존재하고 수치형인지 확인
+        if col not in df.columns:
+            continue
+
+        if df[col].dtype not in ['int', 'int32', 'int64', 'float', 'float32', 'float64']:
+            continue
+
+        # 최소값 확인
+        min_val = df[col].min()
+
+        # 0 또는 음수가 있으면 shift 적용
+        if min_val <= 0:
+            shift = 1 - min_val
+            df[col] = np.log(df[col] + shift)
+        else:
+            df[col] = np.log(df[col])
+
+    return df

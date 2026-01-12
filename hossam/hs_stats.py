@@ -106,6 +106,8 @@ def outlier_table(data: DataFrame, *fields: str):
             - min (float): 최소값
             - max (float): 최대값
             - skew (float): 왜도
+            - outlier_count (int): 이상치 개수
+            - outlier_rate (float): 이상치 비율(%)
 
     Examples:
         전체 숫자형 컬럼에 대한 이상치 경계 확인:
@@ -157,6 +159,10 @@ def outlier_table(data: DataFrame, *fields: str):
         # 왜도
         skew = data[f].skew()
 
+        # 이상치 개수 및 비율
+        outlier_count = ((data[f] < down) | (data[f] > up)).sum()
+        outlier_rate = (outlier_count / len(data)) * 100
+
         iq = {
             "field": f,
             "q1": q1,
@@ -167,12 +173,177 @@ def outlier_table(data: DataFrame, *fields: str):
             "down": down,
             "min": min_value,
             "max": max_value,
-            "skew": skew
+            "skew": skew,
+            "outlier_count": outlier_count,
+            "outlier_rate": outlier_rate
         }
 
         result.append(iq)
 
     return DataFrame(result).set_index("field")
+
+# -------------------------------------------------------------
+
+def category_table(data: DataFrame, *fields: str):
+    """데이터프레임의 명목형(범주형) 변수에 대한 기술통계를 반환한다.
+
+    각 명목형 컬럼의 범주값별 빈도수와 비율을 계산하여 데이터프레임으로 반환한다.
+
+    Args:
+        data (DataFrame): 분석 대상 데이터프레임.
+        *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 명목형 컬럼을 처리.
+
+    Returns:
+        DataFrame: 각 컬럼별 범주값의 빈도와 비율 정보를 포함한 데이터프레임.
+            인덱스는 FIELD(컬럼명)와 CATEGORY(범주값)이며, 다음 컬럼을 포함:
+
+            - count (int): 해당 범주값의 빈도수
+            - rate (float): 전체 행에서 해당 범주값의 비율(%)
+
+    Examples:
+        전체 명목형 컬럼에 대한 기술통계:
+
+        >>> from hossam import category_table
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({
+        ...     'color': ['red', 'blue', 'red', 'green', 'blue', 'red'],
+        ...     'size': ['S', 'M', 'L', 'M', 'S', 'M'],
+        ...     'price': [100, 200, 150, 300, 120, 180]
+        ... })
+        >>> result = category_table(df)
+        >>> print(result)
+
+        특정 컬럼만 분석:
+
+        >>> result = category_table(df, 'color', 'size')
+        >>> print(result)
+
+    Notes:
+        - 숫자형 컬럼은 자동으로 제외됩니다.
+        - 각 범주값별로 별도의 행으로 반환됩니다.
+        - NaN 값도 하나의 범주로 포함됩니다.
+    """
+    if not fields:
+        # 명목형(범주형) 컬럼 선택: object, category, bool 타입
+        fields = data.select_dtypes(include=['object', 'category', 'bool']).columns
+
+    result = []
+    for f in fields:
+        # 숫자형 컬럼은 건너뜀
+        if data[f].dtypes in [
+            "int",
+            "int32",
+            "int64",
+            "float",
+            "float32",
+            "float64",
+        ]:
+            continue
+
+        # 각 범주값의 빈도수 계산 (NaN 포함)
+        value_counts = data[f].value_counts(dropna=False)
+
+        for category, count in value_counts.items():
+            rate = (count / len(data)) * 100
+
+            iq = {
+                "field": f,
+                "category": category,
+                "count": count,
+                "rate": rate
+            }
+
+            result.append(iq)
+
+    return DataFrame(result).set_index(["field", "category"])
+
+# -------------------------------------------------------------
+
+def category_summary(data: DataFrame, *fields: str):
+    """데이터프레임의 명목형(범주형) 변수에 대한 분포 편향을 요약한다.
+
+    각 명목형 컬럼의 최다 범주와 최소 범주의 정보를 요약하여 데이터프레임으로 반환한다.
+
+    Args:
+        data (DataFrame): 분석 대상 데이터프레임.
+        *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 명목형 컬럼을 처리.
+
+    Returns:
+        DataFrame: 각 컬럼별 최다/최소 범주 정보를 포함한 데이터프레임.
+            다음 컬럼을 포함:
+
+            - 변수 (str): 컬럼명
+            - 최다_범주: 가장 빈도가 높은 범주값
+            - 최다_비율(%) (float): 최다 범주의 비율
+            - 최소_범주: 가장 빈도가 낮은 범주값
+            - 최소_비율(%) (float): 최소 범주의 비율
+
+    Examples:
+        전체 명목형 컬럼에 대한 분포 편향 요약:
+
+        >>> from hossam import category_summary
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({
+        ...     'cut': ['Ideal', 'Premium', 'Good', 'Ideal', 'Premium'],
+        ...     'color': ['E', 'F', 'G', 'E', 'F'],
+        ...     'price': [100, 200, 150, 300, 120]
+        ... })
+        >>> result = category_summary(df)
+        >>> print(result)
+
+        특정 컬럼만 분석:
+
+        >>> result = category_summary(df, 'cut', 'color')
+        >>> print(result)
+
+    Notes:
+        - 숫자형 컬럼은 자동으로 제외됩니다.
+        - NaN 값도 하나의 범주로 포함됩니다.
+    """
+    if not fields:
+        # 명목형(범주형) 컬럼 선택: object, category, bool 타입
+        fields = data.select_dtypes(include=['object', 'category', 'bool']).columns
+
+    result = []
+    for f in fields:
+        # 숫자형 컬럼은 건너뜀
+        if data[f].dtypes in [
+            "int",
+            "int32",
+            "int64",
+            "float",
+            "float32",
+            "float64",
+        ]:
+            continue
+
+        # 각 범주값의 빈도수 계산 (NaN 포함)
+        value_counts = data[f].value_counts(dropna=False)
+
+        if len(value_counts) == 0:
+            continue
+
+        # 최다 범주 (첫 번째)
+        max_category = value_counts.index[0]
+        max_count = value_counts.iloc[0]
+        max_rate = (max_count / len(data)) * 100
+
+        # 최소 범주 (마지막)
+        min_category = value_counts.index[-1]
+        min_count = value_counts.iloc[-1]
+        min_rate = (min_count / len(data)) * 100
+
+        iq = {
+            "변수": f,
+            "최다_범주": max_category,
+            "최다_비율(%)": round(max_rate, 2),
+            "최소_범주": min_category,
+            "최소_비율(%)": round(min_rate, 2)
+        }
+
+        result.append(iq)
+
+    return DataFrame(result)
 
 # -------------------------------------------------------------
 
