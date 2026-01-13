@@ -12,29 +12,27 @@
         <meta name="author" content="HOSSAM">
       
       
-        <link rel="canonical" href="https://py.hossam.kr/">
+        <link rel="canonical" href="https://py.hossam.kr/guides/copilot-prompts/">
       
       
-      
-        <link rel="next" href="api/hossam/">
       
       
         
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
     
     
       
-        <title>HOSSAM Overview - HOSSAM API Docs</title>
+        <title>Copilot Chat 프롬프트 예시 모음 - HOSSAM API Docs</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,9 +51,9 @@
       
     
     
-      <link rel="stylesheet" href="assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -80,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#hossam" class="md-skip">
+        <a href="#copilot-chat" class="md-skip">
           콘텐츠로 이동
         </a>
       
@@ -94,7 +92,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="상단/헤더">
-    <a href="." title="HOSSAM API Docs" class="md-header__button md-logo" aria-label="HOSSAM API Docs" data-md-component="logo">
+    <a href="../.." title="HOSSAM API Docs" class="md-header__button md-logo" aria-label="HOSSAM API Docs" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              HOSSAM Overview
+              Copilot Chat 프롬프트 예시 모음
             
           </span>
         </div>
@@ -205,11 +203,9 @@
   
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="." class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
         
   
   
@@ -230,7 +226,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="api/hossam/" class="md-tabs__link">
+        <a href="../../api/hossam/" class="md-tabs__link">
           
   
   
@@ -266,7 +262,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="네비게이션" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="HOSSAM API Docs" class="md-nav__button md-logo" aria-label="HOSSAM API Docs" data-md-component="logo">
+    <a href="../.." title="HOSSAM API Docs" class="md-nav__button md-logo" aria-label="HOSSAM API Docs" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -281,37 +277,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="." class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -327,98 +296,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="목차">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      목차
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        빠른 시작
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        주요 모듈
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mcp" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🤖 MCP 서버
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="🤖 MCP 서버">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        빠른 실행
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#vscode-copilot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        VSCode + Copilot 사용
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        상세 문서
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -502,7 +379,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/hossam/" class="md-nav__link">
+      <a href="../../api/hossam/" class="md-nav__link">
         
   
   
@@ -530,7 +407,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/data_loader/" class="md-nav__link">
+      <a href="../../api/data_loader/" class="md-nav__link">
         
   
   
@@ -558,7 +435,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/hs_classroom/" class="md-nav__link">
+      <a href="../../api/hs_classroom/" class="md-nav__link">
         
   
   
@@ -586,7 +463,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/hs_gis/" class="md-nav__link">
+      <a href="../../api/hs_gis/" class="md-nav__link">
         
   
   
@@ -614,7 +491,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/hs_plot/" class="md-nav__link">
+      <a href="../../api/hs_plot/" class="md-nav__link">
         
   
   
@@ -642,7 +519,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/hs_prep/" class="md-nav__link">
+      <a href="../../api/hs_prep/" class="md-nav__link">
         
   
   
@@ -670,7 +547,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/hs_stats/" class="md-nav__link">
+      <a href="../../api/hs_stats/" class="md-nav__link">
         
   
   
@@ -698,7 +575,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/hs_util/" class="md-nav__link">
+      <a href="../../api/hs_util/" class="md-nav__link">
         
   
   
@@ -756,7 +633,7 @@
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        빠른 시작
+        코드만(기본)
       
     </span>
   </a>
@@ -767,7 +644,7 @@
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        주요 모듈
+        실행 결과까지 원할 때
       
     </span>
   </a>
@@ -775,52 +652,24 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mcp" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🤖 MCP 서버
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="🤖 MCP 서버">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        빠른 실행
+        패턴별 템플릿
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#vscode-copilot" class="md-nav__link">
-    <span class="md-ellipsis">
       
-        VSCode + Copilot 사용
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
+        <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        상세 문서
+        팁
       
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -841,55 +690,40 @@
 
 
 
-<h1 id="hossam">HOSSAM 패키지 개요<a class="headerlink" href="#hossam" title="Permanent link">&para;</a></h1>
-<p>HOSSAM은 데이터 로딩/전처리/분석/시각화 및 GIS 유틸리티를 제공하는 파이썬 패키지입니다.</p>
-<h2 id="_1">빠른 시작<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">hs_util</span><span class="p">,</span> <span class="n">data_loader</span><span class="p">,</span> <span class="n">hs_prep</span><span class="p">,</span> <span class="n">hs_stats</span><span class="p">,</span> <span class="n">hs_plot</span><span class="p">,</span> <span class="n">hs_gis</span>
-
-<span class="c1"># 예: 데이터 로드 후 정보 출력</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">data_loader</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="s2">&quot;sample_key&quot;</span><span class="p">)</span>
-<span class="n">hs_util</span><span class="o">.</span><span class="n">pretty_table</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
-</code></pre></div>
-<h2 id="_2">주요 모듈<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h1 id="copilot-chat">Copilot Chat 프롬프트 예시 모음<a class="headerlink" href="#copilot-chat" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>기본 동작: 코드 스니펫 반환. 실행이 필요하면 <code>run:true</code>(또는 <code>mode:"run"</code>)를 명시하세요.</p>
+</blockquote>
+<h2 id="_1">코드만(기본)<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>hossam.data_loader</code>: 원격/로컬 데이터 조회 및 로딩</li>
-<li><code>hossam.hs_prep</code>: 스케일링, 결측치 처리 등 전처리 유틸</li>
-<li><code>hossam.hs_stats</code>: 통계 분석 유틸 (VIF 필터, 추세선 계산 등)</li>
-<li><code>hossam.hs_plot</code>: 다양한 시각화 함수(kde, box, scatter 등)</li>
-<li><code>hossam.hs_gis</code>: 지오코딩 및 쉐이프 로드/저장</li>
-<li><code>hossam.hs_util</code>: 표 예쁘게 출력, 샘플 데이터 생성 등 공용 유틸</li>
+<li>"@hossam 이 DataFrame 결측치 분석하는 코드만 보여줘"</li>
+<li>"@hossam 'Sales' 컬럼 정규성 검정 코드 예시 만들어줘"</li>
+<li>"@hossam ./data.csv로 이상치 테이블(outlier_table) 코드만 생성해줘"</li>
+<li>"@hossam KDE 플롯 그리는 코드만(데이터는 df, x='value', hue='group')"</li>
 </ul>
-<h2 id="mcp">🤖 MCP 서버<a class="headerlink" href="#mcp" title="Permanent link">&para;</a></h2>
-<p>Hossam은 <strong>Model Context Protocol(MCP)</strong> 서버로도 작동하며, VSCode Copilot/Cline과 통합하여 데이터 분석 코드를 자동 생성할 수 있습니다.</p>
-<h3 id="_3">빠른 실행<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># 설치 후</span>
-pip<span class="w"> </span>install<span class="w"> </span>hossam
-
-<span class="c1"># 서버 실행</span>
-hossam-mcp
-</code></pre></div>
-<h3 id="vscode-copilot">VSCode + Copilot 사용<a class="headerlink" href="#vscode-copilot" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>@hossam 이 DataFrame 결측치 분석 코드만 보여줘
-</code></pre></div>
-<h3 id="_4">상세 문서<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<h2 id="_2">실행 결과까지 원할 때<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong><a href="guides/vscode-settings-sample/">VSCode settings.json 완성형 샘플</a></strong> ⭐ 추천</li>
-<li><a href="guides/mcp/">MCP 서버 사용법</a></li>
-<li><a href="guides/vscode-copilot-integration/">VSCode + Copilot 연동 가이드</a></li>
-<li><a href="guides/copilot-prompts/">Copilot Chat 프롬프트 예시</a></li>
-<li><a href="guides/VSCODE_COPILOT_SETUP/">VSCode Copilot 설정 가이드</a></li>
-<li><a href="guides/hossam_mcp_task_prompt/">MCP 작업 가이드 (개발자용)</a></li>
+<li>"@hossam 실행해서 결과도 함께 보여줘" (또는 "run:true로 실행해줘")</li>
+<li>"@hossam ./data.csv를 로드해서 category_summary 실행하고 결과를 출력해줘 (실행)"</li>
 </ul>
-<p>더 자세한 내용은 API 레퍼런스를 참고하세요.</p>
+<h2 id="_3">패턴별 템플릿<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<ul>
+<li>분석: "@hossam [함수/작업] 코드만 생성해줘"</li>
+<li>실행: "@hossam [함수/작업] 실행해서 결과 출력해줘"</li>
+<li>파일 입력: "@hossam [파일경로]로 [함수][코드만/실행]"</li>
+<li>시각화: "@hossam [플롯함수] (인자들...) 코드만 / 실행"</li>
+</ul>
+<h2 id="_4">팁<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<ul>
+<li>기본은 코드 반환입니다. 실제 실행이 필요하면 메시지에 "실행/결과"를 명시하거나 <code>run:true</code>를 붙여달라고 요청하세요.</li>
+<li>생성된 코드는 그대로 노트북/스크립트에 붙여넣어 사용할 수 있도록 구성됩니다.</li>
+</ul>
 
 
 
 
 
 
-
-  
-  
 
 
 
@@ -933,14 +767,14 @@ hossam-mcp
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.expand", "content.code.copy", "search.suggest", "search.highlight"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.expand", "content.code.copy", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       
-        <script src="assets/javascripts/mermaid-init.js"></script>
+        <script src="../../assets/javascripts/mermaid-init.js"></script>
       
     
   </body>
