@@ -15,14 +15,14 @@ except Exception:
 
 hs_fig = SimpleNamespace(
     dpi=200,
-    width=600,
-    height=320,
-    font_size=6,
+    width=800,
+    height=480,
+    font_size=9.5,
     font_weight="light",
-    frame_width=0.4,
-    line_width=1,
+    frame_width=0.5,
+    line_width=1.5,
     grid_alpha=0.3,
-    grid_width=0.4,
+    grid_width=0.5,
     fill_alpha=0.3
 )
 

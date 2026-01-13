@@ -2707,7 +2707,7 @@ def predict(fit, data: DataFrame | Series) -> DataFrame | Series | float:
 # ===================================================================
 # 확장된 기술통계량 (Extended Descriptive Statistics)
 # ===================================================================
-def summary(data: DataFrame, *fields: str):
+def summary(data: DataFrame, *fields: str, columns: list = None):
     """데이터프레임의 연속형 변수에 대한 확장된 기술통계량을 반환한다.
 
     각 연속형(숫자형) 컬럼의 기술통계량(describe)을 구하고, 이에 사분위수 범위(IQR),
@@ -2717,6 +2717,7 @@ def summary(data: DataFrame, *fields: str):
     Args:
         data (DataFrame): 분석 대상 데이터프레임.
         *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 숫자형 컬럼을 처리.
+        columns (list, optional): 반환할 통계량 컬럼 목록. None이면 모든 통계량 반환.
 
     Returns:
         DataFrame: 각 필드별 확장된 기술통계량을 포함한 데이터프레임.
@@ -2847,5 +2848,9 @@ def summary(data: DataFrame, *fields: str):
 
     # 결과 병합
     result = concat([desc, additional_df], axis=1)
+
+    # columns 파라미터가 지정된 경우 해당 컬럼만 필터링
+    if columns is not None:
+        result = result[columns]
 
     return result

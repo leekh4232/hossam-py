@@ -56,6 +56,9 @@ def get_default_ax(width: int = hs_fig.width, height: int = hs_fig.height, rows:
         rows (int): 서브플롯 행 개수.
         cols (int): 서브플롯 열 개수.
         dpi (int): 해상도(DPI).
+        flatten (bool): Axes 배열을 1차원 리스트로 평탄화할지 여부.
+        ws (int|None): 서브플롯 가로 간격(`wspace`). rows/cols가 1보다 클 때만 적용.
+        hs (int|None): 서브플롯 세로 간격(`hspace`). rows/cols가 1보다 클 때만 적용.
 
     Returns:
         tuple[Figure, Axes]: 생성된 matplotlib Figure와 Axes 객체.
@@ -100,7 +103,7 @@ def finalize_plot(ax: Axes, callback: any = None, outparams: bool = False, save_
         callback (Callable|None): 추가 설정을 위한 사용자 콜백.
         outparams (bool): 내부에서 생성한 Figure인 경우 True.
         save_path (str|None): 이미지 저장 경로. None이 아니면 해당 경로로 저장.
-        grid (bool): 그리드 표시 여부.
+        grid (bool): 그리드 표시 여부. 기본값은 True입니다.
 
     Returns:
         None
@@ -166,6 +169,7 @@ def lineplot(
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
         dpi (int): 해상도.
+        save_path (str|None): 이미지 저장 경로. None이면 화면에 표시.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn lineplot 추가 인자.
@@ -230,6 +234,7 @@ def boxplot(
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
         dpi (int): 그림 크기 및 해상도.
+        save_path (str|None): 이미지 저장 경로. None이면 화면에 표시.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn boxplot 추가 인자.
@@ -1847,6 +1852,7 @@ def distribution_by_class(
                 linewidth=linewidth,
                 dpi=dpi,
                 callback=callback,
+                save_path=save_path
             )
         elif type == "hist":
             histplot(
@@ -1861,6 +1867,7 @@ def distribution_by_class(
                 linewidth=linewidth,
                 dpi=dpi,
                 callback=callback,
+                save_path=save_path
             )
         elif type == "histkde":
             histplot(
@@ -1875,6 +1882,7 @@ def distribution_by_class(
                 linewidth=linewidth,
                 dpi=dpi,
                 callback=callback,
+                save_path=save_path
             )
 
 
@@ -1892,6 +1900,7 @@ def scatter_by_class(
     height: int = hs_fig.height,
     linewidth: float = hs_fig.line_width,
     dpi: int = hs_fig.dpi,
+    save_path: str = None,
     callback: any = None,
 ) -> None:
     """종속변수(y)와 각 연속형 독립변수(x) 간 산점도/볼록껍질을 그린다.
@@ -1939,10 +1948,14 @@ def scatter_by_class(
 
     if outline:
         for v in group:
-            convex_hull(data, v[0], v[1], hue, palette, width, height, linewidth, dpi, callback)
+            convex_hull(data=data, xname=v[0], yname=v[1], hue=hue, palette=palette,
+                        width=width, height=height, linewidth=linewidth, dpi=dpi, callback=callback,
+                        save_path=save_path)
     else:
         for v in group:
-            scatterplot(data, v[0], v[1], hue, palette, width, height, linewidth, dpi, callback)
+            scatterplot(data=data, xname=v[0], yname=v[1], hue=hue, palette=palette,
+                        width=width, height=height, linewidth=linewidth, dpi=dpi, callback=callback,
+                        save_path=save_path)
 
 
 # ===================================================================
@@ -1951,7 +1964,7 @@ def scatter_by_class(
 def categorical_target_distribution(
     data: DataFrame,
     yname: str,
-    xnames: list | str | None = None,
+    hue: list | str | None = None,
     kind: str = "box",
     kde_fill: bool = True,
     palette: str | None = None,
@@ -1960,6 +1973,7 @@ def categorical_target_distribution(
     linewidth: float = hs_fig.line_width,
     dpi: int = hs_fig.dpi,
     cols: int = 2,
+    save_path: str = None,
     callback: any = None,
 ) -> None:
     """명목형 변수별로 종속변수 분포 차이를 시각화한다.
@@ -1967,7 +1981,7 @@ def categorical_target_distribution(
     Args:
         data (DataFrame): 시각화할 데이터.
         yname (str): 종속변수 컬럼명(연속형 추천).
-        xnames (list|str|None): 명목형 독립변수 목록. None이면 자동 탐지.
+        hue (list|str|None): 명목형 독립변수 목록. None이면 자동 탐지.
         kind (str): 'box', 'violin', 'kde'.
         kde_fill (bool): kind='kde'일 때 영역 채우기 여부.
         palette (str|None): 팔레트 이름.
@@ -1983,13 +1997,13 @@ def categorical_target_distribution(
     """
 
     # 명목형 컬럼 후보: object, category, bool
-    if xnames is None:
+    if hue is None:
         cat_cols = data.select_dtypes(include=["object", "category", "bool", "boolean"]).columns
         target_cols = [c for c in cat_cols if c != yname]
-    elif isinstance(xnames, str):
-        target_cols = [xnames]
+    elif isinstance(hue, str):
+        target_cols = [hue]
     else:
-        target_cols = list(xnames)
+        target_cols = list(hue)
 
     if len(target_cols) == 0:
         return
@@ -2030,7 +2044,7 @@ def categorical_target_distribution(
 
 
 # ===================================================================
-#
+# ROC 커브를 시각화 한다.
 # ===================================================================
 def roc_curve_plot(
     fit,
@@ -2100,14 +2114,13 @@ def roc_curve_plot(
 
 
 # ===================================================================
-#
+# 혼동행렬 시각화
 # ===================================================================
 def confusion_matrix_plot(
     fit,
     threshold: float = 0.5,
     width: int = hs_fig.width,
     height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
     dpi: int = hs_fig.dpi,
     save_path: str = None,
     callback: any = None,
@@ -2120,7 +2133,6 @@ def confusion_matrix_plot(
         threshold (float): 예측 확률을 이진 분류로 변환할 임계값. 기본값 0.5.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기 (현재 사용되지 않음).
         dpi (int): 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes. None이면 새로 생성.
@@ -2152,7 +2164,7 @@ def confusion_matrix_plot(
 
 
 # ===================================================================
-#
+# 레이더 차트(방사형 차트)
 # ===================================================================
 def radarplot(
     df: DataFrame,
@@ -2279,3 +2291,118 @@ def radarplot(
         ax.set_title('Radar Chart', pad=20)
 
     finalize_plot(ax, callback, outparams, save_path)
+
+
+# ===================================================================
+# 연속형 데이터 분포 시각화 (KDE + Boxplot)
+# ===================================================================
+def distribution_plot(
+    data: DataFrame,
+    column: str,
+    clevel: float = 0.95,
+    orient: str = "h",
+    hue: str | None = None,
+    kind: str = "boxplot",
+    width: int = hs_fig.width,
+    height: int = hs_fig.height,
+    linewidth: float = hs_fig.line_width,
+    dpi: int = hs_fig.dpi,
+    save_path: str = None,
+    callback: any = None,
+) -> None:
+    """연속형 데이터의 분포를 KDE와 Boxplot으로 시각화한다.
+
+    1행 2열의 서브플롯을 생성하여:
+    - 왼쪽: KDE with 신뢰구간
+    - 오른쪽: Boxplot
+
+    Args:
+        data (DataFrame): 시각화할 데이터.
+        column (str): 분석할 컬럼명.
+        clevel (float): KDE 신뢰수준 (0~1). 기본값 0.95.
+        orient (str): Boxplot 방향 ('v' 또는 'h'). 기본값 'h'.
+        hue (str|None): 명목형 컬럼명. 지정하면 각 범주별로 행을 늘려 KDE와 boxplot을 그림.
+        kind (str): 두 번째 그래프의 유형 (boxplot, hist). 기본값 "boxplot".
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        linewidth (float): 선 굵기.
+        dpi (int): 그림 크기 및 해상도.
+        save_path (str|None): 저장 경로.
+        callback (Callable|None): Axes 후처리 콜백.
+
+    Returns:
+        None
+    """
+    if hue is None:
+        # 1행 2열 서브플롯 생성
+        fig, axes = get_default_ax(width, height, rows=1, cols=2, dpi=dpi)
+
+        kde_confidence_interval(
+            data=data,
+            xnames=column,
+            clevel=clevel,
+            linewidth=linewidth,
+            ax=axes[0],
+        )
+
+        if kind == "hist":
+            histplot(
+                df=data,
+                xname=column,
+                linewidth=linewidth,
+                ax=axes[1]
+            )
+        else:
+            boxplot(
+                df=data[column],
+                linewidth=linewidth,
+                ax=axes[1]
+            )
+
+        fig.suptitle(f"Distribution of {column}", fontsize=14, y=1.02)
+    else:
+        if hue not in data.columns:
+            raise ValueError(f"hue column '{hue}' not found in DataFrame")
+
+        categories = list(pd.Series(data[hue].dropna().unique()).sort_values())
+        n_cat = len(categories) if categories else 1
+
+        fig, axes = get_default_ax(width, height, rows=n_cat, cols=2, dpi=dpi)
+        axes_2d = np.atleast_2d(axes)
+
+        for idx, cat in enumerate(categories):
+            subset = data[data[hue] == cat]
+            left_ax, right_ax = axes_2d[idx, 0], axes_2d[idx, 1]
+
+            kde_confidence_interval(
+                data=subset,
+                xnames=column,
+                clevel=clevel,
+                linewidth=linewidth,
+                ax=left_ax,
+            )
+            left_ax.set_title(f"{hue} = {cat}")
+
+            if kind == "hist":
+                histplot(
+                    df=subset,
+                    xname=column,
+                    linewidth=linewidth,
+                    ax=right_ax,
+                )
+            else:
+                boxplot(
+                    df=subset[column],
+                    linewidth=linewidth,
+                    ax=right_ax
+                )
+
+        fig.suptitle(f"Distribution of {column} by {hue}", fontsize=14, y=1.02)
+
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, bbox_inches='tight', dpi=dpi)
+        plt.close()
+    else:
+        plt.show()

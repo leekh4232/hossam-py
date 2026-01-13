@@ -10,6 +10,7 @@ from itertools import combinations
 #
 # ===================================================================
 import pandas as pd
+import jenkspy
 from pandas import DataFrame
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.impute import SimpleImputer
@@ -432,55 +433,126 @@ def bin_continuous(
     bins: int | list[float] | None = None,
     labels: list[str] | None = None,
     new_col: str | None = None,
+    is_log_transformed: bool = False,
+    apply_labels: bool = True,
 ) -> DataFrame:
     """연속형 변수를 다양한 알고리즘으로 구간화해 명목형 파생변수를 추가한다.
 
     지원 방법:
-    - "natural_breaks"(기본): Jenks 자연 구간화. jenkspy/ mapclassify 미사용 시 quantile로 대체
+    - "natural_breaks"(기본): Jenks 자연 구간화. jenkspy 미사용 시 quantile로 대체
+      기본 라벨: "X~Y" 형식 (예: "18~30", "30~40")
     - "quantile"/"qcut"/"equal_freq": 분위수 기반 동빈도
+      기본 라벨: "X~Y" 형식
     - "equal_width"/"uniform": 동일 간격
+      기본 라벨: "X~Y" 형식
     - "std": 평균±표준편차를 경계로 4구간 생성
-    - "lifecourse"/"life_stage": 아동·청소년·청년·중년·노년
-    - "age_decade": 아동, 10대, 20대, 30대, 40대, 50대, 60대 이상
-    - "health_band"/"policy_band": 0–5, 6–17, 18–39, 40–64, 65+
-    - 커스텀 구간: bins에 경계 리스트 전달
+      라벨: "low", "mid_low", "mid_high", "high"
+    - "lifecourse"/"life_stage": 생애주기 5단계
+      라벨: "아동", "청소년", "청년", "중년", "노년" (경계: 0, 13, 19, 40, 65)
+    - "age_decade": 10대 단위 연령대
+      라벨: "아동", "10대", "20대", "30대", "40대", "50대", "60대 이상"
+    - "health_band"/"policy_band": 의료비 위험도 기반 연령대
+      라벨: "18-29", "30-39", "40-49", "50-64", "65+"
+    - 커스텀 구간: bins에 경계 리스트 전달 (예: [0, 30, 50, 100])
 
     Args:
         data (DataFrame): 입력 데이터프레임
         field (str): 구간화할 연속형 변수명
-        method (str): 구간화 알고리즘 키워드
-        bins (int|list[float]|None): 구간 개수 혹은 경계 리스트
-        labels (list[str]|None): 구간 레이블. None이면 자동 생성
-        new_col (str|None): 생성할 컬럼명. None이면 f"{field}_bin"
+        method (str): 구간화 알고리즘 키워드 (기본값: "natural_breaks")
+        bins (int|list[float]|None):
+            - int: 생성할 구간 개수 (quantile, equal_width, natural_breaks에서 사용)
+            - list: 경계값 리스트 (커스텀 구간화)
+            - None: 기본값 사용 (quantile/equal_width는 4~5, natural_breaks는 5)
+        labels (list[str]|None): 구간 레이블 목록
+            - None: method별 기본 라벨 자동 생성
+            - list: 사용자 정의 라벨 (구간 개수와 일치해야 함)
+        new_col (str|None): 생성할 컬럼명
+            - None: f"{field}_bin" 사용 (예: "age_bin")
+        is_log_transformed (bool): 대상 컬럼이 로그 변환되어 있는지 여부
+            - True: 지정된 컬럼을 역변환(exp)한 후 구간화
+            - False: 원래 값 그대로 구간화 (기본값)
+        apply_labels (bool): 구간에 숫자 인덱스를 적용할지 여부
+            - True: 숫자 인덱스 사용 (0, 1, 2, 3, ...) (기본값)
+            - False: 문자 라벨 적용 (예: "18~30", "아동")
 
     Returns:
         DataFrame: 원본에 구간화된 명목형 컬럼이 추가된 데이터프레임
+
+    Examples:
+        동일 간격으로 5개 구간 생성 (숫자 인덱스):
+        >>> df = pd.DataFrame({'age': [20, 35, 50, 65]})
+        >>> result = bin_continuous(df, 'age', method='equal_width', bins=5)
+        >>> print(result['age_bin'])  # 0, 1, 2, ... (숫자 인덱스)
+
+        문자 레이블 사용:
+        >>> result = bin_continuous(df, 'age', method='equal_width', bins=5, apply_labels=False)
+        >>> print(result['age_bin'])  # 20~30, 30~40, ... (문자 레이블)
+
+        생애주기 기반 구간화:
+        >>> result = bin_continuous(df, 'age', method='lifecourse')
+        >>> print(result['age_bin'])  # 0, 1, 2, 3, 4 (숫자 인덱스)
+
+        생애주기 문자 레이블:
+        >>> result = bin_continuous(df, 'age', method='lifecourse', apply_labels=False)
+        >>> print(result['age_bin'])  # 아동, 청소년, 청년, 중년, 노년
+
+        의료비 위험도 기반 연령대 (health_band):
+        >>> result = bin_continuous(df, 'age', method='health_band', apply_labels=False)
+        >>> print(result['age_bin'])  # 18-29, 30-39, 40-49, 50-64, 65+
+
+        로그 변환된 컬럼 역변환 후 구간화:
+        >>> df_log = pd.DataFrame({'charges_log': [np.log(1000), np.log(5000), np.log(50000)]})
+        >>> result = bin_continuous(df_log, 'charges_log', method='equal_width', is_log_transformed=True)
+        >>> print(result['charges_log_bin'])  # 0, 1, 2 (숫자 인덱스)
     """
 
     if field not in data.columns:
         return data
 
     df = data.copy()
-    series = df[field]
+    series = df[field].copy()
+
+    # 로그 변환 역변환
+    if is_log_transformed:
+        series = np.exp(series)
+
     new_col = new_col or f"{field}_bin"
     method_key = (method or "").lower()
 
-    def _cut(edges: list[float], default_labels: list[str] | None = None, right: bool = False):
+    def _cut(edges: list[float], default_labels: list[str] | None = None, right: bool = False, ordered: bool = True):
         nonlocal labels
-        use_labels = labels if labels is not None else default_labels
+        use_labels = None
+
+        # apply_labels=True일 때 숫자 인덱스, False일 때 문자 레이블
+        if apply_labels:
+            # 숫자 인덱스 생성
+            numeric_labels = list(range(len(edges) - 1))
+            use_labels = numeric_labels
+        else:
+            # 문자 레이블 적용
+            use_labels = labels if labels is not None else default_labels
+
         df[new_col] = pd.cut(
             series,
             bins=edges,
             labels=use_labels,
             right=right,
             include_lowest=True,
+            ordered=False,  # 레이블이 있으므로 ordered=False 사용
         )
         df[new_col] = df[new_col].astype("category")
 
     # 생애주기 구분
     if method_key in {"lifecourse", "life_stage", "lifecycle", "life"}:
         edges = [0, 13, 19, 40, 65, np.inf]
-        default_labels = ["아동", "청소년", "청년", "중년", "노년"]
+        # 나이 구간을 함께 표기한 라벨 (apply_labels=False에서 사용)
+        default_labels = [
+            "아동(0~12)",
+            "청소년(13~18)",
+            "청년(19~39)",
+            "중년(40~64)",
+            "노년(65+)",
+        ]
         _cut(edges, default_labels, right=False)
         return df
 
@@ -491,10 +563,11 @@ def bin_continuous(
         _cut(edges, default_labels, right=False)
         return df
 
-    # 건강/제도 기준
+    # 건강/제도 기준 (의료비 위험군 분류 기준)
     if method_key in {"health_band", "policy_band", "health"}:
-        edges = [0, 6, 18, 40, 65, np.inf]
-        default_labels = ["0-5", "6-17", "18-39", "40-64", "65+"]
+        # 연령 데이터 최소값(예: 18세)과 레이블을 일치시킴
+        edges = [0, 19, 30, 40, 50, 65, np.inf]
+        default_labels = ["0~18", "19-29", "30-39", "40-49", "50-64", "65+"]
         _cut(edges, default_labels, right=False)
         return df
 
@@ -510,17 +583,62 @@ def bin_continuous(
     # 동일 간격
     if method_key in {"equal_width", "uniform"}:
         k = bins if isinstance(bins, int) and bins > 0 else 5
-        df[new_col] = pd.cut(series, bins=k, labels=labels, include_lowest=True)
+        _, edges = pd.cut(series, bins=k, include_lowest=True, retbins=True)
+
+        # apply_labels=True: 숫자 인덱스 / False: 문자 레이블
+        if apply_labels:
+            # 숫자 인덱스 사용 (0, 1, 2, ...)
+            numeric_labels = list(range(len(edges) - 1))
+            df[new_col] = pd.cut(series, bins=edges, labels=numeric_labels, include_lowest=True, ordered=False)
+        else:
+            # 문자 레이블 적용
+            if labels is None:
+                auto_labels = []
+                for i in range(len(edges) - 1):
+                    left = f"{edges[i]:.2f}" if edges[i] != -np.inf else "-∞"
+                    right = f"{edges[i+1]:.2f}" if edges[i+1] != np.inf else "∞"
+                    # 정수값인 경우 소수점 제거
+                    try:
+                        left = str(int(float(left))) if float(left) == int(float(left)) else left
+                        right = str(int(float(right))) if float(right) == int(float(right)) else right
+                    except:
+                        pass
+                    auto_labels.append(f"{left}~{right}")
+                df[new_col] = pd.cut(series, bins=edges, labels=auto_labels, include_lowest=True, ordered=False)
+            else:
+                df[new_col] = pd.cut(series, bins=edges, labels=labels, include_lowest=True, ordered=False)
+
         df[new_col] = df[new_col].astype("category")
         return df
 
     # 분위수 기반 동빈도
     if method_key in {"quantile", "qcut", "equal_freq"}:
         k = bins if isinstance(bins, int) and bins > 0 else 4
+        # apply_labels=False일 때 기본 레이블을 사분위수 위치(Q1~)로 설정
+        default_q_labels = labels if labels is not None else [f"Q{i+1}" for i in range(k)]
         try:
-            df[new_col] = pd.qcut(series, q=k, labels=labels, duplicates="drop")
+            if apply_labels:
+                # 숫자 인덱스 사용
+                numeric_labels = list(range(k))
+                df[new_col] = pd.qcut(series, q=k, labels=numeric_labels, duplicates="drop")
+            else:
+                # 사분위수 위치 기반 문자 레이블(Q1, Q2, ...)
+                df[new_col] = pd.qcut(series, q=k, labels=default_q_labels, duplicates="drop")
         except ValueError:
-            df[new_col] = pd.cut(series, bins=k, labels=labels, include_lowest=True)
+            _, edges = pd.cut(series, bins=k, include_lowest=True, retbins=True)
+            # apply_labels=True: 숫자 인덱스 / False: 문자 레이블
+            n_bins = len(edges) - 1
+            if apply_labels:
+                numeric_labels = list(range(n_bins))
+                df[new_col] = pd.cut(series, bins=edges, labels=numeric_labels, include_lowest=True, ordered=False)
+            else:
+                if labels is None:
+                    position_labels = [f"Q{i+1}" for i in range(n_bins)]
+                    df[new_col] = pd.cut(
+                        series, bins=edges, labels=position_labels, include_lowest=True, ordered=False
+                    )
+                else:
+                    df[new_col] = pd.cut(series, bins=edges, labels=labels, include_lowest=True, ordered=False)
         df[new_col] = df[new_col].astype("category")
         return df
 
@@ -531,23 +649,63 @@ def bin_continuous(
         k = min(k, max(2, series_nonnull.nunique()))
         edges = None
         try:
-            import jenkspy
-
             edges = jenkspy.jenks_breaks(series_nonnull.to_list(), nb_class=k)
             edges[0] = -np.inf
             edges[-1] = np.inf
         except Exception:
             try:
-                df[new_col] = pd.qcut(series, q=k, labels=labels, duplicates="drop")
+                use_labels = labels if apply_labels else None
+                df[new_col] = pd.qcut(series, q=k, labels=use_labels, duplicates="drop")
                 df[new_col] = df[new_col].astype("category")
                 return df
             except Exception:
                 edges = None
 
         if edges:
-            _cut(edges, labels, right=True)
+            # apply_labels=True: 숫자 인덱스 / False: 문자 레이블
+            if apply_labels:
+                # 숫자 인덱스 사용
+                numeric_labels = list(range(len(edges) - 1))
+                df[new_col] = pd.cut(series, bins=edges, labels=numeric_labels, include_lowest=True, ordered=False)
+                df[new_col] = df[new_col].astype("category")
+            else:
+                if labels is None:
+                    auto_labels = []
+                    for i in range(len(edges) - 1):
+                        left = f"{edges[i]:.2f}" if edges[i] != -np.inf else "-∞"
+                        right = f"{edges[i+1]:.2f}" if edges[i+1] != np.inf else "∞"
+                        # 정수값인 경우 소수점 제거
+                        try:
+                            left = str(int(float(left))) if float(left) == int(float(left)) else left
+                            right = str(int(float(right))) if float(right) == int(float(right)) else right
+                        except:
+                            pass
+                        auto_labels.append(f"{left}~{right}")
+                    _cut(edges, auto_labels, right=True, ordered=False)
+                else:
+                    _cut(edges, labels, right=True, ordered=False)
         else:
-            df[new_col] = pd.cut(series, bins=k, labels=labels, include_lowest=True)
+            _, cut_edges = pd.cut(series, bins=k, include_lowest=True, retbins=True)
+            if apply_labels:
+                # 숫자 인덱스 사용
+                numeric_labels = list(range(len(cut_edges) - 1))
+                df[new_col] = pd.cut(series, bins=cut_edges, labels=numeric_labels, include_lowest=True, ordered=False)
+            else:
+                if labels is None:
+                    auto_labels = []
+                    for i in range(len(cut_edges) - 1):
+                        left = f"{cut_edges[i]:.2f}" if cut_edges[i] != -np.inf else "-∞"
+                        right = f"{cut_edges[i+1]:.2f}" if cut_edges[i+1] != np.inf else "∞"
+                        # 정수값인 경우 소수점 제거
+                        try:
+                            left = str(int(float(left))) if float(left) == int(float(left)) else left
+                            right = str(int(float(right))) if float(right) == int(float(right)) else right
+                        except:
+                            pass
+                        auto_labels.append(f"{left}~{right}")
+                    df[new_col] = pd.cut(series, bins=cut_edges, labels=auto_labels, include_lowest=True, ordered=False)
+                else:
+                    df[new_col] = pd.cut(series, bins=cut_edges, labels=labels, include_lowest=True, ordered=False)
             df[new_col] = df[new_col].astype("category")
         return df
 
