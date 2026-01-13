@@ -177,7 +177,7 @@ def set_category(data: DataFrame, *args: str) -> DataFrame:
 
 
 # ===================================================================
-# Melted 형태를 원래 모양으로 복구하여 변수를 펼친다
+# 명목형 변수의 값 종류에 따른 데이터 분리
 # ===================================================================
 def unmelt(
     data: DataFrame, id_vars: str = "class", value_vars: str = "values"
@@ -185,49 +185,32 @@ def unmelt(
     """두 개의 컬럼으로 구성된 데이터프레임에서 하나는 명목형, 나머지는 연속형일 경우
     명목형 변수의 값에 따라 고유한 변수를 갖는 데이터프레임으로 변환한다.
 
+    각 그룹의 데이터 길이가 다를 경우 짧은 쪽에 NaN을 채워 동일한 길이로 맞춥니다.
+    이는 독립표본 t-검정(ttest_ind) 등의 분석을 위한 데이터 준비에 유용합니다.
+
     Args:
         data (DataFrame): 데이터프레임
         id_vars (str, optional): 명목형 변수의 컬럼명. Defaults to 'class'.
         value_vars (str, optional): 연속형 변수의 컬럼명. Defaults to 'values'.
 
     Returns:
-        DataFrame: 변환된 데이터프레임
-    """
-    result = data.groupby(id_vars)[value_vars].apply(list)
-    mydict = {}
-
-    for i in result.index:
-        mydict[i] = result[i]
-
-    return DataFrame(mydict)
-
-
-# ===================================================================
-# 결측치를 평균, 중앙값 등의 전략으로 대체한다
-# ===================================================================
-def replace_missing_value(data: DataFrame, strategy: str = "mean") -> DataFrame:
-    """SimpleImputer로 결측치를 대체한다.
-
-    Args:
-        data (DataFrame): 결측치가 포함된 데이터프레임
-        strategy (str, optional): 결측치 대체 방식(mean, median, most_frequent, constant). Defaults to "mean".
-
-    Returns:
-        DataFrame: 결측치가 대체된 데이터프레임
+        DataFrame: 변환된 데이터프레임 (각 그룹이 개별 컬럼으로 구성)
 
     Examples:
-        >>> from hossam.prep import replace_missing_value
-        >>> out = hs_replace_missing_value(df.select_dtypes(include="number"), strategy="median")
+        >>> df = pd.DataFrame({
+        ...     'group': ['A', 'A', 'B', 'B', 'B'],
+        ...     'value': [1, 2, 3, 4, 5]
+        ... })
+        >>> result = unmelt(df, id_vars='group', value_vars='value')
+        >>> # 결과: A 컬럼에는 [1, 2, NaN], B 컬럼에는 [3, 4, 5]
     """
+    # 그룹별로 값들을 리스트로 모음
+    grouped = data.groupby(id_vars, observed=True)[value_vars].apply(lambda x: x.tolist())
+    series_dict = {}
+    for idx, values in grouped.items():
+        series_dict[str(idx)] = pd.Series(values)
 
-    allowed = {"mean", "median", "most_frequent", "constant"}
-    if strategy not in allowed:
-        raise ValueError(f"strategy는 {allowed} 중 하나여야 합니다.")
-
-    imr = SimpleImputer(missing_values=np.nan, strategy=strategy)
-    df_imr = imr.fit_transform(data.values)
-    return DataFrame(df_imr, index=data.index, columns=data.columns)
-
+    return DataFrame(series_dict)
 
 # ===================================================================
 # 지정된 변수의 이상치 테이블로 반환한다
@@ -436,6 +419,147 @@ def labelling(data: DataFrame, *fields: str) -> DataFrame:
         label_df.index.name = f
         pretty_table(label_df)
 
+    return df
+
+
+# ===================================================================
+# 연속형 변수를 다양한 기준으로 구간화하여 명목형 변수로 추가한다
+# ===================================================================
+def bin_continuous(
+    data: DataFrame,
+    field: str,
+    method: str = "natural_breaks",
+    bins: int | list[float] | None = None,
+    labels: list[str] | None = None,
+    new_col: str | None = None,
+) -> DataFrame:
+    """연속형 변수를 다양한 알고리즘으로 구간화해 명목형 파생변수를 추가한다.
+
+    지원 방법:
+    - "natural_breaks"(기본): Jenks 자연 구간화. jenkspy/ mapclassify 미사용 시 quantile로 대체
+    - "quantile"/"qcut"/"equal_freq": 분위수 기반 동빈도
+    - "equal_width"/"uniform": 동일 간격
+    - "std": 평균±표준편차를 경계로 4구간 생성
+    - "lifecourse"/"life_stage": 아동·청소년·청년·중년·노년
+    - "age_decade": 아동, 10대, 20대, 30대, 40대, 50대, 60대 이상
+    - "health_band"/"policy_band": 0–5, 6–17, 18–39, 40–64, 65+
+    - 커스텀 구간: bins에 경계 리스트 전달
+
+    Args:
+        data (DataFrame): 입력 데이터프레임
+        field (str): 구간화할 연속형 변수명
+        method (str): 구간화 알고리즘 키워드
+        bins (int|list[float]|None): 구간 개수 혹은 경계 리스트
+        labels (list[str]|None): 구간 레이블. None이면 자동 생성
+        new_col (str|None): 생성할 컬럼명. None이면 f"{field}_bin"
+
+    Returns:
+        DataFrame: 원본에 구간화된 명목형 컬럼이 추가된 데이터프레임
+    """
+
+    if field not in data.columns:
+        return data
+
+    df = data.copy()
+    series = df[field]
+    new_col = new_col or f"{field}_bin"
+    method_key = (method or "").lower()
+
+    def _cut(edges: list[float], default_labels: list[str] | None = None, right: bool = False):
+        nonlocal labels
+        use_labels = labels if labels is not None else default_labels
+        df[new_col] = pd.cut(
+            series,
+            bins=edges,
+            labels=use_labels,
+            right=right,
+            include_lowest=True,
+        )
+        df[new_col] = df[new_col].astype("category")
+
+    # 생애주기 구분
+    if method_key in {"lifecourse", "life_stage", "lifecycle", "life"}:
+        edges = [0, 13, 19, 40, 65, np.inf]
+        default_labels = ["아동", "청소년", "청년", "중년", "노년"]
+        _cut(edges, default_labels, right=False)
+        return df
+
+    # 연령대(10단위)
+    if method_key in {"age_decade", "age10", "decade"}:
+        edges = [0, 13, 20, 30, 40, 50, 60, np.inf]
+        default_labels = ["아동", "10대", "20대", "30대", "40대", "50대", "60대 이상"]
+        _cut(edges, default_labels, right=False)
+        return df
+
+    # 건강/제도 기준
+    if method_key in {"health_band", "policy_band", "health"}:
+        edges = [0, 6, 18, 40, 65, np.inf]
+        default_labels = ["0-5", "6-17", "18-39", "40-64", "65+"]
+        _cut(edges, default_labels, right=False)
+        return df
+
+    # 표준편차 기반
+    if method_key == "std":
+        mu = series.mean()
+        sd = series.std(ddof=0)
+        edges = [-np.inf, mu - sd, mu, mu + sd, np.inf]
+        default_labels = ["low", "mid_low", "mid_high", "high"]
+        _cut(edges, default_labels, right=True)
+        return df
+
+    # 동일 간격
+    if method_key in {"equal_width", "uniform"}:
+        k = bins if isinstance(bins, int) and bins > 0 else 5
+        df[new_col] = pd.cut(series, bins=k, labels=labels, include_lowest=True)
+        df[new_col] = df[new_col].astype("category")
+        return df
+
+    # 분위수 기반 동빈도
+    if method_key in {"quantile", "qcut", "equal_freq"}:
+        k = bins if isinstance(bins, int) and bins > 0 else 4
+        try:
+            df[new_col] = pd.qcut(series, q=k, labels=labels, duplicates="drop")
+        except ValueError:
+            df[new_col] = pd.cut(series, bins=k, labels=labels, include_lowest=True)
+        df[new_col] = df[new_col].astype("category")
+        return df
+
+    # 자연 구간화 (Jenks) - 의존성 없으면 분위수로 폴백
+    if method_key in {"natural_breaks", "natural", "jenks"}:
+        k = bins if isinstance(bins, int) and bins > 1 else 5
+        series_nonnull = series.dropna()
+        k = min(k, max(2, series_nonnull.nunique()))
+        edges = None
+        try:
+            import jenkspy
+
+            edges = jenkspy.jenks_breaks(series_nonnull.to_list(), nb_class=k)
+            edges[0] = -np.inf
+            edges[-1] = np.inf
+        except Exception:
+            try:
+                df[new_col] = pd.qcut(series, q=k, labels=labels, duplicates="drop")
+                df[new_col] = df[new_col].astype("category")
+                return df
+            except Exception:
+                edges = None
+
+        if edges:
+            _cut(edges, labels, right=True)
+        else:
+            df[new_col] = pd.cut(series, bins=k, labels=labels, include_lowest=True)
+            df[new_col] = df[new_col].astype("category")
+        return df
+
+    # 커스텀 경계
+    if isinstance(bins, list) and len(bins) >= 2:
+        edges = sorted(bins)
+        _cut(edges, labels, right=False)
+        return df
+
+    # 기본 폴백: 분위수 4구간
+    df[new_col] = pd.qcut(series, q=4, labels=labels, duplicates="drop")
+    df[new_col] = df[new_col].astype("category")
     return df
 
 
