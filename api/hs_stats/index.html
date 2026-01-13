@@ -9193,7 +9193,7 @@ BinaryResultsWrapper(로지스틱 회귀) 객체를 받아 데이터에 대한
 
 
 <a href="#hossam.hs_stats.summary" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">summary</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">summary</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -9245,6 +9245,22 @@ BinaryResultsWrapper(로지스틱 회귀) 객체를 받아 데이터에 대한
             </td>
             <td>
                   <code>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>columns</code>
+            </td>
+            <td>
+                  <code><span title="list">list</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>반환할 통계량 컬럼 목록. None이면 모든 통계량 반환.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -9464,7 +9480,12 @@ BinaryResultsWrapper(로지스틱 회귀) 객체를 받아 데이터에 대한
 <span class="normal">2848</span>
 <span class="normal">2849</span>
 <span class="normal">2850</span>
-<span class="normal">2851</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">summary</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="normal">2851</span>
+<span class="normal">2852</span>
+<span class="normal">2853</span>
+<span class="normal">2854</span>
+<span class="normal">2855</span>
+<span class="normal">2856</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">summary</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;데이터프레임의 연속형 변수에 대한 확장된 기술통계량을 반환한다.</span>
 
 <span class="sd">    각 연속형(숫자형) 컬럼의 기술통계량(describe)을 구하고, 이에 사분위수 범위(IQR),</span>
@@ -9474,6 +9495,7 @@ BinaryResultsWrapper(로지스틱 회귀) 객체를 받아 데이터에 대한
 <span class="sd">    Args:</span>
 <span class="sd">        data (DataFrame): 분석 대상 데이터프레임.</span>
 <span class="sd">        *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 숫자형 컬럼을 처리.</span>
+<span class="sd">        columns (list, optional): 반환할 통계량 컬럼 목록. None이면 모든 통계량 반환.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        DataFrame: 각 필드별 확장된 기술통계량을 포함한 데이터프레임.</span>
@@ -9604,6 +9626,10 @@ BinaryResultsWrapper(로지스틱 회귀) 객체를 받아 데이터에 대한
 
     <span class="c1"># 결과 병합</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">desc</span><span class="p">,</span> <span class="n">additional_df</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># columns 파라미터가 지정된 경우 해당 컬럼만 필터링</span>
+    <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>

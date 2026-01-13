@@ -1168,8 +1168,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_prep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">25</span>
-<span class="normal">26</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">26</span>
 <span class="normal">27</span>
 <span class="normal">28</span>
 <span class="normal">29</span>
@@ -1231,7 +1230,8 @@
 <span class="normal">85</span>
 <span class="normal">86</span>
 <span class="normal">87</span>
-<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">standard_scaler</span><span class="p">(</span>
+<span class="normal">88</span>
+<span class="normal">89</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">standard_scaler</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="nb">any</span><span class="p">,</span> <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">load_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;연속형 변수에 대해 Standard Scaling을 수행한다.</span>
@@ -1431,8 +1431,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_prep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
-<span class="normal"> 95</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 95</span>
 <span class="normal"> 96</span>
 <span class="normal"> 97</span>
 <span class="normal"> 98</span>
@@ -1492,7 +1491,8 @@
 <span class="normal">152</span>
 <span class="normal">153</span>
 <span class="normal">154</span>
-<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">minmax_scaler</span><span class="p">(</span>
+<span class="normal">155</span>
+<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">minmax_scaler</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="nb">any</span><span class="p">,</span> <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">load_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;연속형 변수에 대해 MinMax Scaling을 수행한다.</span>
@@ -1648,8 +1648,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_prep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">161</span>
-<span class="normal">162</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">162</span>
 <span class="normal">163</span>
 <span class="normal">164</span>
 <span class="normal">165</span>
@@ -1663,7 +1662,8 @@
 <span class="normal">173</span>
 <span class="normal">174</span>
 <span class="normal">175</span>
-<span class="normal">176</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_category</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">176</span>
+<span class="normal">177</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_category</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;카테고리 데이터를 설정한다.</span>
 
 <span class="sd">    Args:</span>
@@ -1802,8 +1802,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_prep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">182</span>
-<span class="normal">183</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">183</span>
 <span class="normal">184</span>
 <span class="normal">185</span>
 <span class="normal">186</span>
@@ -1833,7 +1832,8 @@
 <span class="normal">210</span>
 <span class="normal">211</span>
 <span class="normal">212</span>
-<span class="normal">213</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">unmelt</span><span class="p">(</span>
+<span class="normal">213</span>
+<span class="normal">214</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">unmelt</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">id_vars</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;class&quot;</span><span class="p">,</span> <span class="n">value_vars</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;values&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;두 개의 컬럼으로 구성된 데이터프레임에서 하나는 명목형, 나머지는 연속형일 경우</span>
@@ -1967,8 +1967,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_prep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">218</span>
-<span class="normal">219</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">219</span>
 <span class="normal">220</span>
 <span class="normal">221</span>
 <span class="normal">222</span>
@@ -2015,7 +2014,8 @@
 <span class="normal">263</span>
 <span class="normal">264</span>
 <span class="normal">265</span>
-<span class="normal">266</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">outlier_table</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">266</span>
+<span class="normal">267</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">outlier_table</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;수치형 컬럼에 대한 사분위수 및 IQR 기반 이상치 경계를 계산한다.</span>
 
 <span class="sd">    전달된 `fields`가 없으면 데이터프레임의 모든 수치형 컬럼을 대상으로 한다.</span>
@@ -2179,8 +2179,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_prep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">272</span>
-<span class="normal">273</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">273</span>
 <span class="normal">274</span>
 <span class="normal">275</span>
 <span class="normal">276</span>
@@ -2236,7 +2235,8 @@
 <span class="normal">326</span>
 <span class="normal">327</span>
 <span class="normal">328</span>
-<span class="normal">329</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">replace_outliner</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">329</span>
+<span class="normal">330</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">replace_outliner</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;이상치 경계값을 넘어가는 데이터를 경계값으로 대체한다.</span>
 
 <span class="sd">    Args:</span>
@@ -2388,8 +2388,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_prep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">334</span>
-<span class="normal">335</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">335</span>
 <span class="normal">336</span>
 <span class="normal">337</span>
 <span class="normal">338</span>
@@ -2400,7 +2399,8 @@
 <span class="normal">343</span>
 <span class="normal">344</span>
 <span class="normal">345</span>
-<span class="normal">346</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">drop_outliner</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">346</span>
+<span class="normal">347</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">drop_outliner</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;이상치를 결측치로 변환한 후 모두 삭제한다.</span>
 
 <span class="sd">    Args:</span>
@@ -2552,8 +2552,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_prep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">352</span>
-<span class="normal">353</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">353</span>
 <span class="normal">354</span>
 <span class="normal">355</span>
 <span class="normal">356</span>
@@ -2588,7 +2587,8 @@
 <span class="normal">385</span>
 <span class="normal">386</span>
 <span class="normal">387</span>
-<span class="normal">388</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_dummies</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">388</span>
+<span class="normal">389</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_dummies</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;명목형 변수를 더미 변수로 변환한다.</span>
 
 <span class="sd">    컬럼명을 지정하면 그 컬럼들만 더미 변수로 변환하고,</span>
@@ -2719,8 +2719,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_prep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">394</span>
-<span class="normal">395</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">395</span>
 <span class="normal">396</span>
 <span class="normal">397</span>
 <span class="normal">398</span>
@@ -2747,7 +2746,8 @@
 <span class="normal">419</span>
 <span class="normal">420</span>
 <span class="normal">421</span>
-<span class="normal">422</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">labelling</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">422</span>
+<span class="normal">423</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">labelling</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;명목형 변수를 라벨링한다.</span>
 
 <span class="sd">    Args:</span>
@@ -2797,6 +2797,8 @@
     <span class="n">bins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">new_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">is_log_transformed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">apply_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -2804,14 +2806,21 @@
 
         <p>연속형 변수를 다양한 알고리즘으로 구간화해 명목형 파생변수를 추가한다.</p>
 <p>지원 방법:
-- "natural_breaks"(기본): Jenks 자연 구간화. jenkspy/ mapclassify 미사용 시 quantile로 대체
+- "natural_breaks"(기본): Jenks 자연 구간화. jenkspy 미사용 시 quantile로 대체
+  기본 라벨: "X~Y" 형식 (예: "18~30", "30~40")
 - "quantile"/"qcut"/"equal_freq": 분위수 기반 동빈도
+  기본 라벨: "X~Y" 형식
 - "equal_width"/"uniform": 동일 간격
+  기본 라벨: "X~Y" 형식
 - "std": 평균±표준편차를 경계로 4구간 생성
-- "lifecourse"/"life_stage": 아동·청소년·청년·중년·노년
-- "age_decade": 아동, 10대, 20대, 30대, 40대, 50대, 60대 이상
-- "health_band"/"policy_band": 0–5, 6–17, 18–39, 40–64, 65+
-- 커스텀 구간: bins에 경계 리스트 전달</p>
+  라벨: "low", "mid_low", "mid_high", "high"
+- "lifecourse"/"life_stage": 생애주기 5단계
+  라벨: "아동", "청소년", "청년", "중년", "노년" (경계: 0, 13, 19, 40, 65)
+- "age_decade": 10대 단위 연령대
+  라벨: "아동", "10대", "20대", "30대", "40대", "50대", "60대 이상"
+- "health_band"/"policy_band": 의료비 위험도 기반 연령대
+  라벨: "18-29", "30-39", "40-49", "50-64", "65+"
+- 커스텀 구간: bins에 경계 리스트 전달 (예: [0, 30, 50, 100])</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2866,7 +2875,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>구간화 알고리즘 키워드</p>
+                <p>구간화 알고리즘 키워드 (기본값: "natural_breaks")</p>
               </div>
             </td>
             <td>
@@ -2882,7 +2891,11 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>구간 개수 혹은 경계 리스트</p>
+                <ul>
+<li>int: 생성할 구간 개수 (quantile, equal_width, natural_breaks에서 사용)</li>
+<li>list: 경계값 리스트 (커스텀 구간화)</li>
+<li>None: 기본값 사용 (quantile/equal_width는 4~5, natural_breaks는 5)</li>
+</ul>
               </div>
             </td>
             <td>
@@ -2898,7 +2911,9 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>구간 레이블. None이면 자동 생성</p>
+                <p>구간 레이블 목록
+- None: method별 기본 라벨 자동 생성
+- list: 사용자 정의 라벨 (구간 개수와 일치해야 함)</p>
               </div>
             </td>
             <td>
@@ -2914,11 +2929,48 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>생성할 컬럼명. None이면 f"{field}_bin"</p>
+                <p>생성할 컬럼명
+- None: f"{field}_bin" 사용 (예: "age_bin")</p>
               </div>
             </td>
             <td>
                   <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>is_log_transformed</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>대상 컬럼이 로그 변환되어 있는지 여부
+- True: 지정된 컬럼을 역변환(exp)한 후 구간화
+- False: 원래 값 그대로 구간화 (기본값)</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>apply_labels</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>구간에 숫자 인덱스를 적용할지 여부
+- True: 숫자 인덱스 사용 (0, 1, 2, 3, ...) (기본값)
+- False: 문자 라벨 적용 (예: "18~30", "아동")</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
             </td>
           </tr>
       </tbody>
@@ -2948,10 +3000,38 @@
     </table>
 
 
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>동일 간격으로 5개 구간 생성 (숫자 인덱스):</p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">65</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">bin_continuous</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;equal_width&#39;</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;age_bin&#39;</span><span class="p">])</span>  <span class="c1"># 0, 1, 2, ... (숫자 인덱스)</span>
+</code></pre></div>
+    <p>문자 레이블 사용:</p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">bin_continuous</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;equal_width&#39;</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">apply_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;age_bin&#39;</span><span class="p">])</span>  <span class="c1"># 20~30, 30~40, ... (문자 레이블)</span>
+</code></pre></div>
+    <p>생애주기 기반 구간화:</p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">bin_continuous</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;lifecourse&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;age_bin&#39;</span><span class="p">])</span>  <span class="c1"># 0, 1, 2, 3, 4 (숫자 인덱스)</span>
+</code></pre></div>
+    <p>생애주기 문자 레이블:</p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">bin_continuous</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;lifecourse&#39;</span><span class="p">,</span> <span class="n">apply_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;age_bin&#39;</span><span class="p">])</span>  <span class="c1"># 아동, 청소년, 청년, 중년, 노년</span>
+</code></pre></div>
+    <p>의료비 위험도 기반 연령대 (health_band):</p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">bin_continuous</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;health_band&#39;</span><span class="p">,</span> <span class="n">apply_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;age_bin&#39;</span><span class="p">])</span>  <span class="c1"># 18-29, 30-39, 40-49, 50-64, 65+</span>
+</code></pre></div>
+    <p>로그 변환된 컬럼 역변환 후 구간화:</p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">df_log</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;charges_log&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1000</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">5000</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">50000</span><span class="p">)]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">bin_continuous</span><span class="p">(</span><span class="n">df_log</span><span class="p">,</span> <span class="s1">&#39;charges_log&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;equal_width&#39;</span><span class="p">,</span> <span class="n">is_log_transformed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;charges_log_bin&#39;</span><span class="p">])</span>  <span class="c1"># 0, 1, 2 (숫자 인덱스)</span>
+</code></pre></div>
+
+
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_prep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">428</span>
-<span class="normal">429</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">429</span>
 <span class="normal">430</span>
 <span class="normal">431</span>
 <span class="normal">432</span>
@@ -3085,62 +3165,291 @@
 <span class="normal">560</span>
 <span class="normal">561</span>
 <span class="normal">562</span>
-<span class="normal">563</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">bin_continuous</span><span class="p">(</span>
+<span class="normal">563</span>
+<span class="normal">564</span>
+<span class="normal">565</span>
+<span class="normal">566</span>
+<span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span>
+<span class="normal">575</span>
+<span class="normal">576</span>
+<span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span>
+<span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span>
+<span class="normal">614</span>
+<span class="normal">615</span>
+<span class="normal">616</span>
+<span class="normal">617</span>
+<span class="normal">618</span>
+<span class="normal">619</span>
+<span class="normal">620</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span>
+<span class="normal">629</span>
+<span class="normal">630</span>
+<span class="normal">631</span>
+<span class="normal">632</span>
+<span class="normal">633</span>
+<span class="normal">634</span>
+<span class="normal">635</span>
+<span class="normal">636</span>
+<span class="normal">637</span>
+<span class="normal">638</span>
+<span class="normal">639</span>
+<span class="normal">640</span>
+<span class="normal">641</span>
+<span class="normal">642</span>
+<span class="normal">643</span>
+<span class="normal">644</span>
+<span class="normal">645</span>
+<span class="normal">646</span>
+<span class="normal">647</span>
+<span class="normal">648</span>
+<span class="normal">649</span>
+<span class="normal">650</span>
+<span class="normal">651</span>
+<span class="normal">652</span>
+<span class="normal">653</span>
+<span class="normal">654</span>
+<span class="normal">655</span>
+<span class="normal">656</span>
+<span class="normal">657</span>
+<span class="normal">658</span>
+<span class="normal">659</span>
+<span class="normal">660</span>
+<span class="normal">661</span>
+<span class="normal">662</span>
+<span class="normal">663</span>
+<span class="normal">664</span>
+<span class="normal">665</span>
+<span class="normal">666</span>
+<span class="normal">667</span>
+<span class="normal">668</span>
+<span class="normal">669</span>
+<span class="normal">670</span>
+<span class="normal">671</span>
+<span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span>
+<span class="normal">675</span>
+<span class="normal">676</span>
+<span class="normal">677</span>
+<span class="normal">678</span>
+<span class="normal">679</span>
+<span class="normal">680</span>
+<span class="normal">681</span>
+<span class="normal">682</span>
+<span class="normal">683</span>
+<span class="normal">684</span>
+<span class="normal">685</span>
+<span class="normal">686</span>
+<span class="normal">687</span>
+<span class="normal">688</span>
+<span class="normal">689</span>
+<span class="normal">690</span>
+<span class="normal">691</span>
+<span class="normal">692</span>
+<span class="normal">693</span>
+<span class="normal">694</span>
+<span class="normal">695</span>
+<span class="normal">696</span>
+<span class="normal">697</span>
+<span class="normal">698</span>
+<span class="normal">699</span>
+<span class="normal">700</span>
+<span class="normal">701</span>
+<span class="normal">702</span>
+<span class="normal">703</span>
+<span class="normal">704</span>
+<span class="normal">705</span>
+<span class="normal">706</span>
+<span class="normal">707</span>
+<span class="normal">708</span>
+<span class="normal">709</span>
+<span class="normal">710</span>
+<span class="normal">711</span>
+<span class="normal">712</span>
+<span class="normal">713</span>
+<span class="normal">714</span>
+<span class="normal">715</span>
+<span class="normal">716</span>
+<span class="normal">717</span>
+<span class="normal">718</span>
+<span class="normal">719</span>
+<span class="normal">720</span>
+<span class="normal">721</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">bin_continuous</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">field</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;natural_breaks&quot;</span><span class="p">,</span>
     <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">new_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">is_log_transformed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">apply_labels</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;연속형 변수를 다양한 알고리즘으로 구간화해 명목형 파생변수를 추가한다.</span>
 
 <span class="sd">    지원 방법:</span>
-<span class="sd">    - &quot;natural_breaks&quot;(기본): Jenks 자연 구간화. jenkspy/ mapclassify 미사용 시 quantile로 대체</span>
+<span class="sd">    - &quot;natural_breaks&quot;(기본): Jenks 자연 구간화. jenkspy 미사용 시 quantile로 대체</span>
+<span class="sd">      기본 라벨: &quot;X~Y&quot; 형식 (예: &quot;18~30&quot;, &quot;30~40&quot;)</span>
 <span class="sd">    - &quot;quantile&quot;/&quot;qcut&quot;/&quot;equal_freq&quot;: 분위수 기반 동빈도</span>
+<span class="sd">      기본 라벨: &quot;X~Y&quot; 형식</span>
 <span class="sd">    - &quot;equal_width&quot;/&quot;uniform&quot;: 동일 간격</span>
+<span class="sd">      기본 라벨: &quot;X~Y&quot; 형식</span>
 <span class="sd">    - &quot;std&quot;: 평균±표준편차를 경계로 4구간 생성</span>
-<span class="sd">    - &quot;lifecourse&quot;/&quot;life_stage&quot;: 아동·청소년·청년·중년·노년</span>
-<span class="sd">    - &quot;age_decade&quot;: 아동, 10대, 20대, 30대, 40대, 50대, 60대 이상</span>
-<span class="sd">    - &quot;health_band&quot;/&quot;policy_band&quot;: 0–5, 6–17, 18–39, 40–64, 65+</span>
-<span class="sd">    - 커스텀 구간: bins에 경계 리스트 전달</span>
+<span class="sd">      라벨: &quot;low&quot;, &quot;mid_low&quot;, &quot;mid_high&quot;, &quot;high&quot;</span>
+<span class="sd">    - &quot;lifecourse&quot;/&quot;life_stage&quot;: 생애주기 5단계</span>
+<span class="sd">      라벨: &quot;아동&quot;, &quot;청소년&quot;, &quot;청년&quot;, &quot;중년&quot;, &quot;노년&quot; (경계: 0, 13, 19, 40, 65)</span>
+<span class="sd">    - &quot;age_decade&quot;: 10대 단위 연령대</span>
+<span class="sd">      라벨: &quot;아동&quot;, &quot;10대&quot;, &quot;20대&quot;, &quot;30대&quot;, &quot;40대&quot;, &quot;50대&quot;, &quot;60대 이상&quot;</span>
+<span class="sd">    - &quot;health_band&quot;/&quot;policy_band&quot;: 의료비 위험도 기반 연령대</span>
+<span class="sd">      라벨: &quot;18-29&quot;, &quot;30-39&quot;, &quot;40-49&quot;, &quot;50-64&quot;, &quot;65+&quot;</span>
+<span class="sd">    - 커스텀 구간: bins에 경계 리스트 전달 (예: [0, 30, 50, 100])</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        data (DataFrame): 입력 데이터프레임</span>
 <span class="sd">        field (str): 구간화할 연속형 변수명</span>
-<span class="sd">        method (str): 구간화 알고리즘 키워드</span>
-<span class="sd">        bins (int|list[float]|None): 구간 개수 혹은 경계 리스트</span>
-<span class="sd">        labels (list[str]|None): 구간 레이블. None이면 자동 생성</span>
-<span class="sd">        new_col (str|None): 생성할 컬럼명. None이면 f&quot;{field}_bin&quot;</span>
+<span class="sd">        method (str): 구간화 알고리즘 키워드 (기본값: &quot;natural_breaks&quot;)</span>
+<span class="sd">        bins (int|list[float]|None):</span>
+<span class="sd">            - int: 생성할 구간 개수 (quantile, equal_width, natural_breaks에서 사용)</span>
+<span class="sd">            - list: 경계값 리스트 (커스텀 구간화)</span>
+<span class="sd">            - None: 기본값 사용 (quantile/equal_width는 4~5, natural_breaks는 5)</span>
+<span class="sd">        labels (list[str]|None): 구간 레이블 목록</span>
+<span class="sd">            - None: method별 기본 라벨 자동 생성</span>
+<span class="sd">            - list: 사용자 정의 라벨 (구간 개수와 일치해야 함)</span>
+<span class="sd">        new_col (str|None): 생성할 컬럼명</span>
+<span class="sd">            - None: f&quot;{field}_bin&quot; 사용 (예: &quot;age_bin&quot;)</span>
+<span class="sd">        is_log_transformed (bool): 대상 컬럼이 로그 변환되어 있는지 여부</span>
+<span class="sd">            - True: 지정된 컬럼을 역변환(exp)한 후 구간화</span>
+<span class="sd">            - False: 원래 값 그대로 구간화 (기본값)</span>
+<span class="sd">        apply_labels (bool): 구간에 숫자 인덱스를 적용할지 여부</span>
+<span class="sd">            - True: 숫자 인덱스 사용 (0, 1, 2, 3, ...) (기본값)</span>
+<span class="sd">            - False: 문자 라벨 적용 (예: &quot;18~30&quot;, &quot;아동&quot;)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        DataFrame: 원본에 구간화된 명목형 컬럼이 추가된 데이터프레임</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        동일 간격으로 5개 구간 생성 (숫자 인덱스):</span>
+<span class="sd">        &gt;&gt;&gt; df = pd.DataFrame({&#39;age&#39;: [20, 35, 50, 65]})</span>
+<span class="sd">        &gt;&gt;&gt; result = bin_continuous(df, &#39;age&#39;, method=&#39;equal_width&#39;, bins=5)</span>
+<span class="sd">        &gt;&gt;&gt; print(result[&#39;age_bin&#39;])  # 0, 1, 2, ... (숫자 인덱스)</span>
+
+<span class="sd">        문자 레이블 사용:</span>
+<span class="sd">        &gt;&gt;&gt; result = bin_continuous(df, &#39;age&#39;, method=&#39;equal_width&#39;, bins=5, apply_labels=False)</span>
+<span class="sd">        &gt;&gt;&gt; print(result[&#39;age_bin&#39;])  # 20~30, 30~40, ... (문자 레이블)</span>
+
+<span class="sd">        생애주기 기반 구간화:</span>
+<span class="sd">        &gt;&gt;&gt; result = bin_continuous(df, &#39;age&#39;, method=&#39;lifecourse&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; print(result[&#39;age_bin&#39;])  # 0, 1, 2, 3, 4 (숫자 인덱스)</span>
+
+<span class="sd">        생애주기 문자 레이블:</span>
+<span class="sd">        &gt;&gt;&gt; result = bin_continuous(df, &#39;age&#39;, method=&#39;lifecourse&#39;, apply_labels=False)</span>
+<span class="sd">        &gt;&gt;&gt; print(result[&#39;age_bin&#39;])  # 아동, 청소년, 청년, 중년, 노년</span>
+
+<span class="sd">        의료비 위험도 기반 연령대 (health_band):</span>
+<span class="sd">        &gt;&gt;&gt; result = bin_continuous(df, &#39;age&#39;, method=&#39;health_band&#39;, apply_labels=False)</span>
+<span class="sd">        &gt;&gt;&gt; print(result[&#39;age_bin&#39;])  # 18-29, 30-39, 40-49, 50-64, 65+</span>
+
+<span class="sd">        로그 변환된 컬럼 역변환 후 구간화:</span>
+<span class="sd">        &gt;&gt;&gt; df_log = pd.DataFrame({&#39;charges_log&#39;: [np.log(1000), np.log(5000), np.log(50000)]})</span>
+<span class="sd">        &gt;&gt;&gt; result = bin_continuous(df_log, &#39;charges_log&#39;, method=&#39;equal_width&#39;, is_log_transformed=True)</span>
+<span class="sd">        &gt;&gt;&gt; print(result[&#39;charges_log_bin&#39;])  # 0, 1, 2 (숫자 인덱스)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">data</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>
+    <span class="n">series</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># 로그 변환 역변환</span>
+    <span class="k">if</span> <span class="n">is_log_transformed</span><span class="p">:</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+
     <span class="n">new_col</span> <span class="o">=</span> <span class="n">new_col</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">_bin&quot;</span>
     <span class="n">method_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">method</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_cut</span><span class="p">(</span><span class="n">edges</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">default_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cut</span><span class="p">(</span><span class="n">edges</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">default_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">ordered</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="k">nonlocal</span> <span class="n">labels</span>
-        <span class="n">use_labels</span> <span class="o">=</span> <span class="n">labels</span> <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">default_labels</span>
+        <span class="n">use_labels</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># apply_labels=True일 때 숫자 인덱스, False일 때 문자 레이블</span>
+        <span class="k">if</span> <span class="n">apply_labels</span><span class="p">:</span>
+            <span class="c1"># 숫자 인덱스 생성</span>
+            <span class="n">numeric_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">use_labels</span> <span class="o">=</span> <span class="n">numeric_labels</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># 문자 레이블 적용</span>
+            <span class="n">use_labels</span> <span class="o">=</span> <span class="n">labels</span> <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">default_labels</span>
+
         <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span>
             <span class="n">series</span><span class="p">,</span>
             <span class="n">bins</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span>
             <span class="n">labels</span><span class="o">=</span><span class="n">use_labels</span><span class="p">,</span>
             <span class="n">right</span><span class="o">=</span><span class="n">right</span><span class="p">,</span>
             <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># 레이블이 있으므로 ordered=False 사용</span>
         <span class="p">)</span>
         <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
 
     <span class="c1"># 생애주기 구분</span>
     <span class="k">if</span> <span class="n">method_key</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;lifecourse&quot;</span><span class="p">,</span> <span class="s2">&quot;life_stage&quot;</span><span class="p">,</span> <span class="s2">&quot;lifecycle&quot;</span><span class="p">,</span> <span class="s2">&quot;life&quot;</span><span class="p">}:</span>
         <span class="n">edges</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">]</span>
-        <span class="n">default_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;아동&quot;</span><span class="p">,</span> <span class="s2">&quot;청소년&quot;</span><span class="p">,</span> <span class="s2">&quot;청년&quot;</span><span class="p">,</span> <span class="s2">&quot;중년&quot;</span><span class="p">,</span> <span class="s2">&quot;노년&quot;</span><span class="p">]</span>
+        <span class="c1"># 나이 구간을 함께 표기한 라벨 (apply_labels=False에서 사용)</span>
+        <span class="n">default_labels</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;아동(0~12)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;청소년(13~18)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;청년(19~39)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;중년(40~64)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;노년(65+)&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
         <span class="n">_cut</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">default_labels</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df</span>
 
@@ -3151,10 +3460,11 @@
         <span class="n">_cut</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">default_labels</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df</span>
 
-    <span class="c1"># 건강/제도 기준</span>
+    <span class="c1"># 건강/제도 기준 (의료비 위험군 분류 기준)</span>
     <span class="k">if</span> <span class="n">method_key</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;health_band&quot;</span><span class="p">,</span> <span class="s2">&quot;policy_band&quot;</span><span class="p">,</span> <span class="s2">&quot;health&quot;</span><span class="p">}:</span>
-        <span class="n">edges</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">]</span>
-        <span class="n">default_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;0-5&quot;</span><span class="p">,</span> <span class="s2">&quot;6-17&quot;</span><span class="p">,</span> <span class="s2">&quot;18-39&quot;</span><span class="p">,</span> <span class="s2">&quot;40-64&quot;</span><span class="p">,</span> <span class="s2">&quot;65+&quot;</span><span class="p">]</span>
+        <span class="c1"># 연령 데이터 최소값(예: 18세)과 레이블을 일치시킴</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">]</span>
+        <span class="n">default_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;0~18&quot;</span><span class="p">,</span> <span class="s2">&quot;19-29&quot;</span><span class="p">,</span> <span class="s2">&quot;30-39&quot;</span><span class="p">,</span> <span class="s2">&quot;40-49&quot;</span><span class="p">,</span> <span class="s2">&quot;50-64&quot;</span><span class="p">,</span> <span class="s2">&quot;65+&quot;</span><span class="p">]</span>
         <span class="n">_cut</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">default_labels</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df</span>
 
@@ -3170,17 +3480,62 @@
     <span class="c1"># 동일 간격</span>
     <span class="k">if</span> <span class="n">method_key</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;equal_width&quot;</span><span class="p">,</span> <span class="s2">&quot;uniform&quot;</span><span class="p">}:</span>
         <span class="n">k</span> <span class="o">=</span> <span class="n">bins</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">bins</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">5</span>
-        <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">retbins</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># apply_labels=True: 숫자 인덱스 / False: 문자 레이블</span>
+        <span class="k">if</span> <span class="n">apply_labels</span><span class="p">:</span>
+            <span class="c1"># 숫자 인덱스 사용 (0, 1, 2, ...)</span>
+            <span class="n">numeric_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">numeric_labels</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># 문자 레이블 적용</span>
+            <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">auto_labels</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">left</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">edges</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">edges</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">else</span> <span class="s2">&quot;-∞&quot;</span>
+                    <span class="n">right</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">edges</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">edges</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">else</span> <span class="s2">&quot;∞&quot;</span>
+                    <span class="c1"># 정수값인 경우 소수점 제거</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">left</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">left</span><span class="p">)))</span> <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">left</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">left</span><span class="p">))</span> <span class="k">else</span> <span class="n">left</span>
+                        <span class="n">right</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">right</span><span class="p">)))</span> <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">right</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">right</span><span class="p">))</span> <span class="k">else</span> <span class="n">right</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                    <span class="n">auto_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">left</span><span class="si">}</span><span class="s2">~</span><span class="si">{</span><span class="n">right</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">auto_labels</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
         <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df</span>
 
     <span class="c1"># 분위수 기반 동빈도</span>
     <span class="k">if</span> <span class="n">method_key</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;quantile&quot;</span><span class="p">,</span> <span class="s2">&quot;qcut&quot;</span><span class="p">,</span> <span class="s2">&quot;equal_freq&quot;</span><span class="p">}:</span>
         <span class="n">k</span> <span class="o">=</span> <span class="n">bins</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">bins</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">4</span>
+        <span class="c1"># apply_labels=False일 때 기본 레이블을 사분위수 위치(Q1~)로 설정</span>
+        <span class="n">default_q_labels</span> <span class="o">=</span> <span class="n">labels</span> <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Q</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">qcut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="s2">&quot;drop&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">apply_labels</span><span class="p">:</span>
+                <span class="c1"># 숫자 인덱스 사용</span>
+                <span class="n">numeric_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">qcut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">numeric_labels</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="s2">&quot;drop&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># 사분위수 위치 기반 문자 레이블(Q1, Q2, ...)</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">qcut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">default_q_labels</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="s2">&quot;drop&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">retbins</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># apply_labels=True: 숫자 인덱스 / False: 문자 레이블</span>
+            <span class="n">n_bins</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">apply_labels</span><span class="p">:</span>
+                <span class="n">numeric_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_bins</span><span class="p">))</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">numeric_labels</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">position_labels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Q</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_bins</span><span class="p">)]</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span>
+                        <span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">position_labels</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df</span>
 
@@ -3191,23 +3546,63 @@
         <span class="n">k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">series_nonnull</span><span class="o">.</span><span class="n">nunique</span><span class="p">()))</span>
         <span class="n">edges</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span><span class="w"> </span><span class="nn">jenkspy</span>
-
             <span class="n">edges</span> <span class="o">=</span> <span class="n">jenkspy</span><span class="o">.</span><span class="n">jenks_breaks</span><span class="p">(</span><span class="n">series_nonnull</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span> <span class="n">nb_class</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
             <span class="n">edges</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
             <span class="n">edges</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">qcut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="s2">&quot;drop&quot;</span><span class="p">)</span>
+                <span class="n">use_labels</span> <span class="o">=</span> <span class="n">labels</span> <span class="k">if</span> <span class="n">apply_labels</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">qcut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">use_labels</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="s2">&quot;drop&quot;</span><span class="p">)</span>
                 <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">df</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">edges</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">edges</span><span class="p">:</span>
-            <span class="n">_cut</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># apply_labels=True: 숫자 인덱스 / False: 문자 레이블</span>
+            <span class="k">if</span> <span class="n">apply_labels</span><span class="p">:</span>
+                <span class="c1"># 숫자 인덱스 사용</span>
+                <span class="n">numeric_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">numeric_labels</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">auto_labels</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                        <span class="n">left</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">edges</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">edges</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">else</span> <span class="s2">&quot;-∞&quot;</span>
+                        <span class="n">right</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">edges</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">edges</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">else</span> <span class="s2">&quot;∞&quot;</span>
+                        <span class="c1"># 정수값인 경우 소수점 제거</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">left</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">left</span><span class="p">)))</span> <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">left</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">left</span><span class="p">))</span> <span class="k">else</span> <span class="n">left</span>
+                            <span class="n">right</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">right</span><span class="p">)))</span> <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">right</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">right</span><span class="p">))</span> <span class="k">else</span> <span class="n">right</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="n">auto_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">left</span><span class="si">}</span><span class="s2">~</span><span class="si">{</span><span class="n">right</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">_cut</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">auto_labels</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_cut</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">cut_edges</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">retbins</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">apply_labels</span><span class="p">:</span>
+                <span class="c1"># 숫자 인덱스 사용</span>
+                <span class="n">numeric_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cut_edges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">cut_edges</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">numeric_labels</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">auto_labels</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cut_edges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                        <span class="n">left</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cut_edges</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">cut_edges</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">else</span> <span class="s2">&quot;-∞&quot;</span>
+                        <span class="n">right</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cut_edges</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">cut_edges</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">else</span> <span class="s2">&quot;∞&quot;</span>
+                        <span class="c1"># 정수값인 경우 소수점 제거</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">left</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">left</span><span class="p">)))</span> <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">left</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">left</span><span class="p">))</span> <span class="k">else</span> <span class="n">left</span>
+                            <span class="n">right</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">right</span><span class="p">)))</span> <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">right</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">right</span><span class="p">))</span> <span class="k">else</span> <span class="n">right</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="n">auto_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">left</span><span class="si">}</span><span class="s2">~</span><span class="si">{</span><span class="n">right</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">cut_edges</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">auto_labels</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">cut_edges</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">new_col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df</span>
 
@@ -3340,67 +3735,67 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_prep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">569</span>
-<span class="normal">570</span>
-<span class="normal">571</span>
-<span class="normal">572</span>
-<span class="normal">573</span>
-<span class="normal">574</span>
-<span class="normal">575</span>
-<span class="normal">576</span>
-<span class="normal">577</span>
-<span class="normal">578</span>
-<span class="normal">579</span>
-<span class="normal">580</span>
-<span class="normal">581</span>
-<span class="normal">582</span>
-<span class="normal">583</span>
-<span class="normal">584</span>
-<span class="normal">585</span>
-<span class="normal">586</span>
-<span class="normal">587</span>
-<span class="normal">588</span>
-<span class="normal">589</span>
-<span class="normal">590</span>
-<span class="normal">591</span>
-<span class="normal">592</span>
-<span class="normal">593</span>
-<span class="normal">594</span>
-<span class="normal">595</span>
-<span class="normal">596</span>
-<span class="normal">597</span>
-<span class="normal">598</span>
-<span class="normal">599</span>
-<span class="normal">600</span>
-<span class="normal">601</span>
-<span class="normal">602</span>
-<span class="normal">603</span>
-<span class="normal">604</span>
-<span class="normal">605</span>
-<span class="normal">606</span>
-<span class="normal">607</span>
-<span class="normal">608</span>
-<span class="normal">609</span>
-<span class="normal">610</span>
-<span class="normal">611</span>
-<span class="normal">612</span>
-<span class="normal">613</span>
-<span class="normal">614</span>
-<span class="normal">615</span>
-<span class="normal">616</span>
-<span class="normal">617</span>
-<span class="normal">618</span>
-<span class="normal">619</span>
-<span class="normal">620</span>
-<span class="normal">621</span>
-<span class="normal">622</span>
-<span class="normal">623</span>
-<span class="normal">624</span>
-<span class="normal">625</span>
-<span class="normal">626</span>
-<span class="normal">627</span>
-<span class="normal">628</span>
-<span class="normal">629</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">log_transform</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">727</span>
+<span class="normal">728</span>
+<span class="normal">729</span>
+<span class="normal">730</span>
+<span class="normal">731</span>
+<span class="normal">732</span>
+<span class="normal">733</span>
+<span class="normal">734</span>
+<span class="normal">735</span>
+<span class="normal">736</span>
+<span class="normal">737</span>
+<span class="normal">738</span>
+<span class="normal">739</span>
+<span class="normal">740</span>
+<span class="normal">741</span>
+<span class="normal">742</span>
+<span class="normal">743</span>
+<span class="normal">744</span>
+<span class="normal">745</span>
+<span class="normal">746</span>
+<span class="normal">747</span>
+<span class="normal">748</span>
+<span class="normal">749</span>
+<span class="normal">750</span>
+<span class="normal">751</span>
+<span class="normal">752</span>
+<span class="normal">753</span>
+<span class="normal">754</span>
+<span class="normal">755</span>
+<span class="normal">756</span>
+<span class="normal">757</span>
+<span class="normal">758</span>
+<span class="normal">759</span>
+<span class="normal">760</span>
+<span class="normal">761</span>
+<span class="normal">762</span>
+<span class="normal">763</span>
+<span class="normal">764</span>
+<span class="normal">765</span>
+<span class="normal">766</span>
+<span class="normal">767</span>
+<span class="normal">768</span>
+<span class="normal">769</span>
+<span class="normal">770</span>
+<span class="normal">771</span>
+<span class="normal">772</span>
+<span class="normal">773</span>
+<span class="normal">774</span>
+<span class="normal">775</span>
+<span class="normal">776</span>
+<span class="normal">777</span>
+<span class="normal">778</span>
+<span class="normal">779</span>
+<span class="normal">780</span>
+<span class="normal">781</span>
+<span class="normal">782</span>
+<span class="normal">783</span>
+<span class="normal">784</span>
+<span class="normal">785</span>
+<span class="normal">786</span>
+<span class="normal">787</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">log_transform</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;수치형 변수에 대해 로그 변환을 수행한다.</span>
 
 <span class="sd">    자연로그(ln)를 사용하여 변환하며, 0 또는 음수 값이 있을 경우</span>
@@ -3581,93 +3976,93 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_prep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">635</span>
-<span class="normal">636</span>
-<span class="normal">637</span>
-<span class="normal">638</span>
-<span class="normal">639</span>
-<span class="normal">640</span>
-<span class="normal">641</span>
-<span class="normal">642</span>
-<span class="normal">643</span>
-<span class="normal">644</span>
-<span class="normal">645</span>
-<span class="normal">646</span>
-<span class="normal">647</span>
-<span class="normal">648</span>
-<span class="normal">649</span>
-<span class="normal">650</span>
-<span class="normal">651</span>
-<span class="normal">652</span>
-<span class="normal">653</span>
-<span class="normal">654</span>
-<span class="normal">655</span>
-<span class="normal">656</span>
-<span class="normal">657</span>
-<span class="normal">658</span>
-<span class="normal">659</span>
-<span class="normal">660</span>
-<span class="normal">661</span>
-<span class="normal">662</span>
-<span class="normal">663</span>
-<span class="normal">664</span>
-<span class="normal">665</span>
-<span class="normal">666</span>
-<span class="normal">667</span>
-<span class="normal">668</span>
-<span class="normal">669</span>
-<span class="normal">670</span>
-<span class="normal">671</span>
-<span class="normal">672</span>
-<span class="normal">673</span>
-<span class="normal">674</span>
-<span class="normal">675</span>
-<span class="normal">676</span>
-<span class="normal">677</span>
-<span class="normal">678</span>
-<span class="normal">679</span>
-<span class="normal">680</span>
-<span class="normal">681</span>
-<span class="normal">682</span>
-<span class="normal">683</span>
-<span class="normal">684</span>
-<span class="normal">685</span>
-<span class="normal">686</span>
-<span class="normal">687</span>
-<span class="normal">688</span>
-<span class="normal">689</span>
-<span class="normal">690</span>
-<span class="normal">691</span>
-<span class="normal">692</span>
-<span class="normal">693</span>
-<span class="normal">694</span>
-<span class="normal">695</span>
-<span class="normal">696</span>
-<span class="normal">697</span>
-<span class="normal">698</span>
-<span class="normal">699</span>
-<span class="normal">700</span>
-<span class="normal">701</span>
-<span class="normal">702</span>
-<span class="normal">703</span>
-<span class="normal">704</span>
-<span class="normal">705</span>
-<span class="normal">706</span>
-<span class="normal">707</span>
-<span class="normal">708</span>
-<span class="normal">709</span>
-<span class="normal">710</span>
-<span class="normal">711</span>
-<span class="normal">712</span>
-<span class="normal">713</span>
-<span class="normal">714</span>
-<span class="normal">715</span>
-<span class="normal">716</span>
-<span class="normal">717</span>
-<span class="normal">718</span>
-<span class="normal">719</span>
-<span class="normal">720</span>
-<span class="normal">721</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_interaction</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">pairs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">793</span>
+<span class="normal">794</span>
+<span class="normal">795</span>
+<span class="normal">796</span>
+<span class="normal">797</span>
+<span class="normal">798</span>
+<span class="normal">799</span>
+<span class="normal">800</span>
+<span class="normal">801</span>
+<span class="normal">802</span>
+<span class="normal">803</span>
+<span class="normal">804</span>
+<span class="normal">805</span>
+<span class="normal">806</span>
+<span class="normal">807</span>
+<span class="normal">808</span>
+<span class="normal">809</span>
+<span class="normal">810</span>
+<span class="normal">811</span>
+<span class="normal">812</span>
+<span class="normal">813</span>
+<span class="normal">814</span>
+<span class="normal">815</span>
+<span class="normal">816</span>
+<span class="normal">817</span>
+<span class="normal">818</span>
+<span class="normal">819</span>
+<span class="normal">820</span>
+<span class="normal">821</span>
+<span class="normal">822</span>
+<span class="normal">823</span>
+<span class="normal">824</span>
+<span class="normal">825</span>
+<span class="normal">826</span>
+<span class="normal">827</span>
+<span class="normal">828</span>
+<span class="normal">829</span>
+<span class="normal">830</span>
+<span class="normal">831</span>
+<span class="normal">832</span>
+<span class="normal">833</span>
+<span class="normal">834</span>
+<span class="normal">835</span>
+<span class="normal">836</span>
+<span class="normal">837</span>
+<span class="normal">838</span>
+<span class="normal">839</span>
+<span class="normal">840</span>
+<span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span>
+<span class="normal">844</span>
+<span class="normal">845</span>
+<span class="normal">846</span>
+<span class="normal">847</span>
+<span class="normal">848</span>
+<span class="normal">849</span>
+<span class="normal">850</span>
+<span class="normal">851</span>
+<span class="normal">852</span>
+<span class="normal">853</span>
+<span class="normal">854</span>
+<span class="normal">855</span>
+<span class="normal">856</span>
+<span class="normal">857</span>
+<span class="normal">858</span>
+<span class="normal">859</span>
+<span class="normal">860</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span>
+<span class="normal">865</span>
+<span class="normal">866</span>
+<span class="normal">867</span>
+<span class="normal">868</span>
+<span class="normal">869</span>
+<span class="normal">870</span>
+<span class="normal">871</span>
+<span class="normal">872</span>
+<span class="normal">873</span>
+<span class="normal">874</span>
+<span class="normal">875</span>
+<span class="normal">876</span>
+<span class="normal">877</span>
+<span class="normal">878</span>
+<span class="normal">879</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_interaction</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">pairs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;데이터프레임에 상호작용(interaction) 항을 추가한다.</span>
 
 <span class="sd">    수치형 및 명목형 변수 간의 상호작용 항을 생성하여 데이터프레임에 추가한다.</span>
