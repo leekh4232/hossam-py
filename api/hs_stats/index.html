@@ -869,6 +869,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hossam.hs_stats.summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        summary
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1192,6 +1203,17 @@
     <span class="md-ellipsis">
       
         predict
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_stats.summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        summary
       
     </span>
   </a>
@@ -9157,6 +9179,433 @@ BinaryResultsWrapper(로지스틱 회귀) 객체를 받아 데이터에 대한
             <span class="sa">f</span><span class="s2">&quot;모형 학습 시 사용한 특성과 입력 데이터의 특성이 일치하는지 확인하세요.</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="sa">f</span><span class="s2">&quot;원본 오류: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.hs_stats.summary" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">summary</span>
+
+
+<a href="#hossam.hs_stats.summary" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">summary</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>데이터프레임의 연속형 변수에 대한 확장된 기술통계량을 반환한다.</p>
+<p>각 연속형(숫자형) 컬럼의 기술통계량(describe)을 구하고, 이에 사분위수 범위(IQR),
+이상치 경계값(UP, DOWN), 왜도(skew), 이상치 개수 및 비율, 분포 특성, 로그변환 필요성을
+추가하여 반환한다.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>분석 대상 데이터프레임.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>*fields</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>분석할 컬럼명 목록. 지정하지 않으면 모든 숫자형 컬럼을 처리.</p>
+              </div>
+            </td>
+            <td>
+                  <code>()</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>DataFrame</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>각 필드별 확장된 기술통계량을 포함한 데이터프레임.
+행은 다음과 같은 통계량을 포함:</p>
+<ul>
+<li>count (float): 비결측치의 수</li>
+<li>mean (float): 평균값</li>
+<li>std (float): 표준편차</li>
+<li>min (float): 최소값</li>
+<li>25% (float): 제1사분위수 (Q1)</li>
+<li>50% (float): 제2사분위수 (중앙값)</li>
+<li>75% (float): 제3사분위수 (Q3)</li>
+<li>max (float): 최대값</li>
+<li>iqr (float): 사분위 범위 (Q3 - Q1)</li>
+<li>up (float): 이상치 상한 경계값 (Q3 + 1.5 * IQR)</li>
+<li>down (float): 이상치 하한 경계값 (Q1 - 1.5 * IQR)</li>
+<li>skew (float): 왜도</li>
+<li>outlier_count (int): 이상치 개수</li>
+<li>outlier_rate (float): 이상치 비율(%)</li>
+<li>dist (str): 분포 특성 ("극단 우측 꼬리", "거의 대칭" 등)</li>
+<li>log_need (str): 로그변환 필요성 ("높음", "중간", "낮음")</li>
+</ul>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <p>전체 숫자형 컬럼에 대한 확장된 기술통계:</p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">summary</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+<span class="gp">... </span>    <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">60</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">summary</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</code></pre></div>
+    <p>특정 컬럼만 분석:</p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">summary</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</code></pre></div>
+
+
+<details class="notes" open>
+  <summary>Notes</summary>
+  <ul>
+<li>숫자형이 아닌 컬럼은 자동으로 제외됩니다.</li>
+<li>결과는 필드(컬럼)가 행으로, 통계량이 열로 구성됩니다.</li>
+<li>Tukey의 1.5 * IQR 규칙을 사용하여 이상치를 판정합니다.</li>
+<li>분포 특성은 왜도 값으로 판정합니다.</li>
+<li>로그변환 필요성은 왜도의 절댓값 크기로 판정합니다.</li>
+</ul>
+</details>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/hs_stats.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2710</span>
+<span class="normal">2711</span>
+<span class="normal">2712</span>
+<span class="normal">2713</span>
+<span class="normal">2714</span>
+<span class="normal">2715</span>
+<span class="normal">2716</span>
+<span class="normal">2717</span>
+<span class="normal">2718</span>
+<span class="normal">2719</span>
+<span class="normal">2720</span>
+<span class="normal">2721</span>
+<span class="normal">2722</span>
+<span class="normal">2723</span>
+<span class="normal">2724</span>
+<span class="normal">2725</span>
+<span class="normal">2726</span>
+<span class="normal">2727</span>
+<span class="normal">2728</span>
+<span class="normal">2729</span>
+<span class="normal">2730</span>
+<span class="normal">2731</span>
+<span class="normal">2732</span>
+<span class="normal">2733</span>
+<span class="normal">2734</span>
+<span class="normal">2735</span>
+<span class="normal">2736</span>
+<span class="normal">2737</span>
+<span class="normal">2738</span>
+<span class="normal">2739</span>
+<span class="normal">2740</span>
+<span class="normal">2741</span>
+<span class="normal">2742</span>
+<span class="normal">2743</span>
+<span class="normal">2744</span>
+<span class="normal">2745</span>
+<span class="normal">2746</span>
+<span class="normal">2747</span>
+<span class="normal">2748</span>
+<span class="normal">2749</span>
+<span class="normal">2750</span>
+<span class="normal">2751</span>
+<span class="normal">2752</span>
+<span class="normal">2753</span>
+<span class="normal">2754</span>
+<span class="normal">2755</span>
+<span class="normal">2756</span>
+<span class="normal">2757</span>
+<span class="normal">2758</span>
+<span class="normal">2759</span>
+<span class="normal">2760</span>
+<span class="normal">2761</span>
+<span class="normal">2762</span>
+<span class="normal">2763</span>
+<span class="normal">2764</span>
+<span class="normal">2765</span>
+<span class="normal">2766</span>
+<span class="normal">2767</span>
+<span class="normal">2768</span>
+<span class="normal">2769</span>
+<span class="normal">2770</span>
+<span class="normal">2771</span>
+<span class="normal">2772</span>
+<span class="normal">2773</span>
+<span class="normal">2774</span>
+<span class="normal">2775</span>
+<span class="normal">2776</span>
+<span class="normal">2777</span>
+<span class="normal">2778</span>
+<span class="normal">2779</span>
+<span class="normal">2780</span>
+<span class="normal">2781</span>
+<span class="normal">2782</span>
+<span class="normal">2783</span>
+<span class="normal">2784</span>
+<span class="normal">2785</span>
+<span class="normal">2786</span>
+<span class="normal">2787</span>
+<span class="normal">2788</span>
+<span class="normal">2789</span>
+<span class="normal">2790</span>
+<span class="normal">2791</span>
+<span class="normal">2792</span>
+<span class="normal">2793</span>
+<span class="normal">2794</span>
+<span class="normal">2795</span>
+<span class="normal">2796</span>
+<span class="normal">2797</span>
+<span class="normal">2798</span>
+<span class="normal">2799</span>
+<span class="normal">2800</span>
+<span class="normal">2801</span>
+<span class="normal">2802</span>
+<span class="normal">2803</span>
+<span class="normal">2804</span>
+<span class="normal">2805</span>
+<span class="normal">2806</span>
+<span class="normal">2807</span>
+<span class="normal">2808</span>
+<span class="normal">2809</span>
+<span class="normal">2810</span>
+<span class="normal">2811</span>
+<span class="normal">2812</span>
+<span class="normal">2813</span>
+<span class="normal">2814</span>
+<span class="normal">2815</span>
+<span class="normal">2816</span>
+<span class="normal">2817</span>
+<span class="normal">2818</span>
+<span class="normal">2819</span>
+<span class="normal">2820</span>
+<span class="normal">2821</span>
+<span class="normal">2822</span>
+<span class="normal">2823</span>
+<span class="normal">2824</span>
+<span class="normal">2825</span>
+<span class="normal">2826</span>
+<span class="normal">2827</span>
+<span class="normal">2828</span>
+<span class="normal">2829</span>
+<span class="normal">2830</span>
+<span class="normal">2831</span>
+<span class="normal">2832</span>
+<span class="normal">2833</span>
+<span class="normal">2834</span>
+<span class="normal">2835</span>
+<span class="normal">2836</span>
+<span class="normal">2837</span>
+<span class="normal">2838</span>
+<span class="normal">2839</span>
+<span class="normal">2840</span>
+<span class="normal">2841</span>
+<span class="normal">2842</span>
+<span class="normal">2843</span>
+<span class="normal">2844</span>
+<span class="normal">2845</span>
+<span class="normal">2846</span>
+<span class="normal">2847</span>
+<span class="normal">2848</span>
+<span class="normal">2849</span>
+<span class="normal">2850</span>
+<span class="normal">2851</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">summary</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;데이터프레임의 연속형 변수에 대한 확장된 기술통계량을 반환한다.</span>
+
+<span class="sd">    각 연속형(숫자형) 컬럼의 기술통계량(describe)을 구하고, 이에 사분위수 범위(IQR),</span>
+<span class="sd">    이상치 경계값(UP, DOWN), 왜도(skew), 이상치 개수 및 비율, 분포 특성, 로그변환 필요성을</span>
+<span class="sd">    추가하여 반환한다.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (DataFrame): 분석 대상 데이터프레임.</span>
+<span class="sd">        *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 숫자형 컬럼을 처리.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame: 각 필드별 확장된 기술통계량을 포함한 데이터프레임.</span>
+<span class="sd">            행은 다음과 같은 통계량을 포함:</span>
+
+<span class="sd">            - count (float): 비결측치의 수</span>
+<span class="sd">            - mean (float): 평균값</span>
+<span class="sd">            - std (float): 표준편차</span>
+<span class="sd">            - min (float): 최소값</span>
+<span class="sd">            - 25% (float): 제1사분위수 (Q1)</span>
+<span class="sd">            - 50% (float): 제2사분위수 (중앙값)</span>
+<span class="sd">            - 75% (float): 제3사분위수 (Q3)</span>
+<span class="sd">            - max (float): 최대값</span>
+<span class="sd">            - iqr (float): 사분위 범위 (Q3 - Q1)</span>
+<span class="sd">            - up (float): 이상치 상한 경계값 (Q3 + 1.5 * IQR)</span>
+<span class="sd">            - down (float): 이상치 하한 경계값 (Q1 - 1.5 * IQR)</span>
+<span class="sd">            - skew (float): 왜도</span>
+<span class="sd">            - outlier_count (int): 이상치 개수</span>
+<span class="sd">            - outlier_rate (float): 이상치 비율(%)</span>
+<span class="sd">            - dist (str): 분포 특성 (&quot;극단 우측 꼬리&quot;, &quot;거의 대칭&quot; 등)</span>
+<span class="sd">            - log_need (str): 로그변환 필요성 (&quot;높음&quot;, &quot;중간&quot;, &quot;낮음&quot;)</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        전체 숫자형 컬럼에 대한 확장된 기술통계:</span>
+
+<span class="sd">        &gt;&gt;&gt; from hossam import summary</span>
+<span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">        &gt;&gt;&gt; df = pd.DataFrame({</span>
+<span class="sd">        ...     &#39;x&#39;: [1, 2, 3, 4, 5, 100],</span>
+<span class="sd">        ...     &#39;y&#39;: [10, 20, 30, 40, 50, 60],</span>
+<span class="sd">        ...     &#39;z&#39;: [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;, &#39;e&#39;, &#39;f&#39;]</span>
+<span class="sd">        ... })</span>
+<span class="sd">        &gt;&gt;&gt; result = summary(df)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+
+<span class="sd">        특정 컬럼만 분석:</span>
+
+<span class="sd">        &gt;&gt;&gt; result = summary(df, &#39;x&#39;, &#39;y&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        - 숫자형이 아닌 컬럼은 자동으로 제외됩니다.</span>
+<span class="sd">        - 결과는 필드(컬럼)가 행으로, 통계량이 열로 구성됩니다.</span>
+<span class="sd">        - Tukey의 1.5 * IQR 규칙을 사용하여 이상치를 판정합니다.</span>
+<span class="sd">        - 분포 특성은 왜도 값으로 판정합니다.</span>
+<span class="sd">        - 로그변환 필요성은 왜도의 절댓값 크기로 판정합니다.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">fields</span><span class="p">:</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="s1">&#39;int64&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span> <span class="s1">&#39;float64&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span>
+
+    <span class="c1"># 기술통계량 구하기</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">fields</span><span class="p">)]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="c1"># 추가 통계량 계산</span>
+    <span class="n">additional_stats</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+        <span class="c1"># 숫자 타입이 아니라면 건너뜀</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="s1">&#39;int&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;int32&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;int64&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;float&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;float32&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;float64&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;int64&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;float64&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;float32&#39;</span>
+        <span class="p">]:</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># 사분위수</span>
+        <span class="n">q1</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+        <span class="n">q3</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+
+        <span class="c1"># 이상치 경계 (Tukey&#39;s fences)</span>
+        <span class="n">iqr</span> <span class="o">=</span> <span class="n">q3</span> <span class="o">-</span> <span class="n">q1</span>
+        <span class="n">down</span> <span class="o">=</span> <span class="n">q1</span> <span class="o">-</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">iqr</span>
+        <span class="n">up</span> <span class="o">=</span> <span class="n">q3</span> <span class="o">+</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">iqr</span>
+
+        <span class="c1"># 왜도</span>
+        <span class="n">skew</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">skew</span><span class="p">()</span>
+
+        <span class="c1"># 이상치 개수 및 비율</span>
+        <span class="n">outlier_count</span> <span class="o">=</span> <span class="p">((</span><span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">down</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">up</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">outlier_rate</span> <span class="o">=</span> <span class="p">(</span><span class="n">outlier_count</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span>
+
+        <span class="c1"># 분포 특성 판정 (왜도 기준)</span>
+        <span class="n">abs_skew</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">skew</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;거의 대칭&quot;</span>
+        <span class="k">elif</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">skew</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;약한 우측 꼬리&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;약한 좌측 꼬리&quot;</span>
+        <span class="k">elif</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">2.0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">skew</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;중간 우측 꼬리&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;중간 좌측 꼬리&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">skew</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;극단 우측 꼬리&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;극단 좌측 꼬리&quot;</span>
+
+        <span class="c1"># 로그변환 필요성 판정</span>
+        <span class="k">if</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+            <span class="n">log_need</span> <span class="o">=</span> <span class="s2">&quot;낮음&quot;</span>
+        <span class="k">elif</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">log_need</span> <span class="o">=</span> <span class="s2">&quot;중간&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log_need</span> <span class="o">=</span> <span class="s2">&quot;높음&quot;</span>
+
+        <span class="n">additional_stats</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;field&#39;</span><span class="p">:</span> <span class="n">f</span><span class="p">,</span>
+            <span class="s1">&#39;iqr&#39;</span><span class="p">:</span> <span class="n">iqr</span><span class="p">,</span>
+            <span class="s1">&#39;up&#39;</span><span class="p">:</span> <span class="n">up</span><span class="p">,</span>
+            <span class="s1">&#39;down&#39;</span><span class="p">:</span> <span class="n">down</span><span class="p">,</span>
+            <span class="s1">&#39;outlier_count&#39;</span><span class="p">:</span> <span class="n">outlier_count</span><span class="p">,</span>
+            <span class="s1">&#39;outlier_rate&#39;</span><span class="p">:</span> <span class="n">outlier_rate</span><span class="p">,</span>
+            <span class="s1">&#39;skew&#39;</span><span class="p">:</span> <span class="n">skew</span><span class="p">,</span>
+            <span class="s1">&#39;dist&#39;</span><span class="p">:</span> <span class="n">dist</span><span class="p">,</span>
+            <span class="s1">&#39;log_need&#39;</span><span class="p">:</span> <span class="n">log_need</span>
+        <span class="p">})</span>
+
+    <span class="n">additional_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">additional_stats</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;field&#39;</span><span class="p">)</span>
+
+    <span class="c1"># 결과 병합</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">desc</span><span class="p">,</span> <span class="n">additional_df</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
