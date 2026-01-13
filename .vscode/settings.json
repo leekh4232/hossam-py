@@ -7,5 +7,32 @@
   "outline.showClasses": true,
   "outline.sortOrder": "position",
   "outline.badges": false,
-  "outline.problems.enabled": false
+  "outline.problems.enabled": false,
+
+  "[python]": {
+    "defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "linting.enabled": true,
+    "linting.pylintEnabled": false
+  },
+
+  "mcpServers": {
+    "hossam": {
+      "command": "python",
+      "args": ["-m", "hossam.mcp.server"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "disabled": false
+    }
+  },
+
+  "github.copilot.advanced": {
+    "debug.overrideChatModel": "gpt-4"
+  },
+
+  "github.copilot.chat.localeOverride": "ko",
+
+  "[github-copilot-chat]": {
+    "editor.defaultFormatter": "GitHub.copilot"
+  }
 }

@@ -52,3 +52,6 @@ include = ["hossam", "hossam.*"]
 
 [tool.setuptools.package-data]
 hossam = ["*.ttf", "*.png"]
+
+[project.scripts]
+hossam-mcp = "hossam.mcp.server:run"

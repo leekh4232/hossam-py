@@ -1,0 +1,15 @@
+{
+  "cline": {
+    "mcpServers": [
+      {
+        "name": "hossam",
+        "command": "python",
+        "args": ["-m", "hossam.mcp.server"],
+        "env": {
+          "PYTHONPATH": "${workspaceFolder}"
+        },
+        "disabled": false
+      }
+    ]
+  }
+}

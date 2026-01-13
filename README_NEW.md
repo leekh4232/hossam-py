@@ -79,17 +79,16 @@ hossam-mcp
 
 ### VSCode + Copilot 연동
 
-VSCode에서 Copilot과 함께 사용하려면 `.vscode/settings.json` 설정이 필요합니다.
+프로젝트의 `.vscode/settings.json`에 hossam MCP 서버가 자동 등록되어 있습니다.
 
 **Copilot Chat에서 사용:**
 ```
 @hossam 이 DataFrame의 결측치를 분석하고 처리하는 코드 작성해줘
 ```
 
-**설정 가이드:**
-- [`.vscode/settings.json` 완성형 샘플](https://py.hossam.kr/guides/vscode-settings-sample/) ⭐
-- [VSCode + Copilot 연동 상세](https://py.hossam.kr/guides/vscode-copilot-integration/)
+**자세한 가이드:**
 - [MCP 서버 사용법](https://py.hossam.kr/guides/mcp/)
+- [VSCode + Copilot 연동](https://py.hossam.kr/guides/vscode-copilot-integration/)
 - [Copilot Chat 프롬프트 예시](https://py.hossam.kr/guides/copilot-prompts/)
 
 ---
