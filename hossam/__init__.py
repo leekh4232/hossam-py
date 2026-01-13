@@ -1,8 +1,10 @@
 from .data_loader import load_data, load_info
+from .hs_stats import oneway_anova
 from matplotlib import pyplot as plt
 from matplotlib import font_manager as fm
 from importlib.resources import files, as_file
 from importlib.metadata import version
+from types import SimpleNamespace
 import warnings
 
 try:
@@ -10,12 +12,21 @@ try:
 except Exception:
     __version__ = "develop"
 
-hs_dpi = 200  # 이미지 선명도(100~300)
-hs_fig_width = 600
-hs_fig_height = 320
-hs_font_size = 5
 
-__all__ = ["load_data", "load_info", "hs_classroom", "hs_gis", "hs_plot", "hs_prep", "hs_stats", "hs_timeserise", "hs_util", "hs_dpi", "hs_fig_width", "hs_fig_height"]
+hs_fig = SimpleNamespace(
+    dpi=200,
+    width=600,
+    height=320,
+    font_size=6,
+    font_weight="light",
+    frame_width=0.4,
+    line_width=1,
+    grid_alpha=0.3,
+    grid_width=0.4,
+    fill_alpha=0.3
+)
+
+__all__ = ["load_data", "load_info", "hs_classroom", "hs_gis", "hs_plot", "hs_prep", "hs_stats", "hs_timeserise", "hs_util", "hs_fig"]
 
 
 def _init_korean_font():
@@ -29,10 +40,22 @@ def _init_korean_font():
             fm.fontManager.addfont(str(font_path))
             fprop = fm.FontProperties(fname=str(font_path))
             fname = fprop.get_name()
-            plt.rcParams["font.family"] = fname
-            plt.rcParams["font.size"] = hs_font_size
-            plt.rcParams["font.weight"] = "light"
-            plt.rcParams["axes.unicode_minus"] = False
+
+            plt.rcParams.update({
+                "font.family": fname,
+                "font.size": hs_fig.font_size,
+                "font.weight": hs_fig.font_weight,
+                "axes.unicode_minus": False,
+                "text.antialiased": True,
+                "lines.antialiased": True,
+                "patch.antialiased": True,
+                "figure.dpi": hs_fig.dpi,
+                "savefig.dpi": hs_fig.dpi * 2,
+                "text.hinting": "auto",
+                "text.hinting_factor": 8,
+                "pdf.fonttype": 42,
+                "ps.fonttype": 42,
+            })
             print(
                 "\n✅ 시각화를 위한 한글 글꼴(NotoSansKR-Regular)이 자동 적용되었습니다."
             )

@@ -1,17 +1,27 @@
 # -*- coding: utf-8 -*-
-# -------------------------------------------------------------
+# ===================================================================
+#
+# ===================================================================
 import joblib
 import numpy as np
+from itertools import combinations
 
-# -------------------------------------------------------------
-from pandas import DataFrame, get_dummies
+# ===================================================================
+#
+# ===================================================================
+import pandas as pd
+from pandas import DataFrame
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.impute import SimpleImputer
 
-# -------------------------------------------------------------
+# ===================================================================
+#
+# ===================================================================
 from .hs_util import pretty_table
 
-# -------------------------------------------------------------
+# ===================================================================
+# 연속형 변수를 표준정규화(Z-score)로 변환한다
+# ===================================================================
 def standard_scaler(
     data: any, yname: str | None = None, save_path: str | None = None, load_path: str | None = None
 ) -> DataFrame:
@@ -78,7 +88,9 @@ def standard_scaler(
     return std_df
 
 
-# -------------------------------------------------------------
+# ===================================================================
+# 연속형 변수를 0부터 1 사이의 값으로 정규화한다
+# ===================================================================
 def minmax_scaler(
     data: any, yname: str | None = None, save_path: str | None = None, load_path: str | None = None
 ) -> DataFrame:
@@ -143,7 +155,9 @@ def minmax_scaler(
     return std_df
 
 
-# -------------------------------------------------------------
+# ===================================================================
+# 지정된 컬럼들을 범주형 데이터로 설정한다
+# ===================================================================
 def set_category(data: DataFrame, *args: str) -> DataFrame:
     """카테고리 데이터를 설정한다.
 
@@ -162,7 +176,9 @@ def set_category(data: DataFrame, *args: str) -> DataFrame:
     return df
 
 
-# -------------------------------------------------------------
+# ===================================================================
+# Melted 형태를 원래 모양으로 복구하여 변수를 펼친다
+# ===================================================================
 def unmelt(
     data: DataFrame, id_vars: str = "class", value_vars: str = "values"
 ) -> DataFrame:
@@ -186,7 +202,9 @@ def unmelt(
     return DataFrame(mydict)
 
 
-# -------------------------------------------------------------
+# ===================================================================
+# 결측치를 평균, 중앙값 등의 전략으로 대체한다
+# ===================================================================
 def replace_missing_value(data: DataFrame, strategy: str = "mean") -> DataFrame:
     """SimpleImputer로 결측치를 대체한다.
 
@@ -211,7 +229,9 @@ def replace_missing_value(data: DataFrame, strategy: str = "mean") -> DataFrame:
     return DataFrame(df_imr, index=data.index, columns=data.columns)
 
 
-# -------------------------------------------------------------
+# ===================================================================
+# 지정된 변수의 이상치 테이블로 반환한다
+# ===================================================================
 def outlier_table(data: DataFrame, *fields: str) -> DataFrame:
     """수치형 컬럼에 대한 사분위수 및 IQR 기반 이상치 경계를 계산한다.
 
@@ -263,7 +283,9 @@ def outlier_table(data: DataFrame, *fields: str) -> DataFrame:
     return DataFrame(result).set_index("FIELD") if result else DataFrame()
 
 
-# -------------------------------------------------------------
+# ===================================================================
+# 이상치를 대체값(NaN, 0) 또는 중앙값으로 교체한다
+# ===================================================================
 def replace_outliner(data: DataFrame, method: str = "nan", *fields: str) -> DataFrame:
     """이상치 경계값을 넘어가는 데이터를 경계값으로 대체한다.
 
@@ -323,7 +345,9 @@ def replace_outliner(data: DataFrame, method: str = "nan", *fields: str) -> Data
 
     return df
 
-# -------------------------------------------------------------
+# ===================================================================
+# 중빈 이상치를 제거한 연처리된 데이터프레임을 반환한다
+# ===================================================================
 def drop_outliner(data: DataFrame, *fields: str) -> DataFrame:
     """이상치를 결측치로 변환한 후 모두 삭제한다.
 
@@ -339,30 +363,51 @@ def drop_outliner(data: DataFrame, *fields: str) -> DataFrame:
     return df.dropna()
 
 
-# -------------------------------------------------------------
-def dummies(data: DataFrame, drop_first=True, dtype="int", *args: str) -> DataFrame:
+# ===================================================================
+# 범주 변수를 더미 변수(One-Hot 인코딩)로 변환한다
+# ===================================================================
+def get_dummies(data: DataFrame, *args: str, drop_first=True, dtype="int") -> DataFrame:
     """명목형 변수를 더미 변수로 변환한다.
+
+    컬럼명을 지정하면 그 컬럼들만 더미 변수로 변환하고,
+    지정하지 않으면 숫자 타입이 아닌 모든 컬럼(문자열/명목형)을 자동으로 더미 변수로 변환한다.
 
     Args:
         data (DataFrame): 데이터프레임
-        *args (str): 명목형 컬럼 목록
+        *args (str): 변환할 컬럼명 목록. 지정하지 않으면 숫자형이 아닌 모든 컬럼 자동 선택.
+        drop_first (bool, optional): 첫 번째 더미 변수 제거 여부. 기본값 True.
+        dtype (str, optional): 더미 변수 데이터 타입. 기본값 "int".
 
     Returns:
         DataFrame: 더미 변수로 변환된 데이터프레임
+
+    Examples:
+        >>> from hossam.hs_prep import get_dummies
+        >>> # 전체 비숫자 컬럼 자동 변환
+        >>> result = get_dummies(df)
+        >>> # 특정 컬럼만 변환
+        >>> result = get_dummies(df, 'cut', 'color', 'clarity')
+        >>> # 옵션 지정
+        >>> result = get_dummies(df, 'col1', drop_first=False, dtype='bool')
     """
     if not args:
-        args = []
-
+        # args가 없으면 숫자 타입이 아닌 모든 컬럼 자동 선택
+        cols_to_convert = []
         for f in data.columns:
-            if data[f].dtypes == "category":
-                args.append(f)
+            if not pd.api.types.is_numeric_dtype(data[f]):
+                cols_to_convert.append(f)
+        args = cols_to_convert
     else:
-        args = list(args)
+        # args가 있으면 그 컬럼들만 사용 (존재 여부 확인)
+        args = [c for c in args if c in data.columns]
 
-    return get_dummies(data, columns=args, drop_first=drop_first, dtype=dtype)
+    # pandas.get_dummies 사용 (재귀 문제 없음)
+    return pd.get_dummies(data, columns=args, drop_first=drop_first, dtype=dtype) if args else data.copy()
 
 
-# -------------------------------------------------------------
+# ===================================================================
+# 범주형 변수(Categorical)를 순차적 레이블로 인코딩한다
+# ===================================================================
 def labelling(data: DataFrame, *fields: str) -> DataFrame:
     """명목형 변수를 라벨링한다.
 
@@ -394,7 +439,9 @@ def labelling(data: DataFrame, *fields: str) -> DataFrame:
     return df
 
 
-# -------------------------------------------------------------
+# ===================================================================
+# 지정된 변수에 로그 먼저 변환을 적용한다
+# ===================================================================
 def log_transform(data: DataFrame, *fields: str) -> DataFrame:
     """수치형 변수에 대해 로그 변환을 수행한다.
 
@@ -454,5 +501,97 @@ def log_transform(data: DataFrame, *fields: str) -> DataFrame:
             df[col] = np.log(df[col] + shift)
         else:
             df[col] = np.log(df[col])
+
+    return df
+
+
+# ===================================================================
+# 변수 간의 상호작용 항을 추가한 데이터프레임을 반환한다
+# ===================================================================
+def add_interaction(data: DataFrame, pairs: list[tuple[str, str]] | None = None) -> DataFrame:
+    """데이터프레임에 상호작용(interaction) 항을 추가한다.
+
+    수치형 및 명목형 변수 간의 상호작용 항을 생성하여 데이터프레임에 추가한다.
+    - 수치형 * 수치형: 두 변수의 곱셈 (col1*col2)
+    - 수치형 * 명목형: 명목형의 각 카테고리별 수치형 변수 생성 (col1*col2_category)
+    - 명목형 * 명목형: 두 명목형을 결합한 새 명목형 변수 생성 (col1_col2)
+
+    Args:
+        data (DataFrame): 원본 데이터프레임.
+        pairs (list[tuple[str, str]], optional): 직접 지정할 교호작용 쌍의 리스트.
+                                                예: [("age", "gender"), ("color", "cut")]
+                                                None이면 모든 수치형 컬럼의 2-way 상호작용을 생성.
+
+    Returns:
+        DataFrame: 상호작용 항이 추가된 새 데이터프레임.
+
+    Examples:
+        수치형 변수들의 상호작용:
+
+        >>> from hossam.hs_prep import add_interaction
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({'x1': [1, 2, 3], 'x2': [4, 5, 6]})
+        >>> result = add_interaction(df)
+        >>> print(result.columns)  # x1, x2, x1*x2
+
+        수치형과 명목형의 상호작용:
+
+        >>> df = pd.DataFrame({'age': [20, 30, 40], 'gender': ['M', 'F', 'M']})
+        >>> result = add_interaction(df, pairs=[('age', 'gender')])
+        >>> print(result.columns)  # age, gender, age*gender_M, age*gender_F
+
+        명목형끼리의 상호작용:
+
+        >>> df = pd.DataFrame({'color': ['R', 'G', 'B'], 'cut': ['A', 'B', 'A']})
+        >>> result = add_interaction(df, pairs=[('color', 'cut')])
+        >>> print(result.columns)  # color, cut, color_cut
+    """
+    df = data.copy()
+
+    # pairs가 제공되면 그것을 사용, 아니면 모든 수치형 컬럼의 2-way 상호작용 생성
+    if pairs is not None:
+        cols_to_interact = [(col1, col2) for col1, col2 in pairs
+                           if col1 in df.columns and col2 in df.columns]
+    else:
+        numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+        cols_to_interact = list(combinations(numeric_cols, 2))
+
+    # 상호작용 항 생성
+    for col1, col2 in cols_to_interact:
+        is_col1_numeric = pd.api.types.is_numeric_dtype(df[col1])
+        is_col2_numeric = pd.api.types.is_numeric_dtype(df[col2])
+
+        # Case 1: 둘 다 수치형 -> 곱셈
+        if is_col1_numeric and is_col2_numeric:
+            interaction_col_name = f"{col1}*{col2}"
+            df[interaction_col_name] = df[col1] * df[col2]
+
+        # Case 2: 하나는 수치형, 하나는 명목형 -> 명목형의 각 카테고리별로 수치형 변수 생성
+        elif is_col1_numeric and not is_col2_numeric:
+            # col1은 수치형, col2는 명목형
+            categories = df[col2].unique()
+            for cat in categories:
+                # 결측치 처리
+                cat_str = str(cat) if pd.notna(cat) else "nan"
+                interaction_col_name = f"{col1}*{col2}_{cat_str}"
+                # 해당 카테고리인 경우 수치형 값, 아니면 0
+                df[interaction_col_name] = df[col1] * (df[col2] == cat).astype(int)
+
+        elif not is_col1_numeric and is_col2_numeric:
+            # col1은 명목형, col2는 수치형
+            categories = df[col1].unique()
+            for cat in categories:
+                cat_str = str(cat) if pd.notna(cat) else "nan"
+                interaction_col_name = f"{col2}*{col1}_{cat_str}"
+                df[interaction_col_name] = df[col2] * (df[col1] == cat).astype(int)
+
+        # Case 3: 둘 다 명목형 -> 두 변수를 결합한 새로운 명목형 변수
+        else:
+            interaction_col_name = f"{col1}_{col2}"
+            # 문자열로 변환 후 결합 (결측치 처리 포함)
+            df[interaction_col_name] = (
+                df[col1].astype(str).fillna("nan") + "_" +
+                df[col2].astype(str).fillna("nan")
+            )
 
     return df

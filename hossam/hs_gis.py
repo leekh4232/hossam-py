@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-# -------------------------------------------------------------
+# ===================================================================
+# 패키지 참조
+# ===================================================================
 import os
 import time
 import warnings
@@ -13,7 +15,9 @@ from pyproj import CRS
 
 from .hs_util import pretty_table
 
-# -------------------------------------------------------------
+# ===================================================================
+# 단일 주소를 VWorld API로 지오코딩
+# ===================================================================
 def __geocode_item(session: requests.Session, index: int, addr: str, key: str) -> tuple[float, float]:
     """단일 주소를 VWorld API로 지오코딩합니다.
 
@@ -78,7 +82,10 @@ def __geocode_item(session: requests.Session, index: int, addr: str, key: str) -
     #print("%s --> (%s, %s)" % (addr, latitude, longitude))
     return result
 
-# -------------------------------------------------------------
+
+# ===================================================================
+# 주소 컬럼을 일괄 지오코딩하여 위도/경도 컬럼을 추가
+# ===================================================================
 def geocode(df: DataFrame, addr: str, key: str) -> DataFrame:
     """주소 컬럼을 일괄 지오코딩하여 위도/경도 컬럼을 추가합니다.
 
@@ -148,7 +155,9 @@ def geocode(df: DataFrame, addr: str, key: str) -> DataFrame:
 
     return data
 
-# -------------------------------------------------------------
+# ===================================================================
+# Shapefile을 읽어 `GeoDataFrame`으로 로드
+# ===================================================================
 def load_shape(path: str, info: bool = True) -> GeoDataFrame:
     """Shapefile을 읽어 `GeoDataFrame`으로 로드합니다.
 
@@ -188,7 +197,9 @@ def load_shape(path: str, info: bool = True) -> GeoDataFrame:
 
     return data
 
-# -------------------------------------------------------------
+# ===================================================================
+# 전처리된 데이터(GeoDataFrame 또는 DataFrame)를 Shapefile 또는 GeoPackage로 저장
+# ===================================================================
 def save_shape(
     gdf: GeoDataFrame | DataFrame,
     path: str,

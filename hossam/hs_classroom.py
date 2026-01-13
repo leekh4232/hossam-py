@@ -1,21 +1,17 @@
 # -*- coding: utf-8 -*-
-"""
-학생 조 편성 모듈
-
-학생들을 균형잡힌 조로 나누기 위한 기능을 제공합니다.
-관심사 기반 1차 군집과 점수/인원 균형 조정을 통해
-동질성 있고 균형잡힌 조를 구성합니다.
-"""
-
+# ===================================================================
+# 패키지 참조
+# ===================================================================
 import math
 from pandas import DataFrame, qcut, concat, to_numeric
 from kmodes.kmodes import KModes
 from matplotlib import pyplot as plt
 import seaborn as sns
-from hossam import hs_dpi
 from hossam.hs_util import load_data, pretty_table
 
-
+# ===================================================================
+# 학생들을 관심사와 성적으로 균형잡힌 조로 편성한다
+# ===================================================================
 def cluster_students(
     df,
     n_groups: int,
@@ -201,6 +197,9 @@ def cluster_students(
     return result
 
 
+# ===================================================================
+# 조 내 인원과 성적 균형을 반복 조정하여 최적화한다
+# ===================================================================
 def _balance_groups(
     df: DataFrame,
     n_groups: int,
@@ -333,6 +332,9 @@ def _balance_groups(
     return df
 
 
+# ===================================================================
+# 성적 데이터가 없을 때 각 조의 인원 수만 균형조정한다
+# ===================================================================
 def _balance_group_sizes_only(
     df: DataFrame,
     n_groups: int,
@@ -371,6 +373,9 @@ def _balance_group_sizes_only(
     return df
 
 
+# ===================================================================
+# 조 편성 결과의 인원, 관심사, 점수 분포를 시각화한다
+# ===================================================================
 def report_summary(df: DataFrame, figsize: tuple = (20, 4.2), dpi: int = None) -> None:
     """조 편성 결과의 요약 통계를 시각화합니다.
 
@@ -493,6 +498,9 @@ def report_summary(df: DataFrame, figsize: tuple = (20, 4.2), dpi: int = None) -
     plt.show()
 
 
+# ===================================================================
+# 조별 점수 분포를 커널 밀도 추정(KDE) 그래프로 시각화한다
+# ===================================================================
 def report_kde(df: DataFrame, metric: str = 'average', figsize: tuple = (20, 8), dpi: int = None) -> None:
     """조별 점수 분포를 KDE(Kernel Density Estimation)로 시각화합니다.
 
@@ -604,6 +612,9 @@ def report_kde(df: DataFrame, metric: str = 'average', figsize: tuple = (20, 8),
     plt.show()
 
 
+# ===================================================================
+# 조별로 학생 목록과 평균 점수를 요약하여 데이터프레임으로 반환한다
+# ===================================================================
 def group_summary(df: DataFrame, name_col: str = '학생번호') -> DataFrame:
     """조별로 학생 목록과 평균 점수를 요약합니다.
 
@@ -667,6 +678,9 @@ def group_summary(df: DataFrame, name_col: str = '학생번호') -> DataFrame:
     return result_df
 
 
+# ===================================================================
+# 학생 조 편성부터 시각화까지의 전체 분석 프로세스를 일괄 실행한다
+# ===================================================================
 def analyze_classroom(
     df,
     n_groups: int,
