@@ -1,0 +1,1179 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="HOSSAM 패키지의 모듈별 API 레퍼런스와 개요 문서">
+      
+      
+        <meta name="author" content="HOSSAM">
+      
+      
+        <link rel="canonical" href="https://py.hossam.kr/mcp_guide/">
+      
+      
+        <link rel="prev" href="../api/hs_util/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>VS Code에서 Hossam MCP 연동 가이드 - HOSSAM API Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#hossam-mcp-vs-code-copilot" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href=".." title="HOSSAM API Docs" class="md-header__button md-logo" aria-label="HOSSAM API Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            HOSSAM API Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              VS Code에서 Hossam MCP 연동 가이드
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="탭" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../api/hossam/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  MCP Guide
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="HOSSAM API Docs" class="md-nav__button md-logo" aria-label="HOSSAM API Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    HOSSAM API Docs
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/hossam/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Package
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/data_loader/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    data_loader
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/hs_classroom/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hs_classroom
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/hs_gis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hs_gis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/hs_plot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hs_plot
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/hs_prep/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hs_prep
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/hs_stats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hs_stats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/hs_util/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hs_util
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Guide
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MCP Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mcp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP란?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        사전 준비
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="사전 준비">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        패키지 설치:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vs-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VS Code 익스텐션 설치
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vs-code-vscodesettingsjson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VS Code 설정(.vscode/settings.json)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#copilot-githubcopilot-instructionsmd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Copilot 지침 파일(.github/copilot-instructions.md)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        제공 기능(툴) 개요
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        사용 예시(워크플로)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        서버 수동 실행(선택)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        트러블슈팅
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mcp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MCP란?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        사전 준비
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="사전 준비">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        패키지 설치:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vs-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VS Code 익스텐션 설치
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vs-code-vscodesettingsjson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VS Code 설정(.vscode/settings.json)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#copilot-githubcopilot-instructionsmd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Copilot 지침 파일(.github/copilot-instructions.md)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        제공 기능(툴) 개요
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        사용 예시(워크플로)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        서버 수동 실행(선택)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        트러블슈팅
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="hossam-mcp-vs-code-copilot">🧩 Hossam MCP 연동 가이드 (VS Code Copilot)<a class="headerlink" href="#hossam-mcp-vs-code-copilot" title="Permanent link">&para;</a></h1>
+<p>이 문서는 Hossam 라이브러리를 VS Code에서 MCP(Model Context Protocol) 서버로 연동하여 Copilot Chat에서 데이터 분석 도구들을 직접 호출하는 방법을 정리합니다. 또한, 워크스페이스의 설정 파일 예시를 그대로 인용하여 손쉽게 복사/붙여넣기 할 수 있도록 제공합니다.</p>
+<h2 id="mcp">MCP란?<a class="headerlink" href="#mcp" title="Permanent link">&para;</a></h2>
+<ul>
+<li>MCP는 도구(툴)들을 표준화된 프로토콜로 노출해 AI 어시스턴트가 호출할 수 있게 하는 방식입니다.</li>
+<li>Hossam MCP 서버는 <code>StdIO(JSON Lines)</code> 기반으로 동작하며, VS Code Copilot Chat과 호환됩니다.</li>
+<li>서버 실행 엔트리: <code>python -m hossam.mcp.server</code> 또는 <code>hossam-mcp</code>.</li>
+</ul>
+<h2 id="_1">사전 준비<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<h3 id="_2">패키지 설치:<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>hossam
+</code></pre></div>
+<h3 id="vs-code">VS Code 익스텐션 설치<a class="headerlink" href="#vs-code" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>GitHub Copilot Chat
+</code></pre></div>
+<h2 id="vs-code-vscodesettingsjson">VS Code 설정(.vscode/settings.json)<a class="headerlink" href="#vs-code-vscodesettingsjson" title="Permanent link">&para;</a></h2>
+<ul>
+<li>파일: <code>.vscode/settings.json</code></li>
+<li>역할: Copilot Chat에 외부 MCP 서버(Hossam)를 등록하여 도구 호출을 가능하게 함</li>
+<li>위치: 워크스페이스 루트 하위 <code>.vscode</code> 폴더</li>
+</ul>
+<p>아래 설정은 워크스페이스에서 Hossam MCP 서버를 등록하는 예시입니다. 실제 사용 중인 설정과 동일한 형식으로 제시합니다. 워크스페이스 루트에 <code>.vscode/settings.json</code> 파일을 만들고 내용을 추가하세요.</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;github.copilot.chat.mcpServers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;hossam&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">&quot;-m&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;hossam.mcp.server&quot;</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;env&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;PYTHONUNBUFFERED&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;stdIn&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;stdOut&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;stdErr&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="copilot-githubcopilot-instructionsmd">Copilot 지침 파일(.github/copilot-instructions.md)<a class="headerlink" href="#copilot-githubcopilot-instructionsmd" title="Permanent link">&para;</a></h2>
+<ul>
+<li>파일: <code>.github/copilot-instructions.md</code></li>
+<li>역할: Copilot Chat과 MCP 사용 시 어시스턴트 행동 지침을 표준화</li>
+<li>위치: 워크스페이스 루트 하위 <code>.github</code> 폴더</li>
+</ul>
+<p>워크스페이스에 포함된 지침 파일은 MCP 및 데이터 분석 작업 흐름을 표준화합니다. 아래는 현재 파일의 샘플 원문입니다. 필요 시 그대로 사용하세요.</p>
+<div class="highlight"><pre><span></span><code><span class="gh"># Hossam Data Analysis Assistant Guidelines</span>
+
+You are an expert data analysis assistant powered by the Hossam library.
+
+<span class="gu">## 초기 작업 시 필수 조치</span>
+
+아래의 규칙이 숙지되었다면 체팅 초기화 완료 후 <span class="sb">`Hossam MCP에 대한 초기화가 완료되었습니다.`</span>라고 출력하세요.
+
+<span class="gu">## 절대 규칙 (중요!)</span>
+
+<span class="k">1.</span> <span class="gs">**MCP 서버 실행 확인**</span>
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>MCP 서버 관련 작업을 시도하기 전에 먼저 <span class="sb">`mcp_pylance_`</span> 또는 <span class="sb">`hs_`</span> 관련 도구(Hossam MCP)가 이미 사용 가능한지 확인할 것
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>도구 목록에 MCP 관련 도구가 있다면 MCP 서버가 이미 실행 중이므로 재실행하지 말 것
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>사용자가 명시적으로 서버 재시작을 요청하지 않는 한, 절대로 MCP 서버를 재가동하지 말 것
+
+<span class="k">2.</span> tools 명령을 통해서 전체 도구 목록을 숙지해 놓은 상태에서 진행할 것.
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>이미 숙지가 완료된 상태라면 이 작업은 건너뛰어도 됨
+
+<span class="k">3.</span> Jupyter Notebook 작업 시
+<span class="w">  </span><span class="k">-</span><span class="w"> </span><span class="sb">`run_notebook_cell()`</span>로 코드 실행
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>각 코드 셀 다음에 마크다운 셀 추가하여 분석 결과 정리
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>시각화 결과는 이미지로 표시됨
+<span class="w">  </span><span class="k">-</span><span class="w"> </span>분석 결과 정리시 코드의 실행 결과에서 알 수 있는 객관적 사실(인사이트)를 블럿 리스트 형태로 작성할 것. 추론하지 말고 사실로만, 최대한 자세하게 작성할 것.
+    \`\`\`markdown
+    ### 💡 인사이트
+
+<span class="w">    </span><span class="k">-</span><span class="w"> </span>내용1
+<span class="w">    </span><span class="k">-</span><span class="w"> </span>내용2
+<span class="w">    </span><span class="k">-</span><span class="w"> </span>내용3
+    \`\`\`
+
+<span class="k">3.</span> <span class="gs">**데이터 로드 시 명목형 변수 처리**</span>: 명목형 변수가 지정되었다면 반드시 categories 파라미터 사용
+   \`\`\`python
+   hs_util.load_data(&#39;insurance&#39;, categories=[&#39;sex&#39;, &#39;smoker&#39;])
+   \`\`\`
+
+<span class="k">4.</span> <span class="gs">**Import 방식**</span>: <span class="sb">`from hossam import *`</span> 사용 후 모듈명 명시
+<span class="w">   </span><span class="k">-</span><span class="w"> </span>✅ <span class="sb">`hs_stats.describe_variables()`</span>
+<span class="w">   </span><span class="k">-</span><span class="w"> </span>✅ <span class="sb">`hs_plot.histogram()`</span>
+<span class="w">   </span><span class="k">-</span><span class="w"> </span>✅ <span class="sb">`hs_prep.normalize()`</span>
+
+<span class="k">5.</span> <span class="gs">**변수명 규칙**</span>: 간결하게 작성 (df, origin, result, scaled, encoded)
+
+<span class="k">6.</span> <span class="gs">**Hossam MCP 우선 사용**</span>: 요청에 대해 Hossam MCP의 기능을 우선적으로 사용하고, Hossam MCP가 제공하는 기능이 아닐 경우 <span class="sb">`Hossam MC에서 제공하지 않는 기능에 대한 요청이므로 코드를 직접 작성합니다.`</span>라고 출력
+
+<span class="gu">## 작업 방법</span>
+
+<span class="k">-</span><span class="w"> </span>내 요청을 처리할 수 있는 기능을 tools에서 검색해서 수행.
+<span class="w">    </span><span class="k">-</span><span class="w"> </span>이미 tools를 통해서 목록을 숙지하고 있다면 재검색은 필요 없음
+<span class="k">-</span><span class="w"> </span>요청을 처리할 수 있는 기능이 두 개 이상인 경우 넘버 리스트 형태로 나에게 선택지를 제시하고 내 선택에 따라 진행할 것
+<span class="k">-</span><span class="w"> </span>여러 코드 블록을 동시에 추가할 경우 순차적으로 처리할 것. 블록의 순서가 사고 과정과 일치해야 함
+<span class="k">-</span><span class="w"> </span>내가 특별히 요청하기 전까지는 노트북의 요약을 가져오지 말것.
+<span class="k">-</span><span class="w"> </span>요청에 대해 나에게 알려줄 내용이 있다면(AI의 출력 내용 등) 작업중인 노트북에 빈 마크다운 블록을 추가하고 작성할 것.
+<span class="k">-</span><span class="w"> </span>유니코드 아이콘을 최대한 활용할 것
+</code></pre></div>
+<h2 id="_3">제공 기능(툴) 개요<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>Hossam MCP 서버는 <code>hs_</code> 접두사를 사용해 공개 API를 도구로 자동 등록합니다. 주요 네임스페이스와 예시는 아래와 같습니다.</p>
+<ul>
+<li><code>hs_util_*</code>: 파일/노트북 유틸리티, 데이터 로드(<code>hs_util_load_data</code>), 테이블/포맷 유틸 등</li>
+<li><code>hs_stats_*</code>: 변수 기술통계(<code>describe_variables</code>), 상관/가설검정 등 통계 분석 함수</li>
+<li><code>hs_plot_*</code>: <code>lineplot</code>, <code>boxplot</code>, <code>kdeplot</code>, <code>histogram</code> 등 시각화. 원격 환경에서는 <code>save_path</code> 활용 권장</li>
+<li><code>hs_prep_*</code>: 전처리(<code>standard_scaler</code>, <code>minmax_scaler</code>, <code>get_dummies</code>, <code>replace_outliner</code>, <code>set_category</code> 등)</li>
+<li><code>hs_gis_*</code>: 공간 데이터 저장/변환(<code>hs_gis_save_shape</code> 등)</li>
+<li><code>hs_classroom_*</code>: 교육/실습 보조 함수들</li>
+<li><code>hs_timeserise_*</code>: 시계열 관련 유틸리티</li>
+<li><code>hs_data_*</code>: <code>hossam.data_loader</code> 공개 함수 자동 등록(일부 제외)</li>
+</ul>
+<p>각 함수는 원본 시그니처를 따르며, MCP 호출 시 파라미터는 JSON 형태로 전달됩니다.</p>
+<h2 id="_4">사용 예시(워크플로)<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<ol>
+<li>VS Code에서 Copilot Chat 열기 → MCP 서버가 자동 기동됨(첫 요청 시)</li>
+<li>데이터 로드: <code>hs_util_load_data</code>에 <code>name</code>, <code>categories</code> 등 파라미터 전달</li>
+<li>기술통계: <code>hs_stats_describe_variables</code> 호출</li>
+<li>시각화: <code>hs_plot_histogram</code> 또는 <code>hs_plot_kdeplot</code> 호출, <code>save_path</code>로 결과 저장</li>
+<li>전처리: <code>hs_prep_get_dummies</code>, <code>hs_prep_standard_scaler</code> 등 순차 적용</li>
+</ol>
+<h2 id="_5">서버 수동 실행(선택)<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>터미널에서 직접 실행할 수도 있습니다.</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>hossam.mcp.server
+<span class="c1"># 또는</span>
+hossam-mcp
+</code></pre></div>
+<p>서버는 <code>stderr</code>에 로그를 남기고, <code>stdout</code>은 MCP 프로토콜로만 사용됩니다.</p>
+<h2 id="_6">트러블슈팅<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<ul>
+<li>MCP 서버 미기동: VS Code 설정의 <code>github.copilot.chat.mcpServers</code> 항목 확인, Python 경로/가상환경 점검</li>
+<li>도구 미노출: 함수가 언더바(<code>_</code>)로 시작하면 제외됩니다. 공개 API만 노출됨</li>
+<li>그래프 출력 문제: 원격 환경에서는 화면 표시 대신 <code>save_path</code>를 지정해 이미지 파일로 저장하여 확인</li>
+</ul>
+<hr />
+<p>문의/기여는 리포지토리 이슈 또는 가이드를 참고하세요.</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.expand", "content.code.copy", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+        <script src="../assets/javascripts/mermaid-init.js"></script>
+      
+    
+  </body>
+</html>

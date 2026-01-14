@@ -5,6 +5,10 @@
          <lastmod>2026-01-14</lastmod>
     </url>
     <url>
+         <loc>https://py.hossam.kr/mcp_guide/</loc>
+         <lastmod>2026-01-14</lastmod>
+    </url>
+    <url>
          <loc>https://py.hossam.kr/api/data_loader/</loc>
          <lastmod>2026-01-14</lastmod>
     </url>
@@ -34,26 +38,6 @@
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hs_util/</loc>
-         <lastmod>2026-01-14</lastmod>
-    </url>
-    <url>
-         <loc>https://py.hossam.kr/guides/</loc>
-         <lastmod>2026-01-14</lastmod>
-    </url>
-    <url>
-         <loc>https://py.hossam.kr/guides/GUIDE_INTEGRATION_SUMMARY/</loc>
-         <lastmod>2026-01-14</lastmod>
-    </url>
-    <url>
-         <loc>https://py.hossam.kr/guides/MCP_SERVER/</loc>
-         <lastmod>2026-01-14</lastmod>
-    </url>
-    <url>
-         <loc>https://py.hossam.kr/guides/QUICKSTART/</loc>
-         <lastmod>2026-01-14</lastmod>
-    </url>
-    <url>
-         <loc>https://py.hossam.kr/guides/VSCode_COPILOT/</loc>
          <lastmod>2026-01-14</lastmod>
     </url>
 </urlset>
