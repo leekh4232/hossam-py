@@ -2,70 +2,58 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://py.hossam.kr/</loc>
-         <lastmod>2026-01-13</lastmod>
+         <lastmod>2026-01-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/data_loader/</loc>
-         <lastmod>2026-01-13</lastmod>
+         <lastmod>2026-01-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hossam/</loc>
-         <lastmod>2026-01-13</lastmod>
+         <lastmod>2026-01-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hs_classroom/</loc>
-         <lastmod>2026-01-13</lastmod>
+         <lastmod>2026-01-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hs_gis/</loc>
-         <lastmod>2026-01-13</lastmod>
+         <lastmod>2026-01-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hs_plot/</loc>
-         <lastmod>2026-01-13</lastmod>
+         <lastmod>2026-01-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hs_prep/</loc>
-         <lastmod>2026-01-13</lastmod>
+         <lastmod>2026-01-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hs_stats/</loc>
-         <lastmod>2026-01-13</lastmod>
+         <lastmod>2026-01-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hs_util/</loc>
-         <lastmod>2026-01-13</lastmod>
+         <lastmod>2026-01-14</lastmod>
     </url>
     <url>
-         <loc>https://py.hossam.kr/guides/VSCODE_COPILOT_SETUP/</loc>
-         <lastmod>2026-01-13</lastmod>
+         <loc>https://py.hossam.kr/guides/</loc>
+         <lastmod>2026-01-14</lastmod>
     </url>
     <url>
-         <loc>https://py.hossam.kr/guides/copilot-prompts/</loc>
-         <lastmod>2026-01-13</lastmod>
+         <loc>https://py.hossam.kr/guides/GUIDE_INTEGRATION_SUMMARY/</loc>
+         <lastmod>2026-01-14</lastmod>
     </url>
     <url>
-         <loc>https://py.hossam.kr/guides/hossam_mcp_task_prompt/</loc>
-         <lastmod>2026-01-13</lastmod>
+         <loc>https://py.hossam.kr/guides/MCP_SERVER/</loc>
+         <lastmod>2026-01-14</lastmod>
     </url>
     <url>
-         <loc>https://py.hossam.kr/guides/mcp/</loc>
-         <lastmod>2026-01-13</lastmod>
+         <loc>https://py.hossam.kr/guides/QUICKSTART/</loc>
+         <lastmod>2026-01-14</lastmod>
     </url>
     <url>
-         <loc>https://py.hossam.kr/guides/vscode-copilot-integration/</loc>
-         <lastmod>2026-01-13</lastmod>
-    </url>
-    <url>
-         <loc>https://py.hossam.kr/guides/vscode-settings-sample/</loc>
-         <lastmod>2026-01-13</lastmod>
-    </url>
-    <url>
-         <loc>https://py.hossam.kr/guides/workflow/</loc>
-         <lastmod>2026-01-13</lastmod>
-    </url>
-    <url>
-         <loc>https://py.hossam.kr/overview/architecture/</loc>
-         <lastmod>2026-01-13</lastmod>
+         <loc>https://py.hossam.kr/guides/VSCode_COPILOT/</loc>
+         <lastmod>2026-01-14</lastmod>
     </url>
 </urlset>
