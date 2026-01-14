@@ -5,7 +5,6 @@ repo_name: hossam-py
 site_url: https://py.hossam.kr
 theme:
   name: material
-  - MCP Guide: mcp_guide.md
   language: ko
   palette:
     - scheme: default
