@@ -5,6 +5,7 @@ repo_name: hossam-py
 site_url: https://py.hossam.kr
 theme:
   name: material
+  - MCP Guide: mcp_guide.md
   language: ko
   palette:
     - scheme: default
@@ -85,3 +86,4 @@ nav:
       - hs_prep: api/hs_prep.md
       - hs_stats: api/hs_stats.md
       - hs_util: api/hs_util.md
+  - MCP Guide: mcp_guide.md

@@ -28,6 +28,10 @@ jobs:
           python -m pip install black
           python -m pip install pandas numpy requests geopandas
 
+      - name: Copy README to docs/index.md
+        run: |
+          cp -f README.md docs/index.md
+
       - name: Build site
         run: mkdocs build
 
