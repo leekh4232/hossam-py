@@ -921,6 +921,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hossam.hs_stats.corr_effect_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        corr_effect_size
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1304,6 +1315,17 @@
     <span class="md-ellipsis">
       
         describe
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_stats.corr_effect_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        corr_effect_size
       
     </span>
   </a>
@@ -4876,14 +4898,14 @@
 <span class="gp">... </span>    <span class="s1">&#39;x2&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
 <span class="gp">... </span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># 적합 결과만 반환</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fit</span> <span class="o">=</span> <span class="n">hs_linear</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fit</span> <span class="o">=</span> <span class="n">hs_ols</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">fit</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
 </code></pre></div>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># 요약 리포트 반환</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fit</span><span class="p">,</span> <span class="n">rdf</span><span class="p">,</span> <span class="n">result_report</span><span class="p">,</span> <span class="n">model_report</span><span class="p">,</span> <span class="n">var_reports</span><span class="p">,</span> <span class="n">eq</span> <span class="o">=</span> <span class="n">hs_linear</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fit</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">features</span> <span class="o">=</span> <span class="n">hs_ols</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </code></pre></div>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># 풀 리포트 반환</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fit</span><span class="p">,</span> <span class="n">pdf</span><span class="p">,</span> <span class="n">rdf</span><span class="p">,</span> <span class="n">result_report</span><span class="p">,</span> <span class="n">model_report</span><span class="p">,</span> <span class="n">var_reports</span><span class="p">,</span> <span class="n">eq</span> <span class="o">=</span> <span class="n">hs_linear</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fit</span><span class="p">,</span> <span class="n">pdf</span><span class="p">,</span> <span class="n">rdf</span><span class="p">,</span> <span class="n">result_report</span><span class="p">,</span> <span class="n">model_report</span><span class="p">,</span> <span class="n">var_reports</span><span class="p">,</span> <span class="n">eq</span> <span class="o">=</span> <span class="n">hs_ols</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -5003,14 +5025,14 @@
 <span class="sd">        ...     &#39;x2&#39;: np.random.normal(0, 1, 100)</span>
 <span class="sd">        ... })</span>
 <span class="sd">        &gt;&gt;&gt; # 적합 결과만 반환</span>
-<span class="sd">        &gt;&gt;&gt; fit = hs_linear(df, &#39;target&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; fit = hs_ols(df, &#39;target&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; print(fit.summary())</span>
 
 <span class="sd">        &gt;&gt;&gt; # 요약 리포트 반환</span>
-<span class="sd">        &gt;&gt;&gt; fit, rdf, result_report, model_report, var_reports, eq = hs_linear(df, &#39;target&#39;, report=1)</span>
+<span class="sd">        &gt;&gt;&gt; fit, result, features = hs_ols(df, &#39;target&#39;, report=1)</span>
 
 <span class="sd">        &gt;&gt;&gt; # 풀 리포트 반환</span>
-<span class="sd">        &gt;&gt;&gt; fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_linear(df, &#39;target&#39;, report=2)</span>
+<span class="sd">        &gt;&gt;&gt; fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_ols(df, &#39;target&#39;, report=2)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">yname</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">yname</span><span class="p">]</span>
@@ -5025,8 +5047,8 @@
         <span class="k">return</span> <span class="n">linear_fit</span>
     <span class="k">elif</span> <span class="n">report</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">report</span> <span class="o">==</span> <span class="s1">&#39;summary&#39;</span><span class="p">:</span>
         <span class="c1"># 요약 리포트 (full=False)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">ols_report</span><span class="p">(</span><span class="n">linear_fit</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">linear_fit</span><span class="p">,</span> <span class="n">result</span>
+        <span class="n">pdf</span><span class="p">,</span> <span class="n">rdf</span><span class="p">,</span> <span class="n">result_report</span><span class="p">,</span> <span class="n">model_report</span><span class="p">,</span> <span class="n">variable_reports</span><span class="p">,</span> <span class="n">equation_text</span> <span class="o">=</span> <span class="n">ols_report</span><span class="p">(</span><span class="n">linear_fit</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">linear_fit</span><span class="p">,</span> <span class="n">pdf</span><span class="p">,</span> <span class="n">rdf</span>
     <span class="k">elif</span> <span class="n">report</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">report</span> <span class="o">==</span> <span class="s1">&#39;full&#39;</span> <span class="ow">or</span> <span class="n">report</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
         <span class="c1"># 풀 리포트 (full=True)</span>
         <span class="n">pdf</span><span class="p">,</span> <span class="n">rdf</span><span class="p">,</span> <span class="n">result_report</span><span class="p">,</span> <span class="n">model_report</span><span class="p">,</span> <span class="n">variable_reports</span><span class="p">,</span> <span class="n">equation_text</span> <span class="o">=</span> <span class="n">ols_report</span><span class="p">(</span><span class="n">linear_fit</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
@@ -9794,6 +9816,373 @@ BinaryResultsWrapper(로지스틱 회귀) 객체를 받아 데이터에 대한
         <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">result</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.hs_stats.corr_effect_size" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">corr_effect_size</span>
+
+
+<a href="#hossam.hs_stats.corr_effect_size" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">corr_effect_size</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dv</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>종속변수와의 편상관계수 및 효과크기를 계산한다.</p>
+<p>각 독립변수와 종속변수 간의 상관계수를 계산하되, 정규성과 선형성을 검사하여
+Pearson 또는 Spearman 상관계수를 적절히 선택한다.
+Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>분석 대상 데이터프레임.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>dv</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>종속변수 컬럼 이름.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>*fields</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>독립변수 컬럼 이름들. 지정하지 않으면 수치형 컬럼 중 dv 제외 모두 사용.</p>
+              </div>
+            </td>
+            <td>
+                  <code>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>alpha</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>유의수준. 기본 0.05.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.05</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>DataFrame</code></td>            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>다음 컬럼을 포함한 데이터프레임:
+- Variable (str): 독립변수 이름
+- Correlation (float): 상관계수 (Pearson 또는 Spearman)
+- Corr_Type (str): 선택된 상관계수 종류 ('Pearson' 또는 'Spearman')
+- P-value (float): 상관계수의 유의확률
+- Cohens_d (float): 표준화된 효과크기
+- Effect_Size (str): 효과크기 분류 ('Large', 'Medium', 'Small', 'Negligible')</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="n">hs_stats</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="s1">&#39;bmi&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">22</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span>
+<span class="gp">... </span>                    <span class="s1">&#39;charges&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">3000</span><span class="p">,</span> <span class="mi">4000</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">hs_stats</span><span class="o">.</span><span class="n">corr_effect_size</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;charges&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;bmi&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</code></pre></div>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/hs_stats.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2882</span>
+<span class="normal">2883</span>
+<span class="normal">2884</span>
+<span class="normal">2885</span>
+<span class="normal">2886</span>
+<span class="normal">2887</span>
+<span class="normal">2888</span>
+<span class="normal">2889</span>
+<span class="normal">2890</span>
+<span class="normal">2891</span>
+<span class="normal">2892</span>
+<span class="normal">2893</span>
+<span class="normal">2894</span>
+<span class="normal">2895</span>
+<span class="normal">2896</span>
+<span class="normal">2897</span>
+<span class="normal">2898</span>
+<span class="normal">2899</span>
+<span class="normal">2900</span>
+<span class="normal">2901</span>
+<span class="normal">2902</span>
+<span class="normal">2903</span>
+<span class="normal">2904</span>
+<span class="normal">2905</span>
+<span class="normal">2906</span>
+<span class="normal">2907</span>
+<span class="normal">2908</span>
+<span class="normal">2909</span>
+<span class="normal">2910</span>
+<span class="normal">2911</span>
+<span class="normal">2912</span>
+<span class="normal">2913</span>
+<span class="normal">2914</span>
+<span class="normal">2915</span>
+<span class="normal">2916</span>
+<span class="normal">2917</span>
+<span class="normal">2918</span>
+<span class="normal">2919</span>
+<span class="normal">2920</span>
+<span class="normal">2921</span>
+<span class="normal">2922</span>
+<span class="normal">2923</span>
+<span class="normal">2924</span>
+<span class="normal">2925</span>
+<span class="normal">2926</span>
+<span class="normal">2927</span>
+<span class="normal">2928</span>
+<span class="normal">2929</span>
+<span class="normal">2930</span>
+<span class="normal">2931</span>
+<span class="normal">2932</span>
+<span class="normal">2933</span>
+<span class="normal">2934</span>
+<span class="normal">2935</span>
+<span class="normal">2936</span>
+<span class="normal">2937</span>
+<span class="normal">2938</span>
+<span class="normal">2939</span>
+<span class="normal">2940</span>
+<span class="normal">2941</span>
+<span class="normal">2942</span>
+<span class="normal">2943</span>
+<span class="normal">2944</span>
+<span class="normal">2945</span>
+<span class="normal">2946</span>
+<span class="normal">2947</span>
+<span class="normal">2948</span>
+<span class="normal">2949</span>
+<span class="normal">2950</span>
+<span class="normal">2951</span>
+<span class="normal">2952</span>
+<span class="normal">2953</span>
+<span class="normal">2954</span>
+<span class="normal">2955</span>
+<span class="normal">2956</span>
+<span class="normal">2957</span>
+<span class="normal">2958</span>
+<span class="normal">2959</span>
+<span class="normal">2960</span>
+<span class="normal">2961</span>
+<span class="normal">2962</span>
+<span class="normal">2963</span>
+<span class="normal">2964</span>
+<span class="normal">2965</span>
+<span class="normal">2966</span>
+<span class="normal">2967</span>
+<span class="normal">2968</span>
+<span class="normal">2969</span>
+<span class="normal">2970</span>
+<span class="normal">2971</span>
+<span class="normal">2972</span>
+<span class="normal">2973</span>
+<span class="normal">2974</span>
+<span class="normal">2975</span>
+<span class="normal">2976</span>
+<span class="normal">2977</span>
+<span class="normal">2978</span>
+<span class="normal">2979</span>
+<span class="normal">2980</span>
+<span class="normal">2981</span>
+<span class="normal">2982</span>
+<span class="normal">2983</span>
+<span class="normal">2984</span>
+<span class="normal">2985</span>
+<span class="normal">2986</span>
+<span class="normal">2987</span>
+<span class="normal">2988</span>
+<span class="normal">2989</span>
+<span class="normal">2990</span>
+<span class="normal">2991</span>
+<span class="normal">2992</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">corr_effect_size</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">dv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;종속변수와의 편상관계수 및 효과크기를 계산한다.</span>
+
+<span class="sd">    각 독립변수와 종속변수 간의 상관계수를 계산하되, 정규성과 선형성을 검사하여</span>
+<span class="sd">    Pearson 또는 Spearman 상관계수를 적절히 선택한다.</span>
+<span class="sd">    Cohen&#39;s d (효과크기)를 계산하여 상관 강도를 정량화한다.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (DataFrame): 분석 대상 데이터프레임.</span>
+<span class="sd">        dv (str): 종속변수 컬럼 이름.</span>
+<span class="sd">        *fields (str): 독립변수 컬럼 이름들. 지정하지 않으면 수치형 컬럼 중 dv 제외 모두 사용.</span>
+<span class="sd">        alpha (float, optional): 유의수준. 기본 0.05.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame: 다음 컬럼을 포함한 데이터프레임:</span>
+<span class="sd">            - Variable (str): 독립변수 이름</span>
+<span class="sd">            - Correlation (float): 상관계수 (Pearson 또는 Spearman)</span>
+<span class="sd">            - Corr_Type (str): 선택된 상관계수 종류 (&#39;Pearson&#39; 또는 &#39;Spearman&#39;)</span>
+<span class="sd">            - P-value (float): 상관계수의 유의확률</span>
+<span class="sd">            - Cohens_d (float): 표준화된 효과크기</span>
+<span class="sd">            - Effect_Size (str): 효과크기 분류 (&#39;Large&#39;, &#39;Medium&#39;, &#39;Small&#39;, &#39;Negligible&#39;)</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from hossam import hs_stats</span>
+<span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
+<span class="sd">        &gt;&gt;&gt; df = pd.DataFrame({&#39;age&#39;: [20, 30, 40, 50],</span>
+<span class="sd">        ...                     &#39;bmi&#39;: [22, 25, 28, 30],</span>
+<span class="sd">        ...                     &#39;charges&#39;: [1000, 2000, 3000, 4000]})</span>
+<span class="sd">        &gt;&gt;&gt; result = hs_stats.corr_effect_size(df, &#39;charges&#39;, &#39;age&#39;, &#39;bmi&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; print(result)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># fields가 지정되지 않으면 수치형 컬럼 중 dv 제외 모두 사용</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">fields</span><span class="p">:</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span>
+                 <span class="k">if</span> <span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">])</span> <span class="ow">and</span> <span class="n">col</span> <span class="o">!=</span> <span class="n">dv</span><span class="p">]</span>
+
+    <span class="c1"># dv가 수치형인지 확인</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">dv</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dependent variable &#39;</span><span class="si">{</span><span class="n">dv</span><span class="si">}</span><span class="s2">&#39; must be numeric type&quot;</span><span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">var</span><span class="p">]):</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># 결측치 제거</span>
+        <span class="n">valid_idx</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="n">var</span><span class="p">,</span> <span class="n">dv</span><span class="p">]]</span><span class="o">.</span><span class="n">notna</span><span class="p">()</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">valid_idx</span><span class="p">,</span> <span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">valid_idx</span><span class="p">,</span> <span class="n">dv</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># 정규성 검사 (Shapiro-Wilk: n &lt;= 5000 권장, 그 외 D&#39;Agostino)</span>
+        <span class="n">method_x</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">5000</span> <span class="k">else</span> <span class="s1">&#39;n&#39;</span>
+        <span class="n">method_y</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">5000</span> <span class="k">else</span> <span class="s1">&#39;n&#39;</span>
+
+        <span class="n">normal_x_result</span> <span class="o">=</span> <span class="n">normal_test</span><span class="p">(</span><span class="n">data</span><span class="p">[[</span><span class="n">var</span><span class="p">]],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">var</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="n">method_x</span><span class="p">)</span>
+        <span class="n">normal_y_result</span> <span class="o">=</span> <span class="n">normal_test</span><span class="p">(</span><span class="n">data</span><span class="p">[[</span><span class="n">dv</span><span class="p">]],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">dv</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="n">method_y</span><span class="p">)</span>
+
+        <span class="c1"># 정규성 판정 (p &gt; alpha면 정규분포 가정)</span>
+        <span class="n">normal_x</span> <span class="o">=</span> <span class="n">normal_x_result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">var</span><span class="p">,</span> <span class="s1">&#39;p-val&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">alpha</span> <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">normal_x_result</span><span class="o">.</span><span class="n">index</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="n">normal_y</span> <span class="o">=</span> <span class="n">normal_y_result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dv</span><span class="p">,</span> <span class="s1">&#39;p-val&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">alpha</span> <span class="k">if</span> <span class="n">dv</span> <span class="ow">in</span> <span class="n">normal_y_result</span><span class="o">.</span><span class="n">index</span> <span class="k">else</span> <span class="kc">False</span>
+
+        <span class="c1"># Pearson (모두 정규) vs Spearman (하나라도 비정규)</span>
+        <span class="k">if</span> <span class="n">normal_x</span> <span class="ow">and</span> <span class="n">normal_y</span><span class="p">:</span>
+            <span class="n">r</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pearsonr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="n">corr_type</span> <span class="o">=</span> <span class="s1">&#39;Pearson&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">r</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">spearmanr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="n">corr_type</span> <span class="o">=</span> <span class="s1">&#39;Spearman&#39;</span>
+
+        <span class="c1"># Cohen&#39;s d 계산 (상관계수에서 효과크기로 변환)</span>
+        <span class="c1"># d = 2*r / sqrt(1-r^2)</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">**</span><span class="mi">2</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># 효과크기 분류 (Cohen&#39;s d 기준)</span>
+        <span class="c1"># Small: 0.2 &lt; |d| &lt;= 0.5</span>
+        <span class="c1"># Medium: 0.5 &lt; |d| &lt;= 0.8</span>
+        <span class="c1"># Large: |d| &gt; 0.8</span>
+        <span class="n">abs_d</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">abs_d</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">:</span>
+            <span class="n">effect_size</span> <span class="o">=</span> <span class="s1">&#39;Large&#39;</span>
+        <span class="k">elif</span> <span class="n">abs_d</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+            <span class="n">effect_size</span> <span class="o">=</span> <span class="s1">&#39;Medium&#39;</span>
+        <span class="k">elif</span> <span class="n">abs_d</span> <span class="o">&gt;</span> <span class="mf">0.2</span><span class="p">:</span>
+            <span class="n">effect_size</span> <span class="o">=</span> <span class="s1">&#39;Small&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">effect_size</span> <span class="o">=</span> <span class="s1">&#39;Negligible&#39;</span>
+
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;Variable&#39;</span><span class="p">:</span> <span class="n">var</span><span class="p">,</span>
+            <span class="s1">&#39;Correlation&#39;</span><span class="p">:</span> <span class="n">r</span><span class="p">,</span>
+            <span class="s1">&#39;Corr_Type&#39;</span><span class="p">:</span> <span class="n">corr_type</span><span class="p">,</span>
+            <span class="s1">&#39;P-value&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span>
+            <span class="s1">&#39;Cohens_d&#39;</span><span class="p">:</span> <span class="n">d</span><span class="p">,</span>
+            <span class="s1">&#39;Effect_Size&#39;</span><span class="p">:</span> <span class="n">effect_size</span>
+        <span class="p">})</span>
+
+    <span class="n">result_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+    <span class="c1"># 상관계수로 정렬 (절댓값 기준 내림차순)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result_df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">result_df</span> <span class="o">=</span> <span class="n">result_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;Correlation&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">abs</span><span class="p">(),</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result_df</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
