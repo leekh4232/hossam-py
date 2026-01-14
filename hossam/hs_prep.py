@@ -440,11 +440,11 @@ def bin_continuous(
 
     지원 방법:
     - "natural_breaks"(기본): Jenks 자연 구간화. jenkspy 미사용 시 quantile로 대체
-      기본 라벨: "X~Y" 형식 (예: "18~30", "30~40")
+      기본 라벨: "X-Y" 형식 (예: "18-30", "30-40")
     - "quantile"/"qcut"/"equal_freq": 분위수 기반 동빈도
-      기본 라벨: "X~Y" 형식
+      기본 라벨: "X-Y" 형식
     - "equal_width"/"uniform": 동일 간격
-      기본 라벨: "X~Y" 형식
+      기본 라벨: "X-Y" 형식
     - "std": 평균±표준편차를 경계로 4구간 생성
       라벨: "low", "mid_low", "mid_high", "high"
     - "lifecourse"/"life_stage": 생애주기 5단계

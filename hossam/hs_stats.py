@@ -1318,14 +1318,14 @@ def ols(df: DataFrame, yname: str, report=False):
         ...     'x2': np.random.normal(0, 1, 100)
         ... })
         >>> # 적합 결과만 반환
-        >>> fit = hs_linear(df, 'target')
+        >>> fit = hs_ols(df, 'target')
         >>> print(fit.summary())
 
         >>> # 요약 리포트 반환
-        >>> fit, rdf, result_report, model_report, var_reports, eq = hs_linear(df, 'target', report=1)
+        >>> fit, result, features = hs_ols(df, 'target', report=1)
 
         >>> # 풀 리포트 반환
-        >>> fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_linear(df, 'target', report=2)
+        >>> fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_ols(df, 'target', report=2)
     """
     x = df.drop(yname, axis=1)
     y = df[yname]
@@ -1340,8 +1340,8 @@ def ols(df: DataFrame, yname: str, report=False):
         return linear_fit
     elif report == 1 or report == 'summary':
         # 요약 리포트 (full=False)
-        result = ols_report(linear_fit, df, full=False, alpha=0.05)
-        return linear_fit, result
+        pdf, rdf, result_report, model_report, variable_reports, equation_text = ols_report(linear_fit, df, full=True, alpha=0.05)
+        return linear_fit, pdf, rdf
     elif report == 2 or report == 'full' or report is True:
         # 풀 리포트 (full=True)
         pdf, rdf, result_report, model_report, variable_reports, equation_text = ols_report(linear_fit, df, full=True, alpha=0.05)
@@ -2874,3 +2874,119 @@ def describe(data: DataFrame, *fields: str, columns: list = None):
         result = result[columns]
 
     return result
+
+
+# ===================================================================
+# 상관계수 및 효과크기 분석 (Correlation & Effect Size)
+# ===================================================================
+def corr_effect_size(data: DataFrame, dv: str, *fields: str, alpha: float = 0.05) -> DataFrame:
+    """종속변수와의 편상관계수 및 효과크기를 계산한다.
+
+    각 독립변수와 종속변수 간의 상관계수를 계산하되, 정규성과 선형성을 검사하여
+    Pearson 또는 Spearman 상관계수를 적절히 선택한다.
+    Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.
+
+    Args:
+        data (DataFrame): 분석 대상 데이터프레임.
+        dv (str): 종속변수 컬럼 이름.
+        *fields (str): 독립변수 컬럼 이름들. 지정하지 않으면 수치형 컬럼 중 dv 제외 모두 사용.
+        alpha (float, optional): 유의수준. 기본 0.05.
+
+    Returns:
+        DataFrame: 다음 컬럼을 포함한 데이터프레임:
+            - Variable (str): 독립변수 이름
+            - Correlation (float): 상관계수 (Pearson 또는 Spearman)
+            - Corr_Type (str): 선택된 상관계수 종류 ('Pearson' 또는 'Spearman')
+            - P-value (float): 상관계수의 유의확률
+            - Cohens_d (float): 표준화된 효과크기
+            - Effect_Size (str): 효과크기 분류 ('Large', 'Medium', 'Small', 'Negligible')
+
+    Examples:
+        >>> from hossam import hs_stats
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({'age': [20, 30, 40, 50],
+        ...                     'bmi': [22, 25, 28, 30],
+        ...                     'charges': [1000, 2000, 3000, 4000]})
+        >>> result = hs_stats.corr_effect_size(df, 'charges', 'age', 'bmi')
+        >>> print(result)
+    """
+
+    # fields가 지정되지 않으면 수치형 컬럼 중 dv 제외 모두 사용
+    if not fields:
+        fields = [col for col in data.columns
+                 if is_numeric_dtype(data[col]) and col != dv]
+
+    # dv가 수치형인지 확인
+    if not is_numeric_dtype(data[dv]):
+        raise ValueError(f"Dependent variable '{dv}' must be numeric type")
+
+    results = []
+
+    for var in fields:
+        if not is_numeric_dtype(data[var]):
+            continue
+
+        # 결측치 제거
+        valid_idx = data[[var, dv]].notna().all(axis=1)
+        x = data.loc[valid_idx, var].values
+        y = data.loc[valid_idx, dv].values
+
+        if len(x) < 3:
+            continue
+
+        # 정규성 검사 (Shapiro-Wilk: n <= 5000 권장, 그 외 D'Agostino)
+        method_x = 's' if len(x) <= 5000 else 'n'
+        method_y = 's' if len(y) <= 5000 else 'n'
+
+        normal_x_result = normal_test(data[[var]], columns=[var], method=method_x)
+        normal_y_result = normal_test(data[[dv]], columns=[dv], method=method_y)
+
+        # 정규성 판정 (p > alpha면 정규분포 가정)
+        normal_x = normal_x_result.loc[var, 'p-val'] > alpha if var in normal_x_result.index else False
+        normal_y = normal_y_result.loc[dv, 'p-val'] > alpha if dv in normal_y_result.index else False
+
+        # Pearson (모두 정규) vs Spearman (하나라도 비정규)
+        if normal_x and normal_y:
+            r, p = pearsonr(x, y)
+            corr_type = 'Pearson'
+        else:
+            r, p = spearmanr(x, y)
+            corr_type = 'Spearman'
+
+        # Cohen's d 계산 (상관계수에서 효과크기로 변환)
+        # d = 2*r / sqrt(1-r^2)
+        if r**2 < 1:
+            d = (2 * r) / np.sqrt(1 - r**2)
+        else:
+            d = 0
+
+        # 효과크기 분류 (Cohen's d 기준)
+        # Small: 0.2 < |d| <= 0.5
+        # Medium: 0.5 < |d| <= 0.8
+        # Large: |d| > 0.8
+        abs_d = abs(d)
+        if abs_d > 0.8:
+            effect_size = 'Large'
+        elif abs_d > 0.5:
+            effect_size = 'Medium'
+        elif abs_d > 0.2:
+            effect_size = 'Small'
+        else:
+            effect_size = 'Negligible'
+
+        results.append({
+            'Variable': var,
+            'Correlation': r,
+            'Corr_Type': corr_type,
+            'P-value': p,
+            'Cohens_d': d,
+            'Effect_Size': effect_size
+        })
+
+    result_df = DataFrame(results)
+
+    # 상관계수로 정렬 (절댓값 기준 내림차순)
+    if len(result_df) > 0:
+        result_df = result_df.sort_values('Correlation', key=lambda x: x.abs(), ascending=False).reset_index(drop=True)
+
+    return result_df
