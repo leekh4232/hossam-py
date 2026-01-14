@@ -17,10 +17,10 @@ except Exception:
 hs_fig = SimpleNamespace(
     dpi=200,
     width=800,
-    height=480,
+    height=450,
     font_size=9.5,
-    font_weight="light",
-    frame_width=0.5,
+    font_weight="normal",
+    frame_width=0.7,
     line_width=1.5,
     grid_alpha=0.3,
     grid_width=0.5,

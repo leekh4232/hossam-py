@@ -7,7 +7,9 @@ from pandas import DataFrame, qcut, concat, to_numeric
 from kmodes.kmodes import KModes
 from matplotlib import pyplot as plt
 import seaborn as sns
-from hossam.hs_util import load_data, pretty_table
+from .hs_util import load_data, pretty_table
+from . import hs_fig
+from . import hs_plot
 
 # ===================================================================
 # 학생들을 관심사와 성적으로 균형잡힌 조로 편성한다
@@ -73,10 +75,6 @@ def cluster_students(
 
     if interest_col is not None and not isinstance(interest_col, str):
         raise ValueError("interest_col은 문자열이어야 합니다")
-
-    # 필수 컬럼 확인
-    if '학생번호' not in df.columns:
-        raise ValueError("데이터프레임에 '학생번호' 컬럼이 필요합니다")
 
     # 선택적 컬럼 확인
     if score_cols is not None:
@@ -376,24 +374,22 @@ def _balance_group_sizes_only(
 # ===================================================================
 # 조 편성 결과의 인원, 관심사, 점수 분포를 시각화한다
 # ===================================================================
-def report_summary(df: DataFrame, figsize: tuple = (20, 4.2), dpi: int = None) -> None:
+def report_summary(df: DataFrame, width: int = hs_fig.width, height: int = hs_fig.height, dpi: int = hs_fig.dpi) -> None:
     """조 편성 결과의 요약 통계를 시각화합니다.
 
     조별 인원 분포, 관심사 분포, 평균점수 분포를 나타냅니다.
 
     Args:
         df: cluster_students 함수의 반환 결과 데이터프레임.
-        figsize: 그래프 크기 (width, height). 기본값: (20, 4.2)
-        dpi: 그래프 해상도. None이면 my_dpi 사용. 기본값: None
+        width: 그래프 넓이. 기본값: hs_fig.width
+        height: 그래프 높이. 기본값: hs_fig.height
+        dpi: 그래프 해상도. 기본값: hs_fig.dpi
 
     Examples:
         >>> from hossam.classroom import cluster_students, report_summary
         >>> df_result = cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
         >>> report_summary(df_result)
     """
-
-    if dpi is None:
-        dpi = my_dpi
 
     if df is None or len(df) == 0:
         print("데이터프레임이 비어있습니다")
@@ -427,11 +423,15 @@ def report_summary(df: DataFrame, figsize: tuple = (20, 4.2), dpi: int = None) -
     if has_score and has_avg:
         n_plots += 1
 
-    fig, axes = plt.subplots(1, n_plots, figsize=figsize, dpi=dpi)
-
-    # axes를 배열로 변환 (단일 플롯인 경우 대비)
-    if n_plots == 1:
-        axes = [axes]
+    # hs_plot.get_default_ax를 사용하여 Figure와 Axes 생성
+    fig, axes = hs_plot.get_default_ax(
+        width=width,
+        height=height,
+        rows=n_plots,
+        cols=1,
+        dpi=dpi,
+        flatten=True
+    )
 
     plot_idx = 0
 
@@ -439,7 +439,16 @@ def report_summary(df: DataFrame, figsize: tuple = (20, 4.2), dpi: int = None) -
     group_sizes = df['조'].value_counts()
     group_sizes = group_sizes.reindex(ordered_labels, fill_value=0)
     plot_df = DataFrame({'조': group_sizes.index, '인원': group_sizes.values})
-    sns.barplot(data=plot_df, x='조', y='인원', hue='조', ax=axes[plot_idx], palette='Set2', legend=False)
+
+    # hs_plot.barplot 사용
+    hs_plot.barplot(
+        df=plot_df,
+        xname='조',
+        yname='인원',
+        palette='Set2',
+        ax=axes[plot_idx]
+    )
+
     axes[plot_idx].set_title("조별 인원 분포", fontsize=12, fontweight='bold')
     axes[plot_idx].set_xlabel("조")
     axes[plot_idx].set_ylabel("인원")
@@ -449,59 +458,74 @@ def report_summary(df: DataFrame, figsize: tuple = (20, 4.2), dpi: int = None) -
 
     # ===== 2. 조별 관심사 분포 =====
     if has_interest:
-        interest_dist = (
-            df.groupby(['조', '관심사'])
-            .size()
-            .unstack(fill_value=0)
-        )
-        interest_dist = interest_dist.reindex(index=ordered_labels)
+        # hs_plot.stackplot 사용을 위한 데이터 준비
+        interest_df = df[['조', '관심사']].copy()
+        interest_df['조'] = interest_df['조'].astype(str)
 
-        # 비율로 변환 (각 조가 100%가 되도록)
-        interest_pct = interest_dist.div(interest_dist.sum(axis=1), axis=0) * 100
+        def custom_callback(ax):
+            ax.set_title("조별 관심사 분포 (%)", fontsize=12, fontweight='bold')
+            ax.set_xlabel("조")
+            ax.set_ylabel("비율 (%)")
+            # x축: 고정된 위치와 라벨 지정
+            xticks = ax.get_xticks()
+            xticklabels = [tick.get_text() for tick in ax.get_xticklabels()]
+            if len(xticklabels) == len(xticks):
+                ax.set_xticks(xticks)
+                ax.set_xticklabels(xticklabels, rotation=0)
+            # y축: 고정된 위치와 라벨 지정
+            yticks = ax.get_yticks()
+            ax.set_yticks(yticks)
+            ax.set_yticklabels([f'{int(y*100)}%' for y in yticks])
+            ax.set_ylim(0, 1)
+            # legend: 아티스트가 있을 때만
+            handles, labels = ax.get_legend_handles_labels()
+            if handles and any(l for l in labels if l):
+                ax.legend(title='관심사', bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=9)
 
-        # stacked bar chart로 그리기 (각 막대의 높이가 100%)
-        interest_pct.plot(
-            kind='bar',
-            stacked=True,
+        hs_plot.stackplot(
+            df=interest_df,
+            xname='조',
+            hue='관심사',
+            palette='Set3',
             ax=axes[plot_idx],
-            colormap='Set3',
-            width=0.8
+            callback=custom_callback
         )
-        axes[plot_idx].set_title("조별 관심사 분포 (%)", fontsize=12, fontweight='bold')
-        axes[plot_idx].set_xlabel("조")
-        axes[plot_idx].set_ylabel("비율 (%)")
-        axes[plot_idx].set_xticklabels(axes[plot_idx].get_xticklabels(), rotation=0)
-        axes[plot_idx].legend(title='관심사', bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=9)
-        axes[plot_idx].set_ylim(0, 100)
+
         plot_idx += 1
 
     # ===== 3. 조별 평균점수 분포 =====
     if has_score and has_avg:
         avg_by_group = df.groupby('조')['평균점수'].agg(['mean', 'std']).reset_index()
-        sns.barplot(
-            x='조', y='mean', data=avg_by_group, hue='조',
-            ax=axes[plot_idx], palette='coolwarm', legend=False,
-            errorbar='sd', err_kws={'linewidth': 2}
+        avg_by_group['조_str'] = avg_by_group['조'].astype(str)
+
+        # hs_plot.barplot 사용 (errorbar 지원)
+        hs_plot.barplot(
+            df=avg_by_group,
+            xname='조_str',
+            yname='mean',
+            palette='coolwarm',
+            ax=axes[plot_idx],
+            errorbar='sd',
+            err_kws={'linewidth': 2}
         )
+
         axes[plot_idx].set_title("조별 평균점수 분포 (±1 std)", fontsize=12, fontweight='bold')
         axes[plot_idx].set_xlabel("조")
         axes[plot_idx].set_ylabel("평균점수")
-
-        # ylim 고정: 0~100
         axes[plot_idx].set_ylim(0, 100)
 
         for i, row in avg_by_group.iterrows():
             axes[plot_idx].text(i, row['mean'] + 2, f"{row['mean']:.1f}", ha='center', fontsize=10)
         plot_idx += 1
 
-    plt.tight_layout()
-    plt.show()
+    # hs_plot.finalize_plot을 사용하여 마무리
+    hs_plot.finalize_plot(axes, outparams=True, grid=False)
 
 
 # ===================================================================
 # 조별 점수 분포를 커널 밀도 추정(KDE) 그래프로 시각화한다
 # ===================================================================
-def report_kde(df: DataFrame, metric: str = 'average', figsize: tuple = (20, 8), dpi: int = None) -> None:
+def report_kde(df: DataFrame, metric: str = 'average', width: int = hs_fig.width, height: int = hs_fig.height, dpi: int = hs_fig.dpi) -> None:
     """조별 점수 분포를 KDE(Kernel Density Estimation)로 시각화합니다.
 
     각 조의 점수 분포를 커널 밀도 추정으로 표시하고 평균 및 95% 신뢰구간을 나타냅니다.
@@ -510,18 +534,15 @@ def report_kde(df: DataFrame, metric: str = 'average', figsize: tuple = (20, 8),
         df: cluster_students 함수의 반환 결과 데이터프레임.
         metric: 점수 기준 선택 ('total' 또는 'average').
             'total'이면 총점, 'average'이면 평균점수. 기본값: 'average'
-        figsize: 그래프 크기 (width, height). 기본값: (20, 8)
-        dpi: 그래프 해상도. None이면 my_dpi 사용. 기본값: None
+        width: 그래프 넓이. 기본값: hs_fig.width
+        height: 그래프 높이. 기본값: hs_fig.height
+        dpi: 그래프 해상도. 기본값: hs_fig.dpi
 
     Examples:
         >>> from hossam.classroom import cluster_students, report_kde
         >>> df_result = cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
         >>> report_kde(df_result, metric='average')
     """
-
-    if dpi is None:
-        dpi = my_dpi
-
     if df is None or len(df) == 0:
         print("데이터프레임이 비어있습니다")
         return
@@ -530,15 +551,12 @@ def report_kde(df: DataFrame, metric: str = 'average', figsize: tuple = (20, 8),
         print("데이터프레임에 '조' 컬럼이 없습니다")
         return
 
-    # 필요한 컬럼 확인
     has_score = '총점' in df.columns
     has_avg = '평균점수' in df.columns
-
     if not has_score:
         print("점수 데이터가 없습니다")
         return
 
-    # 혼합 타입 안전 정렬 라벨 준비
     labels = df['조'].unique().tolist()
     def _sort_key(v):
         try:
@@ -546,61 +564,27 @@ def report_kde(df: DataFrame, metric: str = 'average', figsize: tuple = (20, 8),
         except (ValueError, TypeError):
             return (1, str(v))
     ordered_labels = sorted(labels, key=_sort_key)
-
     n_groups = len(ordered_labels)
 
-    # 레이아웃 결정 (3열 기준)
-    cols = 3
+    # 레이아웃 결정 (2열 기준)
+    cols = 2
     rows = (n_groups + cols - 1) // cols
-
-    fig, axes = plt.subplots(rows, cols, figsize=figsize, dpi=dpi)
-
-    # axes를 1D 배열로 평탄화
-    if rows == 1 and cols == 1:
-        axes = [axes]
-    elif rows == 1 or cols == 1:
-        axes = axes.flatten()
-    else:
-        axes = axes.flatten()
+    fig, axes = hs_plot.get_default_ax(width=width, height=height, rows=rows, cols=cols, dpi=dpi, flatten=True)
 
     plot_idx = 0
-
-    # 메트릭 컬럼 결정
     metric_col = '평균점수' if (metric or '').lower() == 'average' else '총점'
     if metric_col not in df.columns:
         print(f"'{metric_col}' 컬럼이 없습니다")
         return
 
-    # ===== 각 조별 KDE =====
     for group in ordered_labels:
-        group_series = df[df['조'] == group][metric_col].dropna()
+        group_df = df[df['조'] == group]
+        group_series = group_df[metric_col].dropna()
         n = group_series.size
         if n == 0:
             continue
 
-        ax_kde = axes[plot_idx]
-        sns.kdeplot(group_series, ax=ax_kde, fill=True)
-
-        # 평균선 및 95% 신뢰구간(평균에 대한) 표시
-        mean_val = float(group_series.mean())
-        std_val = float(group_series.std(ddof=1)) if n > 1 else float('nan')
-        se = (std_val / (n ** 0.5)) if (n > 1 and std_val == std_val) else None
-        if se is not None:
-            ci_low = mean_val - 1.96 * se
-            ci_high = mean_val + 1.96 * se
-            ax_kde.axvspan(ci_low, ci_high, color='red', alpha=0.12, label='95% CI', zorder=9)
-        # 평균 세로선 (최상위로)
-        ax_kde.axvline(mean_val, color='red', linestyle='--', linewidth=1.5, label='Mean', zorder=10)
-
-        # 제목/레이블
-        ax_kde.set_title(f"{group}조 {metric_col} KDE", fontsize=12, fontweight='bold')
-        ax_kde.set_xlabel(metric_col)
-        ax_kde.set_ylabel("밀도")
-
-        # 범례 표시 (Mean/CI가 있으면 노출)
-        handles, labels_ = ax_kde.get_legend_handles_labels()
-        if handles:
-            ax_kde.legend(fontsize=9)
+        hs_plot.kde_confidence_interval(data=group_df, xnames=metric_col, ax=axes[plot_idx], callback=lambda ax: ax.set_title(f"{group}조"))
 
         plot_idx += 1
 
@@ -608,20 +592,19 @@ def report_kde(df: DataFrame, metric: str = 'average', figsize: tuple = (20, 8),
     for idx in range(plot_idx, len(axes)):
         fig.delaxes(axes[idx])
 
-    plt.tight_layout()
-    plt.show()
+    hs_plot.finalize_plot(axes)
 
 
 # ===================================================================
 # 조별로 학생 목록과 평균 점수를 요약하여 데이터프레임으로 반환한다
 # ===================================================================
-def group_summary(df: DataFrame, name_col: str = '학생번호') -> DataFrame:
+def group_summary(df: DataFrame, name_col: str = '학생이름') -> DataFrame:
     """조별로 학생 목록과 평균 점수를 요약합니다.
 
     Args:
         df: cluster_students 함수의 반환 결과 데이터프레임.
             '조' 컬럼이 필수로 포함되어야 함.
-        name_col: 학생 이름이 들어있는 컬럼명. 기본값: '학생번호'
+        name_col: 학생 이름이 들어있는 컬럼명. 기본값: '학생이름'
 
     Returns:
         조별 요약 정보가 담긴 데이터프레임.
@@ -688,7 +671,7 @@ def analyze_classroom(
     interest_col: str = None,
     max_iter: int = 200,
     score_metric: str = 'average',
-    name_col: str = '학생번호',
+    name_col: str = '학생이름',
     show_summary: bool = True,
     show_kde: bool = True
 ) -> DataFrame:
@@ -707,7 +690,7 @@ def analyze_classroom(
         interest_col: 관심사 정보가 있는 컬럼명. 기본값: None
         max_iter: 균형 조정 최대 반복 횟수. 기본값: 200
         score_metric: 점수 기준 선택 ('total' 또는 'average'). 기본값: 'average'
-        name_col: 학생 이름 컬럼명. 기본값: '학생번호'
+        name_col: 학생 이름 컬럼명. 기본값: '학생이름'
         show_summary: 요약 시각화 표시 여부. 기본값: True
         show_kde: KDE 시각화 표시 여부. 기본값: True
 
@@ -726,10 +709,6 @@ def analyze_classroom(
         >>> print(summary)
     """
 
-    print("=" * 60)
-    print("1. 학생 조 편성 중...")
-    print("=" * 60)
-
     # 1. 조 편성
     df_result = cluster_students(
         df=df,
@@ -742,34 +721,13 @@ def analyze_classroom(
 
     print(f"\n✓ 조 편성 완료: {len(df_result)}명의 학생을 {n_groups}개 조로 배정\n")
 
-    print("=" * 60)
-    print("2. 조별 요약 생성 중...")
-    print("=" * 60)
-
-    # 2. 조별 요약
-    summary = group_summary(df_result, name_col=name_col)
-    print("\n✓ 조별 요약:")
-    pretty_table(summary, tablefmt="pretty")
-    print()
-
     # 3. 요약 시각화
     if show_summary:
-        print("=" * 60)
-        print("3. 조 편성 요약 시각화 중...")
-        print("=" * 60)
         report_summary(df_result)
-        print("\n✓ 요약 시각화 완료\n")
 
     # 4. KDE 시각화
     if show_kde:
-        print("=" * 60)
-        print(f"4. 조별 {score_metric} KDE 시각화 중...")
-        print("=" * 60)
         report_kde(df_result, metric=score_metric)
-        print("\n✓ KDE 시각화 완료\n")
 
-    print("=" * 60)
-    print("전체 분석 완료!")
-    print("=" * 60)
-
+    summary = group_summary(df_result, name_col=name_col)
     return summary
