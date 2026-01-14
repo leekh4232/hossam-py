@@ -6,7 +6,7 @@ import numpy as np
 from typing import Tuple
 from itertools import combinations
 from pandas import DataFrame, Series, concat
-from pandas.api.types import is_bool_dtype
+from pandas.api.types import is_bool_dtype, is_numeric_dtype
 
 from sklearn.metrics import (
     confusion_matrix,
@@ -274,7 +274,7 @@ def category_table(data: DataFrame, *fields: str):
 # ===================================================================
 # 범주형 변수 요약 (Categorical Variable Summary)
 # ===================================================================
-def category_summary(data: DataFrame, *fields: str):
+def category_describe(data: DataFrame, *fields: str):
     """데이터프레임의 명목형(범주형) 변수에 대한 분포 편향을 요약한다.
 
     각 명목형 컬럼의 최다 범주와 최소 범주의 정보를 요약하여 데이터프레임으로 반환한다.
@@ -296,19 +296,19 @@ def category_summary(data: DataFrame, *fields: str):
     Examples:
         전체 명목형 컬럼에 대한 분포 편향 요약:
 
-        >>> from hossam import category_summary
+        >>> from hossam import category_describe
         >>> import pandas as pd
         >>> df = pd.DataFrame({
         ...     'cut': ['Ideal', 'Premium', 'Good', 'Ideal', 'Premium'],
         ...     'color': ['E', 'F', 'G', 'E', 'F'],
         ...     'price': [100, 200, 150, 300, 120]
         ... })
-        >>> result = category_summary(df)
+        >>> result = category_describe(df)
         >>> print(result)
 
         특정 컬럼만 분석:
 
-        >>> result = category_summary(df, 'cut', 'color')
+        >>> result = category_describe(df, 'cut', 'color')
         >>> print(result)
 
     Notes:
@@ -359,6 +359,16 @@ def category_summary(data: DataFrame, *fields: str):
         result.append(iq)
 
     return DataFrame(result)
+
+# -------------------------------------------------------------------
+# Backward-compatibility alias for categorical summary
+# 기존 함수명(category_summary)을 계속 지원합니다.
+def category_summary(data: DataFrame, *fields: str):
+    """Deprecated alias for category_describe.
+
+    기존 코드 호환을 위해 유지됩니다. 내부적으로 category_describe를 호출합니다.
+    """
+    return category_describe(data, *fields)
 
 # ===================================================================
 # 정규성 검정 (Normal Test)
@@ -443,7 +453,7 @@ def normal_test(data: DataFrame, columns: list | str | None = None, method: str 
             if method == "n":
                 method_name = "normaltest"
                 s, p = normaltest(col_data)
-            else:  # method == "s"
+            else:
                 method_name = "shapiro"
                 s, p = shapiro(col_data)
 
@@ -1027,6 +1037,16 @@ def vif_filter(
     result = data.drop(columns=removed_numeric_cols, errors="ignore")
 
     return result
+
+# -------------------------------------------------------------------
+# Backward-compatibility alias for describe (typo support)
+# 오타(discribe)로 사용된 경우를 지원하여 혼란을 줄입니다.
+def discribe(data: DataFrame, *fields: str, columns: list = None):
+    """Deprecated alias for describe.
+
+    내부적으로 describe를 호출합니다.
+    """
+    return describe(data, *fields, columns=columns)
 
 
 # ===================================================================
@@ -2094,7 +2114,7 @@ def corr_pairwise(
         cols = data.select_dtypes(include=[np.number]).columns.tolist()
     else:
         # fields 리스트에서 데이터에 있는 것만 선택하되, 숫자형만 필터링
-        cols = [c for c in fields if c in data.columns and pd.api.types.is_numeric_dtype(data[c])]
+        cols = [c for c in fields if c in data.columns and is_numeric_dtype(data[c])]
 
     # 사용 가능한 컬럼이 2개 미만이면 상관분석 불가능
     if len(cols) < 2:
@@ -2707,7 +2727,7 @@ def predict(fit, data: DataFrame | Series) -> DataFrame | Series | float:
 # ===================================================================
 # 확장된 기술통계량 (Extended Descriptive Statistics)
 # ===================================================================
-def summary(data: DataFrame, *fields: str, columns: list = None):
+def describe(data: DataFrame, *fields: str, columns: list = None):
     """데이터프레임의 연속형 변수에 대한 확장된 기술통계량을 반환한다.
 
     각 연속형(숫자형) 컬럼의 기술통계량(describe)을 구하고, 이에 사분위수 범위(IQR),

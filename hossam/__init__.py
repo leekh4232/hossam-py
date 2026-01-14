@@ -5,6 +5,7 @@ from matplotlib import font_manager as fm
 from importlib.resources import files, as_file
 from importlib.metadata import version
 from types import SimpleNamespace
+import sys
 import warnings
 
 try:
@@ -56,9 +57,10 @@ def _init_korean_font():
                 "pdf.fonttype": 42,
                 "ps.fonttype": 42,
             })
-            print(
-                "\n✅ 시각화를 위한 한글 글꼴(NotoSansKR-Regular)이 자동 적용되었습니다."
-            )
+            if sys.stdout.isatty():
+                print(
+                    "\n✅ 시각화를 위한 한글 글꼴(NotoSansKR-Regular)이 자동 적용되었습니다."
+                )
             return
     except Exception as e:
         warnings.warn(f"\n한글 폰트 초기화: 패키지 폰트 사용 실패 ({e}).")
@@ -76,8 +78,10 @@ def _init():
         f"🔖 Version: {__version__}",
     ]
 
-    for msg in messages:
-        print(f"{msg}")
+    # MCP/stdio 환경에서는 배너를 출력하지 않음 (stdout TTY일 때만 출력)
+    if sys.stdout.isatty():
+        for msg in messages:
+            print(f"{msg}")
 
     _init_korean_font()
 
