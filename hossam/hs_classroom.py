@@ -89,6 +89,11 @@ def cluster_students(
 
     # ===== 1단계: 점수 기반 처리 =====
     if score_cols is not None:
+        # 결측치는 0점으로 대체
+        for s in score_cols:
+            df[s] = df[s].fillna(0)
+        print(df)
+
         # 총점/평균점수 계산
         df['총점'] = df[score_cols].sum(axis=1)
         df['평균점수'] = df[score_cols].mean(axis=1)
@@ -97,12 +102,22 @@ def cluster_students(
         metric_col = '총점' if (score_metric or '').lower() != 'average' else '평균점수'
 
         # 성적사분위 분류 (선택한 기준 사용)
-        df['성적사분위'] = qcut(
-            df[metric_col],
-            q=[0, 0.25, 0.50, 0.75, 1.0],
-            labels=['Q1', 'Q2', 'Q3', 'Q4'],
-            duplicates='drop'  # 중복된 값 처리
-        )
+        quantiles = [0, 0.25, 0.50, 0.75, 1.0]
+        n_bins = len(quantiles) - 1
+        labels = [f"Q{i+1}" for i in range(n_bins)]
+        try:
+            df['성적사분위'] = qcut(
+                df[metric_col],
+                q=quantiles,
+                labels=labels,
+                duplicates='drop'  # 중복된 값 처리
+            )
+        except ValueError:
+            # 구간이 줄어든 경우, bins 개수에 맞게 labels 재생성
+            import pandas as pd
+            bins = pd.qcut(df[metric_col], q=quantiles, duplicates='drop').cat.categories
+            labels = [f"Q{i+1}" for i in range(len(bins))]
+            df['성적사분위'] = pd.qcut(df[metric_col], q=quantiles, labels=labels, duplicates='drop')
 
         # 성적그룹 매핑
         df['성적그룹'] = df['성적사분위'].map({
