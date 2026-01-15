@@ -1532,9 +1532,10 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <a href="#hossam.hs_classroom.report_summary" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">report_summary</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
-    <span class="n">width</span><span class="o">=</span><span class="n">hs_fig</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-    <span class="n">height</span><span class="o">=</span><span class="n">hs_fig</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
-    <span class="n">dpi</span><span class="o">=</span><span class="n">hs_fig</span><span class="o">.</span><span class="n">dpi</span><span class="p">,</span>
+    <span class="n">interest_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+    <span class="n">dpi</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -1573,6 +1574,22 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
           </tr>
           <tr class="doc-section-item">
             <td>
+                <code>interest_col</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>관심사 컬럼명</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
                 <code>width</code>
             </td>
             <td>
@@ -1580,11 +1597,11 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
             </td>
             <td>
               <div class="doc-md-description">
-                <p>그래프 넓이. 기본값: hs_fig.width</p>
+                <p>그래프 넓이. 기본값: config.width</p>
               </div>
             </td>
             <td>
-                  <code><span title="hossam.hs_fig.width">width</span></code>
+                  <code><span title="hossam.hs_plot.config.width">width</span></code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -1596,11 +1613,11 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
             </td>
             <td>
               <div class="doc-md-description">
-                <p>그래프 높이. 기본값: hs_fig.height</p>
+                <p>그래프 높이. 기본값: config.height</p>
               </div>
             </td>
             <td>
-                  <code><span title="hossam.hs_fig.height">height</span></code>
+                  <code><span title="hossam.hs_plot.config.height">height</span></code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -1612,11 +1629,11 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
             </td>
             <td>
               <div class="doc-md-description">
-                <p>그래프 해상도. 기본값: hs_fig.dpi</p>
+                <p>그래프 해상도. 기본값: config.dpi</p>
               </div>
             </td>
             <td>
-                  <code><span title="hossam.hs_fig.dpi">dpi</span></code>
+                  <code><span title="hossam.hs_plot.config.dpi">dpi</span></code>
             </td>
           </tr>
       </tbody>
@@ -1777,16 +1794,18 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <span class="normal">534</span>
 <span class="normal">535</span>
 <span class="normal">536</span>
-<span class="normal">537</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_summary</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">hs_fig</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">hs_fig</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">hs_fig</span><span class="o">.</span><span class="n">dpi</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">537</span>
+<span class="normal">538</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_summary</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">interest_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;조 편성 결과의 요약 통계를 시각화합니다.</span>
 
 <span class="sd">    조별 인원 분포, 관심사 분포, 평균점수 분포를 나타냅니다.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        df: cluster_students 함수의 반환 결과 데이터프레임.</span>
-<span class="sd">        width: 그래프 넓이. 기본값: hs_fig.width</span>
-<span class="sd">        height: 그래프 높이. 기본값: hs_fig.height</span>
-<span class="sd">        dpi: 그래프 해상도. 기본값: hs_fig.dpi</span>
+<span class="sd">        df (DataFrame): cluster_students 함수의 반환 결과 데이터프레임.</span>
+<span class="sd">        interest_col (str): 관심사 컬럼명</span>
+<span class="sd">        width (int): 그래프 넓이. 기본값: config.width</span>
+<span class="sd">        height (int): 그래프 높이. 기본값: config.height</span>
+<span class="sd">        dpi (int): 그래프 해상도. 기본값: config.dpi</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from hossam.classroom import cluster_students, report_summary</span>
@@ -1808,7 +1827,7 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
     <span class="c1"># 필요한 컬럼 확인</span>
     <span class="n">has_score</span> <span class="o">=</span> <span class="s1">&#39;총점&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
     <span class="n">has_avg</span> <span class="o">=</span> <span class="s1">&#39;평균점수&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
-    <span class="n">has_interest</span> <span class="o">=</span> <span class="s1">&#39;관심사&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+    <span class="n">has_interest</span> <span class="o">=</span> <span class="n">interest_col</span> <span class="ow">and</span> <span class="s1">&#39;관심사&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
 
     <span class="c1"># 혼합 타입 안전 정렬 라벨 준비</span>
     <span class="n">labels</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;조&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
@@ -1940,9 +1959,9 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">report_kde</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;average&quot;</span><span class="p">,</span>
-    <span class="n">width</span><span class="o">=</span><span class="n">hs_fig</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-    <span class="n">height</span><span class="o">=</span><span class="n">hs_fig</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
-    <span class="n">dpi</span><span class="o">=</span><span class="n">hs_fig</span><span class="o">.</span><span class="n">dpi</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+    <span class="n">dpi</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -2005,11 +2024,11 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
             </td>
             <td>
               <div class="doc-md-description">
-                <p>그래프 넓이. 기본값: hs_fig.width</p>
+                <p>그래프 넓이. 기본값: config.width</p>
               </div>
             </td>
             <td>
-                  <code><span title="hossam.hs_fig.width">width</span></code>
+                  <code><span title="hossam.hs_plot.config.width">width</span></code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -2021,11 +2040,11 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
             </td>
             <td>
               <div class="doc-md-description">
-                <p>그래프 높이. 기본값: hs_fig.height</p>
+                <p>그래프 높이. 기본값: config.height</p>
               </div>
             </td>
             <td>
-                  <code><span title="hossam.hs_fig.height">height</span></code>
+                  <code><span title="hossam.hs_plot.config.height">height</span></code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -2037,11 +2056,11 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
             </td>
             <td>
               <div class="doc-md-description">
-                <p>그래프 해상도. 기본값: hs_fig.dpi</p>
+                <p>그래프 해상도. 기본값: config.dpi</p>
               </div>
             </td>
             <td>
-                  <code><span title="hossam.hs_fig.dpi">dpi</span></code>
+                  <code><span title="hossam.hs_plot.config.dpi">dpi</span></code>
             </td>
           </tr>
       </tbody>
@@ -2057,8 +2076,7 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_classroom.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">543</span>
-<span class="normal">544</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">544</span>
 <span class="normal">545</span>
 <span class="normal">546</span>
 <span class="normal">547</span>
@@ -2124,7 +2142,8 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <span class="normal">607</span>
 <span class="normal">608</span>
 <span class="normal">609</span>
-<span class="normal">610</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_kde</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">hs_fig</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">hs_fig</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">hs_fig</span><span class="o">.</span><span class="n">dpi</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">610</span>
+<span class="normal">611</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_kde</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;조별 점수 분포를 KDE(Kernel Density Estimation)로 시각화합니다.</span>
 
 <span class="sd">    각 조의 점수 분포를 커널 밀도 추정으로 표시하고 평균 및 95% 신뢰구간을 나타냅니다.</span>
@@ -2133,9 +2152,9 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <span class="sd">        df: cluster_students 함수의 반환 결과 데이터프레임.</span>
 <span class="sd">        metric: 점수 기준 선택 (&#39;total&#39; 또는 &#39;average&#39;).</span>
 <span class="sd">            &#39;total&#39;이면 총점, &#39;average&#39;이면 평균점수. 기본값: &#39;average&#39;</span>
-<span class="sd">        width: 그래프 넓이. 기본값: hs_fig.width</span>
-<span class="sd">        height: 그래프 높이. 기본값: hs_fig.height</span>
-<span class="sd">        dpi: 그래프 해상도. 기본값: hs_fig.dpi</span>
+<span class="sd">        width: 그래프 넓이. 기본값: config.width</span>
+<span class="sd">        height: 그래프 높이. 기본값: config.height</span>
+<span class="sd">        dpi: 그래프 해상도. 기본값: config.dpi</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from hossam.classroom import cluster_students, report_kde</span>
@@ -2305,8 +2324,7 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_classroom.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">616</span>
-<span class="normal">617</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">617</span>
 <span class="normal">618</span>
 <span class="normal">619</span>
 <span class="normal">620</span>
@@ -2365,7 +2383,8 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <span class="normal">673</span>
 <span class="normal">674</span>
 <span class="normal">675</span>
-<span class="normal">676</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">group_summary</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">name_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;학생이름&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">676</span>
+<span class="normal">677</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">group_summary</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">name_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;학생이름&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;조별로 학생 목록과 평균 점수를 요약합니다.</span>
 
 <span class="sd">    Args:</span>
@@ -2659,8 +2678,7 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_classroom.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">682</span>
-<span class="normal">683</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">683</span>
 <span class="normal">684</span>
 <span class="normal">685</span>
 <span class="normal">686</span>
@@ -2725,7 +2743,8 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <span class="normal">745</span>
 <span class="normal">746</span>
 <span class="normal">747</span>
-<span class="normal">748</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">analyze_classroom</span><span class="p">(</span>
+<span class="normal">748</span>
+<span class="normal">749</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">analyze_classroom</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">n_groups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">score_cols</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2784,7 +2803,7 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 
     <span class="c1"># 3. 요약 시각화</span>
     <span class="k">if</span> <span class="n">show_summary</span><span class="p">:</span>
-        <span class="n">report_summary</span><span class="p">(</span><span class="n">df_result</span><span class="p">)</span>
+        <span class="n">report_summary</span><span class="p">(</span><span class="n">df_result</span><span class="p">,</span> <span class="n">interest_col</span><span class="p">)</span>
 
     <span class="c1"># 4. KDE 시각화</span>
     <span class="k">if</span> <span class="n">show_kde</span><span class="p">:</span>
