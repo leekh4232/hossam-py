@@ -8,9 +8,6 @@ __pycache__/
 *$py.class
 .DS_Store
 
-*.csv
-*.xlsx
-
 # C extensions
 *.so
 
