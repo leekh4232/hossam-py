@@ -7,7 +7,6 @@
 import inspect as _inspect
 import hossam.data_loader as _mod
 
-
 def register(mcp):
     # load_data는 제외 (hs_util.load_data를 사용)
     excluded_functions = ["load_data"]

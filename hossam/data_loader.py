@@ -39,7 +39,8 @@ def __get_df(path: str, index_col=None) -> DataFrame:
                 hs_pretty_table(info)
                 print()
             except Exception:
-                print(f"\033[91m[!] Cannot read metadata\033[0m")
+                #print(f"\033[91m[!] Cannot read metadata\033[0m")
+                pass
         else:
             df = read_excel(path, index_col=index_col)
 
@@ -51,7 +52,8 @@ def __get_df(path: str, index_col=None) -> DataFrame:
                 hs_pretty_table(info)
                 print()
             except:
-                print(f"\033[91m[!] Cannot read metadata\033[0m")
+                #print(f"\033[91m[!] Cannot read metadata\033[0m")
+                pass
     else:
         df = read_csv(path, index_col=index_col)
 
@@ -181,8 +183,9 @@ def load_data(key: str, local: str = None) -> Optional[DataFrame]:
             print(e)
         return
 
-    print("\033[94m[data]\033[0m", url.replace("\\", "/"))
-    print("\033[94m[desc]\033[0m", desc)
+    #print("\033[94m[data]\033[0m", url.replace("\\", "/"))
+    #print("\033[94m[desc]\033[0m", desc)
+    print(f"\033[94m{desc}\033[0m")
 
     df = None
 

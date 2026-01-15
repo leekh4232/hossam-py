@@ -72,7 +72,7 @@ def missing_values(data: DataFrame, *fields: str):
         >>> print(result)
     """
     if not fields:
-        fields = data.columns
+        fields = tuple(data.columns)
 
     result = []
     for f in fields:
@@ -140,7 +140,7 @@ def outlier_table(data: DataFrame, *fields: str):
         - Tukey의 1.5 * IQR 규칙을 사용합니다 (상자그림의 표준 방법).
     """
     if not fields:
-        fields = data.columns
+        fields = tuple(data.columns)
 
     result = []
     for f in fields:
@@ -195,80 +195,158 @@ def outlier_table(data: DataFrame, *fields: str):
 
 
 # ===================================================================
-# 범주형 변수 분석 (Categorical Variable Analysis)
+# 확장된 기술통계량 (Extended Descriptive Statistics)
 # ===================================================================
-def category_table(data: DataFrame, *fields: str):
-    """데이터프레임의 명목형(범주형) 변수에 대한 기술통계를 반환한다.
+def describe(data: DataFrame, *fields: str, columns: list | None = None):
+    """데이터프레임의 연속형 변수의 단위 및 현실성을 평가하기 위해 확장된 기술통계량을 반환한다.
 
-    각 명목형 컬럼의 범주값별 빈도수와 비율을 계산하여 데이터프레임으로 반환한다.
+    각 연속형(숫자형) 컬럼의 기술통계량(describe)을 구하고, 이에 사분위수 범위(IQR),
+    이상치 경계값(UP, DOWN), 왜도(skew), 이상치 개수 및 비율, 분포 특성, 로그변환 필요성을
+    추가하여 반환한다.
 
     Args:
         data (DataFrame): 분석 대상 데이터프레임.
-        *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 명목형 컬럼을 처리.
+        *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 숫자형 컬럼을 처리.
+        columns (list, optional): 반환할 통계량 컬럼 목록. None이면 모든 통계량 반환.
 
     Returns:
-        DataFrame: 각 컬럼별 범주값의 빈도와 비율 정보를 포함한 데이터프레임.
-            인덱스는 FIELD(컬럼명)와 CATEGORY(범주값)이며, 다음 컬럼을 포함:
+        DataFrame: 각 필드별 확장된 기술통계량을 포함한 데이터프레임.
+            행은 다음과 같은 통계량을 포함:
 
-            - count (int): 해당 범주값의 빈도수
-            - rate (float): 전체 행에서 해당 범주값의 비율(%)
+            - count (float): 비결측치의 수
+            - mean (float): 평균값
+            - std (float): 표준편차
+            - min (float): 최소값
+            - 25% (float): 제1사분위수 (Q1)
+            - 50% (float): 제2사분위수 (중앙값)
+            - 75% (float): 제3사분위수 (Q3)
+            - max (float): 최대값
+            - iqr (float): 사분위 범위 (Q3 - Q1)
+            - up (float): 이상치 상한 경계값 (Q3 + 1.5 * IQR)
+            - down (float): 이상치 하한 경계값 (Q1 - 1.5 * IQR)
+            - skew (float): 왜도
+            - outlier_count (int): 이상치 개수
+            - outlier_rate (float): 이상치 비율(%)
+            - dist (str): 분포 특성 ("극단 우측 꼬리", "거의 대칭" 등)
+            - log_need (str): 로그변환 필요성 ("높음", "중간", "낮음")
 
     Examples:
-        전체 명목형 컬럼에 대한 기술통계:
+        전체 숫자형 컬럼에 대한 확장된 기술통계:
 
-        >>> from hossam import category_table
+        >>> from hossam import summary
         >>> import pandas as pd
         >>> df = pd.DataFrame({
-        ...     'color': ['red', 'blue', 'red', 'green', 'blue', 'red'],
-        ...     'size': ['S', 'M', 'L', 'M', 'S', 'M'],
-        ...     'price': [100, 200, 150, 300, 120, 180]
+        ...     'x': [1, 2, 3, 4, 5, 100],
+        ...     'y': [10, 20, 30, 40, 50, 60],
+        ...     'z': ['a', 'b', 'c', 'd', 'e', 'f']
         ... })
-        >>> result = category_table(df)
+        >>> result = summary(df)
         >>> print(result)
 
         특정 컬럼만 분석:
 
-        >>> result = category_table(df, 'color', 'size')
+        >>> result = summary(df, 'x', 'y')
         >>> print(result)
 
     Notes:
-        - 숫자형 컬럼은 자동으로 제외됩니다.
-        - 각 범주값별로 별도의 행으로 반환됩니다.
-        - NaN 값도 하나의 범주로 포함됩니다.
+        - 숫자형이 아닌 컬럼은 자동으로 제외됩니다.
+        - 결과는 필드(컬럼)가 행으로, 통계량이 열로 구성됩니다.
+        - Tukey의 1.5 * IQR 규칙을 사용하여 이상치를 판정합니다.
+        - 분포 특성은 왜도 값으로 판정합니다.
+        - 로그변환 필요성은 왜도의 절댓값 크기로 판정합니다.
     """
     if not fields:
-        # 명목형(범주형) 컬럼 선택: object, category, bool 타입
-        fields = data.select_dtypes(include=['object', 'category', 'bool']).columns
+        fields = tuple(data.select_dtypes(include=['int', 'int32', 'int64', 'float', 'float32', 'float64']).columns)
 
-    result = []
+    # 기술통계량 구하기
+    desc = data[list(fields)].describe().T
+    # 각 컬럼별 결측치 수(null_count) 추가
+    null_counts = data[list(fields)].isnull().sum()
+    desc.insert(1, 'null_count', null_counts)
+
+    # 추가 통계량 계산
+    additional_stats = []
     for f in fields:
-        # 숫자형 컬럼은 건너뜀
-        if data[f].dtypes in [
-            "int",
-            "int32",
-            "int64",
-            "float",
-            "float32",
-            "float64",
+        # 숫자 타입이 아니라면 건너뜀
+        if data[f].dtype not in [
+            'int',
+            'int32',
+            'int64',
+            'float',
+            'float32',
+            'float64',
+            'int64',
+            'float64',
+            'float32'
         ]:
             continue
 
-        # 각 범주값의 빈도수 계산 (NaN 포함)
-        value_counts = data[f].value_counts(dropna=False)
+        # 사분위수
+        q1 = data[f].quantile(q=0.25)
+        q3 = data[f].quantile(q=0.75)
 
-        for category, count in value_counts.items():
-            rate = (count / len(data)) * 100
+        # 이상치 경계 (Tukey's fences)
+        iqr = q3 - q1
+        down = q1 - 1.5 * iqr
+        up = q3 + 1.5 * iqr
 
-            iq = {
-                "field": f,
-                "category": category,
-                "count": count,
-                "rate": rate
-            }
+        # 왜도
+        skew = data[f].skew()
 
-            result.append(iq)
+        # 이상치 개수 및 비율
+        outlier_count = ((data[f] < down) | (data[f] > up)).sum()
+        outlier_rate = (outlier_count / len(data)) * 100
 
-    return DataFrame(result).set_index(["field", "category"])
+        # 분포 특성 판정 (왜도 기준)
+        abs_skew = abs(skew)
+        if abs_skew < 0.5:
+            dist = "거의 대칭"
+        elif abs_skew < 1.0:
+            if skew > 0:
+                dist = "약한 우측 꼬리"
+            else:
+                dist = "약한 좌측 꼬리"
+        elif abs_skew < 2.0:
+            if skew > 0:
+                dist = "중간 우측 꼬리"
+            else:
+                dist = "중간 좌측 꼬리"
+        else:
+            if skew > 0:
+                dist = "극단 우측 꼬리"
+            else:
+                dist = "극단 좌측 꼬리"
+
+        # 로그변환 필요성 판정
+        if abs_skew < 0.5:
+            log_need = "낮음"
+        elif abs_skew < 1.0:
+            log_need = "중간"
+        else:
+            log_need = "높음"
+
+        additional_stats.append({
+            'field': f,
+            'iqr': iqr,
+            'up': up,
+            'down': down,
+            'outlier_count': outlier_count,
+            'outlier_rate': outlier_rate,
+            'skew': skew,
+            'dist': dist,
+            'log_need': log_need
+        })
+
+    additional_df = DataFrame(additional_stats).set_index('field')
+
+    # 결과 병합
+    result = concat([desc, additional_df], axis=1)
+
+    # columns 파라미터가 지정된 경우 해당 컬럼만 필터링
+    if columns is not None:
+        result = result[columns]
+
+    return result
 
 
 # ===================================================================
@@ -335,40 +413,35 @@ def category_describe(data: DataFrame, *fields: str):
         # 각 범주값의 빈도수 계산 (NaN 포함)
         value_counts = data[f].value_counts(dropna=False)
 
+        # 범주별 빈도/비율 정보 추가 (category_table 기능)
+        for category, count in value_counts.items():
+            rate = (count / len(data)) * 100
+            result.append({
+                "변수": f,
+                "범주": category,
+                "빈도": count,
+                "비율(%)": round(rate, 2)
+            })
+
         if len(value_counts) == 0:
             continue
 
-        # 최다 범주 (첫 번째)
+        # 최다/최소 범주 정보 추가 (category_describe 기능)
         max_category = value_counts.index[0]
         max_count = value_counts.iloc[0]
         max_rate = (max_count / len(data)) * 100
-
-        # 최소 범주 (마지막)
         min_category = value_counts.index[-1]
         min_count = value_counts.iloc[-1]
         min_rate = (min_count / len(data)) * 100
-
-        iq = {
+        result.append({
             "변수": f,
             "최다_범주": max_category,
             "최다_비율(%)": round(max_rate, 2),
             "최소_범주": min_category,
             "최소_비율(%)": round(min_rate, 2)
-        }
-
-        result.append(iq)
+        })
 
     return DataFrame(result)
-
-# -------------------------------------------------------------------
-# Backward-compatibility alias for categorical summary
-# 기존 함수명(category_summary)을 계속 지원합니다.
-def category_summary(data: DataFrame, *fields: str):
-    """Deprecated alias for category_describe.
-
-    기존 코드 호환을 위해 유지됩니다. 내부적으로 category_describe를 호출합니다.
-    """
-    return category_describe(data, *fields)
 
 # ===================================================================
 # 정규성 검정 (Normal Test)
@@ -1038,15 +1111,6 @@ def vif_filter(
 
     return result
 
-# -------------------------------------------------------------------
-# Backward-compatibility alias for describe (typo support)
-# 오타(discribe)로 사용된 경우를 지원하여 혼란을 줄입니다.
-def discribe(data: DataFrame, *fields: str, columns: list = None):
-    """Deprecated alias for describe.
-
-    내부적으로 describe를 호출합니다.
-    """
-    return describe(data, *fields, columns=columns)
 
 
 # ===================================================================
@@ -2722,158 +2786,6 @@ def predict(fit, data: DataFrame | Series) -> DataFrame | Series | float:
             f"모형 학습 시 사용한 특성과 입력 데이터의 특성이 일치하는지 확인하세요.\n"
             f"원본 오류: {str(e)}"
         )
-
-
-# ===================================================================
-# 확장된 기술통계량 (Extended Descriptive Statistics)
-# ===================================================================
-def describe(data: DataFrame, *fields: str, columns: list = None):
-    """데이터프레임의 연속형 변수에 대한 확장된 기술통계량을 반환한다.
-
-    각 연속형(숫자형) 컬럼의 기술통계량(describe)을 구하고, 이에 사분위수 범위(IQR),
-    이상치 경계값(UP, DOWN), 왜도(skew), 이상치 개수 및 비율, 분포 특성, 로그변환 필요성을
-    추가하여 반환한다.
-
-    Args:
-        data (DataFrame): 분석 대상 데이터프레임.
-        *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 숫자형 컬럼을 처리.
-        columns (list, optional): 반환할 통계량 컬럼 목록. None이면 모든 통계량 반환.
-
-    Returns:
-        DataFrame: 각 필드별 확장된 기술통계량을 포함한 데이터프레임.
-            행은 다음과 같은 통계량을 포함:
-
-            - count (float): 비결측치의 수
-            - mean (float): 평균값
-            - std (float): 표준편차
-            - min (float): 최소값
-            - 25% (float): 제1사분위수 (Q1)
-            - 50% (float): 제2사분위수 (중앙값)
-            - 75% (float): 제3사분위수 (Q3)
-            - max (float): 최대값
-            - iqr (float): 사분위 범위 (Q3 - Q1)
-            - up (float): 이상치 상한 경계값 (Q3 + 1.5 * IQR)
-            - down (float): 이상치 하한 경계값 (Q1 - 1.5 * IQR)
-            - skew (float): 왜도
-            - outlier_count (int): 이상치 개수
-            - outlier_rate (float): 이상치 비율(%)
-            - dist (str): 분포 특성 ("극단 우측 꼬리", "거의 대칭" 등)
-            - log_need (str): 로그변환 필요성 ("높음", "중간", "낮음")
-
-    Examples:
-        전체 숫자형 컬럼에 대한 확장된 기술통계:
-
-        >>> from hossam import summary
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({
-        ...     'x': [1, 2, 3, 4, 5, 100],
-        ...     'y': [10, 20, 30, 40, 50, 60],
-        ...     'z': ['a', 'b', 'c', 'd', 'e', 'f']
-        ... })
-        >>> result = summary(df)
-        >>> print(result)
-
-        특정 컬럼만 분석:
-
-        >>> result = summary(df, 'x', 'y')
-        >>> print(result)
-
-    Notes:
-        - 숫자형이 아닌 컬럼은 자동으로 제외됩니다.
-        - 결과는 필드(컬럼)가 행으로, 통계량이 열로 구성됩니다.
-        - Tukey의 1.5 * IQR 규칙을 사용하여 이상치를 판정합니다.
-        - 분포 특성은 왜도 값으로 판정합니다.
-        - 로그변환 필요성은 왜도의 절댓값 크기로 판정합니다.
-    """
-    if not fields:
-        fields = data.select_dtypes(include=['int', 'int32', 'int64', 'float', 'float32', 'float64']).columns
-
-    # 기술통계량 구하기
-    desc = data[list(fields)].describe().T
-
-    # 추가 통계량 계산
-    additional_stats = []
-    for f in fields:
-        # 숫자 타입이 아니라면 건너뜀
-        if data[f].dtype not in [
-            'int',
-            'int32',
-            'int64',
-            'float',
-            'float32',
-            'float64',
-            'int64',
-            'float64',
-            'float32'
-        ]:
-            continue
-
-        # 사분위수
-        q1 = data[f].quantile(q=0.25)
-        q3 = data[f].quantile(q=0.75)
-
-        # 이상치 경계 (Tukey's fences)
-        iqr = q3 - q1
-        down = q1 - 1.5 * iqr
-        up = q3 + 1.5 * iqr
-
-        # 왜도
-        skew = data[f].skew()
-
-        # 이상치 개수 및 비율
-        outlier_count = ((data[f] < down) | (data[f] > up)).sum()
-        outlier_rate = (outlier_count / len(data)) * 100
-
-        # 분포 특성 판정 (왜도 기준)
-        abs_skew = abs(skew)
-        if abs_skew < 0.5:
-            dist = "거의 대칭"
-        elif abs_skew < 1.0:
-            if skew > 0:
-                dist = "약한 우측 꼬리"
-            else:
-                dist = "약한 좌측 꼬리"
-        elif abs_skew < 2.0:
-            if skew > 0:
-                dist = "중간 우측 꼬리"
-            else:
-                dist = "중간 좌측 꼬리"
-        else:
-            if skew > 0:
-                dist = "극단 우측 꼬리"
-            else:
-                dist = "극단 좌측 꼬리"
-
-        # 로그변환 필요성 판정
-        if abs_skew < 0.5:
-            log_need = "낮음"
-        elif abs_skew < 1.0:
-            log_need = "중간"
-        else:
-            log_need = "높음"
-
-        additional_stats.append({
-            'field': f,
-            'iqr': iqr,
-            'up': up,
-            'down': down,
-            'outlier_count': outlier_count,
-            'outlier_rate': outlier_rate,
-            'skew': skew,
-            'dist': dist,
-            'log_need': log_need
-        })
-
-    additional_df = DataFrame(additional_stats).set_index('field')
-
-    # 결과 병합
-    result = concat([desc, additional_df], axis=1)
-
-    # columns 파라미터가 지정된 경우 해당 컬럼만 필터링
-    if columns is not None:
-        result = result[columns]
-
-    return result
 
 
 # ===================================================================

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
+from types import SimpleNamespace
 
-# ===================================================================
-#
 # ===================================================================
 import numpy as np
 import pandas as pd
@@ -11,10 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import Axes
 from math import sqrt
 from pandas import DataFrame
-from . import hs_fig
 
-# ===================================================================
-#
 # ===================================================================
 from scipy.stats import t
 from scipy.spatial import ConvexHull
@@ -22,12 +18,8 @@ from statsmodels.graphics.gofplots import qqplot as sm_qqplot
 from statsmodels.nonparametric.smoothers_lowess import lowess
 
 # ===================================================================
-#
-# ===================================================================
 from statannotations.Annotator import Annotator
 
-# ===================================================================
-#
 # ===================================================================
 from sklearn.metrics import (
     mean_squared_error,
@@ -38,16 +30,26 @@ from sklearn.metrics import (
 )
 
 # ===================================================================
-#
-# ===================================================================
 if pd.__version__ > "2.0.0":
     pd.DataFrame.iteritems = pd.DataFrame.items
 
+config = SimpleNamespace(
+    dpi=200,
+    width=800,
+    height=520,
+    font_size=10,
+    font_weight="normal",
+    frame_width=0.7,
+    line_width=1.5,
+    grid_alpha=0.3,
+    grid_width=0.5,
+    fill_alpha=0.3
+)
 
 # ===================================================================
 # 기본 크기가 설정된 Figure와 Axes를 생성한다
 # ===================================================================
-def get_default_ax(width: int = hs_fig.width, height: int = hs_fig.height, rows: int = 1, cols: int = 1, dpi: int = hs_fig.dpi, flatten: bool = False, ws: int | None = None, hs: int | None = None):
+def get_default_ax(width: int = config.width, height: int = config.height, rows: int = 1, cols: int = 1, dpi: int = config.dpi, flatten: bool = False, ws: int | None = None, hs: int | None = None):
     """기본 크기의 Figure와 Axes를 생성한다.
 
     Args:
@@ -80,14 +82,14 @@ def get_default_ax(width: int = hs_fig.width, height: int = hs_fig.height, rows:
     if flatten and isinstance(ax, list):
         for a in ax:
             for spine in a.spines.values():
-                spine.set_linewidth(hs_fig.frame_width)
+                spine.set_linewidth(config.frame_width)
     elif isinstance(ax, np.ndarray):
         for a in ax.flat:
             for spine in a.spines.values():
-                spine.set_linewidth(hs_fig.frame_width)
+                spine.set_linewidth(config.frame_width)
     else:
         for spine in ax.spines.values():
-            spine.set_linewidth(hs_fig.frame_width)
+            spine.set_linewidth(config.frame_width)
 
     return fig, ax
 
@@ -123,14 +125,14 @@ def finalize_plot(ax: Axes, callback: any = None, outparams: bool = False, save_
     if grid:
         if is_array:
             for a in (ax.flat if isinstance(ax, np.ndarray) else ax):
-                a.grid(True, alpha=hs_fig.grid_alpha, linewidth=hs_fig.grid_width)
+                a.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
         else:
-            ax.grid(True, alpha=hs_fig.grid_alpha, linewidth=hs_fig.grid_width)
+            ax.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
 
     plt.tight_layout()
 
     if save_path is not None:
-        plt.savefig(save_path, dpi=hs_fig.dpi * 2, bbox_inches='tight')
+        plt.savefig(save_path, dpi=config.dpi * 2, bbox_inches='tight')
 
     if outparams:
         plt.show()
@@ -147,10 +149,10 @@ def lineplot(
     hue: str = None,
     marker: str = None,
     palette: str = None,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -213,10 +215,10 @@ def boxplot(
     yname: str = None,
     orient: str = "v",
     palette: str = None,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -283,12 +285,12 @@ def kdeplot(
     hue: str = None,
     palette: str = None,
     fill: bool = False,
-    fill_alpha: float = hs_fig.fill_alpha,
-    linewidth: float = hs_fig.line_width,
+    fill_alpha: float = config.fill_alpha,
+    linewidth: float = config.line_width,
     quartile_split: bool = False,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -365,7 +367,7 @@ def kdeplot(
 
             sb.kdeplot(**kdeplot_kwargs)
             axes[idx].set_title(f"Q{idx+1}: [{lo:.3g}, {hi:.3g}]")
-            axes[idx].grid(True, alpha=hs_fig.grid_alpha, linewidth=hs_fig.grid_width)
+            axes[idx].grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
 
         finalize_plot(axes[0], callback, outparams, save_path)
         return
@@ -414,10 +416,10 @@ def histplot(
     bins=None,
     kde: bool = True,
     palette: str = None,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -496,10 +498,10 @@ def stackplot(
     xname: str,
     hue: str,
     palette: str = None,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
+    width: int = config.width,
+    height: int = config.height,
     linewidth: float = 0.25,
-    dpi: int = hs_fig.dpi,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -581,10 +583,10 @@ def scatterplot(
     yname: str,
     hue=None,
     palette: str = None,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -645,10 +647,10 @@ def regplot(
     xname: str,
     yname: str,
     palette: str = None,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -712,10 +714,10 @@ def lmplot(
     yname: str,
     hue=None,
     palette: str = None,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     **params,
 ) -> None:
@@ -762,7 +764,7 @@ def lmplot(
                 continue
             line.set_linewidth(linewidth)
 
-    g.fig.grid(True, alpha=hs_fig.grid_alpha, linewidth=hs_fig.grid_width)
+    g.fig.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
 
     plt.tight_layout()
 
@@ -782,10 +784,10 @@ def pairplot(
     diag_kind: str = "kde",
     hue=None,
     palette: str = None,
-    width: int = hs_fig.height,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.height,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     **params,
 ) -> None:
@@ -850,7 +852,7 @@ def pairplot(
     scale = len(target_cols)
     g.fig.set_size_inches(w=(width / dpi) * scale, h=(height / dpi) * scale)
     g.fig.set_dpi(dpi)
-    g.map_lower(func=sb.kdeplot, fill=True, alpha=hs_fig.fill_alpha, linewidth=linewidth)
+    g.map_lower(func=sb.kdeplot, fill=True, alpha=config.fill_alpha, linewidth=linewidth)
     g.map_upper(func=sb.scatterplot, linewidth=linewidth)
 
     # KDE 대각선에도 linewidth 적용
@@ -876,10 +878,10 @@ def countplot(
     hue=None,
     palette: str = None,
     order: int = 1,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -948,10 +950,10 @@ def barplot(
     yname: str,
     hue=None,
     palette: str = None,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -1012,10 +1014,10 @@ def boxenplot(
     yname: str,
     hue=None,
     palette: str = None,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -1074,10 +1076,10 @@ def violinplot(
     yname: str,
     hue=None,
     palette: str = None,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -1135,10 +1137,10 @@ def pointplot(
     yname: str,
     hue=None,
     palette: str = None,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -1198,10 +1200,10 @@ def jointplot(
     yname: str,
     hue=None,
     palette: str = None,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     **params,
 ) -> None:
@@ -1242,9 +1244,9 @@ def jointplot(
     g.fig.set_dpi(dpi)
 
     # 중앙 및 주변 플롯에 grid 추가
-    g.ax_joint.grid(True, alpha=hs_fig.grid_alpha, linewidth=hs_fig.grid_width)
-    g.ax_marg_x.grid(True, alpha=hs_fig.grid_alpha, linewidth=hs_fig.grid_width)
-    g.ax_marg_y.grid(True, alpha=hs_fig.grid_alpha, linewidth=hs_fig.grid_width)
+    g.ax_joint.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
+    g.ax_marg_x.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
+    g.ax_marg_y.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
 
     plt.tight_layout()
 
@@ -1264,7 +1266,7 @@ def heatmap(
     width: int | None = None,
     height: int | None = None,
     linewidth: float = 0.25,
-    dpi: int = hs_fig.dpi,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -1289,7 +1291,7 @@ def heatmap(
     outparams = False
 
     if width == None or height == None:
-        width = (hs_fig.font_size * hs_fig.dpi / 72) * 4.5 * len(data.columns)
+        width = (config.font_size * config.dpi / 72) * 4.5 * len(data.columns)
         height = width * 0.8
 
     if ax is None:
@@ -1323,10 +1325,10 @@ def convex_hull(
     yname: str,
     hue: str,
     palette: str = None,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -1393,10 +1395,10 @@ def kde_confidence_interval(
     data: DataFrame,
     xnames=None,
     clevel=0.95,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -1476,7 +1478,7 @@ def kde_confidence_interval(
         # 신뢰구간 그리기
         current_ax.plot([cmin, cmin], [ymin_val, ymax_val], linestyle=":", linewidth=linewidth*0.5)
         current_ax.plot([cmax, cmax], [ymin_val, ymax_val], linestyle=":", linewidth=linewidth*0.5)
-        current_ax.fill_between([cmin, cmax], y1=ymin_val, y2=ymax_val, alpha=hs_fig.fill_alpha)
+        current_ax.fill_between([cmin, cmax], y1=ymin_val, y2=ymax_val, alpha=config.fill_alpha)
 
         # 평균 그리기
         current_ax.plot([sample_mean, sample_mean], [0, ymax_val], linestyle="--", linewidth=linewidth)
@@ -1490,7 +1492,7 @@ def kde_confidence_interval(
             fontdict={"color": "red"},
         )
 
-        current_ax.grid(True, alpha=hs_fig.grid_alpha, linewidth=hs_fig.grid_width)
+        current_ax.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
 
     finalize_plot(axes[0] if isinstance(axes, list) and len(axes) > 0 else ax, callback, outparams, save_path)
 
@@ -1506,10 +1508,10 @@ def pvalue1_anotation(
     test: str = "t-test_ind",
     text_format: str = "star",
     loc: str = "outside",
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -1583,10 +1585,10 @@ def ols_residplot(
     fit,
     lowess: bool = False,
     mse: bool = False,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -1709,10 +1711,10 @@ def ols_residplot(
 def ols_qqplot(
     fit,
     line: str = 's',
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -1799,10 +1801,10 @@ def distribution_by_class(
     bins: any = 5,
     palette: str = None,
     fill: bool = False,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
 ) -> None:
@@ -1896,10 +1898,10 @@ def scatter_by_class(
     hue: str | None = None,
     palette: str | None = None,
     outline: bool = False,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
 ) -> None:
@@ -1968,10 +1970,10 @@ def categorical_target_distribution(
     kind: str = "box",
     kde_fill: bool = True,
     palette: str | None = None,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     cols: int = 2,
     save_path: str = None,
     callback: any = None,
@@ -2050,10 +2052,10 @@ def roc_curve_plot(
     fit,
     y: np.ndarray | pd.Series = None,
     X: pd.DataFrame | np.ndarray = None,
-    width: int = hs_fig.height,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.height,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -2119,9 +2121,9 @@ def roc_curve_plot(
 def confusion_matrix_plot(
     fit,
     threshold: float = 0.5,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -2174,10 +2176,10 @@ def radarplot(
     fill: bool = True,
     fill_alpha: float = 0.25,
     palette: str = None,
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
     ax: Axes = None,
@@ -2303,10 +2305,10 @@ def distribution_plot(
     orient: str = "h",
     hue: str | None = None,
     kind: str = "boxplot",
-    width: int = hs_fig.width,
-    height: int = hs_fig.height,
-    linewidth: float = hs_fig.line_width,
-    dpi: int = hs_fig.dpi,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
 ) -> None:

@@ -38,7 +38,11 @@ dependencies = [
     "pmdarima",
     "prophet",
     "plotly",
-    "jenkspy"
+    "jenkspy",
+    "flask",
+    "xgboost",
+    "lightgbm",
+    "catboost"
 ]
 
 [project.urls]
@@ -56,3 +60,4 @@ hossam = ["*.ttf", "*.png"]
 
 [project.scripts]
 hossam-mcp = "hossam.mcp.server:run"
+hossam-mcp-rest = "hossam.mcp.rest_server:main"

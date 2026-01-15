@@ -1,33 +1,30 @@
+# submodules
+from . import hs_classroom
+from . import hs_gis
+from . import hs_plot
+from . import hs_prep
+from . import hs_stats
+from . import hs_timeserise
+from . import hs_util
 from .data_loader import load_data, load_info
-from .hs_stats import oneway_anova
+
+# py-modules
+import sys
+import warnings
 from matplotlib import pyplot as plt
 from matplotlib import font_manager as fm
 from importlib.resources import files, as_file
 from importlib.metadata import version
-from types import SimpleNamespace
-import sys
-import warnings
 
 try:
     __version__ = version("hossam")
 except Exception:
     __version__ = "develop"
 
+__all__ = ["load_data", "load_info", "hs_classroom", "hs_gis", "hs_plot", "hs_prep", "hs_stats", "hs_timeserise", "hs_util"]
 
-hs_fig = SimpleNamespace(
-    dpi=200,
-    width=800,
-    height=450,
-    font_size=9.5,
-    font_weight="normal",
-    frame_width=0.7,
-    line_width=1.5,
-    grid_alpha=0.3,
-    grid_width=0.5,
-    fill_alpha=0.3
-)
-
-__all__ = ["load_data", "load_info", "hs_classroom", "hs_gis", "hs_plot", "hs_prep", "hs_stats", "hs_timeserise", "hs_util", "hs_fig"]
+# 내부 모듈에서 hs_fig를 사용할 때는 아래와 같이 import 하세요.
+# from hossam import hs_fig
 
 
 def _init_korean_font():
@@ -44,14 +41,14 @@ def _init_korean_font():
 
             plt.rcParams.update({
                 "font.family": fname,
-                "font.size": hs_fig.font_size,
-                "font.weight": hs_fig.font_weight,
+                "font.size": hs_plot.config.font_size,
+                "font.weight": hs_plot.config.font_weight,
                 "axes.unicode_minus": False,
                 "text.antialiased": True,
                 "lines.antialiased": True,
                 "patch.antialiased": True,
-                "figure.dpi": hs_fig.dpi,
-                "savefig.dpi": hs_fig.dpi * 2,
+                "figure.dpi": hs_plot.config.dpi,
+                "savefig.dpi": hs_plot.config.dpi * 2,
                 "text.hinting": "auto",
                 "text.hinting_factor": 8,
                 "pdf.fonttype": 42,

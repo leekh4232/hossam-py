@@ -1,13 +1,33 @@
 # -*- coding: utf-8 -*-
 # -------------------------------------------------------------
 from typing import TYPE_CHECKING
-
+from importlib.metadata import distributions
+import pandas as pd
 import numpy as np
 from pandas import DataFrame, DatetimeIndex, read_csv, read_excel
 from scipy.stats import normaltest
 from tabulate import tabulate
 
 from .data_loader import load_data as _load_data_remote
+
+# ===================================================================
+# 설치된 파이썬 패키지 목록 반환
+# ===================================================================
+def my_packages():
+    """
+    현재 파이썬 인터프리터에 설치된 모든 패키지의 이름과 버전을
+    패키지 이름순으로 정렬하여 pandas DataFrame으로 반환합니다.
+    Returns:
+        pd.DataFrame: columns=['name', 'version']
+    """
+    pkgs = []
+    for dist in distributions():
+        name = dist.metadata['Name'] if 'Name' in dist.metadata else dist.name
+        version = dist.version
+        summary = dist.metadata.get('Summary', '')
+        pkgs.append((name, version, summary))
+    pkgs = sorted(pkgs, key=lambda x: x[0].lower())
+    return pd.DataFrame(pkgs, columns=['name', 'version', 'summary'])
 
 # ===================================================================
 # 정규분포 데이터 생성
@@ -113,10 +133,10 @@ def pretty_table(data: DataFrame, tablefmt="simple", headers: str = "keys") -> N
 # ===================================================================
 def __data_info(
     origin: DataFrame,
-    index_col: str = None,
+    index_col: str | None = None,
     timeindex: bool = False,
     info: bool = True,
-    categories: list = None,
+    categories: list | None = None,
 ) -> DataFrame:
     """데이터 프레임을 통해 필요한 초기 작업을 수행한다.
 
@@ -173,11 +193,11 @@ def __data_info(
 # 데이터 로드
 # ===================================================================
 def load_data(key: str,
-                index_col: str = None,
+                index_col: str | None = None,
                 timeindex: bool = False,
                 info: bool = True,
-                categories: list = None,
-                local: str = None) -> DataFrame:
+                categories: list | None = None,
+                local: str | None = None) -> DataFrame:
     """데이터 키를 통해 데이터를 로드한 뒤 기본 전처리/출력을 수행한다.
 
     Args:
@@ -200,11 +220,16 @@ def load_data(key: str,
 
     k = key.lower()
 
+    origin = None
+
     if k.endswith(".xlsx"):
         origin = read_excel(key)
     elif k.endswith(".csv"):
         origin = read_csv(key)
     else:
         origin = _load_data_remote(key, local)
+
+    if origin is None:
+        raise RuntimeError("Data loading failed: origin is None")
 
     return __data_info(origin, index_col, timeindex, info, categories)

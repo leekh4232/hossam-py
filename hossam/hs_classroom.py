@@ -8,8 +8,8 @@ from kmodes.kmodes import KModes
 from matplotlib import pyplot as plt
 import seaborn as sns
 from .hs_util import load_data, pretty_table
-from . import hs_fig
 from . import hs_plot
+from .hs_plot import config
 
 # ===================================================================
 # 학생들을 관심사와 성적으로 균형잡힌 조로 편성한다
@@ -389,16 +389,17 @@ def _balance_group_sizes_only(
 # ===================================================================
 # 조 편성 결과의 인원, 관심사, 점수 분포를 시각화한다
 # ===================================================================
-def report_summary(df: DataFrame, width: int = hs_fig.width, height: int = hs_fig.height, dpi: int = hs_fig.dpi) -> None:
+def report_summary(df: DataFrame, interest_col: str = None, width: int = config.width, height: int = config.height, dpi: int = config.dpi) -> None:
     """조 편성 결과의 요약 통계를 시각화합니다.
 
     조별 인원 분포, 관심사 분포, 평균점수 분포를 나타냅니다.
 
     Args:
-        df: cluster_students 함수의 반환 결과 데이터프레임.
-        width: 그래프 넓이. 기본값: hs_fig.width
-        height: 그래프 높이. 기본값: hs_fig.height
-        dpi: 그래프 해상도. 기본값: hs_fig.dpi
+        df (DataFrame): cluster_students 함수의 반환 결과 데이터프레임.
+        interest_col (str): 관심사 컬럼명
+        width (int): 그래프 넓이. 기본값: config.width
+        height (int): 그래프 높이. 기본값: config.height
+        dpi (int): 그래프 해상도. 기본값: config.dpi
 
     Examples:
         >>> from hossam.classroom import cluster_students, report_summary
@@ -420,7 +421,7 @@ def report_summary(df: DataFrame, width: int = hs_fig.width, height: int = hs_fi
     # 필요한 컬럼 확인
     has_score = '총점' in df.columns
     has_avg = '평균점수' in df.columns
-    has_interest = '관심사' in df.columns
+    has_interest = interest_col and '관심사' in df.columns
 
     # 혼합 타입 안전 정렬 라벨 준비
     labels = df['조'].unique().tolist()
@@ -540,7 +541,7 @@ def report_summary(df: DataFrame, width: int = hs_fig.width, height: int = hs_fi
 # ===================================================================
 # 조별 점수 분포를 커널 밀도 추정(KDE) 그래프로 시각화한다
 # ===================================================================
-def report_kde(df: DataFrame, metric: str = 'average', width: int = hs_fig.width, height: int = hs_fig.height, dpi: int = hs_fig.dpi) -> None:
+def report_kde(df: DataFrame, metric: str = 'average', width: int = config.width, height: int = config.height, dpi: int = config.dpi) -> None:
     """조별 점수 분포를 KDE(Kernel Density Estimation)로 시각화합니다.
 
     각 조의 점수 분포를 커널 밀도 추정으로 표시하고 평균 및 95% 신뢰구간을 나타냅니다.
@@ -549,9 +550,9 @@ def report_kde(df: DataFrame, metric: str = 'average', width: int = hs_fig.width
         df: cluster_students 함수의 반환 결과 데이터프레임.
         metric: 점수 기준 선택 ('total' 또는 'average').
             'total'이면 총점, 'average'이면 평균점수. 기본값: 'average'
-        width: 그래프 넓이. 기본값: hs_fig.width
-        height: 그래프 높이. 기본값: hs_fig.height
-        dpi: 그래프 해상도. 기본값: hs_fig.dpi
+        width: 그래프 넓이. 기본값: config.width
+        height: 그래프 높이. 기본값: config.height
+        dpi: 그래프 해상도. 기본값: config.dpi
 
     Examples:
         >>> from hossam.classroom import cluster_students, report_kde
@@ -738,7 +739,7 @@ def analyze_classroom(
 
     # 3. 요약 시각화
     if show_summary:
-        report_summary(df_result)
+        report_summary(df_result, interest_col)
 
     # 4. KDE 시각화
     if show_kde:
