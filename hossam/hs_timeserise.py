@@ -70,21 +70,20 @@ def diff(
         - 각 반복마다 ADF 검정 통계량, p-value, 기각값을 출력한다.
 
     Examples:
-        기본 사용 (정상성 만족까지 자동 차분):
         ```python
-        from hossam import diff
-        import pandas as pd
-        df = pd.DataFrame({'value': [100, 102, 105, 110, 120]},
-                          index=pd.date_range('2020-01', periods=5, freq='M'))
-        stationary_df = diff(df, 'value')
-        ```
-        최대 2차 차분으로 제한:
-        ```python
-        stationary_df = diff(df, 'value', max_diff=2)
-        ```
-        그래프 없이 실행:
-        ```python
-        stationary_df = diff(df, 'value', plot=False)
+        from hossam import *
+        from pandas import DataFrame, date_range
+
+        # 기본 사용 (정상성 만족까지 자동 차분):
+        df = DataFrame({'value': [100, 102, 105, 110, 120]},
+                          index=date_range('2020-01', periods=5, freq='M'))
+        stationary_df = hs_timeseries.diff(df, 'value')
+
+        # 최대 2차 차분으로 제한:
+        stationary_df = hs_timeseries.diff(df, 'value', max_diff=2)
+
+        # 그래프 없이 실행:
+        stationary_df = hs_timeseries.diff(df, 'value', plot=False)
         ```
     """
     df = data.copy()
@@ -171,17 +170,18 @@ def rolling(
         - 계절성 파악을 위해서는 계절 주기와 동일한 윈도우 사용을 권장한다.
 
     Examples:
-        7일 이동평균 계산:
+        ```python
+        from hossam import *
+        from pandas import Series, date_range
 
-        >>> from hossam import rolling
-        >>> import pandas as pd
-        >>> data = pd.Series([10, 12, 13, 15, 14, 16, 18],
-        ...                  index=pd.date_range('2020-01-01', periods=7))
-        >>> ma7 = hs_rolling(data, window=7)
+        # 7일 이동평균 계산:
+        data = Series([10, 12, 13, 15, 14, 16, 18],
+                        index=date_range('2020-01-01', periods=7))
+        ma7 = hs_timeseries.rolling(data, window=7)
 
-        30일 이동평균, 그래프 없이:
-
-        >>> ma30 = hs_rolling(data, window=30, plot=False)
+        # 30일 이동평균, 그래프 없이:
+        ma30 = hs_timeseries.rolling(data, window=30, plot=False)
+        ```
     """
     rolling = data.rolling(window=window).mean()
 
@@ -230,17 +230,18 @@ def ewm(
         - α = 2/(span+1) 공식으로 smoothing factor가 결정된다.
 
     Examples:
-        12기간 지수가중이동평균:
+        ```python
+        from hossam import ewm
+        from pandas import Series, date_range
 
-        >>> from hossam import ewm
-        >>> import pandas as pd
-        >>> data = pd.Series([10, 12, 13, 15, 14, 16, 18],
-        ...                  index=pd.date_range('2020-01-01', periods=7))
-        >>> ewma = hs_ewm(data, span=12)
+        # 12기간 지수가중이동평균:
+        data = Series([10, 12, 13, 15, 14, 16, 18],
+                         index=date_range('2020-01-01', periods=7))
+        ewma = hs_timeseries.ewm(data, span=12)
 
-        단기 추세 파악 (span=5):
-
-        >>> ewma_short = hs_ewm(data, span=5, plot=False)
+        # 단기 추세 파악 (span=5):
+        ewma_short = hs_timeseries.ewm(data, span=5, plot=False)
+        ```
     """
     ewm = data.ewm(span=span).mean()
 
@@ -305,18 +306,19 @@ def seasonal_decompose(
         - 주기(period)는 데이터의 빈도(frequency)에서 자동 추론된다.
 
     Examples:
-        월별 데이터 가법 분해:
+        ```python
+        from hossam import *
+        from pandas import Series, date_range
 
-        >>> from hossam import seasonal_decompose
-        >>> import pandas as pd
-        >>> data = pd.Series([100, 120, 110, 130, 150, 140],
-        ...                  index=pd.date_range('2020-01', periods=6, freq='M'))
-        >>> components = hs_seasonal_decompose(data, model='additive')
+        # 월별 데이터 가법 분해:
+        data = Series([100, 120, 110, 130, 150, 140],
+                         index=date_range('2020-01', periods=6, freq='M'))
+        components = hs_timeseries.seasonal_decompose(data, model='additive')
 
-        승법 모델 사용:
-
-        >>> components = hs_seasonal_decompose(data, model='multiplicative', plot=False)
-        >>> print(components[['trend', 'seasonal']].head())
+        # 승법 모델 사용:
+        components = hs_timeseries.seasonal_decompose(data, model='multiplicative', plot=False)
+        print(components[['trend', 'seasonal']].head())
+        ```
     """
     if model not in ["additive", "multiplicative"]:
         raise ValueError("model은 'additive' 또는 'multiplicative'이어야 합니다.")
@@ -355,7 +357,7 @@ def seasonal_decompose(
 # ===================================================================
 # 시계열 데이터에 대한 학습/테스트 데이터 분할
 # ===================================================================
-def timeseries_split(data: DataFrame, test_size: float = 0.2) -> tuple:
+def train_test_split(data: DataFrame, test_size: float = 0.2) -> tuple:
     """시계열 데이터를 시간 순서를 유지하며 학습/테스트 세트로 분할한다.
 
     일반적인 random split과 달리 시간 순서를 엄격히 유지하여 분할한다.
@@ -380,19 +382,19 @@ def timeseries_split(data: DataFrame, test_size: float = 0.2) -> tuple:
         - 일반적으로 test_size는 0.1~0.3 범위를 사용한다.
 
     Examples:
-        80:20 분할 (기본):
+        ```python
+        from hossam import *
+        from pandas import DataFrame, date_range
 
-        >>> from hossam import timeseries_split
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({'value': range(100)},
-        ...                   index=pd.date_range('2020-01-01', periods=100))
-        >>> train, test = hs_timeseries_split(df)
-        >>> print(len(train), len(test))  # 80, 20
+        # 80:20 분할 (기본):
+        df = DataFrame({'value': range(100)}, index=date_range('2020-01-01', periods=100))
+        train, test = hs_timeseries.train_test_split(df)
+        print(len(train), len(test))  # 80, 20
 
-        70:30 분할:
-
-        >>> train, test = hs_timeseries_split(df, test_size=0.3)
-        >>> print(len(train), len(test))  # 70, 30
+        # 70:30 분할:
+        train, test = hs_timeseries.train_test_split(df, test_size=0.3)
+        print(len(train), len(test))  # 70, 30
+        ```
     """
     train_size = 1 - test_size
 
@@ -431,17 +433,18 @@ def acf_plot(
         - 계절성이 있으면 계절 주기마다 높은 ACF 값이 나타난다.
 
     Examples:
-        기본 ACF 플롯:
+        ```python
+        from hossam import *
+        from pandas import Series, date_range
 
-        >>> from hossam import acf_plot
-        >>> import pandas as pd
-        >>> data = pd.Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        ...                  index=pd.date_range('2020-01-01', periods=10))
-        >>> hs_acf_plot(data)
+        # 기본 ACF 플롯:
+        data = Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                         index=date_range('2020-01-01', periods=10))
+        hs_timeseries.acf_plot(data)
 
-        콜백으로 제목 추가:
-
-        >>> hs_acf_plot(data, callback=lambda ax: ax.set_title('My ACF Plot'))
+        # 콜백으로 제목 추가:
+        hs_timeseries.acf_plot(data, callback=lambda ax: ax.set_title('My ACF Plot'))
+        ```
     """
     fig = plt.figure(figsize=figsize, dpi=dpi)
     ax = fig.gca()
@@ -482,17 +485,18 @@ def pacf_plot(
         - 파란색 영역(신뢰구간)을 벗어나는 lag가 AR 항의 개수를 나타낸다.
 
     Examples:
-        기본 PACF 플롯:
+        ```python
+        from hossam import *
+        from pandas import Series, date_range
 
-        >>> from hossam import pacf_plot
-        >>> import pandas as pd
-        >>> data = pd.Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        ...                  index=pd.date_range('2020-01-01', periods=10))
-        >>> hs_pacf_plot(data)
+        # 기본 PACF 플롯:
+        data = Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                         index=date_range('2020-01-01', periods=10))
+        hs_timeseries.pacf_plot(data)
 
-        콜백으로 커스터마이징:
-
-        >>> hs_pacf_plot(data, callback=lambda ax: ax.set_ylabel('Partial Correlation'))
+        # 콜백으로 커스터마이징:
+        hs_timeseries.pacf_plot(data, callback=lambda ax: ax.set_ylabel('Partial Correlation'))
+        ```
     """
     fig = plt.figure(figsize=figsize, dpi=dpi)
     ax = fig.gca()
@@ -536,16 +540,17 @@ def acf_pacf_plot(
         실전에서는 auto_arima를 사용한 자동 선택도 권장된다.
 
     Examples:
-        ARIMA 모델링 전 차수 탐색:
+        ```python
+        from hossam import *
+        from pandas import Series, date_range
 
-        >>> from hossam import acf_pacf_plot, hs_diff
-        >>> import pandas as pd
-        >>> data = pd.Series([10, 12, 13, 15, 14, 16, 18, 20],
-        ...                  index=pd.date_range('2020-01-01', periods=8))
-        >>> # 1차 차분 후 정상성 확보
-        >>> stationary = diff(data, plot=False, max_diff=1)
-        >>> # ACF/PACF로 p, q 결정
-        >>> hs_acf_pacf_plot(stationary)
+        # ARIMA 모델링 전 차수 탐색:
+        data = Series([10, 12, 13, 15, 14, 16, 18, 20],
+                         index=date_range('2020-01-01', periods=8))
+
+        # 1차 차분 후 ACF/PACF 플롯:
+        stationary = hs_timeseries.diff(data, 'value')
+        hs_timeseries.acf_pacf_plot(stationary)
     """
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(figsize[0], figsize[1] * 2), dpi=dpi)
 
@@ -616,22 +621,22 @@ def arima(
         - auto=True는 시간이 오래 걸릴 수 있으나 최적 모델을 찾아줌
 
     Examples:
-        수동 ARIMA(2,1,2) 모델:
+        ```python
+        from hossam import *
+        from pandas import Series, date_range
 
-        >>> from hossam import arima, hs_timeseries_split
-        >>> import pandas as pd
-        >>> data = pd.Series([100, 102, 105, 110, 115, 120, 125, 130],
-        ...                  index=pd.date_range('2020-01', periods=8, freq='M'))
-        >>> train, test = hs_timeseries_split(data, test_size=0.25)
-        >>> model = hs_arima(train, test, p=2, d=1, q=2)
+        # 수동으로 ARIMA(2,1,2) 모델 생성:
+        data = Series([100, 102, 105, 110, 115, 120, 125, 130],
+                         index=date_range('2020-01', periods=8, freq='M'))
+        train, test = hs_timeseries.train_test_split(data, test_size=0.25)
+        model = hs_timeseries.arima(train, test, p=2, d=1, q=2)
 
-        auto_arima로 최적 모델 탐색:
+        # auto_arima로 최적 모델 탐색:
+        model = hs_timeseries.arima(train, test, auto=True)
 
-        >>> model = hs_arima(train, test, auto=True)
-
-        계절성 모델 SARIMA(1,1,1)(1,1,1,12):
-
-        >>> model = hs_arima(train, test, p=1, d=1, q=1, s=12)
+        # 계절성 모델 SARIMA(1,1,1)(1,1,1,12):
+        model = hs_timeseries.arima(train, test, p=1, d=1, q=1, s=12)
+        ```
     """
     model = None
 
@@ -822,30 +827,32 @@ def prophet(
         - 외부 회귀변수는 callback에서 add_regressor()로 추가 가능.
 
     Examples:
-        기본 사용 (단일 모델):
+        ```python
+        from hossam import *
+        from pandas import DataFrame, date_range
 
-        >>> from hossam import prophet
-        >>> import pandas as pd
-        >>> train = pd.DataFrame({
-        ...     'ds': pd.date_range('2020-01-01', periods=100),
-        ...     'y': range(100)
-        ... })
-        >>> model, params, score, forecast, pred = hs_prophet(train)
+        # 기본 사용 (단일 모델):
+        train = DataFrame({
+                    'ds': date_range('2020-01-01', periods=100),
+                    'y': range(100)
+                })
+        model, params, score, forecast, pred = hs_timeseries.prophet(train)
 
         하이퍼파라미터 그리드 서치:
 
-        >>> model, params, score, forecast, pred = hs_prophet(
-        ...     train,
-        ...     changepoint_prior_scale=[0.001, 0.01, 0.1],
-        ...     seasonality_prior_scale=[0.01, 0.1, 1.0],
-        ...     seasonality_mode=['additive', 'multiplicative']
-        ... )
+        model, params, score, forecast, pred = hs_timeseries.prophet(
+                train,
+                changepoint_prior_scale=[0.001, 0.01, 0.1],
+                seasonality_prior_scale=[0.01, 0.1, 1.0],
+                seasonality_mode=['additive', 'multiplicative']
+        )
 
-        휴일 효과 추가:
+        # 휴일 효과 추가:
+        def add_holidays(m):
+            m.add_country_holidays(country_name='KR')
 
-        >>> def add_holidays(m):
-        ...     m.add_country_holidays(country_name='KR')
-        >>> model, _, _, _, _ = hs_prophet(train, callback=add_holidays)
+        model, _, _, _, _ = hs_timeseries.prophet(train, callback=add_holidays)
+        ```
     """
 
     # logger = logging.getLogger("cmdstanpy")
@@ -964,19 +971,20 @@ def prophet_report(
         - 변화점은 모델이 추세 변화를 감지한 시점을 수직선으로 표시
 
     Examples:
-        기본 리포트 출력:
+        ```python
+        from hossam import *
+        from pandas import DataFrame, date_range
 
-        >>> from hossam import prophet, hs_prophet_report
-        >>> model, _, _, forecast, pred = hs_prophet(train)
-        >>> hs_prophet_report(model, forecast, pred)
+        # 기본 리포트 출력:
+        model, _, _, forecast, pred = hs_timeseries.prophet(train)
+        hs_timeseries.prophet_report(model, forecast, pred)
 
-        test 데이터와 함께 성능 평가:
+        # test 데이터와 함께 성능 평가:
+        hs_timeseries.prophet_report(model, forecast, pred, test=test)
 
-        >>> hs_prophet_report(model, forecast, pred, test=test)
-
-        예측 테이블 출력:
-
-        >>> hs_prophet_report(model, forecast, pred, print_forecast=True)
+        # 예측 테이블 출력:
+        hs_timeseries.prophet_report(model, forecast, pred, print_forecast=True)
+        ```
     """
 
     # ------------------------------------------------------
@@ -1069,22 +1077,22 @@ def get_weekend_df(start: any, end: any = None) -> DataFrame:
         - 토요일(Saturday), 일요일(Sunday)을 자동 탐지하여 추출한다.
 
     Examples:
-        2020년 전체 주말 생성:
+        ```python
+        from hossam import *
+        from pandas import DataFrame, date_range
 
-        >>> from hossam import get_weekend_df
-        >>> weekends = get_weekend_df('2020-01-01', '2020-12-31')
-        >>> print(len(weekends))  # 104 (52주 × 2일)
+        # 2020년 전체 주말 생성:
+        weekends = hs_timeseries.get_weekend_df('2020-01-01', '2020-12-31')
+        print(len(weekends))  # 104 (52주 × 2일)
 
-        현재까지의 주말:
+        # 현재까지의 주말:
+        weekends = hs_timeseries.get_weekend_df('2023-01-01')
+        print(weekends.head())
 
-        >>> weekends = get_weekend_df('2023-01-01')
-
-        Prophet 모델에 주말 효과 추가:
-
-        >>> from prophet import Prophet
-        >>> weekends = get_weekend_df('2020-01-01', '2025-12-31')
-        >>> model = Prophet(holidays=weekends)
-        >>> model.fit(train)
+        # Prophet 모델에 주말 효과 추가:
+        weekends = hs_timeseries.get_weekend_df('2020-01-01', '2025-12-31')
+        model = hs_timeseries.prophet(train, holidays=weekends)
+        ```
     """
     if end is None:
         end = dt.datetime.now()

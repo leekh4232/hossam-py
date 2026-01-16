@@ -409,6 +409,7 @@ def report_summary(df: DataFrame, interest_col: str = None, width: int = config.
         from hossam import *
         df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
         hs_classroom.report_summary(df_result)
+        ```
     """
 
     if df is None or len(df) == 0:

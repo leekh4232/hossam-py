@@ -1,4 +1,4 @@
-# API Reference
+# HossamPy API Reference
 
 <a id="hs_prep"></a>
 
@@ -43,7 +43,7 @@ std_df = hs_prep.standard_scaler(df, yname="y", save_path="std.pkl")
 
 <a id="hs_prep.minmax_scaler"></a>
 
-#### minmax\_scaler
+### minmax\_scaler
 
 ```python
 def minmax_scaler(data: any,
@@ -73,13 +73,13 @@ DataFrame은 비수치/종속변수를 분리 후 스케일링하고 재결합�
 **Examples**:
 
 ```python
-from hossam.prep import minmax_scaler
+from hossam import *
 mm_df = hs_prep.minmax_scaler(df, yname="y")
 ```
 
 <a id="hs_prep.set_category"></a>
 
-#### set\_category
+### set\_category
 
 ```python
 def set_category(data: DataFrame, *args: str) -> DataFrame
@@ -140,7 +140,7 @@ result = hs_prep.unmelt(df, id_vars='group', value_vars='value')
 
 <a id="hs_prep.outlier_table"></a>
 
-#### outlier\_table
+### outlier\_table
 
 ```python
 def outlier_table(data: DataFrame, *fields: str) -> DataFrame
@@ -258,7 +258,7 @@ result = hs_prep.get_dummies(df, 'col1', drop_first=False, dtype='bool')
 
 <a id="hs_prep.labelling"></a>
 
-#### labelling
+### labelling
 
 ```python
 def labelling(data: DataFrame, *fields: str) -> DataFrame
@@ -371,7 +371,7 @@ print(result['charges_log_bin'])  # 0, 1, 2 (숫자 인덱스)
 
 <a id="hs_prep.log_transform"></a>
 
-#### log\_transform
+### log\_transform
 
 ```python
 def log_transform(data: DataFrame, *fields: str) -> DataFrame
@@ -396,16 +396,15 @@ def log_transform(data: DataFrame, *fields: str) -> DataFrame
 **Examples**:
 
 ```python
-# 전체 수치형 컬럼에 대한 로그 변환:
-
 from hossam import *
-import pandas as pd
-df = pd.DataFrame({'x': [1, 10, 100], 'y': [2, 20, 200], 'z': ['a', 'b', 'c']})
+from pandas import DataFrame
+df = DataFrame({'x': [1, 10, 100], 'y': [2, 20, 200], 'z': ['a', 'b', 'c']})
+
+# 전체 수치형 컬럼에 대한 로그 변환:
 result = hs_prep.log_transform(df)
 print(result)
 
-특정 컬럼만 변환:
-
+# 특정 컬럼만 변환:
 result = hs_prep.log_transform(df, 'x', 'y')
 print(result)
 ```
@@ -419,7 +418,7 @@ print(result)
 
 <a id="hs_prep.add_interaction"></a>
 
-#### add\_interaction
+### add\_interaction
 
 ```python
 def add_interaction(data: DataFrame,
@@ -450,31 +449,31 @@ def add_interaction(data: DataFrame,
 
 ```python
 from hossam import *
-import pandas as pd
+from padas import DataFrame
 
 # 수치형 변수들의 상호작용:
-df = pd.DataFrame({'x1': [1, 2, 3], 'x2': [4, 5, 6]})
+df = DataFrame({'x1': [1, 2, 3], 'x2': [4, 5, 6]})
 result = hs_prep.add_interaction(df)
 print(result.columns)  # x1, x2, x1*x2
 
 # 수치형과 명목형의 상호작용:
-df = pd.DataFrame({'age': [20, 30, 40], 'gender': ['M', 'F', 'M']})
+df = DataFrame({'age': [20, 30, 40], 'gender': ['M', 'F', 'M']})
 result = hs_prep.add_interaction(df, pairs=[('age', 'gender')])
 print(result.columns)  # age, gender, age*gender_M, age*gender_F
 
 # 명목형끼리의 상호작용:
-df = pd.DataFrame({'color': ['R', 'G', 'B'], 'cut': ['A', 'B', 'A']})
+df = DataFrame({'color': ['R', 'G', 'B'], 'cut': ['A', 'B', 'A']})
 result = hs_prep.add_interaction(df, pairs=[('color', 'cut')])
 print(result.columns)  # color, cut, color_cut
 ```
 
 <a id="hs_gis"></a>
 
-# hs\_gis
+## hs\_gis
 
 <a id="hs_gis.geocode"></a>
 
-#### geocode
+### geocode
 
 ```python
 def geocode(df: DataFrame, addr: str, key: str) -> DataFrame
@@ -502,15 +501,15 @@ def geocode(df: DataFrame, addr: str, key: str) -> DataFrame
 **Examples**:
 
 ```python
-from hossam import gis
-result = gis.hs_geocode(df, addr="address", key="YOUR_VWORLD_KEY")
+from hossam import *
+result = hs_gis.geocode(df, addr="address", key="YOUR_VWORLD_KEY")
 set(["latitude","longitude"]).issubset(result.columns)
 # True
 ```
 
 <a id="hs_gis.load_shape"></a>
 
-#### load\_shape
+### load\_shape
 
 ```python
 def load_shape(path: str, info: bool = True) -> GeoDataFrame
@@ -537,13 +536,13 @@ Shapefile을 읽어 `GeoDataFrame`으로 로드합니다.
 **Examples**:
 
 ```python
-from hossam.gis import load_shape
-gdf = hs_load_shape("path/to/file.shp", info=False)
+from hossam import *
+gdf = hs_gis.load_shape("path/to/file.shp", info=False)
 ```
 
 <a id="hs_gis.save_shape"></a>
 
-#### save\_shape
+### save\_shape
 
 ```python
 def save_shape(gdf: GeoDataFrame | DataFrame,
@@ -620,23 +619,23 @@ def missing_values(data: DataFrame, *fields: str)
 
 **Examples**:
 
-  전체 컬럼에 대한 결측치 확인:
 ```python
-from hossam import missing_values
-import pandas as pd
-df = pd.DataFrame({'x': [1, 2, None, 4], 'y': [10, None, None, 40]})
-result = missing_values(df)
+from hossam import *
+from pandas import DataFrame
+
+# 전체 컬럼에 대한 결측치 확인:
+df = DataFrame({'x': [1, 2, None, 4], 'y': [10, None, None, 40]})
+result = hs_stats.missing_values(df)
 print(result)
-```
-  특정 컬럼만 분석:
-```python
-result = missing_values(df, 'x', 'y')
+
+# 특정 컬럼만 분석:
+result = hs_stats.missing_values(df, 'x', 'y')
 print(result)
 ```
 
 <a id="hs_stats.outlier_table"></a>
 
-#### outlier\_table
+### outlier\_table
 
 ```python
 def outlier_table(data: DataFrame, *fields: str)
@@ -674,18 +673,19 @@ Tukey의 방법을 사용하여 각 숫자형 컬럼에 대한 사분위수(Q1, 
 
 **Examples**:
 
-  전체 숫자형 컬럼에 대한 이상치 경계 확인:
 ```python
-from hossam import outlier_table
-import pandas as pd
-df = pd.DataFrame({'x': [1, 2, 3, 100], 'y': [10, 20, 30, 40]})
-result = outlier_table(df)
+from hossam import *
+from pandas import DataFrame
+
+df = DataFrame({'x': [1, 2, 3, 100], 'y': [10, 20, 30, 40]})
+
+# 전체 숫자형 컬럼에 대한 이상치 경계 확인:
+result = hs_stats.outlier_table(df)
 print(result)
-```
-  특정 컬럼만 분석:
-```python
-result = outlier_table(df, 'x', 'y')
-print(result[['Q1', 'Q3', 'UP', 'DOWN']])
+
+# 특정 컬럼만 분석:
+result = hs_stats.outlier_table(df, 'x', 'y')
+print(result[['q1', 'q3', 'up', 'down']])
 ```
   
 
@@ -697,7 +697,7 @@ print(result[['Q1', 'Q3', 'UP', 'DOWN']])
 
 <a id="hs_stats.describe"></a>
 
-#### describe
+### describe
 
 ```python
 def describe(data: DataFrame, *fields: str, columns: list | None = None)
@@ -741,21 +741,22 @@ def describe(data: DataFrame, *fields: str, columns: list | None = None)
 
 **Examples**:
 
-  전체 숫자형 컬럼에 대한 확장된 기술통계:
 ```python
-from hossam import summary
-import pandas as pd
-df = pd.DataFrame({
+from hossam import *
+from pandas import DataFrame
+
+df = DataFrame({
     'x': [1, 2, 3, 4, 5, 100],
     'y': [10, 20, 30, 40, 50, 60],
     'z': ['a', 'b', 'c', 'd', 'e', 'f']
 })
-result = summary(df)
+
+# 전체 숫자형 컬럼에 대한 확장된 기술통계:
+result = hs_stats.describe(df)
 print(result)
-```
-  특정 컬럼만 분석:
-```python
-result = summary(df, 'x', 'y')
+
+# 특정 컬럼만 분석:
+result = hs_stats.describe(df, 'x', 'y')
 print(result)
 ```
   
@@ -770,7 +771,7 @@ print(result)
 
 <a id="hs_stats.category_describe"></a>
 
-#### category\_describe
+### category\_describe
 
 ```python
 def category_describe(data: DataFrame, *fields: str)
@@ -800,21 +801,22 @@ def category_describe(data: DataFrame, *fields: str)
 
 **Examples**:
 
-  전체 명목형 컬럼에 대한 분포 편향 요약:
 ```python
-from hossam import category_describe
-import pandas as pd
-df = pd.DataFrame({
+from hossam import *
+from pandas import DataFrame
+
+df = DataFrame({
     'cut': ['Ideal', 'Premium', 'Good', 'Ideal', 'Premium'],
     'color': ['E', 'F', 'G', 'E', 'F'],
     'price': [100, 200, 150, 300, 120]
 })
-result = category_describe(df)
+
+# 전체 명목형 컬럼에 대한 요약:
+result = hs_stats.category_describe(df)
 print(result)
-```
-  특정 컬럼만 분석:
-```python
-result = category_describe(df, 'cut', 'color')
+
+# 특정 컬럼만 분석:
+result = hs_stats.category_describe(df, 'cut', 'color')
 print(result)
 ```
   
@@ -826,7 +828,7 @@ print(result)
 
 <a id="hs_stats.normal_test"></a>
 
-#### normal\_test
+### normal\_test
 
 ```python
 def normal_test(data: DataFrame,
@@ -870,19 +872,25 @@ def normal_test(data: DataFrame,
 
 **Examples**:
 
-  >>> from hossam.analysis import normal_test
-  >>> import pandas as pd
-  >>> import numpy as np
-  >>> df = pd.DataFrame({
-  ...     'x': np.random.normal(0, 1, 100),
-  ...     'y': np.random.exponential(2, 100)
-  ... })
-  >>> # 모든 수치형 컬럼 검정
-  >>> result = normal_test(df, method='n')
-  >>> # 특정 컬럼만 검정 (리스트)
-  >>> result = normal_test(df, columns=['x'], method='n')
-  >>> # 특정 컬럼만 검정 (문자열)
-  >>> result = normal_test(df, columns='x, y', method='n')
+```python
+from hossam import *
+from pandas import DataFrame
+import numpy as np
+
+df = DataFrame({
+    'x': np.random.normal(0, 1, 100),
+    'y': np.random.exponential(2, 100)
+})
+
+# 모든 수치형 컬럼 검정
+result = hs_stats.normal_test(df, method='n')
+
+# 특정 컬럼만 검정 (리스트)
+result = hs_stats.normal_test(df, columns=['x'], method='n')
+
+# 특정 컬럼만 검정 (문자열)
+result = hs_stats.normal_test(df, columns='x, y', method='n')
+```
 
 <a id="hs_stats.equal_var_test"></a>
 
@@ -934,22 +942,29 @@ def equal_var_test(data: DataFrame,
 
 **Examples**:
 
-  >>> from hossam.analysis import equal_var_test
-  >>> import pandas as pd
-  >>> import numpy as np
-  >>> df = pd.DataFrame({
-  ...     'x': np.random.normal(0, 1, 100),
-  ...     'y': np.random.normal(0, 1, 100),
-  ...     'z': np.random.normal(0, 2, 100)
-  ... })
-  >>> # 모든 수치형 컬럼 자동 판별
-  >>> result = equal_var_test(df)
-  >>> # 특정 컬럼만 검정 (리스트)
-  >>> result = equal_var_test(df, columns=['x', 'y'])
-  >>> # 특정 컬럼만 검정 (문자열)
-  >>> result = equal_var_test(df, columns='x, y')
-  >>> # 명시적 지정
-  >>> result = equal_var_test(df, normal_dist=True)
+```python
+from hossam import *
+from pandas import DataFrame
+import numpy as np
+
+df = DataFrame({
+    'x': np.random.normal(0, 1, 100),
+    'y': np.random.normal(0, 1, 100),
+    'z': np.random.normal(0, 2, 100)
+})
+
+# 모든 수치형 컬럼 자동 판별
+result = hs_stats.equal_var_test(df)
+
+# 특정 컬럼만 검정 (리스트)
+result = hs_stats.equal_var_test(df, columns=['x', 'y'])
+
+# 특정 컬럼만 검정 (문자열)
+result = hs_stats.equal_var_test(df, columns='x, y')
+
+# 명시적 지정
+result = hs_stats.equal_var_test(df, normal_dist=True)
+```
 
 <a id="hs_stats.ttest_1samp"></a>
 
@@ -985,15 +1000,19 @@ def ttest_1samp(data, mean_value: float = 0.0) -> DataFrame
 
 **Examples**:
 
-  >>> from hossam.hs_stats import ttest_1samp
-  >>> import pandas as pd
-  >>> import numpy as np
-  >>> # 리스트 데이터로 검정
-  >>> data = [5.1, 4.9, 5.3, 5.0, 4.8]
-  >>> result = ttest_1samp(data, mean_value=5.0)
-  >>> # Series 데이터로 검정
-  >>> s = pd.Series(np.random.normal(5, 1, 100))
-  >>> result = ttest_1samp(s, mean_value=5)
+```python
+from hossam import *
+from pandas import Series
+import numpy as np
+
+# 리스트 데이터로 검정
+data = [5.1, 4.9, 5.3, 5.0, 4.8]
+result = hs_stats.ttest_1samp(data, mean_value=5.0)
+
+# Series 데이터로 검정
+s = Series(np.random.normal(5, 1, 100))
+result = hs_stats.ttest_1samp(s, mean_value=5)
+```
 
 <a id="hs_stats.ttest_ind"></a>
 
@@ -1033,17 +1052,21 @@ def ttest_ind(x, y, equal_var: bool | None = None) -> DataFrame
 
 **Examples**:
 
-  >>> from hossam.hs_stats import ttest_ind
-  >>> import pandas as pd
-  >>> import numpy as np
-  >>> # 리스트로 검정
-  >>> group1 = [5.1, 4.9, 5.3, 5.0, 4.8]
-  >>> group2 = [5.5, 5.7, 5.4, 5.6, 5.8]
-  >>> result = ttest_ind(group1, group2)
-  >>> # Series로 검정
-  >>> s1 = pd.Series(np.random.normal(5, 1, 100))
-  >>> s2 = pd.Series(np.random.normal(5.5, 1, 100))
-  >>> result = ttest_ind(s1, s2, equal_var=False)
+```python
+from hossam import *
+from pandas import Series, DataFrame
+import numpy as np
+
+# 리스트로 검정
+group1 = [5.1, 4.9, 5.3, 5.0, 4.8]
+group2 = [5.5, 5.7, 5.4, 5.6, 5.8]
+result = hs_stats.ttest_ind(group1, group2)
+
+# Series로 검정
+s1 = Series(np.random.normal(5, 1, 100))
+s2 = Series(np.random.normal(5.5, 1, 100))
+result = hs_stats.ttest_ind(s1, s2, equal_var=False)
+```
 
 <a id="hs_stats.ttest_rel"></a>
 
@@ -1083,17 +1106,21 @@ def ttest_rel(x, y, parametric: bool | None = None) -> DataFrame
 
 **Examples**:
 
-  >>> from hossam.hs_stats import ttest_rel
-  >>> import pandas as pd
-  >>> import numpy as np
-  >>> # 리스트로 검정
-  >>> before = [5.1, 4.9, 5.3, 5.0, 4.8]
-  >>> after = [5.5, 5.2, 5.7, 5.3, 5.1]
-  >>> result = ttest_rel(before, after)
-  >>> # Series로 검정
-  >>> s1 = pd.Series(np.random.normal(5, 1, 100))
-  >>> s2 = pd.Series(np.random.normal(5.3, 1, 100))
-  >>> result = ttest_rel(s1, s2, parametric=False)
+```python
+from hossam import *
+from pandas import Series
+import numpy as np
+
+# 리스트로 검정
+before = [5.1, 4.9, 5.3, 5.0, 4.8]
+after = [5.5, 5.2, 5.7, 5.3, 5.1]
+result = hs_stats.ttest_rel(before, after)
+
+# Series로 검정
+s1 = Series(np.random.normal(5, 1, 100))
+s2 = Series(np.random.normal(5.3, 1, 100))
+result = hs_stats.ttest_rel(s1, s2, parametric=False)
+```
 
 <a id="hs_stats.vif_filter"></a>
 
@@ -1125,11 +1152,11 @@ def vif_filter(data: DataFrame,
 
 **Examples**:
 
-  기본 사용 예:
-  
-  >>> from hossam.analysis import vif_filter
-  >>> filtered = hs_vif_filter(df, yname="target", ignore=["id"], threshold=10.0)
-  >>> filtered.head()
+```python
+# 기본 사용 예
+from hossam import *
+filtered = hs_stats.vif_filter(df, yname="target", ignore=["id"], threshold=10.0)
+```
 
 <a id="hs_stats.trend"></a>
 
@@ -1159,12 +1186,12 @@ x, y 데이터에 대한 추세선을 구한다.
 
 **Examples**:
 
-  2차 다항 회귀 추세선:
-  
-  >>> from hossam.analysis import trend
-  >>> vx, vy = hs_trend(x, y, degree=2, value_count=200)
-  >>> len(vx), len(vy)
-  (200, 200)
+```python
+# 2차 다항 회귀 추세선
+from hossam import *
+vx, vy = hs_stats.trend(x, y, degree=2, value_count=200)
+print(len(vx), len(vy)) # 200, 200
+```
 
 <a id="hs_stats.ols_report"></a>
 
@@ -1200,14 +1227,18 @@ def ols_report(fit, data, full=False, alpha=0.05)
 
 **Examples**:
 
-  >>> import statsmodels.api as sm
-  >>> y = data['target']
-  >>> X = sm.add_constant(data[['x1', 'x2']])
-  >>> fit = sm.OLS(y, X).fit()
-  >>> # 전체 리포트
-  >>> pdf, rdf, result_report, model_report, variable_reports, eq = ols_report(fit, data)
-  >>> # 간단한 버전 (회귀계수 테이블만)
-  >>> rdf = ols_report(fit, data, full=False)
+```python
+from hossam import *
+
+df = hs_util.load_data("some_data.csv")
+fit = hs_stats.ols(df, yname="target")
+
+# 전체 리포트
+pdf, rdf, result_report, model_report, variable_reports, eq = hs_stats.ols_report(fit, data, full=True)
+
+# 간단한 버전 (성능지표, 회귀계수 테이블만)
+pdf, rdf = hs_stats.ols_report(fit, data)
+```
 
 <a id="hs_stats.ols"></a>
 
@@ -1254,23 +1285,26 @@ OLS(Ordinary Least Squares) 선형회귀분석을 실시한다.
 
 **Examples**:
 
-  >>> from hossam.analysis import linear
-  >>> import pandas as pd
-  >>> import numpy as np
-  >>> df = pd.DataFrame({
-  ...     'target': np.random.normal(100, 10, 100),
-  ...     'x1': np.random.normal(0, 1, 100),
-  ...     'x2': np.random.normal(0, 1, 100)
-  ... })
-  >>> # 적합 결과만 반환
-  >>> fit = hs_ols(df, 'target')
-  >>> print(fit.summary())
-  
-  >>> # 요약 리포트 반환
-  >>> fit, result, features = hs_ols(df, 'target', report=1)
-  
-  >>> # 풀 리포트 반환
-  >>> fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_ols(df, 'target', report=2)
+```python
+from hossam import *
+from pandas import DataFrame
+import numpy as np
+
+df = DataFrame({
+    'target': np.random.normal(100, 10, 100),
+    'x1': np.random.normal(0, 1, 100),
+    'x2': np.random.normal(0, 1, 100)
+})
+
+# 적합 결과만 반환
+fit = hs_stats.ols(df, 'target')
+
+# 요약 리포트 반환
+fit, pdf, rdf = hs_stats.ols(df, 'target', report=1)
+
+# 풀 리포트 반환
+fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_stats.ols(df, 'target', report=2)
+```
 
 <a id="hs_stats.logit_report"></a>
 
@@ -1308,14 +1342,26 @@ def logit_report(fit, data, threshold=0.5, full=False, alpha=0.05)
 
 **Examples**:
 
-  >>> import statsmodels.api as sm
-  >>> y = data['target']
-  >>> X = sm.add_constant(data[['x1', 'x2']])
-  >>> fit = sm.Logit(y, X).fit(disp=0)
-  >>> # 전체 리포트
-  >>> cdf, rdf, result_report, model_report, variable_reports, cm = hs_logit_report(fit, data)
-  >>> # 간단한 버전 (주요 테이블만)
-  >>> cdf, rdf = hs_logit_report(fit, data, full=False)
+```python
+from hossam import *
+from pandas import DataFrame
+import numpy as np
+
+df = DataFrame({
+    'target': np.random.binomial(1, 0.5, 100),
+    'x1': np.random.normal(0, 1, 100),
+    'x2': np.random.normal(0, 1, 100)
+})
+
+# 로지스틱 회귀 적합
+fit = hs_stats.logit(df, yname="target")
+
+# 전체 리포트
+cdf, rdf, result_report, model_report, variable_reports, cm = hs_stats.logit_report(fit, df, full=True)
+
+# 간단한 버전 (주요 테이블만)
+cdf, rdf = hs_stats.logit_report(fit, df)
+```
 
 <a id="hs_stats.logit"></a>
 
@@ -1361,23 +1407,26 @@ def logit(df: DataFrame, yname: str, report=False)
 
 **Examples**:
 
-  >>> from hossam.analysis import logit
-  >>> import pandas as pd
-  >>> import numpy as np
-  >>> df = pd.DataFrame({
-  ...     'target': np.random.binomial(1, 0.5, 100),
-  ...     'x1': np.random.normal(0, 1, 100),
-  ...     'x2': np.random.normal(0, 1, 100)
-  ... })
-  >>> # 적합 결과만 반환
-  >>> fit = hs_logit(df, 'target')
-  >>> print(fit.summary())
-  
-  >>> # 요약 리포트 반환
-  >>> fit, rdf, result_report, var_reports = hs_logit(df, 'target', report=1)
-  
-  >>> # 풀 리포트 반환
-  >>> fit, cdf, rdf, result_report, model_report, var_reports = hs_logit(df, 'target', report=2)
+```python
+from hossam import *
+from pandas import DataFrame
+import numpy as np
+
+df = DataFrame({
+    'target': np.random.binomial(1, 0.5, 100),
+    'x1': np.random.normal(0, 1, 100),
+    'x2': np.random.normal(0, 1, 100)
+})
+
+# 적합 결과만 반환
+fit = hs_stats.logit(df, 'target')
+
+# 요약 리포트 반환
+fit, rdf, result_report, var_reports = hs_stats.logit(df, 'target', report='summary')
+
+# 풀 리포트 반환
+fit, cdf, rdf, result_report, model_report, var_reports = hs_stats.logit(df, 'target', report='full')
+```
 
 <a id="hs_stats.ols_linearity_test"></a>
 
@@ -1413,12 +1462,11 @@ def ols_linearity_test(fit, power: int = 2, alpha: float = 0.05) -> DataFrame
 
 **Examples**:
 
-  >>> import statsmodels.api as sm
-  >>> X = sm.add_constant(df[['x1', 'x2']])
-  >>> y = df['y']
-  >>> fit = sm.OLS(y, X).fit()
-  >>> result = linearity_test(fit)
-  >>> print(result)
+```python
+from hossam import *
+fit = hs_stats.logit(df, 'target')
+result = hs_stats.ols_linearity_test(fit)
+```
   
 
 **Notes**:
@@ -1458,12 +1506,11 @@ def ols_normality_test(fit, alpha: float = 0.05) -> DataFrame
 
 **Examples**:
 
-  >>> import statsmodels.api as sm
-  >>> X = sm.add_constant(df[['x1', 'x2']])
-  >>> y = df['y']
-  >>> fit = sm.OLS(y, X).fit()
-  >>> result = normality_test(fit)
-  >>> print(result)
+```python
+from hossam import *
+fit = hs_stats.logit(df, 'target')
+result = hs_stats.ols_normality_test(fit)
+```
   
 
 **Notes**:
@@ -1505,12 +1552,11 @@ def ols_variance_test(fit, alpha: float = 0.05) -> DataFrame
 
 **Examples**:
 
-  >>> import statsmodels.api as sm
-  >>> X = sm.add_constant(df[['x1', 'x2']])
-  >>> y = df['y']
-  >>> fit = sm.OLS(y, X).fit()
-  >>> result = homoscedasticity_test(fit)
-  >>> print(result)
+```python
+from hossam import *
+fit = hs_stats.logit(df, 'target')
+result = hs_stats.ols_variance_test(fit)
+```
   
 
 **Notes**:
@@ -1550,22 +1596,11 @@ Durbin-Watson 검정을 사용하여 잔차의 1차 자기상관 여부를 검�
 
 **Examples**:
 
-  >>> import pandas as pd
-  >>> import statsmodels.api as sm
-  >>> from hossam.hs_stats import ols_independence_test
-  >>>
-  >>> # 예제 데이터
-  >>> df = pd.DataFrame({
-  ...     'x': range(100),
-  ...     'y': [i + np.random.randn() for i in range(100)]
-  ... })
-  >>> X = sm.add_constant(df['x'])
-  >>> model = sm.OLS(df['y'], X)
-  >>> fit = model.fit()
-  >>>
-  >>> # 독립성 검정
-  >>> result = ols_independence_test(fit)
-  >>> print(result)
+```python
+from hossam import *
+fit = hs_stats.logit(df, 'target')
+result = hs_stats.ols_independence_test(fit)
+```
   
 
 **Notes**:
@@ -1576,61 +1611,6 @@ Durbin-Watson 검정을 사용하여 잔차의 1차 자기상관 여부를 검�
   * 4에 가까우면: 음의 자기상관 (독립성 위반)
   - 일반적으로 1.5~2.5 범위를 자기상관 없음으로 판단
   - 시계열 데이터나 관측치에 순서가 있는 경우 중요한 검정
-
-<a id="hs_stats.corr"></a>
-
-### corr
-
-```python
-def corr(data: DataFrame, *fields: str) -> tuple[DataFrame, DataFrame]
-```
-
-데이터프레임의 연속형 변수들에 대한 상관계수 히트맵과 상관계수 종류를 반환한다.
-
-정규성 검정을 통해 피어슨 또는 스피어만 상관계수를 자동 선택하여 계산한다.
-선택된 상관계수 종류를 별도의 데이터프레임으로 교차표(행렬) 형태로 반환한다.
-
-**Arguments**:
-
-- `data` _DataFrame_ - 분석 대상 데이터프레임.
-- `*fields` _str_ - 분석할 컬럼명 목록. 지정하지 않으면 모든 숫자형 컬럼을 사용.
-  
-
-**Returns**:
-
-  tuple[DataFrame, DataFrame]: 상관계수 행렬과 사용된 상관계수 종류 정보를 포함한 두 개의 데이터프레임.
-  
-  - 첫 번째 DataFrame: 상관계수 행렬 (각 변수 쌍의 상관계수 값)
-  - 두 번째 DataFrame: 상관계수 종류 (교차표 형태)
-  - 행과 열: 변수명
-  - 셀의 값: 각 변수 쌍에 사용된 상관계수 종류 ('Pearson' 또는 'Spearman')
-  
-
-**Examples**:
-
-  >>> import pandas as pd
-  >>> import numpy as np
-  >>> df = pd.DataFrame({
-  ...     'x1': np.random.normal(0, 1, 100),
-  ...     'x2': np.random.normal(0, 1, 100),
-  ...     'x3': np.random.normal(0, 1, 100),
-  ... })
-  >>> # 모든 연속형 변수에 대해 상관계수 계산
-  >>> corr_matrix, corr_types = corr(df)
-  >>> print(corr_matrix)
-  >>>     x1   x2   x3
-  >>> x1 1.00 0.12 -0.05
-  >>> x2 0.12 1.00  0.08
-  >>> x3 -0.05 0.08 1.00
-  >>> print(corr_types)
-  >>>       x1       x2       x3
-  >>> x1  Pearson Pearson Pearson
-  >>> x2  Pearson Pearson Pearson
-  >>> x3  Pearson Pearson Pearson
-  
-  >>> # 특정 컬럼만 분석
-  >>> corr_matrix, corr_info = corr(df, 'x1', 'x2')
-  >>> print(corr_matrix)
 
 <a id="hs_stats.corr_pairwise"></a>
 
@@ -1677,13 +1657,16 @@ def corr_pairwise(data: DataFrame,
 
 **Examples**:
 
-  >>> from hossam.hs_stats import corr_pairwise
-  >>> import pandas as pd
-  >>> df = pd.DataFrame({'x1': [1,2,3,4,5], 'x2': [2,4,5,4,6], 'x3': [10,20,25,24,30]})
-  >>> # 전체 숫자형 컬럼에 대해 상관분석
-  >>> result_df, corr_matrix = corr_pairwise(df)
-  >>> # 특정 컬럼만 분석
-  >>> result_df, corr_matrix = corr_pairwise(df, fields=['x1', 'x2'])
+```python
+from hossam import *
+from pandas import DataFrame
+
+df = DataFrame({'x1': [1,2,3,4,5], 'x2': [2,4,5,4,6], 'x3': [10,20,25,24,30]})
+# 전체 숫자형 컬럼에 대해 상관분석
+result_df, corr_matrix = hs_stats.corr_pairwise(df)
+# 특정 컬럼만 분석
+result_df, corr_matrix = hs_stats.corr_pairwise(df, fields=['x1', 'x2'])
+```
 
 <a id="hs_stats.oneway_anova"></a>
 
@@ -1728,17 +1711,22 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.
 
 **Examples**:
 
-  >>> from hossam import oneway_anova
-  >>> import pandas as pd
-  >>> df = pd.DataFrame({
-  ...     'score': [5.1, 4.9, 5.3, 5.0, 4.8, 5.5, 5.2, 5.7, 5.3, 5.1],
-  ...     'group': ['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B']
-  ... })
-  >>> anova_df, anova_report, posthoc_df, posthoc_report = oneway_anova(df, dv='score', between='group')
-  >>> print(anova_report)
-  >>> if posthoc_df is not None:
-  ...     print(posthoc_report)
-  ...     print(posthoc_df.head())
+```python
+from hossam import *
+from pandas import DataFrame
+
+df = DataFrame({
+    'score': [5.1, 4.9, 5.3, 5.0, 4.8, 5.5, 5.2, 5.7, 5.3, 5.1],
+    'group': ['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B']
+})
+
+anova_df, anova_report, posthoc_df, posthoc_report = hs_stats.oneway_anova(df, dv='score', between='group')
+
+# 사후검정결과는 ANOVA가 유의할 때만 생성됨
+if posthoc_df is not None:
+    print(posthoc_report)
+    print(posthoc_df.head())
+```
   
 
 **Raises**:
@@ -1836,16 +1824,18 @@ BinaryResultsWrapper(로지스틱 회귀) 객체를 받아 데이터에 대한
 
 **Examples**:
 
-  >>> import statsmodels.api as sm
-  >>> # 선형회귀 (상수항 자동 추가)
-  >>> X = sm.add_constant(df[['x1', 'x2']])
-  >>> y = df['y']
-  >>> fit_ols = sm.OLS(y, X).fit()
-  >>> pred = predict(fit_ols, df_new[['x1', 'x2']])  # DataFrame 반환
-  
-  >>> # 로지스틱 회귀 (상수항 자동 추가)
-  >>> fit_logit = sm.Logit(y_binary, X).fit()
-  >>> pred_prob = predict(fit_logit, df_new[['x1', 'x2']])  # DataFrame 반환 (해석 포함)
+```python
+from hossam import *
+
+df = hs_util.load_data("some_data.csv")
+fit1 = hs_stats.ols(df, yname="target")
+
+pred = hs_stats.predict(fit1, df_new[['x1', 'x2']])  # DataFrame 반환
+
+# 로지스틱 회귀 (상수항 자동 추가)
+fit2 = hs_stats.logit(df, yname="target")
+pred_prob = hs_stats.predict(fit2, df_new[['x1', 'x2']])  # DataFrame 반환 (해석 포함)
+```
 
 <a id="hs_stats.corr_effect_size"></a>
 
@@ -1885,13 +1875,16 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.
 
 **Examples**:
 
-  >>> from hossam import hs_stats
-  >>> import pandas as pd
-  >>> df = pd.DataFrame({'age': [20, 30, 40, 50],
-  ...                     'bmi': [22, 25, 28, 30],
-  ...                     'charges': [1000, 2000, 3000, 4000]})
-  >>> result = hs_stats.corr_effect_size(df, 'charges', 'age', 'bmi')
-  >>> print(result)
+```python
+from hossam import *
+from pandas import DataFrame
+
+df = DataFrame({'age': [20, 30, 40, 50],
+           'bmi': [22, 25, 28, 30],
+           'charges': [1000, 2000, 3000, 4000]})
+
+result = hs_stats.corr_effect_size(df, 'charges', 'age', 'bmi')
+```
 
 <a id="data_loader"></a>
 
@@ -1928,7 +1921,7 @@ list(info.columns) #['name', 'chapter', 'desc', 'url']
 
 <a id="data_loader.load_data"></a>
 
-#### load\_data
+### load\_data
 
 ```python
 def load_data(key: str, local: str = None) -> Optional[DataFrame]
@@ -1956,15 +1949,15 @@ df = load_data('AD_SALES')  # 메타데이터에 해당 키가 있어야 함
 
 <a id="__init__"></a>
 
-# \_\_init\_\_
+## \_\_init\_\_
 
 <a id="hs_plot"></a>
 
-# hs\_plot
+## hs\_plot
 
 <a id="hs_plot.get_default_ax"></a>
 
-#### get\_default\_ax
+### get\_default\_ax
 
 ```python
 def get_default_ax(width: int = config.width,
@@ -2867,16 +2860,14 @@ def ols_residplot(fit,
 **Examples**:
 
 ```python
-import statsmodels.api as sm
-X = sm.add_constant(df[['x1', 'x2']])
-y = df['y']
-fit = sm.OLS(y, X).fit()
+from hossam import *
+fit = hs_stats.ols(data, yname='target', report=False)
 residplot(fit, lowess=True, mse=True)
 ```
 
 <a id="hs_plot.ols_qqplot"></a>
 
-#### ols\_qqplot
+### ols\_qqplot
 
 ```python
 def ols_qqplot(fit,
@@ -2923,10 +2914,9 @@ statsmodels의 qqplot 함수를 사용하여 최적화된 Q-Q plot을 생성한�
 **Examples**:
 
 ```python
-import statsmodels.api as sm
-X = sm.add_constant(df[['x1', 'x2']])
-y = df['y']
-fit = sm.OLS(y, X).fit()
+from hossam import *
+# 선형회귀 모형 적합
+fit = hs_stats.ols(data, yname='target', report=False)
 # 표준화된 선 (권장)
 qqplot(fit)
 # 회귀선 (데이터 추세 반영)
@@ -2937,7 +2927,7 @@ qqplot(fit, line='45')
 
 <a id="hs_plot.distribution_by_class"></a>
 
-#### distribution\_by\_class
+### distribution\_by\_class
 
 ```python
 def distribution_by_class(data: DataFrame,
@@ -3289,7 +3279,7 @@ result = hs_classroom.cluster_students(
 
 <a id="hs_classroom.report_summary"></a>
 
-#### report\_summary
+### report\_summary
 
 ```python
 def report_summary(df: DataFrame,
@@ -3318,10 +3308,11 @@ def report_summary(df: DataFrame,
 from hossam import *
 df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
 hs_classroom.report_summary(df_result)
+```
 
 <a id="hs_classroom.report_kde"></a>
 
-#### report\_kde
+### report\_kde
 
 ```python
 def report_kde(df: DataFrame,
@@ -3355,7 +3346,7 @@ hs_classroom.report_kde(df_result, metric='average')
 
 <a id="hs_classroom.group_summary"></a>
 
-#### group\_summary
+### group\_summary
 
 ```python
 def group_summary(df: DataFrame, name_col: str = '학생이름') -> DataFrame
@@ -3387,7 +3378,7 @@ print(summary)
 
 <a id="hs_classroom.analyze_classroom"></a>
 
-#### analyze\_classroom
+### analyze\_classroom
 
 ```python
 def analyze_classroom(df,
@@ -3441,11 +3432,11 @@ print(summary)
 
 <a id="hs_timeserise"></a>
 
-# hs\_timeserise
+## hs\_timeserise
 
 <a id="hs_timeserise.diff"></a>
 
-#### diff
+### diff
 
 ```python
 def diff(data: DataFrame,
@@ -3489,26 +3480,25 @@ ARIMA 모델링 전 필수적인 전처리 과정이다.
 
 **Examples**:
 
-  기본 사용 (정상성 만족까지 자동 차분):
 ```python
-from hossam import diff
-import pandas as pd
-df = pd.DataFrame({'value': [100, 102, 105, 110, 120]},
-                  index=pd.date_range('2020-01', periods=5, freq='M'))
-stationary_df = diff(df, 'value')
-```
-  최대 2차 차분으로 제한:
-```python
-stationary_df = diff(df, 'value', max_diff=2)
-```
-  그래프 없이 실행:
-```python
-stationary_df = diff(df, 'value', plot=False)
+from hossam import *
+from pandas import DataFrame, date_range
+
+# 기본 사용 (정상성 만족까지 자동 차분):
+df = DataFrame({'value': [100, 102, 105, 110, 120]},
+                  index=date_range('2020-01', periods=5, freq='M'))
+stationary_df = hs_timeseries.diff(df, 'value')
+
+# 최대 2차 차분으로 제한:
+stationary_df = hs_timeseries.diff(df, 'value', max_diff=2)
+
+# 그래프 없이 실행:
+stationary_df = hs_timeseries.diff(df, 'value', plot=False)
 ```
 
 <a id="hs_timeserise.rolling"></a>
 
-#### rolling
+### rolling
 
 ```python
 def rolling(data: Series,
@@ -3548,17 +3538,18 @@ def rolling(data: Series,
 
 **Examples**:
 
-  7일 이동평균 계산:
-  
-  >>> from hossam import rolling
-  >>> import pandas as pd
-  >>> data = pd.Series([10, 12, 13, 15, 14, 16, 18],
-  ...                  index=pd.date_range('2020-01-01', periods=7))
-  >>> ma7 = hs_rolling(data, window=7)
-  
-  30일 이동평균, 그래프 없이:
-  
-  >>> ma30 = hs_rolling(data, window=30, plot=False)
+```python
+from hossam import *
+from pandas import Series, date_range
+
+# 7일 이동평균 계산:
+data = Series([10, 12, 13, 15, 14, 16, 18],
+                index=date_range('2020-01-01', periods=7))
+ma7 = hs_timeseries.rolling(data, window=7)
+
+# 30일 이동평균, 그래프 없이:
+ma30 = hs_timeseries.rolling(data, window=30, plot=False)
+```
 
 <a id="hs_timeserise.ewm"></a>
 
@@ -3603,17 +3594,18 @@ def ewm(data: Series,
 
 **Examples**:
 
-  12기간 지수가중이동평균:
-  
-  >>> from hossam import ewm
-  >>> import pandas as pd
-  >>> data = pd.Series([10, 12, 13, 15, 14, 16, 18],
-  ...                  index=pd.date_range('2020-01-01', periods=7))
-  >>> ewma = hs_ewm(data, span=12)
-  
-  단기 추세 파악 (span=5):
-  
-  >>> ewma_short = hs_ewm(data, span=5, plot=False)
+```python
+from hossam import ewm
+from pandas import Series, date_range
+
+# 12기간 지수가중이동평균:
+data = Series([10, 12, 13, 15, 14, 16, 18],
+                 index=date_range('2020-01-01', periods=7))
+ewma = hs_timeseries.ewm(data, span=12)
+
+# 단기 추세 파악 (span=5):
+ewma_short = hs_timeseries.ewm(data, span=5, plot=False)
+```
 
 <a id="hs_timeserise.seasonal_decompose"></a>
 
@@ -3672,25 +3664,26 @@ classical decomposition 기법을 사용하여 시계열을 구조적 성분으�
 
 **Examples**:
 
-  월별 데이터 가법 분해:
-  
-  >>> from hossam import seasonal_decompose
-  >>> import pandas as pd
-  >>> data = pd.Series([100, 120, 110, 130, 150, 140],
-  ...                  index=pd.date_range('2020-01', periods=6, freq='M'))
-  >>> components = hs_seasonal_decompose(data, model='additive')
-  
-  승법 모델 사용:
-  
-  >>> components = hs_seasonal_decompose(data, model='multiplicative', plot=False)
-  >>> print(components[['trend', 'seasonal']].head())
+```python
+from hossam import *
+from pandas import Series, date_range
 
-<a id="hs_timeserise.timeseries_split"></a>
+# 월별 데이터 가법 분해:
+data = Series([100, 120, 110, 130, 150, 140],
+                 index=date_range('2020-01', periods=6, freq='M'))
+components = hs_timeseries.seasonal_decompose(data, model='additive')
 
-### timeseries\_split
+# 승법 모델 사용:
+components = hs_timeseries.seasonal_decompose(data, model='multiplicative', plot=False)
+print(components[['trend', 'seasonal']].head())
+```
+
+<a id="hs_timeserise.train_test_split"></a>
+
+### train\_test\_split
 
 ```python
-def timeseries_split(data: DataFrame, test_size: float = 0.2) -> tuple
+def train_test_split(data: DataFrame, test_size: float = 0.2) -> tuple
 ```
 
 시계열 데이터를 시간 순서를 유지하며 학습/테스트 세트로 분할한다.
@@ -3724,19 +3717,19 @@ def timeseries_split(data: DataFrame, test_size: float = 0.2) -> tuple
 
 **Examples**:
 
-  80:20 분할 (기본):
-  
-  >>> from hossam import timeseries_split
-  >>> import pandas as pd
-  >>> df = pd.DataFrame({'value': range(100)},
-  ...                   index=pd.date_range('2020-01-01', periods=100))
-  >>> train, test = hs_timeseries_split(df)
-  >>> print(len(train), len(test))  # 80, 20
-  
-  70:30 분할:
-  
-  >>> train, test = hs_timeseries_split(df, test_size=0.3)
-  >>> print(len(train), len(test))  # 70, 30
+```python
+from hossam import *
+from pandas import DataFrame, date_range
+
+# 80:20 분할 (기본):
+df = DataFrame({'value': range(100)}, index=date_range('2020-01-01', periods=100))
+train, test = hs_timeseries.train_test_split(df)
+print(len(train), len(test))  # 80, 20
+
+# 70:30 분할:
+train, test = hs_timeseries.train_test_split(df, test_size=0.3)
+print(len(train), len(test))  # 70, 30
+```
 
 <a id="hs_timeserise.acf_plot"></a>
 
@@ -3774,17 +3767,18 @@ def acf_plot(data: Series,
 
 **Examples**:
 
-  기본 ACF 플롯:
-  
-  >>> from hossam import acf_plot
-  >>> import pandas as pd
-  >>> data = pd.Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-  ...                  index=pd.date_range('2020-01-01', periods=10))
-  >>> hs_acf_plot(data)
-  
-  콜백으로 제목 추가:
-  
-  >>> hs_acf_plot(data, callback=lambda ax: ax.set_title('My ACF Plot'))
+```python
+from hossam import *
+from pandas import Series, date_range
+
+# 기본 ACF 플롯:
+data = Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                 index=date_range('2020-01-01', periods=10))
+hs_timeseries.acf_plot(data)
+
+# 콜백으로 제목 추가:
+hs_timeseries.acf_plot(data, callback=lambda ax: ax.set_title('My ACF Plot'))
+```
 
 <a id="hs_timeserise.pacf_plot"></a>
 
@@ -3822,17 +3816,18 @@ ARIMA 모델의 AR(p) 차수 결정에 사용된다.
 
 **Examples**:
 
-  기본 PACF 플롯:
-  
-  >>> from hossam import pacf_plot
-  >>> import pandas as pd
-  >>> data = pd.Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-  ...                  index=pd.date_range('2020-01-01', periods=10))
-  >>> hs_pacf_plot(data)
-  
-  콜백으로 커스터마이징:
-  
-  >>> hs_pacf_plot(data, callback=lambda ax: ax.set_ylabel('Partial Correlation'))
+```python
+from hossam import *
+from pandas import Series, date_range
+
+# 기본 PACF 플롯:
+data = Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                 index=date_range('2020-01-01', periods=10))
+hs_timeseries.pacf_plot(data)
+
+# 콜백으로 커스터마이징:
+hs_timeseries.pacf_plot(data, callback=lambda ax: ax.set_ylabel('Partial Correlation'))
+```
 
 <a id="hs_timeserise.acf_pacf_plot"></a>
 
@@ -3873,16 +3868,17 @@ ACF와 PACF를 함께 분석하여 ARIMA(p,d,q) 모델의 p(AR 차수)와 q(MA �
 
 **Examples**:
 
-  ARIMA 모델링 전 차수 탐색:
-  
-  >>> from hossam import acf_pacf_plot, hs_diff
-  >>> import pandas as pd
-  >>> data = pd.Series([10, 12, 13, 15, 14, 16, 18, 20],
-  ...                  index=pd.date_range('2020-01-01', periods=8))
-  >>> # 1차 차분 후 정상성 확보
-  >>> stationary = diff(data, plot=False, max_diff=1)
-  >>> # ACF/PACF로 p, q 결정
-  >>> hs_acf_pacf_plot(stationary)
+```python
+from hossam import *
+from pandas import Series, date_range
+
+# ARIMA 모델링 전 차수 탐색:
+data = Series([10, 12, 13, 15, 14, 16, 18, 20],
+                 index=date_range('2020-01-01', periods=8))
+
+# 1차 차분 후 ACF/PACF 플롯:
+stationary = hs_timeseries.diff(data, 'value')
+hs_timeseries.acf_pacf_plot(stationary)
 
 <a id="hs_timeserise.arima"></a>
 
@@ -3890,15 +3886,15 @@ ACF와 PACF를 함께 분석하여 ARIMA(p,d,q) 모델의 p(AR 차수)와 q(MA �
 
 ```python
 def arima(train: Series,
-          test: Series,
-          auto: bool = False,
-          p: int = 3,
-          d: int = 3,
-          q: int = 3,
-          s: int = None,
-          periods: int = 0,
-          figsize: tuple = (15, 5),
-          dpi: int = 100) -> ARIMA
+      test: Series,
+      auto: bool = False,
+      p: int = 3,
+      d: int = 3,
+      q: int = 3,
+      s: int = None,
+      periods: int = 0,
+      figsize: tuple = (15, 5),
+      dpi: int = 100) -> ARIMA
 ```
 
 ARIMA 또는 SARIMA 모델을 학습하고 예측 결과를 시각화한다.
@@ -3947,22 +3943,22 @@ auto=True로 설정하면 pmdarima의 auto_arima로 최적 하이퍼파라미터
 
 **Examples**:
 
-  수동 ARIMA(2,1,2) 모델:
-  
-  >>> from hossam import arima, hs_timeseries_split
-  >>> import pandas as pd
-  >>> data = pd.Series([100, 102, 105, 110, 115, 120, 125, 130],
-  ...                  index=pd.date_range('2020-01', periods=8, freq='M'))
-  >>> train, test = hs_timeseries_split(data, test_size=0.25)
-  >>> model = hs_arima(train, test, p=2, d=1, q=2)
-  
-  auto_arima로 최적 모델 탐색:
-  
-  >>> model = hs_arima(train, test, auto=True)
-  
-  계절성 모델 SARIMA(1,1,1)(1,1,1,12):
-  
-  >>> model = hs_arima(train, test, p=1, d=1, q=1, s=12)
+```python
+from hossam import *
+from pandas import Series, date_range
+
+# 수동으로 ARIMA(2,1,2) 모델 생성:
+data = Series([100, 102, 105, 110, 115, 120, 125, 130],
+                 index=date_range('2020-01', periods=8, freq='M'))
+train, test = hs_timeseries.train_test_split(data, test_size=0.25)
+model = hs_timeseries.arima(train, test, p=2, d=1, q=2)
+
+# auto_arima로 최적 모델 탐색:
+model = hs_timeseries.arima(train, test, auto=True)
+
+# 계절성 모델 SARIMA(1,1,1)(1,1,1,12):
+model = hs_timeseries.arima(train, test, p=1, d=1, q=1, s=12)
+```
 
 <a id="hs_timeserise.prophet"></a>
 
@@ -4039,30 +4035,32 @@ Facebook(Meta)의 Prophet 라이브러리를 사용하여 시계열 예측 모�
 
 **Examples**:
 
-  기본 사용 (단일 모델):
-  
-  >>> from hossam import prophet
-  >>> import pandas as pd
-  >>> train = pd.DataFrame({
-  ...     'ds': pd.date_range('2020-01-01', periods=100),
-  ...     'y': range(100)
-  ... })
-  >>> model, params, score, forecast, pred = hs_prophet(train)
-  
-  하이퍼파라미터 그리드 서치:
-  
-  >>> model, params, score, forecast, pred = hs_prophet(
-  ...     train,
-  ...     changepoint_prior_scale=[0.001, 0.01, 0.1],
-  ...     seasonality_prior_scale=[0.01, 0.1, 1.0],
-  ...     seasonality_mode=['additive', 'multiplicative']
-  ... )
-  
-  휴일 효과 추가:
-  
-  >>> def add_holidays(m):
-  ...     m.add_country_holidays(country_name='KR')
-  >>> model, _, _, _, _ = hs_prophet(train, callback=add_holidays)
+```python
+from hossam import *
+from pandas import DataFrame, date_range
+
+# 기본 사용 (단일 모델):
+train = DataFrame({
+            'ds': date_range('2020-01-01', periods=100),
+            'y': range(100)
+        })
+model, params, score, forecast, pred = hs_timeseries.prophet(train)
+
+하이퍼파라미터 그리드 서치:
+
+model, params, score, forecast, pred = hs_timeseries.prophet(
+        train,
+        changepoint_prior_scale=[0.001, 0.01, 0.1],
+        seasonality_prior_scale=[0.01, 0.1, 1.0],
+        seasonality_mode=['additive', 'multiplicative']
+)
+
+# 휴일 효과 추가:
+def add_holidays(m):
+    m.add_country_holidays(country_name='KR')
+
+model, _, _, _, _ = hs_timeseries.prophet(train, callback=add_holidays)
+```
 
 <a id="hs_timeserise.prophet_report"></a>
 
@@ -4112,19 +4110,20 @@ Prophet 모델의 예측 결과와 성분 분해를 시각화하고 성능을 �
 
 **Examples**:
 
-  기본 리포트 출력:
-  
-  >>> from hossam import prophet, hs_prophet_report
-  >>> model, _, _, forecast, pred = hs_prophet(train)
-  >>> hs_prophet_report(model, forecast, pred)
-  
-  test 데이터와 함께 성능 평가:
-  
-  >>> hs_prophet_report(model, forecast, pred, test=test)
-  
-  예측 테이블 출력:
-  
-  >>> hs_prophet_report(model, forecast, pred, print_forecast=True)
+```python
+from hossam import *
+from pandas import DataFrame, date_range
+
+# 기본 리포트 출력:
+model, _, _, forecast, pred = hs_timeseries.prophet(train)
+hs_timeseries.prophet_report(model, forecast, pred)
+
+# test 데이터와 함께 성능 평가:
+hs_timeseries.prophet_report(model, forecast, pred, test=test)
+
+# 예측 테이블 출력:
+hs_timeseries.prophet_report(model, forecast, pred, print_forecast=True)
+```
 
 <a id="hs_timeserise.get_weekend_df"></a>
 
@@ -4165,22 +4164,22 @@ Prophet 모델의 holidays 파라미터에 사용할 수 있는 형식의 주말
 
 **Examples**:
 
-  2020년 전체 주말 생성:
-  
-  >>> from hossam import get_weekend_df
-  >>> weekends = get_weekend_df('2020-01-01', '2020-12-31')
-  >>> print(len(weekends))  # 104 (52주 × 2일)
-  
-  현재까지의 주말:
-  
-  >>> weekends = get_weekend_df('2023-01-01')
-  
-  Prophet 모델에 주말 효과 추가:
-  
-  >>> from prophet import Prophet
-  >>> weekends = get_weekend_df('2020-01-01', '2025-12-31')
-  >>> model = Prophet(holidays=weekends)
-  >>> model.fit(train)
+```python
+from hossam import *
+from pandas import DataFrame, date_range
+
+# 2020년 전체 주말 생성:
+weekends = hs_timeseries.get_weekend_df('2020-01-01', '2020-12-31')
+print(len(weekends))  # 104 (52주 × 2일)
+
+# 현재까지의 주말:
+weekends = hs_timeseries.get_weekend_df('2023-01-01')
+print(weekends.head())
+
+# Prophet 모델에 주말 효과 추가:
+weekends = hs_timeseries.get_weekend_df('2020-01-01', '2025-12-31')
+model = hs_timeseries.prophet(train, holidays=weekends)
+```
 
 <a id="hs_util"></a>
 
@@ -4230,15 +4229,13 @@ def make_normalize_values(mean: float,
 **Examples**:
 
 ```python
-from hossam.util import make_normalize_values
-x = make_normalize_values(mean=0.0, std=1.0, size=100)
-x.shape
-(100,)
+from hossam import *
+x = hs.util.make_normalize_values(mean=0.0, std=1.0, size=100)
 ```
 
 <a id="hs_util.make_normalize_data"></a>
 
-#### make\_normalize\_data
+### make\_normalize\_data
 
 ```python
 def make_normalize_data(means: list | None = None,
@@ -4288,14 +4285,14 @@ def pretty_table(data: DataFrame,
 **Examples**:
 
 ```python
-from hossam.util import pretty_table
+from hossam import *
 from pandas import DataFrame
-pretty_table(DataFrame({"a":[1,2],"b":[3,4]}))
+hs_util.pretty_table(DataFrame({"a":[1,2],"b":[3,4]}))
 ```
 
 <a id="hs_util.load_data"></a>
 
-#### load\_data
+### load\_data
 
 ```python
 def load_data(key: str,
@@ -4326,9 +4323,6 @@ def load_data(key: str,
 **Examples**:
 
 ```python
-from hossam.util import load_data
-df = load_data("AD_SALES", index_col=None, timeindex=False, info=False)
-isinstance(df.columns, object)
-# True
+from hossam import *
+df = hs_util.load_data("AD_SALES", index_col=None, timeindex=False, info=False)
 ```
-

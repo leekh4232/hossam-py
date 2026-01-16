@@ -1619,10 +1619,8 @@ def ols_residplot(
 
     Examples:
         ```python
-        import statsmodels.api as sm
-        X = sm.add_constant(df[['x1', 'x2']])
-        y = df['y']
-        fit = sm.OLS(y, X).fit()
+        from hossam import *
+        fit = hs_stats.ols(data, yname='target', report=False)
         residplot(fit, lowess=True, mse=True)
         ```
     """
@@ -1749,10 +1747,9 @@ def ols_qqplot(
 
     Examples:
         ```python
-        import statsmodels.api as sm
-        X = sm.add_constant(df[['x1', 'x2']])
-        y = df['y']
-        fit = sm.OLS(y, X).fit()
+        from hossam import *
+        # 선형회귀 모형 적합
+        fit = hs_stats.ols(data, yname='target', report=False)
         # 표준화된 선 (권장)
         qqplot(fit)
         # 회귀선 (데이터 추세 반영)

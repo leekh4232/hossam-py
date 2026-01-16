@@ -102,8 +102,8 @@ def geocode(df: DataFrame, addr: str, key: str) -> DataFrame:
 
     Examples:
         ```python
-        from hossam import gis
-        result = gis.hs_geocode(df, addr="address", key="YOUR_VWORLD_KEY")
+        from hossam import *
+        result = hs_gis.geocode(df, addr="address", key="YOUR_VWORLD_KEY")
         set(["latitude","longitude"]).issubset(result.columns)
         # True
         ```
@@ -175,8 +175,8 @@ def load_shape(path: str, info: bool = True) -> GeoDataFrame:
 
     Examples:
         ```python
-        from hossam.gis import load_shape
-        gdf = hs_load_shape("path/to/file.shp", info=False)
+        from hossam import *
+        gdf = hs_gis.load_shape("path/to/file.shp", info=False)
         ```
     """
     if not os.path.exists(path):

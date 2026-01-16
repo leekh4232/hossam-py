@@ -1,28 +1,25 @@
-name: Generate HOSSAM API Docs
-
+name: Generate API Docs
 on:
   push:
-    branches: [main]
-
+    branches:
+      - main
+  workflow_dispatch:
 jobs:
-  build-docs:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
+      - name: Checkout code
+        uses: actions/checkout@v3
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-
       - name: Install dependencies
         run: |
           pip install pydoc-markdown
-
       - name: Generate API markdown
         run: |
-          pydoc-markdown | awk '/^    ```/{flag=1;sub(/^    /,"\");print;next} flag&&/^    /{sub(/^    /,"\");print;next} flag&&/^```/{flag=0;print;next} {print}' > HOSSAM_API.md
-
+          python gen_api_md.py
       - name: Commit and push docs
         run: |
           git config --global user.name "github-actions"

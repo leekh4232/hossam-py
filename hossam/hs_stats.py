@@ -35,6 +35,8 @@ from statsmodels.stats.diagnostic import linear_reset, het_breuschpagan, het_whi
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from statsmodels.stats.multitest import multipletests
 from statsmodels.stats.stattools import durbin_watson
+from statsmodels.regression.linear_model import RegressionResultsWrapper
+from statsmodels.discrete.discrete_model import BinaryResults
 
 from pingouin import anova, pairwise_tukey, welch_anova, pairwise_gameshowell
 
@@ -58,17 +60,17 @@ def missing_values(data: DataFrame, *fields: str):
             - missing_rate (float): 전체 행에서 결측치의 비율(%)
 
     Examples:
-        전체 컬럼에 대한 결측치 확인:
         ```python
-        from hossam import missing_values
-        import pandas as pd
-        df = pd.DataFrame({'x': [1, 2, None, 4], 'y': [10, None, None, 40]})
-        result = missing_values(df)
+        from hossam import *
+        from pandas import DataFrame
+
+        # 전체 컬럼에 대한 결측치 확인:
+        df = DataFrame({'x': [1, 2, None, 4], 'y': [10, None, None, 40]})
+        result = hs_stats.missing_values(df)
         print(result)
-        ```
-        특정 컬럼만 분석:
-        ```python
-        result = missing_values(df, 'x', 'y')
+
+        # 특정 컬럼만 분석:
+        result = hs_stats.missing_values(df, 'x', 'y')
         print(result)
         ```
     """
@@ -122,18 +124,19 @@ def outlier_table(data: DataFrame, *fields: str):
             - outlier_rate (float): 이상치 비율(%)
 
     Examples:
-        전체 숫자형 컬럼에 대한 이상치 경계 확인:
         ```python
-        from hossam import outlier_table
-        import pandas as pd
-        df = pd.DataFrame({'x': [1, 2, 3, 100], 'y': [10, 20, 30, 40]})
-        result = outlier_table(df)
+        from hossam import *
+        from pandas import DataFrame
+
+        df = DataFrame({'x': [1, 2, 3, 100], 'y': [10, 20, 30, 40]})
+
+        # 전체 숫자형 컬럼에 대한 이상치 경계 확인:
+        result = hs_stats.outlier_table(df)
         print(result)
-        ```
-        특정 컬럼만 분석:
-        ```python
-        result = outlier_table(df, 'x', 'y')
-        print(result[['Q1', 'Q3', 'UP', 'DOWN']])
+
+        # 특정 컬럼만 분석:
+        result = hs_stats.outlier_table(df, 'x', 'y')
+        print(result[['q1', 'q3', 'up', 'down']])
         ```
 
     Notes:
@@ -233,21 +236,22 @@ def describe(data: DataFrame, *fields: str, columns: list | None = None):
             - log_need (str): 로그변환 필요성 ("높음", "중간", "낮음")
 
     Examples:
-        전체 숫자형 컬럼에 대한 확장된 기술통계:
         ```python
-        from hossam import summary
-        import pandas as pd
-        df = pd.DataFrame({
+        from hossam import *
+        from pandas import DataFrame
+
+        df = DataFrame({
             'x': [1, 2, 3, 4, 5, 100],
             'y': [10, 20, 30, 40, 50, 60],
             'z': ['a', 'b', 'c', 'd', 'e', 'f']
         })
-        result = summary(df)
+
+        # 전체 숫자형 컬럼에 대한 확장된 기술통계:
+        result = hs_stats.describe(df)
         print(result)
-        ```
-        특정 컬럼만 분석:
-        ```python
-        result = summary(df, 'x', 'y')
+
+        # 특정 컬럼만 분석:
+        result = hs_stats.describe(df, 'x', 'y')
         print(result)
         ```
 
@@ -375,21 +379,22 @@ def category_describe(data: DataFrame, *fields: str):
             - 최소_비율(%) (float): 최소 범주의 비율
 
     Examples:
-        전체 명목형 컬럼에 대한 분포 편향 요약:
         ```python
-        from hossam import category_describe
-        import pandas as pd
-        df = pd.DataFrame({
+        from hossam import *
+        from pandas import DataFrame
+
+        df = DataFrame({
             'cut': ['Ideal', 'Premium', 'Good', 'Ideal', 'Premium'],
             'color': ['E', 'F', 'G', 'E', 'F'],
             'price': [100, 200, 150, 300, 120]
         })
-        result = category_describe(df)
+
+        # 전체 명목형 컬럼에 대한 요약:
+        result = hs_stats.category_describe(df)
         print(result)
-        ```
-        특정 컬럼만 분석:
-        ```python
-        result = category_describe(df, 'cut', 'color')
+
+        # 특정 컬럼만 분석:
+        result = hs_stats.category_describe(df, 'cut', 'color')
         print(result)
         ```
 
@@ -480,19 +485,25 @@ def normal_test(data: DataFrame, columns: list | str | None = None, method: str 
         ValueError: 메서드가 "n" 또는 "s"가 아닐 경우.
 
     Examples:
-        >>> from hossam.analysis import normal_test
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> df = pd.DataFrame({
-        ...     'x': np.random.normal(0, 1, 100),
-        ...     'y': np.random.exponential(2, 100)
-        ... })
-        >>> # 모든 수치형 컬럼 검정
-        >>> result = normal_test(df, method='n')
-        >>> # 특정 컬럼만 검정 (리스트)
-        >>> result = normal_test(df, columns=['x'], method='n')
-        >>> # 특정 컬럼만 검정 (문자열)
-        >>> result = normal_test(df, columns='x, y', method='n')
+        ```python
+        from hossam import *
+        from pandas import DataFrame
+        import numpy as np
+
+        df = DataFrame({
+            'x': np.random.normal(0, 1, 100),
+            'y': np.random.exponential(2, 100)
+        })
+
+        # 모든 수치형 컬럼 검정
+        result = hs_stats.normal_test(df, method='n')
+
+        # 특정 컬럼만 검정 (리스트)
+        result = hs_stats.normal_test(df, columns=['x'], method='n')
+
+        # 특정 컬럼만 검정 (문자열)
+        result = hs_stats.normal_test(df, columns='x, y', method='n')
+        ```
     """
     if method not in ["n", "s"]:
         raise ValueError(f"method는 'n' 또는 's'여야 합니다. 입력값: {method}")
@@ -592,22 +603,29 @@ def equal_var_test(data: DataFrame, columns: list | str | None = None, normal_di
         ValueError: 수치형 컬럼이 2개 미만일 경우 (검정에 최소 2개 필요).
 
     Examples:
-        >>> from hossam.analysis import equal_var_test
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> df = pd.DataFrame({
-        ...     'x': np.random.normal(0, 1, 100),
-        ...     'y': np.random.normal(0, 1, 100),
-        ...     'z': np.random.normal(0, 2, 100)
-        ... })
-        >>> # 모든 수치형 컬럼 자동 판별
-        >>> result = equal_var_test(df)
-        >>> # 특정 컬럼만 검정 (리스트)
-        >>> result = equal_var_test(df, columns=['x', 'y'])
-        >>> # 특정 컬럼만 검정 (문자열)
-        >>> result = equal_var_test(df, columns='x, y')
-        >>> # 명시적 지정
-        >>> result = equal_var_test(df, normal_dist=True)
+        ```python
+        from hossam import *
+        from pandas import DataFrame
+        import numpy as np
+
+        df = DataFrame({
+            'x': np.random.normal(0, 1, 100),
+            'y': np.random.normal(0, 1, 100),
+            'z': np.random.normal(0, 2, 100)
+        })
+
+        # 모든 수치형 컬럼 자동 판별
+        result = hs_stats.equal_var_test(df)
+
+        # 특정 컬럼만 검정 (리스트)
+        result = hs_stats.equal_var_test(df, columns=['x', 'y'])
+
+        # 특정 컬럼만 검정 (문자열)
+        result = hs_stats.equal_var_test(df, columns='x, y')
+
+        # 명시적 지정
+        result = hs_stats.equal_var_test(df, normal_dist=True)
+        ```
     """
     # columns가 문자열인 경우 리스트로 변환
     if isinstance(columns, str):
@@ -704,15 +722,19 @@ def ttest_1samp(data, mean_value: float = 0.0) -> DataFrame:
             - interpretation (str): 검정 결과 해석 문자열
 
     Examples:
-        >>> from hossam.hs_stats import ttest_1samp
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> # 리스트 데이터로 검정
-        >>> data = [5.1, 4.9, 5.3, 5.0, 4.8]
-        >>> result = ttest_1samp(data, mean_value=5.0)
-        >>> # Series 데이터로 검정
-        >>> s = pd.Series(np.random.normal(5, 1, 100))
-        >>> result = ttest_1samp(s, mean_value=5)
+        ```python
+        from hossam import *
+        from pandas import Series
+        import numpy as np
+
+        # 리스트 데이터로 검정
+        data = [5.1, 4.9, 5.3, 5.0, 4.8]
+        result = hs_stats.ttest_1samp(data, mean_value=5.0)
+
+        # Series 데이터로 검정
+        s = Series(np.random.normal(5, 1, 100))
+        result = hs_stats.ttest_1samp(s, mean_value=5)
+        ```
     """
     # 데이터를 Series로 변환하고 이름 감지
     if isinstance(data, Series):
@@ -801,17 +823,21 @@ def ttest_ind(x, y, equal_var: bool | None = None) -> DataFrame:
             - interpretation (str): 검정 결과 해석
 
     Examples:
-        >>> from hossam.hs_stats import ttest_ind
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> # 리스트로 검정
-        >>> group1 = [5.1, 4.9, 5.3, 5.0, 4.8]
-        >>> group2 = [5.5, 5.7, 5.4, 5.6, 5.8]
-        >>> result = ttest_ind(group1, group2)
-        >>> # Series로 검정
-        >>> s1 = pd.Series(np.random.normal(5, 1, 100))
-        >>> s2 = pd.Series(np.random.normal(5.5, 1, 100))
-        >>> result = ttest_ind(s1, s2, equal_var=False)
+        ```python
+        from hossam import *
+        from pandas import Series, DataFrame
+        import numpy as np
+
+        # 리스트로 검정
+        group1 = [5.1, 4.9, 5.3, 5.0, 4.8]
+        group2 = [5.5, 5.7, 5.4, 5.6, 5.8]
+        result = hs_stats.ttest_ind(group1, group2)
+
+        # Series로 검정
+        s1 = Series(np.random.normal(5, 1, 100))
+        s2 = Series(np.random.normal(5.5, 1, 100))
+        result = hs_stats.ttest_ind(s1, s2, equal_var=False)
+        ```
     """
     # 데이터를 Series로 변환
     if isinstance(x, Series):
@@ -912,17 +938,21 @@ def ttest_rel(x, y, parametric: bool | None = None) -> DataFrame:
             - interpretation (str): 검정 결과 해석
 
     Examples:
-        >>> from hossam.hs_stats import ttest_rel
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> # 리스트로 검정
-        >>> before = [5.1, 4.9, 5.3, 5.0, 4.8]
-        >>> after = [5.5, 5.2, 5.7, 5.3, 5.1]
-        >>> result = ttest_rel(before, after)
-        >>> # Series로 검정
-        >>> s1 = pd.Series(np.random.normal(5, 1, 100))
-        >>> s2 = pd.Series(np.random.normal(5.3, 1, 100))
-        >>> result = ttest_rel(s1, s2, parametric=False)
+        ```python
+        from hossam import *
+        from pandas import Series
+        import numpy as np
+
+        # 리스트로 검정
+        before = [5.1, 4.9, 5.3, 5.0, 4.8]
+        after = [5.5, 5.2, 5.7, 5.3, 5.1]
+        result = hs_stats.ttest_rel(before, after)
+
+        # Series로 검정
+        s1 = Series(np.random.normal(5, 1, 100))
+        s2 = Series(np.random.normal(5.3, 1, 100))
+        result = hs_stats.ttest_rel(s1, s2, parametric=False)
+        ```
     """
     # 데이터를 Series로 변환
     if isinstance(x, Series):
@@ -1035,11 +1065,11 @@ def vif_filter(
         DataFrame: VIF가 threshold 이하인 변수만 남은 데이터프레임 (원본 컬럼 순서 유지)
 
     Examples:
-        기본 사용 예:
-
-        >>> from hossam.analysis import vif_filter
-        >>> filtered = hs_vif_filter(df, yname="target", ignore=["id"], threshold=10.0)
-        >>> filtered.head()
+        ```python
+        # 기본 사용 예
+        from hossam import *
+        filtered = hs_stats.vif_filter(df, yname="target", ignore=["id"], threshold=10.0)
+        ```
     """
 
     df = data.copy()
@@ -1133,12 +1163,12 @@ def trend(x: any, y: any, degree: int = 1, value_count: int = 100) -> Tuple[np.n
         tuple: (v_trend, t_trend)
 
     Examples:
-        2차 다항 회귀 추세선:
-
-        >>> from hossam.analysis import trend
-        >>> vx, vy = hs_trend(x, y, degree=2, value_count=200)
-        >>> len(vx), len(vy)
-        (200, 200)
+        ```python
+        # 2차 다항 회귀 추세선
+        from hossam import *
+        vx, vy = hs_stats.trend(x, y, degree=2, value_count=200)
+        print(len(vx), len(vy)) # 200, 200
+        ```
     """
     # [ a, b, c ] ==> ax^2 + bx + c
     x_arr = np.asarray(x)
@@ -1184,14 +1214,18 @@ def ols_report(fit, data, full=False, alpha=0.05):
             - 회귀계수 표 (`rdf`, DataFrame)
 
     Examples:
-        >>> import statsmodels.api as sm
-        >>> y = data['target']
-        >>> X = sm.add_constant(data[['x1', 'x2']])
-        >>> fit = sm.OLS(y, X).fit()
-        >>> # 전체 리포트
-        >>> pdf, rdf, result_report, model_report, variable_reports, eq = ols_report(fit, data)
-        >>> # 간단한 버전 (회귀계수 테이블만)
-        >>> rdf = ols_report(fit, data, full=False)
+        ```python
+        from hossam import *
+
+        df = hs_util.load_data("some_data.csv")
+        fit = hs_stats.ols(df, yname="target")
+
+        # 전체 리포트
+        pdf, rdf, result_report, model_report, variable_reports, eq = hs_stats.ols_report(fit, data, full=True)
+
+        # 간단한 버전 (성능지표, 회귀계수 테이블만)
+        pdf, rdf = hs_stats.ols_report(fit, data)
+        ```
     """
 
     # summary2() 결과에서 실제 회귀계수 DataFrame 추출
@@ -1338,7 +1372,7 @@ def ols_report(fit, data, full=False, alpha=0.05):
     if full:
         return pdf, rdf, result_report, model_report, variable_reports, equation_text
     else:
-        return pdf
+        return pdf, rdf
 
 
 # ===================================================================
@@ -1377,23 +1411,26 @@ def ols(df: DataFrame, yname: str, report=False):
             - equation_text: 회귀식 문자열 (str)
 
     Examples:
-        >>> from hossam.analysis import linear
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> df = pd.DataFrame({
-        ...     'target': np.random.normal(100, 10, 100),
-        ...     'x1': np.random.normal(0, 1, 100),
-        ...     'x2': np.random.normal(0, 1, 100)
-        ... })
-        >>> # 적합 결과만 반환
-        >>> fit = hs_ols(df, 'target')
-        >>> print(fit.summary())
+        ```python
+        from hossam import *
+        from pandas import DataFrame
+        import numpy as np
 
-        >>> # 요약 리포트 반환
-        >>> fit, result, features = hs_ols(df, 'target', report=1)
+        df = DataFrame({
+            'target': np.random.normal(100, 10, 100),
+            'x1': np.random.normal(0, 1, 100),
+            'x2': np.random.normal(0, 1, 100)
+        })
 
-        >>> # 풀 리포트 반환
-        >>> fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_ols(df, 'target', report=2)
+        # 적합 결과만 반환
+        fit = hs_stats.ols(df, 'target')
+
+        # 요약 리포트 반환
+        fit, pdf, rdf = hs_stats.ols(df, 'target', report=1)
+
+        # 풀 리포트 반환
+        fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_stats.ols(df, 'target', report=2)
+        ```
     """
     x = df.drop(yname, axis=1)
     y = df[yname]
@@ -1408,7 +1445,7 @@ def ols(df: DataFrame, yname: str, report=False):
         return linear_fit
     elif report == 1 or report == 'summary':
         # 요약 리포트 (full=False)
-        pdf, rdf, result_report, model_report, variable_reports, equation_text = ols_report(linear_fit, df, full=True, alpha=0.05)
+        pdf, rdf = ols_report(linear_fit, df, full=False, alpha=0.05)
         return linear_fit, pdf, rdf
     elif report == 2 or report == 'full' or report is True:
         # 풀 리포트 (full=True)
@@ -1446,14 +1483,26 @@ def logit_report(fit, data, threshold=0.5, full=False, alpha=0.05):
             - 회귀계수 표 (`rdf`, DataFrame)
 
     Examples:
-        >>> import statsmodels.api as sm
-        >>> y = data['target']
-        >>> X = sm.add_constant(data[['x1', 'x2']])
-        >>> fit = sm.Logit(y, X).fit(disp=0)
-        >>> # 전체 리포트
-        >>> cdf, rdf, result_report, model_report, variable_reports, cm = hs_logit_report(fit, data)
-        >>> # 간단한 버전 (주요 테이블만)
-        >>> cdf, rdf = hs_logit_report(fit, data, full=False)
+        ```python
+        from hossam import *
+        from pandas import DataFrame
+        import numpy as np
+
+        df = DataFrame({
+            'target': np.random.binomial(1, 0.5, 100),
+            'x1': np.random.normal(0, 1, 100),
+            'x2': np.random.normal(0, 1, 100)
+        })
+
+        # 로지스틱 회귀 적합
+        fit = hs_stats.logit(df, yname="target")
+
+        # 전체 리포트
+        cdf, rdf, result_report, model_report, variable_reports, cm = hs_stats.logit_report(fit, df, full=True)
+
+        # 간단한 버전 (주요 테이블만)
+        cdf, rdf = hs_stats.logit_report(fit, df)
+        ```
     """
 
     # -----------------------------
@@ -1635,23 +1684,26 @@ def logit(df: DataFrame, yname: str, report=False):
             - variable_reports: 변수별 보고 문장 리스트 (list[str])
 
     Examples:
-        >>> from hossam.analysis import logit
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> df = pd.DataFrame({
-        ...     'target': np.random.binomial(1, 0.5, 100),
-        ...     'x1': np.random.normal(0, 1, 100),
-        ...     'x2': np.random.normal(0, 1, 100)
-        ... })
-        >>> # 적합 결과만 반환
-        >>> fit = hs_logit(df, 'target')
-        >>> print(fit.summary())
+        ```python
+        from hossam import *
+        from pandas import DataFrame
+        import numpy as np
 
-        >>> # 요약 리포트 반환
-        >>> fit, rdf, result_report, var_reports = hs_logit(df, 'target', report=1)
+        df = DataFrame({
+            'target': np.random.binomial(1, 0.5, 100),
+            'x1': np.random.normal(0, 1, 100),
+            'x2': np.random.normal(0, 1, 100)
+        })
 
-        >>> # 풀 리포트 반환
-        >>> fit, cdf, rdf, result_report, model_report, var_reports = hs_logit(df, 'target', report=2)
+        # 적합 결과만 반환
+        fit = hs_stats.logit(df, 'target')
+
+        # 요약 리포트 반환
+        fit, rdf, result_report, var_reports = hs_stats.logit(df, 'target', report='summary')
+
+        # 풀 리포트 반환
+        fit, cdf, rdf, result_report, model_report, var_reports = hs_stats.logit(df, 'target', report='full')
+        ```
     """
     x = df.drop(yname, axis=1)
     y = df[yname]
@@ -1704,12 +1756,11 @@ def ols_linearity_test(fit, power: int = 2, alpha: float = 0.05) -> DataFrame:
                    - 해석: 선형성 판정 (문자열)
 
     Examples:
-        >>> import statsmodels.api as sm
-        >>> X = sm.add_constant(df[['x1', 'x2']])
-        >>> y = df['y']
-        >>> fit = sm.OLS(y, X).fit()
-        >>> result = linearity_test(fit)
-        >>> print(result)
+        ```python
+        from hossam import *
+        fit = hs_stats.logit(df, 'target')
+        result = hs_stats.ols_linearity_test(fit)
+        ```
 
     Notes:
         - p-value > alpha: 선형성 가정을 만족 (귀무가설 채택)
@@ -1804,12 +1855,11 @@ def ols_normality_test(fit, alpha: float = 0.05) -> DataFrame:
                    - 해석: 정규성 판정 (문자열)
 
     Examples:
-        >>> import statsmodels.api as sm
-        >>> X = sm.add_constant(df[['x1', 'x2']])
-        >>> y = df['y']
-        >>> fit = sm.OLS(y, X).fit()
-        >>> result = normality_test(fit)
-        >>> print(result)
+        ```python
+        from hossam import *
+        fit = hs_stats.logit(df, 'target')
+        result = hs_stats.ols_normality_test(fit)
+        ```
 
     Notes:
         - Shapiro-Wilk: 샘플 크기가 작을 때 (< 5000) 강력한 검정
@@ -1899,12 +1949,11 @@ def ols_variance_test(fit, alpha: float = 0.05) -> DataFrame:
                    - 해석: 등분산성 판정 (문자열)
 
     Examples:
-        >>> import statsmodels.api as sm
-        >>> X = sm.add_constant(df[['x1', 'x2']])
-        >>> y = df['y']
-        >>> fit = sm.OLS(y, X).fit()
-        >>> result = homoscedasticity_test(fit)
-        >>> print(result)
+        ```python
+        from hossam import *
+        fit = hs_stats.logit(df, 'target')
+        result = hs_stats.ols_variance_test(fit)
+        ```
 
     Notes:
         - Breusch-Pagan: 잔차 제곱과 독립변수의 선형관계 검정
@@ -1990,22 +2039,11 @@ def ols_independence_test(fit, alpha: float = 0.05) -> DataFrame:
             - 해석: 검정 결과 해석
 
     Examples:
-        >>> import pandas as pd
-        >>> import statsmodels.api as sm
-        >>> from hossam.hs_stats import ols_independence_test
-        >>>
-        >>> # 예제 데이터
-        >>> df = pd.DataFrame({
-        ...     'x': range(100),
-        ...     'y': [i + np.random.randn() for i in range(100)]
-        ... })
-        >>> X = sm.add_constant(df['x'])
-        >>> model = sm.OLS(df['y'], X)
-        >>> fit = model.fit()
-        >>>
-        >>> # 독립성 검정
-        >>> result = ols_independence_test(fit)
-        >>> print(result)
+        ```python
+        from hossam import *
+        fit = hs_stats.logit(df, 'target')
+        result = hs_stats.ols_independence_test(fit)
+        ```
 
     Notes:
         - Durbin-Watson 통계량 해석:
@@ -2042,92 +2080,6 @@ def ols_independence_test(fit, alpha: float = 0.05) -> DataFrame:
     )
 
     return result_df
-
-
-# ===================================================================
-# 상관계수 히트맵
-# ===================================================================
-def corr(data: DataFrame, *fields: str) -> tuple[DataFrame, DataFrame]:
-    """데이터프레임의 연속형 변수들에 대한 상관계수 히트맵과 상관계수 종류를 반환한다.
-
-    정규성 검정을 통해 피어슨 또는 스피어만 상관계수를 자동 선택하여 계산한다.
-    선택된 상관계수 종류를 별도의 데이터프레임으로 교차표(행렬) 형태로 반환한다.
-
-    Args:
-        data (DataFrame): 분석 대상 데이터프레임.
-        *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 숫자형 컬럼을 사용.
-
-    Returns:
-        tuple[DataFrame, DataFrame]: 상관계수 행렬과 사용된 상관계수 종류 정보를 포함한 두 개의 데이터프레임.
-
-            - 첫 번째 DataFrame: 상관계수 행렬 (각 변수 쌍의 상관계수 값)
-            - 두 번째 DataFrame: 상관계수 종류 (교차표 형태)
-                - 행과 열: 변수명
-                - 셀의 값: 각 변수 쌍에 사용된 상관계수 종류 ('Pearson' 또는 'Spearman')
-
-    Examples:
-        >>> import pandas as pd
-        >>> import numpy as np
-        >>> df = pd.DataFrame({
-        ...     'x1': np.random.normal(0, 1, 100),
-        ...     'x2': np.random.normal(0, 1, 100),
-        ...     'x3': np.random.normal(0, 1, 100),
-        ... })
-        >>> # 모든 연속형 변수에 대해 상관계수 계산
-        >>> corr_matrix, corr_types = corr(df)
-        >>> print(corr_matrix)
-        >>>     x1   x2   x3
-        >>> x1 1.00 0.12 -0.05
-        >>> x2 0.12 1.00  0.08
-        >>> x3 -0.05 0.08 1.00
-        >>> print(corr_types)
-        >>>       x1       x2       x3
-        >>> x1  Pearson Pearson Pearson
-        >>> x2  Pearson Pearson Pearson
-        >>> x3  Pearson Pearson Pearson
-
-        >>> # 특정 컬럼만 분석
-        >>> corr_matrix, corr_info = corr(df, 'x1', 'x2')
-        >>> print(corr_matrix)
-    """
-    # 분석 대상 컬럼 결정
-    if fields:
-        # 지정된 컬럼만 사용
-        numeric_cols = list(fields)
-    else:
-        # 모든 숫자형 컬럼 선택
-        numeric_cols = data.select_dtypes(include=[np.number]).columns.tolist()
-
-    # 분석 데이터 추출
-    analysis_data = data[numeric_cols].copy()
-
-    # 샘플 크기에 따라 자동으로 shapiro 또는 normaltest 선택
-    test_method = 's' if len(analysis_data) <= 5000 else 'n'
-    normality_results = normal_test(analysis_data, columns=numeric_cols, method=test_method)
-
-    # 정규성 결과를 딕셔너리로 변환
-    normality_info = dict(zip(normality_results['column'], normality_results['is_normal']))
-
-    # 상관계수 계산: 모든 변수가 정규분포를 따르면 Pearson, 하나라도 아니면 Spearman 사용
-    all_normal = all(normality_info.values())
-    if all_normal:
-        # Pearson 상관계수
-        corr_matrix = analysis_data.corr(method='pearson')
-        selected_corr_type = 'Pearson'
-    else:
-        # Spearman 상관계수
-        corr_matrix = analysis_data.corr(method='spearman')
-        selected_corr_type = 'Spearman'
-
-    # 상관계수 정보 데이터프레임 생성 (교차표 형태 - 상관행렬과 동일한 구조)
-    corr_info_df = DataFrame(
-        selected_corr_type,
-        index=numeric_cols,
-        columns=numeric_cols
-    )
-
-    return corr_matrix, corr_info_df
-
 
 # ===================================================================
 # 쌍별 상관분석 (선형성/이상치 점검 후 Pearson/Spearman 자동 선택)
@@ -2167,13 +2119,16 @@ def corr_pairwise(
             [1] corr_matrix: 상관계수 행렬 (행과 열에 변수명, 값에 상관계수)
 
     Examples:
-        >>> from hossam.hs_stats import corr_pairwise
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({'x1': [1,2,3,4,5], 'x2': [2,4,5,4,6], 'x3': [10,20,25,24,30]})
-        >>> # 전체 숫자형 컬럼에 대해 상관분석
-        >>> result_df, corr_matrix = corr_pairwise(df)
-        >>> # 특정 컬럼만 분석
-        >>> result_df, corr_matrix = corr_pairwise(df, fields=['x1', 'x2'])
+        ```python
+        from hossam import *
+        from pandas import DataFrame
+
+        df = DataFrame({'x1': [1,2,3,4,5], 'x2': [2,4,5,4,6], 'x3': [10,20,25,24,30]})
+        # 전체 숫자형 컬럼에 대해 상관분석
+        result_df, corr_matrix = hs_stats.corr_pairwise(df)
+        # 특정 컬럼만 분석
+        result_df, corr_matrix = hs_stats.corr_pairwise(df, fields=['x1', 'x2'])
+        ```
     """
 
     # 0) 컬럼 선정 (숫자형만)
@@ -2357,17 +2312,22 @@ def oneway_anova(data: DataFrame, dv: str, between: str, alpha: float = 0.05) ->
             - posthoc_report (str): 사후검정 유무와 유의한 쌍 정보를 요약한 보고 문장.
 
     Examples:
-        >>> from hossam import oneway_anova
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({
-        ...     'score': [5.1, 4.9, 5.3, 5.0, 4.8, 5.5, 5.2, 5.7, 5.3, 5.1],
-        ...     'group': ['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B']
-        ... })
-        >>> anova_df, anova_report, posthoc_df, posthoc_report = oneway_anova(df, dv='score', between='group')
-        >>> print(anova_report)
-        >>> if posthoc_df is not None:
-        ...     print(posthoc_report)
-        ...     print(posthoc_df.head())
+        ```python
+        from hossam import *
+        from pandas import DataFrame
+
+        df = DataFrame({
+            'score': [5.1, 4.9, 5.3, 5.0, 4.8, 5.5, 5.2, 5.7, 5.3, 5.1],
+            'group': ['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B']
+        })
+
+        anova_df, anova_report, posthoc_df, posthoc_report = hs_stats.oneway_anova(df, dv='score', between='group')
+
+        # 사후검정결과는 ANOVA가 유의할 때만 생성됨
+        if posthoc_df is not None:
+            print(posthoc_report)
+            print(posthoc_df.head())
+        ```
 
     Raises:
         ValueError: dv 또는 between 컬럼이 데이터프레임에 없을 경우.
@@ -2704,20 +2664,19 @@ def predict(fit, data: DataFrame | Series) -> DataFrame | Series | float:
         Exception: 데이터와 모형의 특성 불일치로 인한 predict 실패.
 
     Examples:
-        >>> import statsmodels.api as sm
-        >>> # 선형회귀 (상수항 자동 추가)
-        >>> X = sm.add_constant(df[['x1', 'x2']])
-        >>> y = df['y']
-        >>> fit_ols = sm.OLS(y, X).fit()
-        >>> pred = predict(fit_ols, df_new[['x1', 'x2']])  # DataFrame 반환
+        ```python
+        from hossam import *
 
-        >>> # 로지스틱 회귀 (상수항 자동 추가)
-        >>> fit_logit = sm.Logit(y_binary, X).fit()
-        >>> pred_prob = predict(fit_logit, df_new[['x1', 'x2']])  # DataFrame 반환 (해석 포함)
+        df = hs_util.load_data("some_data.csv")
+        fit1 = hs_stats.ols(df, yname="target")
+
+        pred = hs_stats.predict(fit1, df_new[['x1', 'x2']])  # DataFrame 반환
+
+        # 로지스틱 회귀 (상수항 자동 추가)
+        fit2 = hs_stats.logit(df, yname="target")
+        pred_prob = hs_stats.predict(fit2, df_new[['x1', 'x2']])  # DataFrame 반환 (해석 포함)
+        ```
     """
-    from statsmodels.regression.linear_model import RegressionResultsWrapper
-    from statsmodels.discrete.discrete_model import BinaryResults
-
     # fit 객체의 타입 확인
     fit_type = type(fit).__name__
 
@@ -2818,13 +2777,16 @@ def corr_effect_size(data: DataFrame, dv: str, *fields: str, alpha: float = 0.05
             - Effect_Size (str): 효과크기 분류 ('Large', 'Medium', 'Small', 'Negligible')
 
     Examples:
-        >>> from hossam import hs_stats
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({'age': [20, 30, 40, 50],
-        ...                     'bmi': [22, 25, 28, 30],
-        ...                     'charges': [1000, 2000, 3000, 4000]})
-        >>> result = hs_stats.corr_effect_size(df, 'charges', 'age', 'bmi')
-        >>> print(result)
+        ```python
+        from hossam import *
+        from pandas import DataFrame
+
+        df = DataFrame({'age': [20, 30, 40, 50],
+                   'bmi': [22, 25, 28, 30],
+                   'charges': [1000, 2000, 3000, 4000]})
+
+        result = hs_stats.corr_effect_size(df, 'charges', 'age', 'bmi')
+        ```
     """
 
     # fields가 지정되지 않으면 수치형 컬럼 중 dv 제외 모두 사용

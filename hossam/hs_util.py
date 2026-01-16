@@ -48,10 +48,8 @@ def make_normalize_values(
 
     Examples:
         ```python
-        from hossam.util import make_normalize_values
-        x = make_normalize_values(mean=0.0, std=1.0, size=100)
-        x.shape
-        (100,)
+        from hossam import *
+        x = hs.util.make_normalize_values(mean=0.0, std=1.0, size=100)
         ```
     """
     p = 0.0
@@ -118,9 +116,9 @@ def pretty_table(data: DataFrame, tablefmt="simple", headers: str = "keys") -> N
 
     Examples:
         ```python
-        from hossam.util import pretty_table
+        from hossam import *
         from pandas import DataFrame
-        pretty_table(DataFrame({"a":[1,2],"b":[3,4]}))
+        hs_util.pretty_table(DataFrame({"a":[1,2],"b":[3,4]}))
         ```
     """
 
@@ -217,10 +215,8 @@ def load_data(key: str,
 
     Examples:
         ```python
-        from hossam.util import load_data
-        df = load_data("AD_SALES", index_col=None, timeindex=False, info=False)
-        isinstance(df.columns, object)
-        # True
+        from hossam import *
+        df = hs_util.load_data("AD_SALES", index_col=None, timeindex=False, info=False)
         ```
     """
 

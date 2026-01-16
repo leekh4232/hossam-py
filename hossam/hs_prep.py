@@ -108,7 +108,7 @@ def minmax_scaler(
 
     Examples:
         ```python
-        from hossam.prep import minmax_scaler
+        from hossam import *
         mm_df = hs_prep.minmax_scaler(df, yname="y")
         ```
     """
@@ -748,12 +748,14 @@ def log_transform(data: DataFrame, *fields: str) -> DataFrame:
 
     Examples:
         ```python
-        # 전체 수치형 컬럼에 대한 로그 변환:
         from hossam import *
-        import pandas as pd
-        df = pd.DataFrame({'x': [1, 10, 100], 'y': [2, 20, 200], 'z': ['a', 'b', 'c']})
+        from pandas import DataFrame
+        df = DataFrame({'x': [1, 10, 100], 'y': [2, 20, 200], 'z': ['a', 'b', 'c']})
+
+        # 전체 수치형 컬럼에 대한 로그 변환:
         result = hs_prep.log_transform(df)
         print(result)
+
         # 특정 컬럼만 변환:
         result = hs_prep.log_transform(df, 'x', 'y')
         print(result)
@@ -818,20 +820,20 @@ def add_interaction(data: DataFrame, pairs: list[tuple[str, str]] | None = None)
     Examples:
         ```python
         from hossam import *
-        import pandas as pd
+        from padas import DataFrame
 
         # 수치형 변수들의 상호작용:
-        df = pd.DataFrame({'x1': [1, 2, 3], 'x2': [4, 5, 6]})
+        df = DataFrame({'x1': [1, 2, 3], 'x2': [4, 5, 6]})
         result = hs_prep.add_interaction(df)
         print(result.columns)  # x1, x2, x1*x2
 
         # 수치형과 명목형의 상호작용:
-        df = pd.DataFrame({'age': [20, 30, 40], 'gender': ['M', 'F', 'M']})
+        df = DataFrame({'age': [20, 30, 40], 'gender': ['M', 'F', 'M']})
         result = hs_prep.add_interaction(df, pairs=[('age', 'gender')])
         print(result.columns)  # age, gender, age*gender_M, age*gender_F
 
         # 명목형끼리의 상호작용:
-        df = pd.DataFrame({'color': ['R', 'G', 'B'], 'cut': ['A', 'B', 'A']})
+        df = DataFrame({'color': ['R', 'G', 'B'], 'cut': ['A', 'B', 'A']})
         result = hs_prep.add_interaction(df, pairs=[('color', 'cut')])
         print(result.columns)  # color, cut, color_cut
         ```
