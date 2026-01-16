@@ -75,10 +75,8 @@ def _init():
         f"🔖 Version: {__version__}",
     ]
 
-    # MCP/stdio 환경에서는 배너를 출력하지 않음 (stdout TTY일 때만 출력)
-    if sys.stdout.isatty():
-        for msg in messages:
-            print(f"{msg}")
+    for msg in messages:
+        print(f"{msg}")
 
     _init_korean_font()
 
