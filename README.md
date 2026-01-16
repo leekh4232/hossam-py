@@ -22,7 +22,6 @@ title: 🎓 Hossam Data Helper
 - 🤖 **MCP 서버**: VSCode/Copilot과 통합 가능한 Model Context Protocol 지원
 - 📈 **교육용 최적화**: 데이터 분석 교육에 특화된 설계
 
----
 
 ## 📦 설치
 
@@ -31,72 +30,6 @@ pip install hossam
 ```
 
 **요구사항**: Python 3.8 이상
-
----
-
-## 🚀 빠른 시작
-
-### 샘플 데이터 로드
-
-```python
-from hossam import load_data, load_info
-
-# 사용 가능한 데이터셋 확인
-datasets = load_info()
-
-# 데이터 로드
-df = load_data('AD_SALES')
-```
-
-### 간단한 시각화
-
-```python
-from hossam import hs_plot
-import pandas as pd
-import numpy as np
-
-df = pd.DataFrame({
-    'x': np.random.randn(100),
-    'y': np.random.randn(100),
-    'category': np.random.choice(['A', 'B', 'C'], 100)
-})
-
-# 산점도
-hs_plot.scatterplot(df=df, xname='x', yname='y', hue='category')
-
-# 박스플롯
-hs_plot.boxplot(df=df, xname='category', yname='x')
-```
-
----
-
-## 🤖 MCP Server
-
-Hossam은 **Model Context Protocol(MCP)** 기반 서버로도 작동하며, VSCode Copilot/Cline과 통합하여 데이터 분석 코드를 자동 생성할 수 있습니다.
-
-### 빠른 시작
-
-```bash
-# 서버 시작
-hossam-mcp
-```
-
-### VSCode + Copilot 연동
-
-VSCode에서 Copilot과 함께 사용하려면 `.vscode/settings.json` 설정이 필요합니다.
-
-**Copilot Chat에서 사용:**
-```
-@hossam 이 DataFrame의 결측치를 분석하고 처리하는 코드 작성해줘
-```
-
-**설정 가이드:**
-- [`.vscode/settings.json` 완성형 샘플](https://py.hossam.kr/guides/vscode-settings-sample/) ⭐
-- [VSCode + Copilot 연동 상세](https://py.hossam.kr/guides/vscode-copilot-integration/)
-- [MCP 서버 사용법](https://py.hossam.kr/guides/mcp/)
-- [Copilot Chat 프롬프트 예시](https://py.hossam.kr/guides/copilot-prompts/)
-
----
 
 ## 📚 전체 문서
 
@@ -113,48 +46,10 @@ VSCode에서 Copilot과 함께 사용하려면 `.vscode/settings.json` 설정이
 
 자세한 사용법은 [API 문서](https://py.hossam.kr/api/hossam/)를 참고하세요.
 
----
-
-## 🎓 예제
-
-### 결측치 분석
-
-```python
-from hossam import hs_prep
-
-# 결측치 정보 확인
-hs_prep.hs_missing_values(df)
-
-# 결측치 시각화
-hs_prep.hs_missing_values_barplot(df)
-```
-
-### 회귀 분석
-
-```python
-from hossam import hs_stats
-
-# 단순 선형 회귀
-result = hs_stats.hs_simple_regression(df, xname='x', yname='y', plot=True)
-```
-
-### 상관분석 히트맵
-
-```python
-from hossam import hs_plot
-
-hs_plot.heatmap(df=df, annot=True, cmap='coolwarm')
-```
-
-더 많은 예제는 [문서 사이트](https://py.hossam.kr)를 참고하세요.
-
----
 
 ## 📄 라이선스
 
 이 프로젝트는 MIT 라이선스를 따릅니다. 자유롭게 사용, 수정, 배포할 수 있습니다.
-
----
 
 ## 🔗 링크
 
@@ -164,4 +59,4 @@ hs_plot.heatmap(df=df, annot=True, cmap='coolwarm')
 
 ---
 
-**Made with ❤️ for Data Science Education**
+{% include 'HOSSAM_API.md' %}
