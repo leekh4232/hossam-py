@@ -1,5 +1,221 @@
 # HossamPy API Reference
 
+<a id="hs_classroom"></a>
+
+## hs\_classroom
+
+<a id="hs_classroom.cluster_students"></a>
+
+### cluster\_students
+
+```python
+def cluster_students(df,
+                     n_groups: int,
+                     score_cols: list = None,
+                     interest_col: str = None,
+                     max_iter: int = 200,
+                     score_metric: str = 'total') -> DataFrame
+```
+
+학생들을 균형잡힌 조로 편성하는 함수.
+
+관심사 기반 1차 군집과 점수/인원 균형 조정을 통해 동질성 있고
+균형잡힌 조를 구성합니다.
+
+**Arguments**:
+
+- `df` - 학생 정보를 담은 데이터프레임 또는 엑셀/CSV 파일 경로.
+  데이터프레임의 경우: 반드시 '학생번호' 컬럼 포함.
+  파일 경로의 경우: 자동으로 hs_load_data 함수를 사용하여 로드.
+  interest_col이 지정된 경우 해당 컬럼 필수.
+  score_cols이 지정된 경우 해당 컬럼들 필수.
+- `n_groups` - 목표 조의 개수.
+- `score_cols` - 성적 계산에 사용할 점수 컬럼명 리스트.
+- `예` - ['과목1점수', '과목2점수', '과목3점수']
+  None일 경우 점수 기반 균형 조정을 하지 않습니다. 기본값: None
+- `interest_col` - 관심사 정보가 있는 컬럼명.
+  None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: None
+- `max_iter` - 균형 조정 최대 반복 횟수. 기본값: 200
+- `score_metric` - 점수 기준 선택 ('total' 또는 'average').
+  'total'이면 총점, 'average'이면 평균점수 기준. 기본값: 'total'
+  
+
+**Returns**:
+
+  '조' 컬럼이 추가된 데이터프레임. 관심사와 점수로 균형잡힌 조 배치 완료.
+  
+
+**Raises**:
+
+- `ValueError` - 필수 컬럼이 없거나 입력값이 유효하지 않은 경우.
+  
+
+**Examples**:
+
+```python
+df = read_csv('students.csv')
+
+from hossam import *
+result = hs_classroom.cluster_students(
+            df=df,
+            n_groups=5,
+            score_cols=['국어', '영어', '수학'],
+            interest_col='관심사')
+```
+
+<a id="hs_classroom.report_summary"></a>
+
+### report\_summary
+
+```python
+def report_summary(df: DataFrame,
+                   interest_col: str = None,
+                   width: int = config.width,
+                   height: int = config.height,
+                   dpi: int = config.dpi) -> None
+```
+
+조 편성 결과의 요약 통계를 시각화합니다.
+
+조별 인원 분포, 관심사 분포, 평균점수 분포를 나타냅니다.
+
+**Arguments**:
+
+- `df` _DataFrame_ - cluster_students 함수의 반환 결과 데이터프레임.
+- `interest_col` _str_ - 관심사 컬럼명
+- `width` _int_ - 그래프 넓이. 기본값: config.width
+- `height` _int_ - 그래프 높이. 기본값: config.height
+- `dpi` _int_ - 그래프 해상도. 기본값: config.dpi
+  
+
+**Examples**:
+
+```python
+from hossam import *
+df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
+hs_classroom.report_summary(df_result)
+```
+
+<a id="hs_classroom.report_kde"></a>
+
+### report\_kde
+
+```python
+def report_kde(df: DataFrame,
+               metric: str = 'average',
+               width: int = config.width,
+               height: int = config.height,
+               dpi: int = config.dpi) -> None
+```
+
+조별 점수 분포를 KDE(Kernel Density Estimation)로 시각화합니다.
+
+각 조의 점수 분포를 커널 밀도 추정으로 표시하고 평균 및 95% 신뢰구간을 나타냅니다.
+
+**Arguments**:
+
+- `df` - cluster_students 함수의 반환 결과 데이터프레임.
+- `metric` - 점수 기준 선택 ('total' 또는 'average').
+  'total'이면 총점, 'average'이면 평균점수. 기본값: 'average'
+- `width` - 그래프 넓이. 기본값: config.width
+- `height` - 그래프 높이. 기본값: config.height
+- `dpi` - 그래프 해상도. 기본값: config.dpi
+  
+
+**Examples**:
+
+```python
+from hossam import *
+df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
+hs_classroom.report_kde(df_result, metric='average')
+```
+
+<a id="hs_classroom.group_summary"></a>
+
+### group\_summary
+
+```python
+def group_summary(df: DataFrame, name_col: str = '학생이름') -> DataFrame
+```
+
+조별로 학생 목록과 평균 점수를 요약합니다.
+
+**Arguments**:
+
+- `df` - cluster_students 함수의 반환 결과 데이터프레임.
+  '조' 컬럼이 필수로 포함되어야 함.
+- `name_col` - 학생 이름이 들어있는 컬럼명. 기본값: '학생이름'
+  
+
+**Returns**:
+
+  조별 요약 정보가 담긴 데이터프레임.
+- `컬럼` - '조', '학생', '총점평균', '평균점수평균'
+  
+
+**Examples**:
+
+```python
+from hossam import *
+df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
+summary = hs_classroom.group_summary(df_result, name_col='이름')
+print(summary)
+```
+
+<a id="hs_classroom.analyze_classroom"></a>
+
+### analyze\_classroom
+
+```python
+def analyze_classroom(df,
+                      n_groups: int,
+                      score_cols: list = None,
+                      interest_col: str = None,
+                      max_iter: int = 200,
+                      score_metric: str = 'average',
+                      name_col: str = '학생이름',
+                      show_summary: bool = True,
+                      show_kde: bool = True) -> DataFrame
+```
+
+학생 조 편성부터 시각화까지 전체 프로세스를 일괄 실행합니다.
+
+다음 순서로 실행됩니다:
+1. cluster_students: 학생들을 균형잡힌 조로 편성
+2. group_summary: 조별 학생 목록과 평균 점수 요약
+3. report_summary: 조 편성 결과 요약 시각화 (선택적)
+4. report_kde: 조별 점수 분포 KDE 시각화 (선택적)
+
+**Arguments**:
+
+- `df` - 학생 정보를 담은 데이터프레임 또는 파일 경로.
+- `n_groups` - 목표 조의 개수.
+- `score_cols` - 성적 계산에 사용할 점수 컬럼명 리스트. 기본값: None
+- `interest_col` - 관심사 정보가 있는 컬럼명. 기본값: None
+- `max_iter` - 균형 조정 최대 반복 횟수. 기본값: 200
+- `score_metric` - 점수 기준 선택 ('total' 또는 'average'). 기본값: 'average'
+- `name_col` - 학생 이름 컬럼명. 기본값: '학생이름'
+- `show_summary` - 요약 시각화 표시 여부. 기본값: True
+- `show_kde` - KDE 시각화 표시 여부. 기본값: True
+  
+
+**Returns**:
+
+  조별 요약 정보 (group_summary의 결과).
+  
+
+**Examples**:
+
+```python
+from hossam import *
+summary = hs_classroom.analyze_classroom(df='students.csv',
+                                         n_groups=5,
+                                         score_cols=['국어', '영어', '수학'],
+                                         interest_col='관심사',
+                                         name_col='이름')
+print(summary)
+```
+
 <a id="hs_prep"></a>
 
 ## hs\_prep
@@ -466,125 +682,6 @@ df = DataFrame({'color': ['R', 'G', 'B'], 'cut': ['A', 'B', 'A']})
 result = hs_prep.add_interaction(df, pairs=[('color', 'cut')])
 print(result.columns)  # color, cut, color_cut
 ```
-
-<a id="hs_gis"></a>
-
-## hs\_gis
-
-<a id="hs_gis.geocode"></a>
-
-### geocode
-
-```python
-def geocode(df: DataFrame, addr: str, key: str) -> DataFrame
-```
-
-주소 컬럼을 일괄 지오코딩하여 위도/경도 컬럼을 추가합니다.
-
-**Arguments**:
-
-- `df` - 입력 `DataFrame`.
-- `addr` - 주소가 들어있는 컬럼명.
-- `key` - VWorld API 키.
-  
-
-**Returns**:
-
-  위도(`latitude`), 경도(`longitude`) 컬럼이 추가된 `DataFrame`.
-  
-
-**Raises**:
-
-- `Exception` - 지오코딩 과정에서 발생한 예외를 전파합니다.
-  
-
-**Examples**:
-
-```python
-from hossam import *
-result = hs_gis.geocode(df, addr="address", key="YOUR_VWORLD_KEY")
-set(["latitude","longitude"]).issubset(result.columns)
-# True
-```
-
-<a id="hs_gis.load_shape"></a>
-
-### load\_shape
-
-```python
-def load_shape(path: str, info: bool = True) -> GeoDataFrame
-```
-
-Shapefile을 읽어 `GeoDataFrame`으로 로드합니다.
-
-**Arguments**:
-
-- `path` - 읽을 Shapefile(.shp) 경로.
-- `info` - True면 데이터 프리뷰와 통계를 출력.
-  
-
-**Returns**:
-
-  로드된 `GeoDataFrame`.
-  
-
-**Raises**:
-
-- `FileNotFoundError` - 파일이 존재하지 않는 경우.
-  
-
-**Examples**:
-
-```python
-from hossam import *
-gdf = hs_gis.load_shape("path/to/file.shp", info=False)
-```
-
-<a id="hs_gis.save_shape"></a>
-
-### save\_shape
-
-```python
-def save_shape(gdf: GeoDataFrame | DataFrame,
-               path: str,
-               crs: str | None = None,
-               lat_col: str = "latitude",
-               lon_col: str = "longitude") -> None
-```
-
-전처리된 데이터(GeoDataFrame 또는 DataFrame)를 Shapefile 또는 GeoPackage로 저장합니다.
-
-- GeoDataFrame 입력:
-- CRS가 있으면 그대로 유지합니다.
-- CRS가 없으면 `crs`(기본 WGS84)를 지정합니다.
-- DataFrame 입력:
-- 오직 이 경우에만 `lat_col`, `lon_col`을 사용해 포인트 지오메트리를 생성합니다.
-- 좌표가 유효하지 않은 행은 제외되며, 유효한 좌표가 하나도 없으면 예외를 발생시킵니다.
-
-파일 형식:
-- .shp: ESRI Shapefile (필드명 10자 제한, ASCII 권장)
-- .gpkg: GeoPackage (필드명 제약 없음, 한글 가능)
-- 확장자 없으면 .shp로 저장
-
-**Arguments**:
-
-- `gdf` - 저장할 `GeoDataFrame` 또는 `DataFrame`.
-- `path` - 저장 경로(.shp 또는 .gpkg, 확장자 없으면 .shp 자동 추가).
-- `crs` - 좌표계 문자열(e.g., "EPSG:4326"). 미지정 시 WGS84.
-- `lat_col` - DataFrame 입력 시 위도 컬럼명.
-- `lon_col` - DataFrame 입력 시 경도 컬럼명.
-  
-
-**Returns**:
-
-- `None` - 파일을 저장하고 반환값이 없습니다.
-  
-
-**Raises**:
-
-- `TypeError` - 입력 타입이 잘못된 경우.
-- `ValueError` - 경로가 잘못되었거나 CRS가 유효하지 않은 경우,
-  또는 DataFrame에서 유효 좌표가 하나도 없는 경우.
 
 <a id="hs_stats"></a>
 
@@ -1886,71 +1983,6 @@ df = DataFrame({'age': [20, 30, 40, 50],
 result = hs_stats.corr_effect_size(df, 'charges', 'age', 'bmi')
 ```
 
-<a id="data_loader"></a>
-
-## data\_loader
-
-<a id="data_loader.load_info"></a>
-
-### load\_info
-
-```python
-def load_info(search: str = None, local: str = None) -> DataFrame
-```
-
-메타데이터에서 사용 가능한 데이터셋 정보를 로드한다.
-
-**Arguments**:
-
-- `search` _str, optional_ - 이름 필터 문자열. 포함하는 항목만 반환.
-- `local` _str, optional_ - 로컬 메타데이터 경로. None이면 원격(BASE_URL) 사용.
-  
-
-**Returns**:
-
-- `DataFrame` - name, chapter, desc, url 컬럼을 갖는 테이블
-  
-
-**Examples**:
-
-```python
-from hossam import *
-info = load_info()
-list(info.columns) #['name', 'chapter', 'desc', 'url']
-```
-
-<a id="data_loader.load_data"></a>
-
-### load\_data
-
-```python
-def load_data(key: str, local: str = None) -> Optional[DataFrame]
-```
-
-키로 지정된 데이터셋을 로드한다.
-
-**Arguments**:
-
-- `key` _str_ - 메타데이터에 정의된 데이터 식별자(파일명 또는 별칭)
-- `local` _str, optional_ - 로컬 메타데이터 경로. None이면 원격(BASE_URL) 사용.
-  
-
-**Returns**:
-
-  DataFrame | None: 성공 시 데이터프레임, 실패 시 None
-  
-
-**Examples**:
-
-```python
-from hossam import *
-df = load_data('AD_SALES')  # 메타데이터에 해당 키가 있어야 함
-```
-
-<a id="__init__"></a>
-
-## \_\_init\_\_
-
 <a id="hs_plot"></a>
 
 ## hs\_plot
@@ -3214,220 +3246,150 @@ def distribution_plot(data: DataFrame,
 
   None
 
-<a id="hs_classroom"></a>
+<a id="hs_util"></a>
 
-## hs\_classroom
+## hs\_util
 
-<a id="hs_classroom.cluster_students"></a>
+<a id="hs_util.my_packages"></a>
 
-### cluster\_students
+### my\_packages
 
 ```python
-def cluster_students(df,
-                     n_groups: int,
-                     score_cols: list = None,
-                     interest_col: str = None,
-                     max_iter: int = 200,
-                     score_metric: str = 'total') -> DataFrame
+def my_packages()
 ```
 
-학생들을 균형잡힌 조로 편성하는 함수.
+현재 파이썬 인터프리터에 설치된 모든 패키지의 이름과 버전을
+패키지 이름순으로 정렬하여 pandas DataFrame으로 반환합니다.
 
-관심사 기반 1차 군집과 점수/인원 균형 조정을 통해 동질성 있고
-균형잡힌 조를 구성합니다.
+**Returns**:
+
+- `pd.DataFrame` - columns=['name', 'version']
+
+<a id="hs_util.make_normalize_values"></a>
+
+### make\_normalize\_values
+
+```python
+def make_normalize_values(mean: float,
+                          std: float,
+                          size: int = 100,
+                          round: int = 2) -> np.ndarray
+```
+
+정규분포를 따르는 데이터를 생성한다.
 
 **Arguments**:
 
-- `df` - 학생 정보를 담은 데이터프레임 또는 엑셀/CSV 파일 경로.
-  데이터프레임의 경우: 반드시 '학생번호' 컬럼 포함.
-  파일 경로의 경우: 자동으로 hs_load_data 함수를 사용하여 로드.
-  interest_col이 지정된 경우 해당 컬럼 필수.
-  score_cols이 지정된 경우 해당 컬럼들 필수.
-- `n_groups` - 목표 조의 개수.
-- `score_cols` - 성적 계산에 사용할 점수 컬럼명 리스트.
-- `예` - ['과목1점수', '과목2점수', '과목3점수']
-  None일 경우 점수 기반 균형 조정을 하지 않습니다. 기본값: None
-- `interest_col` - 관심사 정보가 있는 컬럼명.
-  None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: None
-- `max_iter` - 균형 조정 최대 반복 횟수. 기본값: 200
-- `score_metric` - 점수 기준 선택 ('total' 또는 'average').
-  'total'이면 총점, 'average'이면 평균점수 기준. 기본값: 'total'
+- `mean` _float_ - 평균
+- `std` _float_ - 표준편차
+- `size` _int, optional_ - 데이터 크기. Defaults to 100.
+- `round` _int, optional_ - 소수점 반올림 자리수. Defaults to 2.
   
 
 **Returns**:
 
-  '조' 컬럼이 추가된 데이터프레임. 관심사와 점수로 균형잡힌 조 배치 완료.
-  
-
-**Raises**:
-
-- `ValueError` - 필수 컬럼이 없거나 입력값이 유효하지 않은 경우.
-  
-
-**Examples**:
-
-```python
-df = read_csv('students.csv')
-
-from hossam import *
-result = hs_classroom.cluster_students(
-            df=df,
-            n_groups=5,
-            score_cols=['국어', '영어', '수학'],
-            interest_col='관심사')
-```
-
-<a id="hs_classroom.report_summary"></a>
-
-### report\_summary
-
-```python
-def report_summary(df: DataFrame,
-                   interest_col: str = None,
-                   width: int = config.width,
-                   height: int = config.height,
-                   dpi: int = config.dpi) -> None
-```
-
-조 편성 결과의 요약 통계를 시각화합니다.
-
-조별 인원 분포, 관심사 분포, 평균점수 분포를 나타냅니다.
-
-**Arguments**:
-
-- `df` _DataFrame_ - cluster_students 함수의 반환 결과 데이터프레임.
-- `interest_col` _str_ - 관심사 컬럼명
-- `width` _int_ - 그래프 넓이. 기본값: config.width
-- `height` _int_ - 그래프 높이. 기본값: config.height
-- `dpi` _int_ - 그래프 해상도. 기본값: config.dpi
+- `np.ndarray` - 정규분포를 따르는 데이터
   
 
 **Examples**:
 
 ```python
 from hossam import *
-df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
-hs_classroom.report_summary(df_result)
+x = hs.util.make_normalize_values(mean=0.0, std=1.0, size=100)
 ```
 
-<a id="hs_classroom.report_kde"></a>
+<a id="hs_util.make_normalize_data"></a>
 
-### report\_kde
+### make\_normalize\_data
 
 ```python
-def report_kde(df: DataFrame,
-               metric: str = 'average',
-               width: int = config.width,
-               height: int = config.height,
-               dpi: int = config.dpi) -> None
+def make_normalize_data(means: list | None = None,
+                        stds: list | None = None,
+                        sizes: list | None = None,
+                        rounds: int = 2) -> DataFrame
 ```
 
-조별 점수 분포를 KDE(Kernel Density Estimation)로 시각화합니다.
-
-각 조의 점수 분포를 커널 밀도 추정으로 표시하고 평균 및 95% 신뢰구간을 나타냅니다.
+정규분포를 따르는 데이터프레임을 생성한다.
 
 **Arguments**:
 
-- `df` - cluster_students 함수의 반환 결과 데이터프레임.
-- `metric` - 점수 기준 선택 ('total' 또는 'average').
-  'total'이면 총점, 'average'이면 평균점수. 기본값: 'average'
-- `width` - 그래프 넓이. 기본값: config.width
-- `height` - 그래프 높이. 기본값: config.height
-- `dpi` - 그래프 해상도. 기본값: config.dpi
-  
-
-**Examples**:
-
-```python
-from hossam import *
-df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
-hs_classroom.report_kde(df_result, metric='average')
-```
-
-<a id="hs_classroom.group_summary"></a>
-
-### group\_summary
-
-```python
-def group_summary(df: DataFrame, name_col: str = '학생이름') -> DataFrame
-```
-
-조별로 학생 목록과 평균 점수를 요약합니다.
-
-**Arguments**:
-
-- `df` - cluster_students 함수의 반환 결과 데이터프레임.
-  '조' 컬럼이 필수로 포함되어야 함.
-- `name_col` - 학생 이름이 들어있는 컬럼명. 기본값: '학생이름'
+- `means` _list, optional_ - 평균 목록. Defaults to [0, 0, 0].
+- `stds` _list, optional_ - 표준편차 목록. Defaults to [1, 1, 1].
+- `sizes` _list, optional_ - 데이터 크기 목록. Defaults to [100, 100, 100].
+- `rounds` _int, optional_ - 반올림 자리수. Defaults to 2.
   
 
 **Returns**:
 
-  조별 요약 정보가 담긴 데이터프레임.
-- `컬럼` - '조', '학생', '총점평균', '평균점수평균'
-  
+- `DataFrame` - 정규분포를 따르는 데이터프레임
 
-**Examples**:
+<a id="hs_util.pretty_table"></a>
 
-```python
-from hossam import *
-df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
-summary = hs_classroom.group_summary(df_result, name_col='이름')
-print(summary)
-```
-
-<a id="hs_classroom.analyze_classroom"></a>
-
-### analyze\_classroom
+### pretty\_table
 
 ```python
-def analyze_classroom(df,
-                      n_groups: int,
-                      score_cols: list = None,
-                      interest_col: str = None,
-                      max_iter: int = 200,
-                      score_metric: str = 'average',
-                      name_col: str = '학생이름',
-                      show_summary: bool = True,
-                      show_kde: bool = True) -> DataFrame
+def pretty_table(data: DataFrame,
+                 tablefmt="simple",
+                 headers: str = "keys") -> None
 ```
 
-학생 조 편성부터 시각화까지 전체 프로세스를 일괄 실행합니다.
-
-다음 순서로 실행됩니다:
-1. cluster_students: 학생들을 균형잡힌 조로 편성
-2. group_summary: 조별 학생 목록과 평균 점수 요약
-3. report_summary: 조 편성 결과 요약 시각화 (선택적)
-4. report_kde: 조별 점수 분포 KDE 시각화 (선택적)
+`tabulate`를 사용해 DataFrame을 단순 표 형태로 출력한다.
 
 **Arguments**:
 
-- `df` - 학생 정보를 담은 데이터프레임 또는 파일 경로.
-- `n_groups` - 목표 조의 개수.
-- `score_cols` - 성적 계산에 사용할 점수 컬럼명 리스트. 기본값: None
-- `interest_col` - 관심사 정보가 있는 컬럼명. 기본값: None
-- `max_iter` - 균형 조정 최대 반복 횟수. 기본값: 200
-- `score_metric` - 점수 기준 선택 ('total' 또는 'average'). 기본값: 'average'
-- `name_col` - 학생 이름 컬럼명. 기본값: '학생이름'
-- `show_summary` - 요약 시각화 표시 여부. 기본값: True
-- `show_kde` - KDE 시각화 표시 여부. 기본값: True
+- `data` _DataFrame_ - 출력할 데이터프레임
+- `tablefmt` _str, optional_ - `tabulate` 테이블 포맷. Defaults to "simple".
+- `headers` _str | list, optional_ - 헤더 지정 방식. Defaults to "keys".
   
 
 **Returns**:
 
-  조별 요약 정보 (group_summary의 결과).
+  None
   
 
 **Examples**:
 
 ```python
 from hossam import *
-summary = hs_classroom.analyze_classroom(df='students.csv',
-                                         n_groups=5,
-                                         score_cols=['국어', '영어', '수학'],
-                                         interest_col='관심사',
-                                         name_col='이름')
-print(summary)
+from pandas import DataFrame
+hs_util.pretty_table(DataFrame({"a":[1,2],"b":[3,4]}))
+```
+
+<a id="hs_util.load_data"></a>
+
+### load\_data
+
+```python
+def load_data(key: str,
+              index_col: str | None = None,
+              timeindex: bool = False,
+              info: bool = True,
+              categories: list | None = None,
+              local: str | None = None) -> DataFrame
+```
+
+데이터 키를 통해 데이터를 로드한 뒤 기본 전처리/출력을 수행한다.
+
+**Arguments**:
+
+- `key` _str_ - 데이터 키 (metadata.json에 정의된 데이터 식별자)
+- `index_col` _str, optional_ - 인덱스로 설정할 컬럼명. Defaults to None.
+- `timeindex` _bool, optional_ - True일 경우 인덱스를 시계열(DatetimeIndex)로 설정한다. Defaults to False.
+- `info` _bool, optional_ - True일 경우 데이터 정보(head, tail, 기술통계, 카테고리 정보)를 출력한다. Defaults to True.
+- `categories` _list, optional_ - 카테고리 dtype으로 설정할 컬럼명 목록. Defaults to None.
+- `local` _str, optional_ - 원격 데이터 대신 로컬 메타데이터 경로를 사용한다. Defaults to None.
+  
+
+**Returns**:
+
+- `DataFrame` - 전처리(인덱스 설정, 카테고리 변환)가 완료된 데이터프레임
+  
+
+**Examples**:
+
+```python
+from hossam import *
+df = hs_util.load_data("AD_SALES", index_col=None, timeindex=False, info=False)
 ```
 
 <a id="hs_timeserise"></a>
@@ -4181,148 +4143,186 @@ weekends = hs_timeseries.get_weekend_df('2020-01-01', '2025-12-31')
 model = hs_timeseries.prophet(train, holidays=weekends)
 ```
 
-<a id="hs_util"></a>
+<a id="hs_gis"></a>
 
-## hs\_util
+## hs\_gis
 
-<a id="hs_util.my_packages"></a>
+<a id="hs_gis.geocode"></a>
 
-### my\_packages
-
-```python
-def my_packages()
-```
-
-현재 파이썬 인터프리터에 설치된 모든 패키지의 이름과 버전을
-패키지 이름순으로 정렬하여 pandas DataFrame으로 반환합니다.
-
-**Returns**:
-
-- `pd.DataFrame` - columns=['name', 'version']
-
-<a id="hs_util.make_normalize_values"></a>
-
-### make\_normalize\_values
+### geocode
 
 ```python
-def make_normalize_values(mean: float,
-                          std: float,
-                          size: int = 100,
-                          round: int = 2) -> np.ndarray
+def geocode(df: DataFrame, addr: str, key: str) -> DataFrame
 ```
 
-정규분포를 따르는 데이터를 생성한다.
+주소 컬럼을 일괄 지오코딩하여 위도/경도 컬럼을 추가합니다.
 
 **Arguments**:
 
-- `mean` _float_ - 평균
-- `std` _float_ - 표준편차
-- `size` _int, optional_ - 데이터 크기. Defaults to 100.
-- `round` _int, optional_ - 소수점 반올림 자리수. Defaults to 2.
+- `df` - 입력 `DataFrame`.
+- `addr` - 주소가 들어있는 컬럼명.
+- `key` - VWorld API 키.
   
 
 **Returns**:
 
-- `np.ndarray` - 정규분포를 따르는 데이터
+  위도(`latitude`), 경도(`longitude`) 컬럼이 추가된 `DataFrame`.
+  
+
+**Raises**:
+
+- `Exception` - 지오코딩 과정에서 발생한 예외를 전파합니다.
   
 
 **Examples**:
 
 ```python
 from hossam import *
-x = hs.util.make_normalize_values(mean=0.0, std=1.0, size=100)
+result = hs_gis.geocode(df, addr="address", key="YOUR_VWORLD_KEY")
+set(["latitude","longitude"]).issubset(result.columns)
+# True
 ```
 
-<a id="hs_util.make_normalize_data"></a>
+<a id="hs_gis.load_shape"></a>
 
-### make\_normalize\_data
+### load\_shape
 
 ```python
-def make_normalize_data(means: list | None = None,
-                        stds: list | None = None,
-                        sizes: list | None = None,
-                        rounds: int = 2) -> DataFrame
+def load_shape(path: str, info: bool = True) -> GeoDataFrame
 ```
 
-정규분포를 따르는 데이터프레임을 생성한다.
+Shapefile을 읽어 `GeoDataFrame`으로 로드합니다.
 
 **Arguments**:
 
-- `means` _list, optional_ - 평균 목록. Defaults to [0, 0, 0].
-- `stds` _list, optional_ - 표준편차 목록. Defaults to [1, 1, 1].
-- `sizes` _list, optional_ - 데이터 크기 목록. Defaults to [100, 100, 100].
-- `rounds` _int, optional_ - 반올림 자리수. Defaults to 2.
+- `path` - 읽을 Shapefile(.shp) 경로.
+- `info` - True면 데이터 프리뷰와 통계를 출력.
   
 
 **Returns**:
 
-- `DataFrame` - 정규분포를 따르는 데이터프레임
-
-<a id="hs_util.pretty_table"></a>
-
-### pretty\_table
-
-```python
-def pretty_table(data: DataFrame,
-                 tablefmt="simple",
-                 headers: str = "keys") -> None
-```
-
-`tabulate`를 사용해 DataFrame을 단순 표 형태로 출력한다.
-
-**Arguments**:
-
-- `data` _DataFrame_ - 출력할 데이터프레임
-- `tablefmt` _str, optional_ - `tabulate` 테이블 포맷. Defaults to "simple".
-- `headers` _str | list, optional_ - 헤더 지정 방식. Defaults to "keys".
+  로드된 `GeoDataFrame`.
   
 
-**Returns**:
+**Raises**:
 
-  None
+- `FileNotFoundError` - 파일이 존재하지 않는 경우.
   
 
 **Examples**:
 
 ```python
 from hossam import *
-from pandas import DataFrame
-hs_util.pretty_table(DataFrame({"a":[1,2],"b":[3,4]}))
+gdf = hs_gis.load_shape("path/to/file.shp", info=False)
 ```
 
-<a id="hs_util.load_data"></a>
+<a id="hs_gis.save_shape"></a>
+
+### save\_shape
+
+```python
+def save_shape(gdf: GeoDataFrame | DataFrame,
+               path: str,
+               crs: str | None = None,
+               lat_col: str = "latitude",
+               lon_col: str = "longitude") -> None
+```
+
+전처리된 데이터(GeoDataFrame 또는 DataFrame)를 Shapefile 또는 GeoPackage로 저장합니다.
+
+- GeoDataFrame 입력:
+- CRS가 있으면 그대로 유지합니다.
+- CRS가 없으면 `crs`(기본 WGS84)를 지정합니다.
+- DataFrame 입력:
+- 오직 이 경우에만 `lat_col`, `lon_col`을 사용해 포인트 지오메트리를 생성합니다.
+- 좌표가 유효하지 않은 행은 제외되며, 유효한 좌표가 하나도 없으면 예외를 발생시킵니다.
+
+파일 형식:
+- .shp: ESRI Shapefile (필드명 10자 제한, ASCII 권장)
+- .gpkg: GeoPackage (필드명 제약 없음, 한글 가능)
+- 확장자 없으면 .shp로 저장
+
+**Arguments**:
+
+- `gdf` - 저장할 `GeoDataFrame` 또는 `DataFrame`.
+- `path` - 저장 경로(.shp 또는 .gpkg, 확장자 없으면 .shp 자동 추가).
+- `crs` - 좌표계 문자열(e.g., "EPSG:4326"). 미지정 시 WGS84.
+- `lat_col` - DataFrame 입력 시 위도 컬럼명.
+- `lon_col` - DataFrame 입력 시 경도 컬럼명.
+  
+
+**Returns**:
+
+- `None` - 파일을 저장하고 반환값이 없습니다.
+  
+
+**Raises**:
+
+- `TypeError` - 입력 타입이 잘못된 경우.
+- `ValueError` - 경로가 잘못되었거나 CRS가 유효하지 않은 경우,
+  또는 DataFrame에서 유효 좌표가 하나도 없는 경우.
+
+<a id="data_loader"></a>
+
+## data\_loader
+
+<a id="data_loader.load_info"></a>
+
+### load\_info
+
+```python
+def load_info(search: str = None, local: str = None) -> DataFrame
+```
+
+메타데이터에서 사용 가능한 데이터셋 정보를 로드한다.
+
+**Arguments**:
+
+- `search` _str, optional_ - 이름 필터 문자열. 포함하는 항목만 반환.
+- `local` _str, optional_ - 로컬 메타데이터 경로. None이면 원격(BASE_URL) 사용.
+  
+
+**Returns**:
+
+- `DataFrame` - name, chapter, desc, url 컬럼을 갖는 테이블
+  
+
+**Examples**:
+
+```python
+from hossam import *
+info = load_info()
+list(info.columns) #['name', 'chapter', 'desc', 'url']
+```
+
+<a id="data_loader.load_data"></a>
 
 ### load\_data
 
 ```python
-def load_data(key: str,
-              index_col: str | None = None,
-              timeindex: bool = False,
-              info: bool = True,
-              categories: list | None = None,
-              local: str | None = None) -> DataFrame
+def load_data(key: str, local: str = None) -> Optional[DataFrame]
 ```
 
-데이터 키를 통해 데이터를 로드한 뒤 기본 전처리/출력을 수행한다.
+키로 지정된 데이터셋을 로드한다.
 
 **Arguments**:
 
-- `key` _str_ - 데이터 키 (metadata.json에 정의된 데이터 식별자)
-- `index_col` _str, optional_ - 인덱스로 설정할 컬럼명. Defaults to None.
-- `timeindex` _bool, optional_ - True일 경우 인덱스를 시계열(DatetimeIndex)로 설정한다. Defaults to False.
-- `info` _bool, optional_ - True일 경우 데이터 정보(head, tail, 기술통계, 카테고리 정보)를 출력한다. Defaults to True.
-- `categories` _list, optional_ - 카테고리 dtype으로 설정할 컬럼명 목록. Defaults to None.
-- `local` _str, optional_ - 원격 데이터 대신 로컬 메타데이터 경로를 사용한다. Defaults to None.
+- `key` _str_ - 메타데이터에 정의된 데이터 식별자(파일명 또는 별칭)
+- `local` _str, optional_ - 로컬 메타데이터 경로. None이면 원격(BASE_URL) 사용.
   
 
 **Returns**:
 
-- `DataFrame` - 전처리(인덱스 설정, 카테고리 변환)가 완료된 데이터프레임
+  DataFrame | None: 성공 시 데이터프레임, 실패 시 None
   
 
 **Examples**:
 
 ```python
 from hossam import *
-df = hs_util.load_data("AD_SALES", index_col=None, timeindex=False, info=False)
+df = load_data('AD_SALES')  # 메타데이터에 해당 키가 있어야 함
 ```
+
+<a id="__init__"></a>
+
+## \_\_init\_\_
