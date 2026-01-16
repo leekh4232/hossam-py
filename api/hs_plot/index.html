@@ -11016,7 +11016,7 @@ finalize_plot의 래퍼 함수.</p>
     <span class="n">y</span> <span class="o">=</span> <span class="n">y_pred</span> <span class="o">+</span> <span class="n">resid</span>  <span class="c1"># 실제값 = 적합값 + 잔차</span>
 
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">get_default_ax</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dpi</span><span class="p">)</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">get_default_ax</span><span class="p">(</span><span class="n">width</span> <span class="o">+</span> <span class="mi">150</span> <span class="k">if</span> <span class="n">mse</span> <span class="k">else</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dpi</span><span class="p">)</span>
         <span class="n">outparams</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="c1"># 산점도 직접 그리기 (seaborn.residplot보다 훨씬 빠름)</span>
