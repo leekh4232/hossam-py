@@ -9895,11 +9895,9 @@
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="s1">&#39;x1&#39;</span><span class="p">,</span> <span class="s1">&#39;x2&#39;</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fit</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">residplot</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">lowess</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="n">fit</span> <span class="o">=</span> <span class="n">hs_stats</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">yname</span><span class="o">=</span><span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">residplot</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">lowess</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -10063,11 +10061,11 @@
 <span class="sd">        None</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; import statsmodels.api as sm</span>
-<span class="sd">        &gt;&gt;&gt; X = sm.add_constant(df[[&#39;x1&#39;, &#39;x2&#39;]])</span>
-<span class="sd">        &gt;&gt;&gt; y = df[&#39;y&#39;]</span>
-<span class="sd">        &gt;&gt;&gt; fit = sm.OLS(y, X).fit()</span>
-<span class="sd">        &gt;&gt;&gt; residplot(fit, lowess=True, mse=True)</span>
+<span class="sd">        ```python</span>
+<span class="sd">        from hossam import *</span>
+<span class="sd">        fit = hs_stats.ols(data, yname=&#39;target&#39;, report=False)</span>
+<span class="sd">        residplot(fit, lowess=True, mse=True)</span>
+<span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">outparams</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -10385,16 +10383,15 @@
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="s1">&#39;x1&#39;</span><span class="p">,</span> <span class="s1">&#39;x2&#39;</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fit</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 표준화된 선 (권장)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">qqplot</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 회귀선 (데이터 추세 반영)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">qqplot</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># 45도 대각선 (전통적 방식)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">qqplot</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;45&#39;</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="c1"># 선형회귀 모형 적합</span>
+<span class="n">fit</span> <span class="o">=</span> <span class="n">hs_stats</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">yname</span><span class="o">=</span><span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="c1"># 표준화된 선 (권장)</span>
+<span class="n">qqplot</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+<span class="c1"># 회귀선 (데이터 추세 반영)</span>
+<span class="n">qqplot</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="c1"># 45도 대각선 (전통적 방식)</span>
+<span class="n">qqplot</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="s1">&#39;45&#39;</span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -10479,7 +10476,8 @@
 <span class="normal">1787</span>
 <span class="normal">1788</span>
 <span class="normal">1789</span>
-<span class="normal">1790</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_qqplot</span><span class="p">(</span>
+<span class="normal">1790</span>
+<span class="normal">1791</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_qqplot</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">,</span>
     <span class="n">line</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span>
     <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
@@ -10517,16 +10515,17 @@
 <span class="sd">        None</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; import statsmodels.api as sm</span>
-<span class="sd">        &gt;&gt;&gt; X = sm.add_constant(df[[&#39;x1&#39;, &#39;x2&#39;]])</span>
-<span class="sd">        &gt;&gt;&gt; y = df[&#39;y&#39;]</span>
-<span class="sd">        &gt;&gt;&gt; fit = sm.OLS(y, X).fit()</span>
-<span class="sd">        &gt;&gt;&gt; # 표준화된 선 (권장)</span>
-<span class="sd">        &gt;&gt;&gt; qqplot(fit)</span>
-<span class="sd">        &gt;&gt;&gt; # 회귀선 (데이터 추세 반영)</span>
-<span class="sd">        &gt;&gt;&gt; qqplot(fit, line=&#39;r&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; # 45도 대각선 (전통적 방식)</span>
-<span class="sd">        &gt;&gt;&gt; qqplot(fit, line=&#39;45&#39;)</span>
+<span class="sd">        ```python</span>
+<span class="sd">        from hossam import *</span>
+<span class="sd">        # 선형회귀 모형 적합</span>
+<span class="sd">        fit = hs_stats.ols(data, yname=&#39;target&#39;, report=False)</span>
+<span class="sd">        # 표준화된 선 (권장)</span>
+<span class="sd">        qqplot(fit)</span>
+<span class="sd">        # 회귀선 (데이터 추세 반영)</span>
+<span class="sd">        qqplot(fit, line=&#39;r&#39;)</span>
+<span class="sd">        # 45도 대각선 (전통적 방식)</span>
+<span class="sd">        qqplot(fit, line=&#39;45&#39;)</span>
+<span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">outparams</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -10827,8 +10826,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1796</span>
-<span class="normal">1797</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1797</span>
 <span class="normal">1798</span>
 <span class="normal">1799</span>
 <span class="normal">1800</span>
@@ -10919,7 +10917,8 @@
 <span class="normal">1885</span>
 <span class="normal">1886</span>
 <span class="normal">1887</span>
-<span class="normal">1888</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">distribution_by_class</span><span class="p">(</span>
+<span class="normal">1888</span>
+<span class="normal">1889</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">distribution_by_class</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">xnames</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hue</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -11263,8 +11262,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1894</span>
-<span class="normal">1895</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1895</span>
 <span class="normal">1896</span>
 <span class="normal">1897</span>
 <span class="normal">1898</span>
@@ -11329,7 +11327,8 @@
 <span class="normal">1957</span>
 <span class="normal">1958</span>
 <span class="normal">1959</span>
-<span class="normal">1960</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">scatter_by_class</span><span class="p">(</span>
+<span class="normal">1960</span>
+<span class="normal">1961</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">scatter_by_class</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">group</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -11664,8 +11663,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1966</span>
-<span class="normal">1967</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1967</span>
 <span class="normal">1968</span>
 <span class="normal">1969</span>
 <span class="normal">1970</span>
@@ -11743,7 +11741,8 @@
 <span class="normal">2042</span>
 <span class="normal">2043</span>
 <span class="normal">2044</span>
-<span class="normal">2045</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">categorical_target_distribution</span><span class="p">(</span>
+<span class="normal">2045</span>
+<span class="normal">2046</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">categorical_target_distribution</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">hue</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -12047,8 +12046,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2051</span>
-<span class="normal">2052</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2052</span>
 <span class="normal">2053</span>
 <span class="normal">2054</span>
 <span class="normal">2055</span>
@@ -12111,7 +12109,8 @@
 <span class="normal">2112</span>
 <span class="normal">2113</span>
 <span class="normal">2114</span>
-<span class="normal">2115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">roc_curve_plot</span><span class="p">(</span>
+<span class="normal">2115</span>
+<span class="normal">2116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">roc_curve_plot</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">,</span>
     <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -12358,8 +12357,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2121</span>
-<span class="normal">2122</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2122</span>
 <span class="normal">2123</span>
 <span class="normal">2124</span>
 <span class="normal">2125</span>
@@ -12402,7 +12400,8 @@
 <span class="normal">2162</span>
 <span class="normal">2163</span>
 <span class="normal">2164</span>
-<span class="normal">2165</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">confusion_matrix_plot</span><span class="p">(</span>
+<span class="normal">2165</span>
+<span class="normal">2166</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">confusion_matrix_plot</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">,</span>
     <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
     <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
@@ -12748,8 +12747,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2171</span>
-<span class="normal">2172</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2172</span>
 <span class="normal">2173</span>
 <span class="normal">2174</span>
 <span class="normal">2175</span>
@@ -12872,7 +12870,8 @@
 <span class="normal">2292</span>
 <span class="normal">2293</span>
 <span class="normal">2294</span>
-<span class="normal">2295</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">radarplot</span><span class="p">(</span>
+<span class="normal">2295</span>
+<span class="normal">2296</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">radarplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hue</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -13267,8 +13266,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2301</span>
-<span class="normal">2302</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2302</span>
 <span class="normal">2303</span>
 <span class="normal">2304</span>
 <span class="normal">2305</span>
@@ -13376,7 +13374,8 @@
 <span class="normal">2407</span>
 <span class="normal">2408</span>
 <span class="normal">2409</span>
-<span class="normal">2410</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">distribution_plot</span><span class="p">(</span>
+<span class="normal">2410</span>
+<span class="normal">2411</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">distribution_plot</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">clevel</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.95</span><span class="p">,</span>

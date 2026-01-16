@@ -1117,13 +1117,14 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;students.csv&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">cluster_students</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">n_groups</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">score_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;국어&#39;</span><span class="p">,</span> <span class="s1">&#39;영어&#39;</span><span class="p">,</span> <span class="s1">&#39;수학&#39;</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">interest_col</span><span class="o">=</span><span class="s1">&#39;관심사&#39;</span>
-<span class="gp">... </span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><code><span class="n">df</span> <span class="o">=</span> <span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;students.csv&#39;</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">hs_classroom</span><span class="o">.</span><span class="n">cluster_students</span><span class="p">(</span>
+            <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+            <span class="n">n_groups</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+            <span class="n">score_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;국어&#39;</span><span class="p">,</span> <span class="s1">&#39;영어&#39;</span><span class="p">,</span> <span class="s1">&#39;수학&#39;</span><span class="p">],</span>
+            <span class="n">interest_col</span><span class="o">=</span><span class="s1">&#39;관심사&#39;</span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -1322,7 +1323,10 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <span class="normal">207</span>
 <span class="normal">208</span>
 <span class="normal">209</span>
-<span class="normal">210</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cluster_students</span><span class="p">(</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cluster_students</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">n_groups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">score_cols</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1358,13 +1362,16 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <span class="sd">        ValueError: 필수 컬럼이 없거나 입력값이 유효하지 않은 경우.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; df = read_csv(&#39;students.csv&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; result = cluster_students(</span>
-<span class="sd">        ...     df=df,</span>
-<span class="sd">        ...     n_groups=5,</span>
-<span class="sd">        ...     score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;],</span>
-<span class="sd">        ...     interest_col=&#39;관심사&#39;</span>
-<span class="sd">        ... )</span>
+<span class="sd">        ```python</span>
+<span class="sd">        df = read_csv(&#39;students.csv&#39;)</span>
+
+<span class="sd">        from hossam import *</span>
+<span class="sd">        result = hs_classroom.cluster_students(</span>
+<span class="sd">                    df=df,</span>
+<span class="sd">                    n_groups=5,</span>
+<span class="sd">                    score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;],</span>
+<span class="sd">                    interest_col=&#39;관심사&#39;)</span>
+<span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># 파일 경로인 경우 데이터프레임으로 로드</span>
@@ -1641,18 +1648,15 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hossam.classroom</span><span class="w"> </span><span class="kn">import</span> <span class="n">cluster_students</span><span class="p">,</span> <span class="n">report_summary</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df_result</span> <span class="o">=</span> <span class="n">cluster_students</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">n_groups</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">score_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;국어&#39;</span><span class="p">,</span> <span class="s1">&#39;영어&#39;</span><span class="p">,</span> <span class="s1">&#39;수학&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">report_summary</span><span class="p">(</span><span class="n">df_result</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="n">df_result</span> <span class="o">=</span> <span class="n">hs_classroom</span><span class="o">.</span><span class="n">cluster_students</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">n_groups</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">score_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;국어&#39;</span><span class="p">,</span> <span class="s1">&#39;영어&#39;</span><span class="p">,</span> <span class="s1">&#39;수학&#39;</span><span class="p">])</span>
+<span class="n">hs_classroom</span><span class="o">.</span><span class="n">report_summary</span><span class="p">(</span><span class="n">df_result</span><span class="p">)</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_classroom.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">392</span>
-<span class="normal">393</span>
-<span class="normal">394</span>
-<span class="normal">395</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">395</span>
 <span class="normal">396</span>
 <span class="normal">397</span>
 <span class="normal">398</span>
@@ -1795,7 +1799,12 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <span class="normal">535</span>
 <span class="normal">536</span>
 <span class="normal">537</span>
-<span class="normal">538</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_summary</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">interest_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">538</span>
+<span class="normal">539</span>
+<span class="normal">540</span>
+<span class="normal">541</span>
+<span class="normal">542</span>
+<span class="normal">543</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_summary</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">interest_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;조 편성 결과의 요약 통계를 시각화합니다.</span>
 
 <span class="sd">    조별 인원 분포, 관심사 분포, 평균점수 분포를 나타냅니다.</span>
@@ -1808,9 +1817,11 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <span class="sd">        dpi (int): 그래프 해상도. 기본값: config.dpi</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from hossam.classroom import cluster_students, report_summary</span>
-<span class="sd">        &gt;&gt;&gt; df_result = cluster_students(df, n_groups=5, score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;])</span>
-<span class="sd">        &gt;&gt;&gt; report_summary(df_result)</span>
+<span class="sd">        ```python</span>
+<span class="sd">        from hossam import *</span>
+<span class="sd">        df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;])</span>
+<span class="sd">        hs_classroom.report_summary(df_result)</span>
+<span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -2068,20 +2079,15 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hossam.classroom</span><span class="w"> </span><span class="kn">import</span> <span class="n">cluster_students</span><span class="p">,</span> <span class="n">report_kde</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df_result</span> <span class="o">=</span> <span class="n">cluster_students</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">n_groups</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">score_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;국어&#39;</span><span class="p">,</span> <span class="s1">&#39;영어&#39;</span><span class="p">,</span> <span class="s1">&#39;수학&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">report_kde</span><span class="p">(</span><span class="n">df_result</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="n">df_result</span> <span class="o">=</span> <span class="n">hs_classroom</span><span class="o">.</span><span class="n">cluster_students</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">n_groups</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">score_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;국어&#39;</span><span class="p">,</span> <span class="s1">&#39;영어&#39;</span><span class="p">,</span> <span class="s1">&#39;수학&#39;</span><span class="p">])</span>
+<span class="n">hs_classroom</span><span class="o">.</span><span class="n">report_kde</span><span class="p">(</span><span class="n">df_result</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">)</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_classroom.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">544</span>
-<span class="normal">545</span>
-<span class="normal">546</span>
-<span class="normal">547</span>
-<span class="normal">548</span>
-<span class="normal">549</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">549</span>
 <span class="normal">550</span>
 <span class="normal">551</span>
 <span class="normal">552</span>
@@ -2143,7 +2149,14 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <span class="normal">608</span>
 <span class="normal">609</span>
 <span class="normal">610</span>
-<span class="normal">611</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_kde</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span>
+<span class="normal">614</span>
+<span class="normal">615</span>
+<span class="normal">616</span>
+<span class="normal">617</span>
+<span class="normal">618</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_kde</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;조별 점수 분포를 KDE(Kernel Density Estimation)로 시각화합니다.</span>
 
 <span class="sd">    각 조의 점수 분포를 커널 밀도 추정으로 표시하고 평균 및 95% 신뢰구간을 나타냅니다.</span>
@@ -2157,9 +2170,11 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <span class="sd">        dpi: 그래프 해상도. 기본값: config.dpi</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from hossam.classroom import cluster_students, report_kde</span>
-<span class="sd">        &gt;&gt;&gt; df_result = cluster_students(df, n_groups=5, score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;])</span>
-<span class="sd">        &gt;&gt;&gt; report_kde(df_result, metric=&#39;average&#39;)</span>
+<span class="sd">        ```python</span>
+<span class="sd">        from hossam import *</span>
+<span class="sd">        df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;])</span>
+<span class="sd">        hs_classroom.report_kde(df_result, metric=&#39;average&#39;)</span>
+<span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;데이터프레임이 비어있습니다&quot;</span><span class="p">)</span>
@@ -2315,23 +2330,16 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hossam.classroom</span><span class="w"> </span><span class="kn">import</span> <span class="n">cluster_students</span><span class="p">,</span> <span class="n">group_summary</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">df_result</span> <span class="o">=</span> <span class="n">cluster_students</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">n_groups</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">score_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;국어&#39;</span><span class="p">,</span> <span class="s1">&#39;영어&#39;</span><span class="p">,</span> <span class="s1">&#39;수학&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">summary</span> <span class="o">=</span> <span class="n">group_summary</span><span class="p">(</span><span class="n">df_result</span><span class="p">,</span> <span class="n">name_col</span><span class="o">=</span><span class="s1">&#39;이름&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="n">df_result</span> <span class="o">=</span> <span class="n">hs_classroom</span><span class="o">.</span><span class="n">cluster_students</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">n_groups</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">score_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;국어&#39;</span><span class="p">,</span> <span class="s1">&#39;영어&#39;</span><span class="p">,</span> <span class="s1">&#39;수학&#39;</span><span class="p">])</span>
+<span class="n">summary</span> <span class="o">=</span> <span class="n">hs_classroom</span><span class="o">.</span><span class="n">group_summary</span><span class="p">(</span><span class="n">df_result</span><span class="p">,</span> <span class="n">name_col</span><span class="o">=</span><span class="s1">&#39;이름&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_classroom.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">617</span>
-<span class="normal">618</span>
-<span class="normal">619</span>
-<span class="normal">620</span>
-<span class="normal">621</span>
-<span class="normal">622</span>
-<span class="normal">623</span>
-<span class="normal">624</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">624</span>
 <span class="normal">625</span>
 <span class="normal">626</span>
 <span class="normal">627</span>
@@ -2384,7 +2392,16 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <span class="normal">674</span>
 <span class="normal">675</span>
 <span class="normal">676</span>
-<span class="normal">677</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">group_summary</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">name_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;학생이름&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">677</span>
+<span class="normal">678</span>
+<span class="normal">679</span>
+<span class="normal">680</span>
+<span class="normal">681</span>
+<span class="normal">682</span>
+<span class="normal">683</span>
+<span class="normal">684</span>
+<span class="normal">685</span>
+<span class="normal">686</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">group_summary</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">name_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;학생이름&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;조별로 학생 목록과 평균 점수를 요약합니다.</span>
 
 <span class="sd">    Args:</span>
@@ -2397,10 +2414,12 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <span class="sd">        컬럼: &#39;조&#39;, &#39;학생&#39;, &#39;총점평균&#39;, &#39;평균점수평균&#39;</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from hossam.classroom import cluster_students, group_summary</span>
-<span class="sd">        &gt;&gt;&gt; df_result = cluster_students(df, n_groups=5, score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;])</span>
-<span class="sd">        &gt;&gt;&gt; summary = group_summary(df_result, name_col=&#39;이름&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; print(summary)</span>
+<span class="sd">        ```python</span>
+<span class="sd">        from hossam import *</span>
+<span class="sd">        df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;])</span>
+<span class="sd">        summary = hs_classroom.group_summary(df_result, name_col=&#39;이름&#39;)</span>
+<span class="sd">        print(summary)</span>
+<span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -2664,30 +2683,19 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">hossam.classroom</span><span class="w"> </span><span class="kn">import</span> <span class="n">analyze_classroom</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">summary</span> <span class="o">=</span> <span class="n">analyze_classroom</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">df</span><span class="o">=</span><span class="s1">&#39;students.csv&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">n_groups</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">score_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;국어&#39;</span><span class="p">,</span> <span class="s1">&#39;영어&#39;</span><span class="p">,</span> <span class="s1">&#39;수학&#39;</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="n">interest_col</span><span class="o">=</span><span class="s1">&#39;관심사&#39;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">name_col</span><span class="o">=</span><span class="s1">&#39;이름&#39;</span>
-<span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="n">summary</span> <span class="o">=</span> <span class="n">hs_classroom</span><span class="o">.</span><span class="n">analyze_classroom</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="s1">&#39;students.csv&#39;</span><span class="p">,</span>
+                                         <span class="n">n_groups</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                         <span class="n">score_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;국어&#39;</span><span class="p">,</span> <span class="s1">&#39;영어&#39;</span><span class="p">,</span> <span class="s1">&#39;수학&#39;</span><span class="p">],</span>
+                                         <span class="n">interest_col</span><span class="o">=</span><span class="s1">&#39;관심사&#39;</span><span class="p">,</span>
+                                         <span class="n">name_col</span><span class="o">=</span><span class="s1">&#39;이름&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_classroom.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">683</span>
-<span class="normal">684</span>
-<span class="normal">685</span>
-<span class="normal">686</span>
-<span class="normal">687</span>
-<span class="normal">688</span>
-<span class="normal">689</span>
-<span class="normal">690</span>
-<span class="normal">691</span>
-<span class="normal">692</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">692</span>
 <span class="normal">693</span>
 <span class="normal">694</span>
 <span class="normal">695</span>
@@ -2744,7 +2752,16 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <span class="normal">746</span>
 <span class="normal">747</span>
 <span class="normal">748</span>
-<span class="normal">749</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">analyze_classroom</span><span class="p">(</span>
+<span class="normal">749</span>
+<span class="normal">750</span>
+<span class="normal">751</span>
+<span class="normal">752</span>
+<span class="normal">753</span>
+<span class="normal">754</span>
+<span class="normal">755</span>
+<span class="normal">756</span>
+<span class="normal">757</span>
+<span class="normal">758</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">analyze_classroom</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">n_groups</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">score_cols</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2778,15 +2795,15 @@ None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: Non
 <span class="sd">        조별 요약 정보 (group_summary의 결과).</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from hossam.classroom import analyze_classroom</span>
-<span class="sd">        &gt;&gt;&gt; summary = analyze_classroom(</span>
-<span class="sd">        ...     df=&#39;students.csv&#39;,</span>
-<span class="sd">        ...     n_groups=5,</span>
-<span class="sd">        ...     score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;],</span>
-<span class="sd">        ...     interest_col=&#39;관심사&#39;,</span>
-<span class="sd">        ...     name_col=&#39;이름&#39;</span>
-<span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; print(summary)</span>
+<span class="sd">        ```python</span>
+<span class="sd">        from hossam import *</span>
+<span class="sd">        summary = hs_classroom.analyze_classroom(df=&#39;students.csv&#39;,</span>
+<span class="sd">                                                 n_groups=5,</span>
+<span class="sd">                                                 score_cols=[&#39;국어&#39;, &#39;영어&#39;, &#39;수학&#39;],</span>
+<span class="sd">                                                 interest_col=&#39;관심사&#39;,</span>
+<span class="sd">                                                 name_col=&#39;이름&#39;)</span>
+<span class="sd">        print(summary)</span>
+<span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># 1. 조 편성</span>
