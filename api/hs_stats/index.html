@@ -2333,17 +2333,18 @@
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>DataFrame</code></td>            <td>
+            <td>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>각 컬럼별 최다/최소 범주 정보를 포함한 데이터프레임.
+                <p>tuple[DataFrame, DataFrame]: 각 컬럼별 최다/최소 범주 정보를 포함한 데이터프레임과
+각 범주별 빈도/비율 정보를 포함한 데이터프레임을 튜플로 반환.
 다음 컬럼을 포함:</p>
 <ul>
 <li>변수 (str): 컬럼명</li>
@@ -2370,12 +2371,10 @@
 <span class="p">})</span>
 
 <span class="c1"># 전체 명목형 컬럼에 대한 요약:</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">hs_stats</span><span class="o">.</span><span class="n">category_describe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="n">result</span><span class="p">,</span> <span class="n">summary</span> <span class="o">=</span> <span class="n">hs_stats</span><span class="o">.</span><span class="n">category_describe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
 <span class="c1"># 특정 컬럼만 분석:</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">hs_stats</span><span class="o">.</span><span class="n">category_describe</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;cut&#39;</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="n">result</span><span class="p">,</span> <span class="n">summary</span> <span class="o">=</span> <span class="n">hs_stats</span><span class="o">.</span><span class="n">category_describe</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;cut&#39;</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -2490,7 +2489,8 @@
 <span class="sd">        *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 명목형 컬럼을 처리.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        DataFrame: 각 컬럼별 최다/최소 범주 정보를 포함한 데이터프레임.</span>
+<span class="sd">        tuple[DataFrame, DataFrame]: 각 컬럼별 최다/최소 범주 정보를 포함한 데이터프레임과</span>
+<span class="sd">            각 범주별 빈도/비율 정보를 포함한 데이터프레임을 튜플로 반환.</span>
 <span class="sd">            다음 컬럼을 포함:</span>
 
 <span class="sd">            - 변수 (str): 컬럼명</span>
@@ -2511,12 +2511,10 @@
 <span class="sd">        })</span>
 
 <span class="sd">        # 전체 명목형 컬럼에 대한 요약:</span>
-<span class="sd">        result = hs_stats.category_describe(df)</span>
-<span class="sd">        print(result)</span>
+<span class="sd">        result, summary = hs_stats.category_describe(df)</span>
 
 <span class="sd">        # 특정 컬럼만 분석:</span>
-<span class="sd">        result = hs_stats.category_describe(df, &#39;cut&#39;, &#39;color&#39;)</span>
-<span class="sd">        print(result)</span>
+<span class="sd">        result, summary = hs_stats.category_describe(df, &#39;cut&#39;, &#39;color&#39;)</span>
 <span class="sd">        ```</span>
 
 <span class="sd">    Notes:</span>
@@ -2528,6 +2526,7 @@
         <span class="n">fields</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;bool&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span>
 
     <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
         <span class="c1"># 숫자형 컬럼은 건너뜀</span>
         <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">dtypes</span> <span class="ow">in</span> <span class="p">[</span>
@@ -2563,7 +2562,7 @@
         <span class="n">min_category</span> <span class="o">=</span> <span class="n">value_counts</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">min_count</span> <span class="o">=</span> <span class="n">value_counts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">min_rate</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_count</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span>
-        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+        <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
             <span class="s2">&quot;변수&quot;</span><span class="p">:</span> <span class="n">f</span><span class="p">,</span>
             <span class="s2">&quot;최다_범주&quot;</span><span class="p">:</span> <span class="n">max_category</span><span class="p">,</span>
             <span class="s2">&quot;최다_비율(%)&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">max_rate</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
@@ -2571,7 +2570,7 @@
             <span class="s2">&quot;최소_비율(%)&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">min_rate</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="p">})</span>
 
-    <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">result</span><span class="p">),</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;변수&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
