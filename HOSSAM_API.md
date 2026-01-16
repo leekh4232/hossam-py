@@ -1309,7 +1309,13 @@ print(len(vx), len(vy)) # 200, 200
 ### ols\_report
 
 ```python
-def ols_report(fit, data, full=False, alpha=0.05)
+def ols_report(
+    fit,
+    data,
+    full=False,
+    alpha=0.05
+) -> Union[Tuple[DataFrame, DataFrame], Tuple[DataFrame, DataFrame, str, str,
+                                              list[str], str]]
 ```
 
 선형회귀 적합 결과를 요약 리포트로 변환한다.
@@ -1333,6 +1339,7 @@ def ols_report(fit, data, full=False, alpha=0.05)
   - 회귀식 문자열 (`equation_text`, str): 상수항과 계수를 포함한 회귀식 표현.
   
   full=False일 때:
+  - 성능 지표 표 (`pdf`, DataFrame): R, R², Adj. R², F, p-value, Durbin-Watson.
   - 회귀계수 표 (`rdf`, DataFrame)
   
 
@@ -1356,7 +1363,14 @@ pdf, rdf = hs_stats.ols_report(fit, data)
 ### ols
 
 ```python
-def ols(df: DataFrame, yname: str, report: bool | str | int = False)
+def ols(
+    df: DataFrame,
+    yname: str,
+    report: bool | str | int = False
+) -> Union[RegressionResultsWrapper, Tuple[RegressionResultsWrapper, DataFrame,
+                                           DataFrame],
+           Tuple[RegressionResultsWrapper, DataFrame, DataFrame, str, str,
+                 list[str], str]]
 ```
 
 선형회귀분석을 수행하고 적합 결과를 반환한다.
@@ -1422,11 +1436,14 @@ fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_stats.ols(df, '
 ### logit\_report
 
 ```python
-def logit_report(fit,
-                 data: DataFrame,
-                 threshold: float = 0.5,
-                 full: bool | str | int = False,
-                 alpha: float = 0.05)
+def logit_report(
+    fit: BinaryResultsWrapper,
+    data: DataFrame,
+    threshold: float = 0.5,
+    full: Union[bool, str, int] = False,
+    alpha: float = 0.05
+) -> Union[Tuple[DataFrame, DataFrame], Tuple[DataFrame, DataFrame, str, str,
+                                              list[str], np.ndarray]]
 ```
 
 로지스틱 회귀 적합 결과를 상세 리포트로 변환한다.
@@ -1483,7 +1500,12 @@ cdf, rdf = hs_stats.logit_report(fit, df)
 ### logit
 
 ```python
-def logit(df: DataFrame, yname: str, report=False)
+def logit(
+    df: DataFrame,
+    yname: str,
+    report: Union[bool, str, int] = False
+) -> Union[BinaryResultsWrapper, Tuple[BinaryResultsWrapper, DataFrame], Tuple[
+        BinaryResultsWrapper, DataFrame, DataFrame, str, str, List[str]]]
 ```
 
 로지스틱 회귀분석을 수행하고 적합 결과를 반환한다.
@@ -1548,7 +1570,12 @@ fit, cdf, rdf, result_report, model_report, var_reports = hs_stats.logit(df, 'ta
 ### ols\_linearity\_test
 
 ```python
-def ols_linearity_test(fit, power: int = 2, alpha: float = 0.05) -> DataFrame
+def ols_linearity_test(fit,
+                       power: int = 2,
+                       alpha: float = 0.05,
+                       plot: bool = False,
+                       title: str = None,
+                       save_path: str = None) -> DataFrame
 ```
 
 회귀모형의 선형성을 Ramsey RESET 검정으로 평가한다.
@@ -1564,6 +1591,9 @@ def ols_linearity_test(fit, power: int = 2, alpha: float = 0.05) -> DataFrame
   power=2일 때 예측값의 제곱항이 추가됨.
   power가 클수록 더 높은 차수의 비선형성을 감지.
 - `alpha` _float, optional_ - 유의수준. 기본값 0.05.
+- `plot` _bool, optional_ - True이면 잔차 플롯을 출력. 기본값 False.
+- `title` _str, optional_ - 플롯 제목. 기본값 None.
+- `save_path` _str, optional_ - 플롯을 저장할 경로. 기본값 None
   
 
 **Returns**:
@@ -1594,7 +1624,11 @@ result = hs_stats.ols_linearity_test(fit)
 ### ols\_normality\_test
 
 ```python
-def ols_normality_test(fit, alpha: float = 0.05) -> DataFrame
+def ols_normality_test(fit,
+                       alpha: float = 0.05,
+                       plot: bool = False,
+                       title: str = None,
+                       save_path: str = None) -> DataFrame
 ```
 
 회귀모형 잔차의 정규성을 검정한다.
@@ -1606,6 +1640,9 @@ def ols_normality_test(fit, alpha: float = 0.05) -> DataFrame
 
 - `fit` - 회귀 모형 객체 (statsmodels의 RegressionResultsWrapper).
 - `alpha` _float, optional_ - 유의수준. 기본값 0.05.
+- `plot` _bool, optional_ - True이면 Q-Q 플롯을 출력. 기본값 False.
+- `title` _str, optional_ - 플롯 제목. 기본값 None.
+- `save_path` _str, optional_ - 플롯을 저장할 경로. 기본값 None
   
 
 **Returns**:
