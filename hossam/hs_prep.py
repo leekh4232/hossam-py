@@ -13,7 +13,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.impute import SimpleImputer
 
 
-from .hs_prep.util import pretty_table
+from .hs_util import pretty_table
 
 # ===================================================================
 # 연속형 변수를 표준정규화(Z-score)로 변환한다

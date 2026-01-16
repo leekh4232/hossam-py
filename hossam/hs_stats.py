@@ -369,7 +369,8 @@ def category_describe(data: DataFrame, *fields: str):
         *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 명목형 컬럼을 처리.
 
     Returns:
-        DataFrame: 각 컬럼별 최다/최소 범주 정보를 포함한 데이터프레임.
+        tuple[DataFrame, DataFrame]: 각 컬럼별 최다/최소 범주 정보를 포함한 데이터프레임과
+            각 범주별 빈도/비율 정보를 포함한 데이터프레임을 튜플로 반환.
             다음 컬럼을 포함:
 
             - 변수 (str): 컬럼명
@@ -390,12 +391,10 @@ def category_describe(data: DataFrame, *fields: str):
         })
 
         # 전체 명목형 컬럼에 대한 요약:
-        result = hs_stats.category_describe(df)
-        print(result)
+        result, summary = hs_stats.category_describe(df)
 
         # 특정 컬럼만 분석:
-        result = hs_stats.category_describe(df, 'cut', 'color')
-        print(result)
+        result, summary = hs_stats.category_describe(df, 'cut', 'color')
         ```
 
     Notes:
@@ -407,6 +406,7 @@ def category_describe(data: DataFrame, *fields: str):
         fields = data.select_dtypes(include=['object', 'category', 'bool']).columns
 
     result = []
+    summary = []
     for f in fields:
         # 숫자형 컬럼은 건너뜀
         if data[f].dtypes in [
@@ -442,7 +442,7 @@ def category_describe(data: DataFrame, *fields: str):
         min_category = value_counts.index[-1]
         min_count = value_counts.iloc[-1]
         min_rate = (min_count / len(data)) * 100
-        result.append({
+        summary.append({
             "변수": f,
             "최다_범주": max_category,
             "최다_비율(%)": round(max_rate, 2),
@@ -450,7 +450,7 @@ def category_describe(data: DataFrame, *fields: str):
             "최소_비율(%)": round(min_rate, 2)
         })
 
-    return DataFrame(result)
+    return DataFrame(result), DataFrame(summary).set_index("변수")
 
 # ===================================================================
 # 정규성 검정 (Normal Test)
