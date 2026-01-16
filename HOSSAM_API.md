@@ -886,7 +886,8 @@ def category_describe(data: DataFrame, *fields: str)
 
 **Returns**:
 
-- `DataFrame` - 각 컬럼별 최다/최소 범주 정보를 포함한 데이터프레임.
+  tuple[DataFrame, DataFrame]: 각 컬럼별 최다/최소 범주 정보를 포함한 데이터프레임과
+  각 범주별 빈도/비율 정보를 포함한 데이터프레임을 튜플로 반환.
   다음 컬럼을 포함:
   
   - 변수 (str): 컬럼명
@@ -909,12 +910,10 @@ df = DataFrame({
 })
 
 # 전체 명목형 컬럼에 대한 요약:
-result = hs_stats.category_describe(df)
-print(result)
+result, summary = hs_stats.category_describe(df)
 
 # 특정 컬럼만 분석:
-result = hs_stats.category_describe(df, 'cut', 'color')
-print(result)
+result, summary = hs_stats.category_describe(df, 'cut', 'color')
 ```
   
 
