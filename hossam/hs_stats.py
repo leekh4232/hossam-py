@@ -219,6 +219,8 @@ def describe(data: DataFrame, *fields: str, columns: list | None = None):
             행은 다음과 같은 통계량을 포함:
 
             - count (float): 비결측치의 수
+            - na_count (int): 결측치의 수
+            - na_rate (float): 결측치 비율(%)
             - mean (float): 평균값
             - std (float): 표준편차
             - min (float): 최소값
@@ -267,9 +269,13 @@ def describe(data: DataFrame, *fields: str, columns: list | None = None):
 
     # 기술통계량 구하기
     desc = data[list(fields)].describe().T
-    # 각 컬럼별 결측치 수(null_count) 추가
-    null_counts = data[list(fields)].isnull().sum()
-    desc.insert(1, 'null_count', null_counts)
+
+    # 각 컬럼별 결측치 수(na_count) 추가
+    na_counts = data[list(fields)].isnull().sum()
+    desc.insert(1, 'na_count', na_counts)
+
+    # 결측치 비율(na_rate) 추가
+    desc.insert(2, 'na_rate', (na_counts / len(data)) * 100)
 
     # 추가 통계량 계산
     additional_stats = []
@@ -1378,7 +1384,7 @@ def ols_report(fit, data, full=False, alpha=0.05):
 # ===================================================================
 # 선형회귀
 # ===================================================================
-def ols(df: DataFrame, yname: str, report=False):
+def ols(df: DataFrame, yname: str, report: bool | str | int = False):
     """선형회귀분석을 수행하고 적합 결과를 반환한다.
 
     OLS(Ordinary Least Squares) 선형회귀분석을 실시한다.
@@ -1387,7 +1393,7 @@ def ols(df: DataFrame, yname: str, report=False):
     Args:
         df (DataFrame): 종속변수와 독립변수를 모두 포함한 데이터프레임.
         yname (str): 종속변수 컬럼명.
-        report: 리포트 모드 설정. 다음 값 중 하나:
+        report (bool | str | int): 리포트 모드 설정. 다음 값 중 하나:
             - False (기본값): 리포트 미사용. fit 객체만 반환.
             - 1 또는 'summary': 요약 리포트 반환 (full=False).
             - 2 또는 'full': 풀 리포트 반환 (full=True).
@@ -1426,10 +1432,10 @@ def ols(df: DataFrame, yname: str, report=False):
         fit = hs_stats.ols(df, 'target')
 
         # 요약 리포트 반환
-        fit, pdf, rdf = hs_stats.ols(df, 'target', report=1)
+        fit, pdf, rdf = hs_stats.ols(df, 'target', report='summary')
 
         # 풀 리포트 반환
-        fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_stats.ols(df, 'target', report=2)
+        fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_stats.ols(df, 'target', report='full')
         ```
     """
     x = df.drop(yname, axis=1)
@@ -1459,15 +1465,15 @@ def ols(df: DataFrame, yname: str, report=False):
 # ===================================================================
 # 로지스틱 회귀 요약 리포트
 # ===================================================================
-def logit_report(fit, data, threshold=0.5, full=False, alpha=0.05):
+def logit_report(fit, data: DataFrame, threshold: float=0.5, full: bool | str | int = False, alpha: float=0.05):
     """로지스틱 회귀 적합 결과를 상세 리포트로 변환한다.
 
     Args:
         fit: statsmodels Logit 결과 객체 (`fit.summary()`와 예측 확률을 지원해야 함).
-        data: 종속변수와 독립변수를 모두 포함한 DataFrame.
-        threshold: 예측 확률을 이진 분류로 변환할 임계값. 기본값 0.5.
-        full: True이면 6개 값 반환, False이면 주요 2개(cdf, rdf)만 반환. 기본값 False.
-        alpha: 유의수준. 기본값 0.05.
+        data (DataFrame): 종속변수와 독립변수를 모두 포함한 DataFrame.
+        threshold (float): 예측 확률을 이진 분류로 변환할 임계값. 기본값 0.5.
+        full (bool | str | int): True이면 6개 값 반환, False이면 주요 2개(cdf, rdf)만 반환. 기본값 False.
+        alpha (float): 유의수준. 기본값 0.05.
 
     Returns:
         tuple: full=True일 때 다음 요소를 포함한다.

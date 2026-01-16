@@ -69,10 +69,13 @@ def get_default_ax(width: int = config.width, height: int = config.height, rows:
     figsize = (width * cols / 100, height * rows / 100)
     fig, ax = plt.subplots(rows, cols, figsize=figsize, dpi=dpi)
 
-    if (rows > 1 or cols > 1) and (ws != None and hs != None):
+    # ax가 배열 (subplots)인지 단일 Axes인지 확인
+    is_array = isinstance(ax, (np.ndarray, list))
+
+    if is_array and (ws != None and hs != None):
         fig.subplots_adjust(wspace=ws, hspace=hs)
 
-    if title:
+    if title and not is_array:
         fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight='bold')
 
     if flatten == True:
@@ -125,11 +128,11 @@ def create_figure(width: int = config.width, height: int = config.height, rows: 
 # ===================================================================
 # 그래프의 그리드, 레이아웃을 정리하고 필요 시 저장 또는 표시한다
 # ===================================================================
-def finalize_plot(ax: Axes, callback: any = None, outparams: bool = False, save_path: str = None, grid: bool = True, title: str = None) -> None:
+def finalize_plot(ax: Axes | np.ndarray, callback: any = None, outparams: bool = False, save_path: str = None, grid: bool = True, title: str = None) -> None:
     """공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
 
     Args:
-        ax (Axes|ndarray|list): 대상 Axes (단일 Axes 또는 subplots 배열).
+        ax (Axes|np.ndarray): 대상 Axes (단일 Axes 또는 subplots 배열).
         callback (Callable|None): 추가 설정을 위한 사용자 콜백.
         outparams (bool): 내부에서 생성한 Figure인 경우 True.
         save_path (str|None): 이미지 저장 경로. None이 아니면 해당 경로로 저장.
@@ -159,7 +162,7 @@ def finalize_plot(ax: Axes, callback: any = None, outparams: bool = False, save_
 
     plt.tight_layout()
 
-    if title:
+    if title and not is_array:
         ax.set_title(title, fontsize=config.font_size * 1.3, pad=7, fontweight='bold')
 
     if save_path is not None:
@@ -173,12 +176,12 @@ def finalize_plot(ax: Axes, callback: any = None, outparams: bool = False, save_
 # ===================================================================
 # 그래프의 그리드, 레이아웃을 정리하고 필요 시 저장 또는 표시한다
 # ===================================================================
-def show_figure(ax: Axes, callback: any = None, outparams: bool = False, save_path: str = None, grid: bool = True, title: str = None) -> None:
+def show_figure(ax: Axes | np.ndarray, callback: any = None, outparams: bool = False, save_path: str = None, grid: bool = True, title: str = None) -> None:
     """공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
     finalize_plot의 래퍼 함수.
 
     Args:
-        ax (Axes|ndarray|list): 대상 Axes (단일 Axes 또는 subplots 배열).
+        ax (Axes|np.ndarray): 대상 Axes (단일 Axes 또는 subplots 배열).
         callback (Callable|None): 추가 설정을 위한 사용자 콜백.
         outparams (bool): 내부에서 생성한 Figure인 경우 True.
         save_path (str|None): 이미지 저장 경로. None이 아니면 해당 경로로 저장.

@@ -158,16 +158,23 @@ def minmax_scaler(
 # ===================================================================
 # 지정된 컬럼들을 범주형 데이터로 설정한다
 # ===================================================================
-def set_category(data: DataFrame, *args: str) -> DataFrame:
+def set_category(data: DataFrame, *args: str, columns: list = None) -> DataFrame:
     """카테고리 데이터를 설정한다.
 
     Args:
         data (DataFrame): 데이터프레임 객체
         *args (str): 컬럼명 목록
+        columns (list, optional): 변환할 컬럼명 목록. args와 중복 사용 불가.
 
     Returns:
         DataFrame: 카테고리 설정된 데이터프레임
     """
+    # columns 인자가 있으면 args보다 우선한다.
+    if columns is not None:
+        if args:
+            raise ValueError("args와 columns 인자는 중복 사용할 수 없습니다.")
+        args = columns
+
     df = data.copy()
 
     for k in args:
@@ -219,7 +226,7 @@ def unmelt(
 # ===================================================================
 # 지정된 변수의 이상치 테이블로 반환한다
 # ===================================================================
-def outlier_table(data: DataFrame, *fields: str) -> DataFrame:
+def outlier_table(data: DataFrame, *fields: str, columns: list = None) -> DataFrame:
     """수치형 컬럼에 대한 사분위수 및 IQR 기반 이상치 경계를 계산한다.
 
     전달된 `fields`가 없으면 데이터프레임의 모든 수치형 컬럼을 대상으로 한다.
@@ -228,6 +235,7 @@ def outlier_table(data: DataFrame, *fields: str) -> DataFrame:
     Args:
         data (DataFrame): 분석할 데이터프레임.
         *fields (str): 대상 컬럼명(들). 생략 시 모든 수치형 컬럼 대상.
+        columns (list, optional): 변환할 컬럼명 목록. args와 중복 사용 불가.
 
     Returns:
         DataFrame: Q1, Q2(중앙값), Q3, IQR, 하한, 상한을 포함한 통계표.
@@ -236,6 +244,11 @@ def outlier_table(data: DataFrame, *fields: str) -> DataFrame:
         from hossam import *
         hs_prep.outlier_table(df, "value")
     """
+    # columns 인자가 있으면 args보다 우선한다.
+    if columns is not None:
+        if args:
+            raise ValueError("args와 columns 인자는 중복 사용할 수 없습니다.")
+        args = columns
 
     target_fields = list(fields) if fields else list(data.select_dtypes(include=[np.number]).columns)
     result = []
@@ -273,7 +286,7 @@ def outlier_table(data: DataFrame, *fields: str) -> DataFrame:
 # ===================================================================
 # 이상치를 대체값(NaN, 0) 또는 중앙값으로 교체한다
 # ===================================================================
-def replace_outliner(data: DataFrame, method: str = "nan", *fields: str) -> DataFrame:
+def replace_outliner(data: DataFrame, method: str = "nan", *fields: str, columns: list = None) -> DataFrame:
     """이상치 경계값을 넘어가는 데이터를 경계값으로 대체한다.
 
     Args:
@@ -285,10 +298,16 @@ def replace_outliner(data: DataFrame, method: str = "nan", *fields: str) -> Data
             - most: 최빈값 대체
             - median: 중앙값 대체
         *fields (str): 컬럼명 목록
+        columns (list, optional): 변환할 컬럼명 목록. args와 중복 사용 불가.
 
     Returns:
         DataFrame: 이상치가 경계값으로 대체된 데이터 프레임
     """
+    # columns 인자가 있으면 args보다 우선한다.
+    if columns is not None:
+        if args:
+            raise ValueError("args와 columns 인자는 중복 사용할 수 없습니다.")
+        args = columns
 
     # 원본 데이터 프레임 복사
     df = data.copy()
@@ -335,16 +354,22 @@ def replace_outliner(data: DataFrame, method: str = "nan", *fields: str) -> Data
 # ===================================================================
 # 중빈 이상치를 제거한 연처리된 데이터프레임을 반환한다
 # ===================================================================
-def drop_outliner(data: DataFrame, *fields: str) -> DataFrame:
+def drop_outliner(data: DataFrame, *fields: str, columns: list = None) -> DataFrame:
     """이상치를 결측치로 변환한 후 모두 삭제한다.
 
     Args:
         data (DataFrame): 데이터프레임
         *fields (str): 컬럼명 목록
+        columns (list, optional): 변환할 컬럼명 목록. args와 중복 사용 불가.
 
     Returns:
         DataFrame: 이상치가 삭제된 데이터프레임
     """
+    # columns 인자가 있으면 args보다 우선한다.
+    if columns is not None:
+        if args:
+            raise ValueError("args와 columns 인자는 중복 사용할 수 없습니다.")
+        args = columns
 
     df = replace_outliner(data, "nan", *fields)
     return df.dropna()
@@ -353,7 +378,7 @@ def drop_outliner(data: DataFrame, *fields: str) -> DataFrame:
 # ===================================================================
 # 범주 변수를 더미 변수(One-Hot 인코딩)로 변환한다
 # ===================================================================
-def get_dummies(data: DataFrame, *args: str, drop_first=True, dtype="int") -> DataFrame:
+def get_dummies(data: DataFrame, *args: str, columns: list = None, drop_first: bool = True, dtype: str = "int") -> DataFrame:
     """명목형 변수를 더미 변수로 변환한다.
 
     컬럼명을 지정하면 그 컬럼들만 더미 변수로 변환하고,
@@ -362,6 +387,7 @@ def get_dummies(data: DataFrame, *args: str, drop_first=True, dtype="int") -> Da
     Args:
         data (DataFrame): 데이터프레임
         *args (str): 변환할 컬럼명 목록. 지정하지 않으면 숫자형이 아닌 모든 컬럼 자동 선택.
+        columns (list, optional): 변환할 컬럼명 목록. args와 중복 사용 불가.
         drop_first (bool, optional): 첫 번째 더미 변수 제거 여부. 기본값 True.
         dtype (str, optional): 더미 변수 데이터 타입. 기본값 "int".
 
@@ -379,6 +405,12 @@ def get_dummies(data: DataFrame, *args: str, drop_first=True, dtype="int") -> Da
         result = hs_prep.get_dummies(df, 'col1', drop_first=False, dtype='bool')
         ```
     """
+    # columns 인자가 있으면 args보다 우선한다.
+    if columns is not None:
+        if args:
+            raise ValueError("args와 columns 인자는 중복 사용할 수 없습니다.")
+        args = columns
+
     if not args:
         # args가 없으면 숫자 타입이 아닌 모든 컬럼 자동 선택
         cols_to_convert = []
