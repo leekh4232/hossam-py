@@ -35,12 +35,12 @@ if pd.__version__ > "2.0.0":
 
 config = SimpleNamespace(
     dpi=200,
-    width=800,
-    height=520,
-    font_size=10,
+    width=600,
+    height=350,
+    font_size=7,
     font_weight="normal",
-    frame_width=0.7,
-    line_width=1.5,
+    frame_width=0.5,
+    line_width=1,
     grid_alpha=0.3,
     grid_width=0.5,
     fill_alpha=0.3
@@ -1739,7 +1739,7 @@ def ols_residplot(
     y = y_pred + resid  # 실제값 = 적합값 + 잔차
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width + 150 if mse else width, height, 1, 1, dpi)
         outparams = True
 
     # 산점도 직접 그리기 (seaborn.residplot보다 훨씬 빠름)
