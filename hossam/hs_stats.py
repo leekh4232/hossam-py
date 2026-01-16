@@ -59,17 +59,18 @@ def missing_values(data: DataFrame, *fields: str):
 
     Examples:
         전체 컬럼에 대한 결측치 확인:
-
-        >>> from hossam import missing_values
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({'x': [1, 2, None, 4], 'y': [10, None, None, 40]})
-        >>> result = missing_values(df)
-        >>> print(result)
-
+        ```python
+        from hossam import missing_values
+        import pandas as pd
+        df = pd.DataFrame({'x': [1, 2, None, 4], 'y': [10, None, None, 40]})
+        result = missing_values(df)
+        print(result)
+        ```
         특정 컬럼만 분석:
-
-        >>> result = missing_values(df, 'x', 'y')
-        >>> print(result)
+        ```python
+        result = missing_values(df, 'x', 'y')
+        print(result)
+        ```
     """
     if not fields:
         fields = tuple(data.columns)
@@ -122,17 +123,18 @@ def outlier_table(data: DataFrame, *fields: str):
 
     Examples:
         전체 숫자형 컬럼에 대한 이상치 경계 확인:
-
-        >>> from hossam import outlier_table
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({'x': [1, 2, 3, 100], 'y': [10, 20, 30, 40]})
-        >>> result = outlier_table(df)
-        >>> print(result)
-
+        ```python
+        from hossam import outlier_table
+        import pandas as pd
+        df = pd.DataFrame({'x': [1, 2, 3, 100], 'y': [10, 20, 30, 40]})
+        result = outlier_table(df)
+        print(result)
+        ```
         특정 컬럼만 분석:
-
-        >>> result = outlier_table(df, 'x', 'y')
-        >>> print(result[['Q1', 'Q3', 'UP', 'DOWN']])
+        ```python
+        result = outlier_table(df, 'x', 'y')
+        print(result[['Q1', 'Q3', 'UP', 'DOWN']])
+        ```
 
     Notes:
         - DOWN 미만이거나 UP 초과인 값은 이상치(outlier)로 간주됩니다.
@@ -232,21 +234,22 @@ def describe(data: DataFrame, *fields: str, columns: list | None = None):
 
     Examples:
         전체 숫자형 컬럼에 대한 확장된 기술통계:
-
-        >>> from hossam import summary
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({
-        ...     'x': [1, 2, 3, 4, 5, 100],
-        ...     'y': [10, 20, 30, 40, 50, 60],
-        ...     'z': ['a', 'b', 'c', 'd', 'e', 'f']
-        ... })
-        >>> result = summary(df)
-        >>> print(result)
-
+        ```python
+        from hossam import summary
+        import pandas as pd
+        df = pd.DataFrame({
+            'x': [1, 2, 3, 4, 5, 100],
+            'y': [10, 20, 30, 40, 50, 60],
+            'z': ['a', 'b', 'c', 'd', 'e', 'f']
+        })
+        result = summary(df)
+        print(result)
+        ```
         특정 컬럼만 분석:
-
-        >>> result = summary(df, 'x', 'y')
-        >>> print(result)
+        ```python
+        result = summary(df, 'x', 'y')
+        print(result)
+        ```
 
     Notes:
         - 숫자형이 아닌 컬럼은 자동으로 제외됩니다.
@@ -373,21 +376,22 @@ def category_describe(data: DataFrame, *fields: str):
 
     Examples:
         전체 명목형 컬럼에 대한 분포 편향 요약:
-
-        >>> from hossam import category_describe
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({
-        ...     'cut': ['Ideal', 'Premium', 'Good', 'Ideal', 'Premium'],
-        ...     'color': ['E', 'F', 'G', 'E', 'F'],
-        ...     'price': [100, 200, 150, 300, 120]
-        ... })
-        >>> result = category_describe(df)
-        >>> print(result)
-
+        ```python
+        from hossam import category_describe
+        import pandas as pd
+        df = pd.DataFrame({
+            'cut': ['Ideal', 'Premium', 'Good', 'Ideal', 'Premium'],
+            'color': ['E', 'F', 'G', 'E', 'F'],
+            'price': [100, 200, 150, 300, 120]
+        })
+        result = category_describe(df)
+        print(result)
+        ```
         특정 컬럼만 분석:
-
-        >>> result = category_describe(df, 'cut', 'color')
-        >>> print(result)
+        ```python
+        result = category_describe(df, 'cut', 'color')
+        print(result)
+        ```
 
     Notes:
         - 숫자형 컬럼은 자동으로 제외됩니다.

@@ -107,10 +107,11 @@ def load_info(search: str = None, local: str = None) -> DataFrame:
         DataFrame: name, chapter, desc, url 컬럼을 갖는 테이블
 
     Examples:
-        >>> from hossam.data_loader import load_info
-        >>> info = load_info()
-        >>> list(info.columns)
-        ['name', 'chapter', 'desc', 'url']
+        ```python
+        from hossam import *
+        info = load_info()
+        list(info.columns) #['name', 'chapter', 'desc', 'url']
+        ```
     """
     global BASE_URL
 
@@ -170,8 +171,10 @@ def load_data(key: str, local: str = None) -> Optional[DataFrame]:
         DataFrame | None: 성공 시 데이터프레임, 실패 시 None
 
     Examples:
-        >>> from hossam.data_loader import load_data
-        >>> df = load_data('AD_SALES')  # 메타데이터에 해당 키가 있어야 함
+        ```python
+        from hossam import *
+        df = load_data('AD_SALES')  # 메타데이터에 해당 키가 있어야 함
+        ```
     """
     index = None
     try:

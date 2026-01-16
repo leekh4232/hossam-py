@@ -1618,11 +1618,13 @@ def ols_residplot(
         None
 
     Examples:
-        >>> import statsmodels.api as sm
-        >>> X = sm.add_constant(df[['x1', 'x2']])
-        >>> y = df['y']
-        >>> fit = sm.OLS(y, X).fit()
-        >>> residplot(fit, lowess=True, mse=True)
+        ```python
+        import statsmodels.api as sm
+        X = sm.add_constant(df[['x1', 'x2']])
+        y = df['y']
+        fit = sm.OLS(y, X).fit()
+        residplot(fit, lowess=True, mse=True)
+        ```
     """
     outparams = False
 
@@ -1746,16 +1748,18 @@ def ols_qqplot(
         None
 
     Examples:
-        >>> import statsmodels.api as sm
-        >>> X = sm.add_constant(df[['x1', 'x2']])
-        >>> y = df['y']
-        >>> fit = sm.OLS(y, X).fit()
-        >>> # 표준화된 선 (권장)
-        >>> qqplot(fit)
-        >>> # 회귀선 (데이터 추세 반영)
-        >>> qqplot(fit, line='r')
-        >>> # 45도 대각선 (전통적 방식)
-        >>> qqplot(fit, line='45')
+        ```python
+        import statsmodels.api as sm
+        X = sm.add_constant(df[['x1', 'x2']])
+        y = df['y']
+        fit = sm.OLS(y, X).fit()
+        # 표준화된 선 (권장)
+        qqplot(fit)
+        # 회귀선 (데이터 추세 반영)
+        qqplot(fit, line='r')
+        # 45도 대각선 (전통적 방식)
+        qqplot(fit, line='45')
+        ```
     """
     outparams = False
 

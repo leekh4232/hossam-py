@@ -71,20 +71,21 @@ def diff(
 
     Examples:
         기본 사용 (정상성 만족까지 자동 차분):
-
-        >>> from hossam import diff
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({'value': [100, 102, 105, 110, 120]},
-        ...                   index=pd.date_range('2020-01', periods=5, freq='M'))
-        >>> stationary_df = diff(df, 'value')
-
+        ```python
+        from hossam import diff
+        import pandas as pd
+        df = pd.DataFrame({'value': [100, 102, 105, 110, 120]},
+                          index=pd.date_range('2020-01', periods=5, freq='M'))
+        stationary_df = diff(df, 'value')
+        ```
         최대 2차 차분으로 제한:
-
-        >>> stationary_df = diff(df, 'value', max_diff=2)
-
+        ```python
+        stationary_df = diff(df, 'value', max_diff=2)
+        ```
         그래프 없이 실행:
-
-        >>> stationary_df = diff(df, 'value', plot=False)
+        ```python
+        stationary_df = diff(df, 'value', plot=False)
+        ```
     """
     df = data.copy()
 

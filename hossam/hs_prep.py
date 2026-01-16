@@ -1,24 +1,19 @@
 # -*- coding: utf-8 -*-
 # ===================================================================
-#
+# 패키지 참조
 # ===================================================================
 import joblib
 import numpy as np
 from itertools import combinations
 
-# ===================================================================
-#
-# ===================================================================
 import pandas as pd
 import jenkspy
 from pandas import DataFrame
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.impute import SimpleImputer
 
-# ===================================================================
-#
-# ===================================================================
-from .hs_util import pretty_table
+
+from .hs_prep.util import pretty_table
 
 # ===================================================================
 # 연속형 변수를 표준정규화(Z-score)로 변환한다
@@ -42,8 +37,10 @@ def standard_scaler(
         DataFrame | ndarray: 스케일링된 데이터(입력 타입과 동일).
 
     Examples:
-        >>> from hossam.prep import standard_scaler
-        >>> std_df = hs_standard_scaler(df, yname="y", save_path="std.pkl")
+        ```python
+        from hossam import *
+        std_df = hs_prep.standard_scaler(df, yname="y", save_path="std.pkl")
+        ```
     """
 
     is_df = isinstance(data, DataFrame)
@@ -110,8 +107,10 @@ def minmax_scaler(
         DataFrame | ndarray: 스케일링된 데이터(입력 타입과 동일).
 
     Examples:
-        >>> from hossam.prep import minmax_scaler
-        >>> mm_df = hs_minmax_scaler(df, yname="y")
+        ```python
+        from hossam.prep import minmax_scaler
+        mm_df = hs_prep.minmax_scaler(df, yname="y")
+        ```
     """
 
     is_df = isinstance(data, DataFrame)
@@ -198,12 +197,16 @@ def unmelt(
         DataFrame: 변환된 데이터프레임 (각 그룹이 개별 컬럼으로 구성)
 
     Examples:
-        >>> df = pd.DataFrame({
-        ...     'group': ['A', 'A', 'B', 'B', 'B'],
-        ...     'value': [1, 2, 3, 4, 5]
-        ... })
-        >>> result = unmelt(df, id_vars='group', value_vars='value')
-        >>> # 결과: A 컬럼에는 [1, 2, NaN], B 컬럼에는 [3, 4, 5]
+        ```python
+        df = pd.DataFrame({
+            'group': ['A', 'A', 'B', 'B', 'B'],
+            'value': [1, 2, 3, 4, 5]
+        })
+
+        from hossam import *
+        result = hs_prep.unmelt(df, id_vars='group', value_vars='value')
+        # 결과: A 컬럼에는 [1, 2, NaN], B 컬럼에는 [3, 4, 5]
+        ```
     """
     # 그룹별로 값들을 리스트로 모음
     grouped = data.groupby(id_vars, observed=True)[value_vars].apply(lambda x: x.tolist())
@@ -230,8 +233,8 @@ def outlier_table(data: DataFrame, *fields: str) -> DataFrame:
         DataFrame: Q1, Q2(중앙값), Q3, IQR, 하한, 상한을 포함한 통계표.
 
     Examples:
-        >>> from hossam.prep import outlier_table
-        >>> outlier_table(df, "value")
+        from hossam import *
+        hs_prep.outlier_table(df, "value")
     """
 
     target_fields = list(fields) if fields else list(data.select_dtypes(include=[np.number]).columns)
@@ -366,13 +369,15 @@ def get_dummies(data: DataFrame, *args: str, drop_first=True, dtype="int") -> Da
         DataFrame: 더미 변수로 변환된 데이터프레임
 
     Examples:
-        >>> from hossam.hs_prep import get_dummies
-        >>> # 전체 비숫자 컬럼 자동 변환
-        >>> result = get_dummies(df)
-        >>> # 특정 컬럼만 변환
-        >>> result = get_dummies(df, 'cut', 'color', 'clarity')
-        >>> # 옵션 지정
-        >>> result = get_dummies(df, 'col1', drop_first=False, dtype='bool')
+        ```python
+        from hossam import *
+        # 전체 비숫자 컬럼 자동 변환
+        result = hs_prep.get_dummies(df)
+        # 특정 컬럼만 변환
+        result = hs_prep.get_dummies(df, 'cut', 'color', 'clarity')
+        # 옵션 지정
+        result = hs_prep.get_dummies(df, 'col1', drop_first=False, dtype='bool')
+        ```
     """
     if not args:
         # args가 없으면 숫자 타입이 아닌 모든 컬럼 자동 선택
@@ -479,31 +484,35 @@ def bin_continuous(
         DataFrame: 원본에 구간화된 명목형 컬럼이 추가된 데이터프레임
 
     Examples:
-        동일 간격으로 5개 구간 생성 (숫자 인덱스):
-        >>> df = pd.DataFrame({'age': [20, 35, 50, 65]})
-        >>> result = bin_continuous(df, 'age', method='equal_width', bins=5)
-        >>> print(result['age_bin'])  # 0, 1, 2, ... (숫자 인덱스)
+        ```python
+        from hossam import *
 
-        문자 레이블 사용:
-        >>> result = bin_continuous(df, 'age', method='equal_width', bins=5, apply_labels=False)
-        >>> print(result['age_bin'])  # 20~30, 30~40, ... (문자 레이블)
+        # 동일 간격으로 5개 구간 생성 (숫자 인덱스):
+        df = pd.DataFrame({'age': [20, 35, 50, 65]})
+        result = hs_prep.bin_continuous(df, 'age', method='equal_width', bins=5)
+        print(result['age_bin'])  # 0, 1, 2, ... (숫자 인덱스)
 
-        생애주기 기반 구간화:
-        >>> result = bin_continuous(df, 'age', method='lifecourse')
-        >>> print(result['age_bin'])  # 0, 1, 2, 3, 4 (숫자 인덱스)
+        # 문자 레이블 사용:
+        result = hs_prep.bin_continuous(df, 'age', method='equal_width', bins=5, apply_labels=False)
+        print(result['age_bin'])  # 20~30, 30~40, ... (문자 레이블)
 
-        생애주기 문자 레이블:
-        >>> result = bin_continuous(df, 'age', method='lifecourse', apply_labels=False)
-        >>> print(result['age_bin'])  # 아동, 청소년, 청년, 중년, 노년
+        # 생애주기 기반 구간화:
+        result = hs_prep.bin_continuous(df, 'age', method='lifecourse')
+        print(result['age_bin'])  # 0, 1, 2, 3, 4 (숫자 인덱스)
 
-        의료비 위험도 기반 연령대 (health_band):
-        >>> result = bin_continuous(df, 'age', method='health_band', apply_labels=False)
-        >>> print(result['age_bin'])  # 18-29, 30-39, 40-49, 50-64, 65+
+        # 생애주기 문자 레이블:
+        result = hs_prep.bin_continuous(df, 'age', method='lifecourse', apply_labels=False)
+        print(result['age_bin'])  # 아동, 청소년, 청년, 중년, 노년
 
-        로그 변환된 컬럼 역변환 후 구간화:
-        >>> df_log = pd.DataFrame({'charges_log': [np.log(1000), np.log(5000), np.log(50000)]})
-        >>> result = bin_continuous(df_log, 'charges_log', method='equal_width', is_log_transformed=True)
-        >>> print(result['charges_log_bin'])  # 0, 1, 2 (숫자 인덱스)
+        # 의료비 위험도 기반 연령대 (health_band):
+        result = hs_prep.bin_continuous(df, 'age', method='health_band', apply_labels=False)
+        print(result['age_bin'])  # 18-29, 30-39, 40-49, 50-64, 65+
+
+        # 로그 변환된 컬럼 역변환 후 구간화:
+        df_log = pd.DataFrame({'charges_log': [np.log(1000), np.log(5000), np.log(50000)]})
+        result = hs_prep.bin_continuous(df_log, 'charges_log', method='equal_width', is_log_transformed=True)
+        print(result['charges_log_bin'])  # 0, 1, 2 (숫자 인덱스)
+        ```
     """
 
     if field not in data.columns:
@@ -738,18 +747,17 @@ def log_transform(data: DataFrame, *fields: str) -> DataFrame:
         DataFrame: 로그 변환된 데이터프레임.
 
     Examples:
-        전체 수치형 컬럼에 대한 로그 변환:
-
-        >>> from hossam.prep import log_transform
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({'x': [1, 10, 100], 'y': [2, 20, 200], 'z': ['a', 'b', 'c']})
-        >>> result = log_transform(df)
-        >>> print(result)
-
-        특정 컬럼만 변환:
-
-        >>> result = log_transform(df, 'x', 'y')
-        >>> print(result)
+        ```python
+        # 전체 수치형 컬럼에 대한 로그 변환:
+        from hossam import *
+        import pandas as pd
+        df = pd.DataFrame({'x': [1, 10, 100], 'y': [2, 20, 200], 'z': ['a', 'b', 'c']})
+        result = hs_prep.log_transform(df)
+        print(result)
+        # 특정 컬럼만 변환:
+        result = hs_prep.log_transform(df, 'x', 'y')
+        print(result)
+        ```
 
     Notes:
         - 수치형이 아닌 컬럼은 자동으로 제외됩니다.
@@ -794,39 +802,39 @@ def add_interaction(data: DataFrame, pairs: list[tuple[str, str]] | None = None)
     """데이터프레임에 상호작용(interaction) 항을 추가한다.
 
     수치형 및 명목형 변수 간의 상호작용 항을 생성하여 데이터프레임에 추가한다.
-    - 수치형 * 수치형: 두 변수의 곱셈 (col1*col2)
-    - 수치형 * 명목형: 명목형의 각 카테고리별 수치형 변수 생성 (col1*col2_category)
-    - 명목형 * 명목형: 두 명목형을 결합한 새 명목형 변수 생성 (col1_col2)
+    - `수치형 * 수치형`: 두 변수의 곱셈 (col1*col2)
+    - `수치형 * 명목형`: 명목형의 각 카테고리별 수치형 변수 생성 (col1*col2_category)
+    - `명목형 * 명목형`: 두 명목형을 결합한 새 명목형 변수 생성 (col1_col2)
 
     Args:
         data (DataFrame): 원본 데이터프레임.
         pairs (list[tuple[str, str]], optional): 직접 지정할 교호작용 쌍의 리스트.
-                                                예: [("age", "gender"), ("color", "cut")]
-                                                None이면 모든 수치형 컬럼의 2-way 상호작용을 생성.
+            예: [("age", "gender"), ("color", "cut")]
+            None이면 모든 수치형 컬럼의 2-way 상호작용을 생성.
 
     Returns:
         DataFrame: 상호작용 항이 추가된 새 데이터프레임.
 
     Examples:
-        수치형 변수들의 상호작용:
+        ```python
+        from hossam import *
+        import pandas as pd
 
-        >>> from hossam.hs_prep import add_interaction
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({'x1': [1, 2, 3], 'x2': [4, 5, 6]})
-        >>> result = add_interaction(df)
-        >>> print(result.columns)  # x1, x2, x1*x2
+        # 수치형 변수들의 상호작용:
+        df = pd.DataFrame({'x1': [1, 2, 3], 'x2': [4, 5, 6]})
+        result = hs_prep.add_interaction(df)
+        print(result.columns)  # x1, x2, x1*x2
 
-        수치형과 명목형의 상호작용:
+        # 수치형과 명목형의 상호작용:
+        df = pd.DataFrame({'age': [20, 30, 40], 'gender': ['M', 'F', 'M']})
+        result = hs_prep.add_interaction(df, pairs=[('age', 'gender')])
+        print(result.columns)  # age, gender, age*gender_M, age*gender_F
 
-        >>> df = pd.DataFrame({'age': [20, 30, 40], 'gender': ['M', 'F', 'M']})
-        >>> result = add_interaction(df, pairs=[('age', 'gender')])
-        >>> print(result.columns)  # age, gender, age*gender_M, age*gender_F
-
-        명목형끼리의 상호작용:
-
-        >>> df = pd.DataFrame({'color': ['R', 'G', 'B'], 'cut': ['A', 'B', 'A']})
-        >>> result = add_interaction(df, pairs=[('color', 'cut')])
-        >>> print(result.columns)  # color, cut, color_cut
+        # 명목형끼리의 상호작용:
+        df = pd.DataFrame({'color': ['R', 'G', 'B'], 'cut': ['A', 'B', 'A']})
+        result = hs_prep.add_interaction(df, pairs=[('color', 'cut')])
+        print(result.columns)  # color, cut, color_cut
+        ```
     """
     df = data.copy()
 

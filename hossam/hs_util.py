@@ -47,10 +47,12 @@ def make_normalize_values(
         np.ndarray: 정규분포를 따르는 데이터
 
     Examples:
-        >>> from hossam.util import make_normalize_values
-        >>> x = make_normalize_values(mean=0.0, std=1.0, size=100)
-        >>> x.shape
+        ```python
+        from hossam.util import make_normalize_values
+        x = make_normalize_values(mean=0.0, std=1.0, size=100)
+        x.shape
         (100,)
+        ```
     """
     p = 0.0
     x: np.ndarray = np.array([])
@@ -115,9 +117,11 @@ def pretty_table(data: DataFrame, tablefmt="simple", headers: str = "keys") -> N
         None
 
     Examples:
-        >>> from hossam.util import pretty_table
-        >>> from pandas import DataFrame
-        >>> pretty_table(DataFrame({"a":[1,2],"b":[3,4]}))
+        ```python
+        from hossam.util import pretty_table
+        from pandas import DataFrame
+        pretty_table(DataFrame({"a":[1,2],"b":[3,4]}))
+        ```
     """
 
     tabulate.WIDE_CHARS_MODE = False
@@ -212,10 +216,12 @@ def load_data(key: str,
         DataFrame: 전처리(인덱스 설정, 카테고리 변환)가 완료된 데이터프레임
 
     Examples:
-        >>> from hossam.util import load_data
-        >>> df = load_data("AD_SALES", index_col=None, timeindex=False, info=False)
-        >>> isinstance(df.columns, object)
-        True
+        ```python
+        from hossam.util import load_data
+        df = load_data("AD_SALES", index_col=None, timeindex=False, info=False)
+        isinstance(df.columns, object)
+        # True
+        ```
     """
 
     k = key.lower()

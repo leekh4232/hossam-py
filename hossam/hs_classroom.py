@@ -50,13 +50,16 @@ def cluster_students(
         ValueError: 필수 컬럼이 없거나 입력값이 유효하지 않은 경우.
 
     Examples:
-        >>> df = read_csv('students.csv')
-        >>> result = cluster_students(
-        ...     df=df,
-        ...     n_groups=5,
-        ...     score_cols=['국어', '영어', '수학'],
-        ...     interest_col='관심사'
-        ... )
+        ```python
+        df = read_csv('students.csv')
+
+        from hossam import *
+        result = hs_classroom.cluster_students(
+                    df=df,
+                    n_groups=5,
+                    score_cols=['국어', '영어', '수학'],
+                    interest_col='관심사')
+        ```
     """
 
     # 파일 경로인 경우 데이터프레임으로 로드
@@ -402,9 +405,10 @@ def report_summary(df: DataFrame, interest_col: str = None, width: int = config.
         dpi (int): 그래프 해상도. 기본값: config.dpi
 
     Examples:
-        >>> from hossam.classroom import cluster_students, report_summary
-        >>> df_result = cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
-        >>> report_summary(df_result)
+        ```python
+        from hossam import *
+        df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
+        hs_classroom.report_summary(df_result)
     """
 
     if df is None or len(df) == 0:
@@ -555,9 +559,11 @@ def report_kde(df: DataFrame, metric: str = 'average', width: int = config.width
         dpi: 그래프 해상도. 기본값: config.dpi
 
     Examples:
-        >>> from hossam.classroom import cluster_students, report_kde
-        >>> df_result = cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
-        >>> report_kde(df_result, metric='average')
+        ```python
+        from hossam import *
+        df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
+        hs_classroom.report_kde(df_result, metric='average')
+        ```
     """
     if df is None or len(df) == 0:
         print("데이터프레임이 비어있습니다")
@@ -627,10 +633,12 @@ def group_summary(df: DataFrame, name_col: str = '학생이름') -> DataFrame:
         컬럼: '조', '학생', '총점평균', '평균점수평균'
 
     Examples:
-        >>> from hossam.classroom import cluster_students, group_summary
-        >>> df_result = cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
-        >>> summary = group_summary(df_result, name_col='이름')
-        >>> print(summary)
+        ```python
+        from hossam import *
+        df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
+        summary = hs_classroom.group_summary(df_result, name_col='이름')
+        print(summary)
+        ```
     """
 
     if df is None or len(df) == 0:
@@ -714,15 +722,15 @@ def analyze_classroom(
         조별 요약 정보 (group_summary의 결과).
 
     Examples:
-        >>> from hossam.classroom import analyze_classroom
-        >>> summary = analyze_classroom(
-        ...     df='students.csv',
-        ...     n_groups=5,
-        ...     score_cols=['국어', '영어', '수학'],
-        ...     interest_col='관심사',
-        ...     name_col='이름'
-        ... )
-        >>> print(summary)
+        ```python
+        from hossam import *
+        summary = hs_classroom.analyze_classroom(df='students.csv',
+                                                 n_groups=5,
+                                                 score_cols=['국어', '영어', '수학'],
+                                                 interest_col='관심사',
+                                                 name_col='이름')
+        print(summary)
+        ```
     """
 
     # 1. 조 편성

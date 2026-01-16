@@ -101,10 +101,12 @@ def geocode(df: DataFrame, addr: str, key: str) -> DataFrame:
         Exception: 지오코딩 과정에서 발생한 예외를 전파합니다.
 
     Examples:
-        >>> from hossam import gis
-        >>> result = gis.hs_geocode(df, addr="address", key="YOUR_VWORLD_KEY")
-        >>> set(["latitude","longitude"]).issubset(result.columns)
-        True
+        ```python
+        from hossam import gis
+        result = gis.hs_geocode(df, addr="address", key="YOUR_VWORLD_KEY")
+        set(["latitude","longitude"]).issubset(result.columns)
+        # True
+        ```
     """
     data: DataFrame = df.copy()
     size: int = len(data)
@@ -172,8 +174,10 @@ def load_shape(path: str, info: bool = True) -> GeoDataFrame:
         FileNotFoundError: 파일이 존재하지 않는 경우.
 
     Examples:
-        >>> from hossam.gis import load_shape
-        >>> gdf = hs_load_shape("path/to/file.shp", info=False)
+        ```python
+        from hossam.gis import load_shape
+        gdf = hs_load_shape("path/to/file.shp", info=False)
+        ```
     """
     if not os.path.exists(path):
         raise FileNotFoundError("⚠️[FileNotFoundException] 주어진 파일을 찾을 수 없습니다.\n - %s" % path)
