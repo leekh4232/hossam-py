@@ -298,7 +298,9 @@ mm_df = hs_prep.minmax_scaler(df, yname="y")
 ### set\_category
 
 ```python
-def set_category(data: DataFrame, *args: str) -> DataFrame
+def set_category(data: DataFrame,
+                 *args: str,
+                 columns: list = None) -> DataFrame
 ```
 
 카테고리 데이터를 설정한다.
@@ -307,6 +309,7 @@ def set_category(data: DataFrame, *args: str) -> DataFrame
 
 - `data` _DataFrame_ - 데이터프레임 객체
 - `*args` _str_ - 컬럼명 목록
+- `columns` _list, optional_ - 변환할 컬럼명 목록. args와 중복 사용 불가.
   
 
 **Returns**:
@@ -359,7 +362,9 @@ result = hs_prep.unmelt(df, id_vars='group', value_vars='value')
 ### outlier\_table
 
 ```python
-def outlier_table(data: DataFrame, *fields: str) -> DataFrame
+def outlier_table(data: DataFrame,
+                  *fields: str,
+                  columns: list = None) -> DataFrame
 ```
 
 수치형 컬럼에 대한 사분위수 및 IQR 기반 이상치 경계를 계산한다.
@@ -371,6 +376,7 @@ def outlier_table(data: DataFrame, *fields: str) -> DataFrame
 
 - `data` _DataFrame_ - 분석할 데이터프레임.
 - `*fields` _str_ - 대상 컬럼명(들). 생략 시 모든 수치형 컬럼 대상.
+- `columns` _list, optional_ - 변환할 컬럼명 목록. args와 중복 사용 불가.
   
 
 **Returns**:
@@ -390,7 +396,8 @@ def outlier_table(data: DataFrame, *fields: str) -> DataFrame
 ```python
 def replace_outliner(data: DataFrame,
                      method: str = "nan",
-                     *fields: str) -> DataFrame
+                     *fields: str,
+                     columns: list = None) -> DataFrame
 ```
 
 이상치 경계값을 넘어가는 데이터를 경계값으로 대체한다.
@@ -405,6 +412,7 @@ def replace_outliner(data: DataFrame,
   - most: 최빈값 대체
   - median: 중앙값 대체
 - `*fields` _str_ - 컬럼명 목록
+- `columns` _list, optional_ - 변환할 컬럼명 목록. args와 중복 사용 불가.
   
 
 **Returns**:
@@ -416,7 +424,9 @@ def replace_outliner(data: DataFrame,
 ### drop\_outliner
 
 ```python
-def drop_outliner(data: DataFrame, *fields: str) -> DataFrame
+def drop_outliner(data: DataFrame,
+                  *fields: str,
+                  columns: list = None) -> DataFrame
 ```
 
 이상치를 결측치로 변환한 후 모두 삭제한다.
@@ -425,6 +435,7 @@ def drop_outliner(data: DataFrame, *fields: str) -> DataFrame
 
 - `data` _DataFrame_ - 데이터프레임
 - `*fields` _str_ - 컬럼명 목록
+- `columns` _list, optional_ - 변환할 컬럼명 목록. args와 중복 사용 불가.
   
 
 **Returns**:
@@ -438,8 +449,9 @@ def drop_outliner(data: DataFrame, *fields: str) -> DataFrame
 ```python
 def get_dummies(data: DataFrame,
                 *args: str,
-                drop_first=True,
-                dtype="int") -> DataFrame
+                columns: list = None,
+                drop_first: bool = True,
+                dtype: str = "int") -> DataFrame
 ```
 
 명목형 변수를 더미 변수로 변환한다.
@@ -451,6 +463,7 @@ def get_dummies(data: DataFrame,
 
 - `data` _DataFrame_ - 데이터프레임
 - `*args` _str_ - 변환할 컬럼명 목록. 지정하지 않으면 숫자형이 아닌 모든 컬럼 자동 선택.
+- `columns` _list, optional_ - 변환할 컬럼명 목록. args와 중복 사용 불가.
 - `drop_first` _bool, optional_ - 첫 번째 더미 변수 제거 여부. 기본값 True.
 - `dtype` _str, optional_ - 더미 변수 데이터 타입. 기본값 "int".
   
@@ -819,6 +832,8 @@ def describe(data: DataFrame, *fields: str, columns: list | None = None)
   행은 다음과 같은 통계량을 포함:
   
   - count (float): 비결측치의 수
+  - na_count (int): 결측치의 수
+  - na_rate (float): 결측치 비율(%)
   - mean (float): 평균값
   - std (float): 표준편차
   - min (float): 최소값
@@ -1341,7 +1356,7 @@ pdf, rdf = hs_stats.ols_report(fit, data)
 ### ols
 
 ```python
-def ols(df: DataFrame, yname: str, report=False)
+def ols(df: DataFrame, yname: str, report: bool | str | int = False)
 ```
 
 선형회귀분석을 수행하고 적합 결과를 반환한다.
@@ -1353,7 +1368,7 @@ OLS(Ordinary Least Squares) 선형회귀분석을 실시한다.
 
 - `df` _DataFrame_ - 종속변수와 독립변수를 모두 포함한 데이터프레임.
 - `yname` _str_ - 종속변수 컬럼명.
-- `report` - 리포트 모드 설정. 다음 값 중 하나:
+- `report` _bool | str | int_ - 리포트 모드 설정. 다음 값 중 하나:
   - False (기본값): 리포트 미사용. fit 객체만 반환.
   - 1 또는 'summary': 요약 리포트 반환 (full=False).
   - 2 또는 'full': 풀 리포트 반환 (full=True).
@@ -1396,10 +1411,10 @@ df = DataFrame({
 fit = hs_stats.ols(df, 'target')
 
 # 요약 리포트 반환
-fit, pdf, rdf = hs_stats.ols(df, 'target', report=1)
+fit, pdf, rdf = hs_stats.ols(df, 'target', report='summary')
 
 # 풀 리포트 반환
-fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_stats.ols(df, 'target', report=2)
+fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_stats.ols(df, 'target', report='full')
 ```
 
 <a id="hs_stats.logit_report"></a>
@@ -1407,7 +1422,11 @@ fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_stats.ols(df, '
 ### logit\_report
 
 ```python
-def logit_report(fit, data, threshold=0.5, full=False, alpha=0.05)
+def logit_report(fit,
+                 data: DataFrame,
+                 threshold: float = 0.5,
+                 full: bool | str | int = False,
+                 alpha: float = 0.05)
 ```
 
 로지스틱 회귀 적합 결과를 상세 리포트로 변환한다.
@@ -1415,10 +1434,10 @@ def logit_report(fit, data, threshold=0.5, full=False, alpha=0.05)
 **Arguments**:
 
 - `fit` - statsmodels Logit 결과 객체 (`fit.summary()`와 예측 확률을 지원해야 함).
-- `data` - 종속변수와 독립변수를 모두 포함한 DataFrame.
-- `threshold` - 예측 확률을 이진 분류로 변환할 임계값. 기본값 0.5.
-- `full` - True이면 6개 값 반환, False이면 주요 2개(cdf, rdf)만 반환. 기본값 False.
-- `alpha` - 유의수준. 기본값 0.05.
+- `data` _DataFrame_ - 종속변수와 독립변수를 모두 포함한 DataFrame.
+- `threshold` _float_ - 예측 확률을 이진 분류로 변환할 임계값. 기본값 0.5.
+- `full` _bool | str | int_ - True이면 6개 값 반환, False이면 주요 2개(cdf, rdf)만 반환. 기본값 False.
+- `alpha` _float_ - 유의수준. 기본값 0.05.
   
 
 **Returns**:
@@ -2061,7 +2080,7 @@ def create_figure(width: int = config.width,
 ### finalize\_plot
 
 ```python
-def finalize_plot(ax: Axes,
+def finalize_plot(ax: Axes | np.ndarray,
                   callback: any = None,
                   outparams: bool = False,
                   save_path: str = None,
@@ -2073,7 +2092,7 @@ def finalize_plot(ax: Axes,
 
 **Arguments**:
 
-- `ax` _Axes|ndarray|list_ - 대상 Axes (단일 Axes 또는 subplots 배열).
+- `ax` _Axes|np.ndarray_ - 대상 Axes (단일 Axes 또는 subplots 배열).
 - `callback` _Callable|None_ - 추가 설정을 위한 사용자 콜백.
 - `outparams` _bool_ - 내부에서 생성한 Figure인 경우 True.
 - `save_path` _str|None_ - 이미지 저장 경로. None이 아니면 해당 경로로 저장.
@@ -2089,7 +2108,7 @@ def finalize_plot(ax: Axes,
 ### show\_figure
 
 ```python
-def show_figure(ax: Axes,
+def show_figure(ax: Axes | np.ndarray,
                 callback: any = None,
                 outparams: bool = False,
                 save_path: str = None,
@@ -2102,7 +2121,7 @@ finalize_plot의 래퍼 함수.
 
 **Arguments**:
 
-- `ax` _Axes|ndarray|list_ - 대상 Axes (단일 Axes 또는 subplots 배열).
+- `ax` _Axes|np.ndarray_ - 대상 Axes (단일 Axes 또는 subplots 배열).
 - `callback` _Callable|None_ - 추가 설정을 위한 사용자 콜백.
 - `outparams` _bool_ - 내부에서 생성한 Figure인 경우 True.
 - `save_path` _str|None_ - 이미지 저장 경로. None이 아니면 해당 경로로 저장.
