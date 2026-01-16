@@ -49,7 +49,7 @@ config = SimpleNamespace(
 # ===================================================================
 # 기본 크기가 설정된 Figure와 Axes를 생성한다
 # ===================================================================
-def get_default_ax(width: int = config.width, height: int = config.height, rows: int = 1, cols: int = 1, dpi: int = config.dpi, flatten: bool = False, ws: int | None = None, hs: int | None = None):
+def get_default_ax(width: int = config.width, height: int = config.height, rows: int = 1, cols: int = 1, dpi: int = config.dpi, flatten: bool = False, ws: int | None = None, hs: int | None = None, title: str = None):
     """기본 크기의 Figure와 Axes를 생성한다.
 
     Args:
@@ -61,6 +61,7 @@ def get_default_ax(width: int = config.width, height: int = config.height, rows:
         flatten (bool): Axes 배열을 1차원 리스트로 평탄화할지 여부.
         ws (int|None): 서브플롯 가로 간격(`wspace`). rows/cols가 1보다 클 때만 적용.
         hs (int|None): 서브플롯 세로 간격(`hspace`). rows/cols가 1보다 클 때만 적용.
+        title (str|None): Figure 제목.
 
     Returns:
         tuple[Figure, Axes]: 생성된 matplotlib Figure와 Axes 객체.
@@ -70,6 +71,9 @@ def get_default_ax(width: int = config.width, height: int = config.height, rows:
 
     if (rows > 1 or cols > 1) and (ws != None and hs != None):
         fig.subplots_adjust(wspace=ws, hspace=hs)
+
+    if title:
+        fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight='bold')
 
     if flatten == True:
         # 단일 Axes인 경우 리스트로 변환
@@ -95,9 +99,33 @@ def get_default_ax(width: int = config.width, height: int = config.height, rows:
 
 
 # ===================================================================
+# 기본 크기가 설정된 Figure와 Axes를 생성한다
+# ===================================================================
+def create_figure(width: int = config.width, height: int = config.height, rows: int = 1, cols: int = 1, dpi: int = config.dpi, flatten: bool = False, ws: int | None = None, hs: int | None = None, title: str = None):
+    """기본 크기의 Figure와 Axes를 생성한다. get_default_ax의 래퍼 함수.
+
+    Args:
+        width (int): 가로 픽셀 크기.
+        height (int): 세로 픽셀 크기.
+        rows (int): 서브플롯 행 개수.
+        cols (int): 서브플롯 열 개수.
+        dpi (int): 해상도(DPI).
+        flatten (bool): Axes 배열을 1차원 리스트로 평탄화할지 여부.
+        ws (int|None): 서브플롯 가로 간격(`wspace`). rows/cols가 1보다 클 때만 적용.
+        hs (int|None): 서브플롯 세로 간격(`hspace`). rows/cols가 1보다 클 때만 적용.
+        title (str): Figure 제목.
+
+    Returns:
+        tuple[Figure, Axes]: 생성된 matplotlib Figure와 Axes 객체.
+    """
+    fig, ax = get_default_ax(width, height, rows, cols, dpi, flatten, ws, hs, title)
+    return fig, ax
+
+
+# ===================================================================
 # 그래프의 그리드, 레이아웃을 정리하고 필요 시 저장 또는 표시한다
 # ===================================================================
-def finalize_plot(ax: Axes, callback: any = None, outparams: bool = False, save_path: str = None, grid: bool = True) -> None:
+def finalize_plot(ax: Axes, callback: any = None, outparams: bool = False, save_path: str = None, grid: bool = True, title: str = None) -> None:
     """공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
 
     Args:
@@ -106,7 +134,7 @@ def finalize_plot(ax: Axes, callback: any = None, outparams: bool = False, save_
         outparams (bool): 내부에서 생성한 Figure인 경우 True.
         save_path (str|None): 이미지 저장 경로. None이 아니면 해당 경로로 저장.
         grid (bool): 그리드 표시 여부. 기본값은 True입니다.
-
+        title (str|None): 그래프 제목.
     Returns:
         None
     """
@@ -131,12 +159,36 @@ def finalize_plot(ax: Axes, callback: any = None, outparams: bool = False, save_
 
     plt.tight_layout()
 
+    if title:
+        ax.set_title(title, fontsize=config.font_size * 1.3, pad=7, fontweight='bold')
+
     if save_path is not None:
         plt.savefig(save_path, dpi=config.dpi * 2, bbox_inches='tight')
 
     if outparams:
         plt.show()
         plt.close()
+
+
+# ===================================================================
+# 그래프의 그리드, 레이아웃을 정리하고 필요 시 저장 또는 표시한다
+# ===================================================================
+def show_figure(ax: Axes, callback: any = None, outparams: bool = False, save_path: str = None, grid: bool = True, title: str = None) -> None:
+    """공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
+    finalize_plot의 래퍼 함수.
+
+    Args:
+        ax (Axes|ndarray|list): 대상 Axes (단일 Axes 또는 subplots 배열).
+        callback (Callable|None): 추가 설정을 위한 사용자 콜백.
+        outparams (bool): 내부에서 생성한 Figure인 경우 True.
+        save_path (str|None): 이미지 저장 경로. None이 아니면 해당 경로로 저장.
+        grid (bool): 그리드 표시 여부. 기본값은 True입니다.
+        title (str|None): 그래프 제목.
+
+    Returns:
+        None
+    """
+    finalize_plot(ax, callback, outparams, save_path, grid, title)
 
 
 # ===================================================================
@@ -147,6 +199,7 @@ def lineplot(
     xname: str = None,
     yname: str = None,
     hue: str = None,
+    title: str | None = None,
     marker: str = None,
     palette: str = None,
     width: int = config.width,
@@ -165,6 +218,7 @@ def lineplot(
         xname (str|None): x축 컬럼명.
         yname (str|None): y축 컬럼명.
         hue (str|None): 범주 구분 컬럼명.
+        title (str|None): 그래프 제목.
         marker (str|None): 마커 모양.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
@@ -203,7 +257,7 @@ def lineplot(
     lineplot_kwargs.update(params)
 
     sb.lineplot(**lineplot_kwargs, linewidth=linewidth)
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -213,6 +267,7 @@ def boxplot(
     df: DataFrame,
     xname: str = None,
     yname: str = None,
+    title: str | None = None,
     orient: str = "v",
     palette: str = None,
     width: int = config.width,
@@ -230,6 +285,7 @@ def boxplot(
         df (DataFrame): 시각화할 데이터.
         xname (str|None): x축 범주 컬럼명.
         yname (str|None): y축 값 컬럼명.
+        title (str|None): 그래프 제목.
         orient (str): 'v' 또는 'h' 방향.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
@@ -272,7 +328,7 @@ def boxplot(
     else:
         sb.boxplot(data=df, orient=orient, ax=ax, linewidth=linewidth, **params)
 
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -283,6 +339,7 @@ def kdeplot(
     xname: str = None,
     yname: str = None,
     hue: str = None,
+    title: str | None = None,
     palette: str = None,
     fill: bool = False,
     fill_alpha: float = config.fill_alpha,
@@ -306,6 +363,7 @@ def kdeplot(
         xname (str|None): x축 컬럼명.
         yname (str|None): y축 컬럼명.
         hue (str|None): 범주 컬럼명.
+        title (str|None): 그래프 제목.
         palette (str|None): 팔레트 이름.
         fill (bool): 면적 채우기 여부.
         fill_alpha (float): 채움 투명도.
@@ -369,7 +427,7 @@ def kdeplot(
             axes[idx].set_title(f"Q{idx+1}: [{lo:.3g}, {hi:.3g}]")
             axes[idx].grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
 
-        finalize_plot(axes[0], callback, outparams, save_path)
+        finalize_plot(axes[0], callback, outparams, save_path, True, title)
         return
 
     if ax is None:
@@ -403,7 +461,7 @@ def kdeplot(
 
     sb.kdeplot(**kdeplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -412,8 +470,9 @@ def kdeplot(
 def histplot(
     df: DataFrame,
     xname: str,
-    hue=None,
-    bins=None,
+    hue: str | None = None,
+    title: str | None = None,
+    bins: int | None = None,
     kde: bool = True,
     palette: str = None,
     width: int = config.width,
@@ -431,6 +490,7 @@ def histplot(
         df (DataFrame): 시각화할 데이터.
         xname (str): 히스토그램 대상 컬럼명.
         hue (str|None): 범주 컬럼명.
+        title (str|None): 그래프 제목.
         bins (int|sequence|None): 구간 수 또는 경계.
         kde (bool): KDE 표시 여부.
         palette (str|None): 팔레트 이름.
@@ -487,7 +547,7 @@ def histplot(
         histplot_kwargs.update(params)
         sb.histplot(**histplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -497,6 +557,7 @@ def stackplot(
     df: DataFrame,
     xname: str,
     hue: str,
+    title: str | None = None,
     palette: str = None,
     width: int = config.width,
     height: int = config.height,
@@ -513,6 +574,7 @@ def stackplot(
         df (DataFrame): 시각화할 데이터.
         xname (str): x축 기준 컬럼.
         hue (str): 클래스 컬럼.
+        title (str|None): 그래프 제목.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
@@ -571,7 +633,7 @@ def stackplot(
         ax.set_xticks(xticks)
         ax.set_xticklabels(xticks)
 
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -582,6 +644,7 @@ def scatterplot(
     xname: str,
     yname: str,
     hue=None,
+    title: str | None = None,
     palette: str = None,
     width: int = config.width,
     height: int = config.height,
@@ -599,6 +662,7 @@ def scatterplot(
         xname (str): x축 컬럼.
         yname (str): y축 컬럼.
         hue (str|None): 범주 컬럼.
+        title (str|None): 그래프 제목.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
@@ -636,7 +700,7 @@ def scatterplot(
 
     sb.scatterplot(**scatterplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -646,6 +710,7 @@ def regplot(
     df: DataFrame,
     xname: str,
     yname: str,
+    title: str | None = None,
     palette: str = None,
     width: int = config.width,
     height: int = config.height,
@@ -662,6 +727,7 @@ def regplot(
         df (DataFrame): 시각화할 데이터.
         xname (str): 독립변수 컬럼.
         yname (str): 종속변수 컬럼.
+        title (str|None): 그래프 제목.
         palette (str|None): 선/점 색상.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
@@ -702,7 +768,7 @@ def regplot(
 
     sb.regplot(**regplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -713,6 +779,7 @@ def lmplot(
     xname: str,
     yname: str,
     hue=None,
+    title: str | None = None,
     palette: str = None,
     width: int = config.width,
     height: int = config.height,
@@ -728,6 +795,7 @@ def lmplot(
         xname (str): 독립변수 컬럼.
         yname (str): 종속변수 컬럼.
         hue (str|None): 범주 컬럼.
+        title (str|None): 그래프 제목.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
@@ -766,6 +834,9 @@ def lmplot(
 
     g.fig.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
 
+    if title:
+        g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight='bold')
+
     plt.tight_layout()
 
     if save_path is not None:
@@ -781,6 +852,7 @@ def lmplot(
 def pairplot(
     df: DataFrame,
     xnames=None,
+    title: str | None = None,
     diag_kind: str = "kde",
     hue=None,
     palette: str = None,
@@ -800,6 +872,7 @@ def pairplot(
             - str: 해당 컬럼에 대해서만 처리.
             - list: 주어진 컬럼들에 대해서만 처리.
             기본값은 None.
+        title (str|None): 그래프 제목.
         diag_kind (str): 대각선 플롯 종류('kde' 등).
         hue (str|None): 범주 컬럼.
         palette (str|None): 팔레트 이름.
@@ -852,6 +925,10 @@ def pairplot(
     scale = len(target_cols)
     g.fig.set_size_inches(w=(width / dpi) * scale, h=(height / dpi) * scale)
     g.fig.set_dpi(dpi)
+
+    if title:
+        g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight='bold')
+
     g.map_lower(func=sb.kdeplot, fill=True, alpha=config.fill_alpha, linewidth=linewidth)
     g.map_upper(func=sb.scatterplot, linewidth=linewidth)
 
@@ -876,6 +953,7 @@ def countplot(
     df: DataFrame,
     xname: str,
     hue=None,
+    title: str | None = None,
     palette: str = None,
     order: int = 1,
     width: int = config.width,
@@ -893,6 +971,7 @@ def countplot(
         df (DataFrame): 시각화할 데이터.
         xname (str): 범주 컬럼.
         hue (str|None): 보조 범주 컬럼.
+        title (str|None): 그래프 제목.
         palette (str|None): 팔레트 이름.
         order (int): 숫자형일 때 정렬 방식(1: 값 기준, 기타: 빈도 기준).
         width (int): 캔버스 가로 픽셀.
@@ -938,7 +1017,7 @@ def countplot(
 
     sb.countplot(**countplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -949,6 +1028,7 @@ def barplot(
     xname: str,
     yname: str,
     hue=None,
+    title: str | None = None,
     palette: str = None,
     width: int = config.width,
     height: int = config.height,
@@ -966,6 +1046,7 @@ def barplot(
         xname (str): 범주 컬럼.
         yname (str): 값 컬럼.
         hue (str|None): 보조 범주 컬럼.
+        title (str|None): 그래프 제목.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
@@ -1002,7 +1083,7 @@ def barplot(
     barplot_kwargs.update(params)
 
     sb.barplot(**barplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -1013,6 +1094,7 @@ def boxenplot(
     xname: str,
     yname: str,
     hue=None,
+    title: str | None = None,
     palette: str = None,
     width: int = config.width,
     height: int = config.height,
@@ -1030,6 +1112,7 @@ def boxenplot(
         xname (str): 범주 컬럼.
         yname (str): 값 컬럼.
         hue (str|None): 보조 범주 컬럼.
+        title (str|None): 그래프 제목.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
@@ -1064,7 +1147,7 @@ def boxenplot(
     boxenplot_kwargs.update(params)
 
     sb.boxenplot(**boxenplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -1075,6 +1158,7 @@ def violinplot(
     xname: str,
     yname: str,
     hue=None,
+    title: str | None = None,
     palette: str = None,
     width: int = config.width,
     height: int = config.height,
@@ -1092,6 +1176,7 @@ def violinplot(
         xname (str): 범주 컬럼.
         yname (str): 값 컬럼.
         hue (str|None): 보조 범주 컬럼.
+        title (str|None): 그래프 제목.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
@@ -1125,7 +1210,7 @@ def violinplot(
 
     violinplot_kwargs.update(params)
     sb.violinplot(**violinplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -1136,6 +1221,7 @@ def pointplot(
     xname: str,
     yname: str,
     hue=None,
+    title: str | None = None,
     palette: str = None,
     width: int = config.width,
     height: int = config.height,
@@ -1153,6 +1239,7 @@ def pointplot(
         xname (str): 범주 컬럼.
         yname (str): 값 컬럼.
         hue (str|None): 보조 범주 컬럼.
+        title (str|None): 그래프 제목.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
@@ -1188,7 +1275,7 @@ def pointplot(
 
     pointplot_kwargs.update(params)
     sb.pointplot(**pointplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -1199,6 +1286,7 @@ def jointplot(
     xname: str,
     yname: str,
     hue=None,
+    title: str | None = None,
     palette: str = None,
     width: int = config.width,
     height: int = config.height,
@@ -1214,6 +1302,7 @@ def jointplot(
         xname (str): x축 컬럼.
         yname (str): y축 컬럼.
         hue (str|None): 범주 컬럼.
+        title (str|None): 그래프 제목.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
@@ -1243,6 +1332,9 @@ def jointplot(
     g.fig.set_size_inches(width / dpi, height / dpi)
     g.fig.set_dpi(dpi)
 
+    if title:
+        g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight='bold')
+
     # 중앙 및 주변 플롯에 grid 추가
     g.ax_joint.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
     g.ax_marg_x.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
@@ -1262,6 +1354,7 @@ def jointplot(
 # ===================================================================
 def heatmap(
     data: DataFrame,
+    title: str | None = None,
     palette: str = None,
     width: int | None = None,
     height: int | None = None,
@@ -1276,6 +1369,7 @@ def heatmap(
 
     Args:
         data (DataFrame): 행렬 형태 데이터.
+        title (str|None): 그래프 제목.
         palette (str|None): 컬러맵 이름.
         width (int|None): 캔버스 가로 픽셀. None이면 자동 계산.
         height (int|None): 캔버스 세로 픽셀. None이면 자동 계산.
@@ -1313,7 +1407,7 @@ def heatmap(
     # heatmap은 hue를 지원하지 않으므로 cmap에 palette 사용
     sb.heatmap(**heatmatp_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, False)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -1324,6 +1418,7 @@ def convex_hull(
     xname: str,
     yname: str,
     hue: str,
+    title: str | None = None,
     palette: str = None,
     width: int = config.width,
     height: int = config.height,
@@ -1341,6 +1436,7 @@ def convex_hull(
         xname (str): x축 컬럼.
         yname (str): y축 컬럼.
         hue (str): 클러스터/범주 컬럼.
+        title (str|None): 그래프 제목.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
@@ -1385,7 +1481,7 @@ def convex_hull(
     sb.scatterplot(
         data=data, x=xname, y=yname, hue=hue, palette=palette, ax=ax, **params
     )
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -1394,10 +1490,12 @@ def convex_hull(
 def kde_confidence_interval(
     data: DataFrame,
     xnames=None,
+    title: str | None = None,
     clevel=0.95,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
+    fill: bool = False,
     dpi: int = config.dpi,
     save_path: str = None,
     callback: any = None,
@@ -1412,10 +1510,12 @@ def kde_confidence_interval(
             - str: 해당 컬럼에 대해서만 처리.
             - list: 주어진 컬럼들에 대해서만 처리.
             기본값은 None.
+        title (str|None): 그래프 제목.
         clevel (float): 신뢰수준(0~1).
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
+        fill (bool): KDE 채우기 여부.
         dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
@@ -1469,7 +1569,7 @@ def kde_confidence_interval(
         cmin, cmax = t.interval(clevel, dof, loc=sample_mean, scale=sample_std_error)
 
         # 현재 컬럼에 대한 커널밀도추정
-        sb.kdeplot(data=column, linewidth=linewidth, ax=current_ax)
+        sb.kdeplot(data=column, linewidth=linewidth, ax=current_ax, fill=fill, alpha=config.fill_alpha)
 
         # 그래프 축의 범위
         xmin, xmax, ymin, ymax = current_ax.get_position().bounds
@@ -1494,7 +1594,7 @@ def kde_confidence_interval(
 
         current_ax.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
 
-    finalize_plot(axes[0] if isinstance(axes, list) and len(axes) > 0 else ax, callback, outparams, save_path)
+    finalize_plot(axes[0] if isinstance(axes, list) and len(axes) > 0 else ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -1504,6 +1604,7 @@ def pvalue1_anotation(
     data: DataFrame,
     target: str,
     hue: str,
+    title: str | None = None,
     pairs: list = None,
     test: str = "t-test_ind",
     text_format: str = "star",
@@ -1523,6 +1624,7 @@ def pvalue1_anotation(
         data (DataFrame): 시각화할 데이터.
         target (str): 값 컬럼명.
         hue (str): 그룹 컬럼명.
+        title (str|None): 그래프 제목.
         pairs (list|None): 비교할 (group_a, group_b) 튜플 목록. None이면 hue 컬럼의 모든 고유값 조합을 자동 생성.
         test (str): 적용할 통계 검정 이름.
         text_format (str): 주석 형식('star' 등).
@@ -1574,7 +1676,7 @@ def pvalue1_anotation(
     annotator.apply_and_annotate()
 
     sb.despine()
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 
@@ -1583,6 +1685,7 @@ def pvalue1_anotation(
 # ===================================================================
 def ols_residplot(
     fit,
+    title: str | None = None,
     lowess: bool = False,
     mse: bool = False,
     width: int = config.width,
@@ -1603,6 +1706,7 @@ def ols_residplot(
     Args:
         fit: 회귀 모형 객체 (statsmodels의 RegressionResultsWrapper).
              fit.resid와 fit.fittedvalues를 통해 잔차와 적합값을 추출한다.
+        title (str|None): 그래프 제목.
         lowess (bool): LOWESS 스무딩 적용 여부.
         mse (bool): √MSE, 2√MSE, 3√MSE 대역선과 비율 표시 여부.
         width (int): 캔버스 가로 픽셀.
@@ -1702,7 +1806,7 @@ def ols_residplot(
                 color=c,
             )
 
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -1710,6 +1814,7 @@ def ols_residplot(
 # ===================================================================
 def ols_qqplot(
     fit,
+    title: str | None = None,
     line: str = 's',
     width: int = config.width,
     height: int = config.height,
@@ -1728,6 +1833,7 @@ def ols_qqplot(
     Args:
         fit: 회귀 모형 객체 (statsmodels의 RegressionResultsWrapper 등).
              fit.resid 속성을 통해 잔차를 추출하여 정규성을 확인한다.
+        title (str|None): 그래프 제목.
         line (str): 참조선의 유형. 기본값 's' (standardized).
                     - 's': 표본의 표준편차와 평균을 기반으로 조정된 선 (권장)
                     - 'r': 실제 점들에 대한 회귀선 (데이터 추세 반영)
@@ -1788,7 +1894,7 @@ def ols_qqplot(
         if line.get_linestyle() == '--' or line.get_color() == 'r':
             line.set_linewidth(linewidth)
 
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -1796,6 +1902,7 @@ def ols_qqplot(
 # ===================================================================
 def distribution_by_class(
     data: DataFrame,
+    title: str | None = None,
     xnames: list = None,
     hue: str = None,
     type: str = "kde",
@@ -1815,6 +1922,7 @@ def distribution_by_class(
         data (DataFrame): 시각화할 데이터.
         xnames (list|None): 대상 컬럼 목록(None이면 전 컬럼).
         hue (str|None): 클래스 컬럼.
+        title (str|None): 그래프 제목.
         type (str): 'kde' | 'hist' | 'histkde'.
         bins (int|sequence|None): 히스토그램 구간.
         palette (str|None): 팔레트 이름.
@@ -1897,6 +2005,7 @@ def scatter_by_class(
     yname: str,
     group: list | None = None,
     hue: str | None = None,
+    title: str | None = None,
     palette: str | None = None,
     outline: bool = False,
     width: int = config.width,
@@ -1913,6 +2022,7 @@ def scatter_by_class(
         yname (str): 종속변수 컬럼명(필수).
         group (list|None): x 컬럼 목록 또는 [[x, y], ...] 형태. None이면 자동 생성.
         hue (str|None): 클래스 컬럼.
+        title (str|None): 그래프 제목.
         palette (str|None): 팔레트 이름.
         outline (bool): 볼록 껍질을 표시할지 여부.
         width (int): 캔버스 가로 픽셀.
@@ -1968,6 +2078,7 @@ def categorical_target_distribution(
     data: DataFrame,
     yname: str,
     hue: list | str | None = None,
+    title: str | None = None,
     kind: str = "box",
     kde_fill: bool = True,
     palette: str | None = None,
@@ -1985,6 +2096,7 @@ def categorical_target_distribution(
         data (DataFrame): 시각화할 데이터.
         yname (str): 종속변수 컬럼명(연속형 추천).
         hue (list|str|None): 명목형 독립변수 목록. None이면 자동 탐지.
+        title (str|None): 그래프 제목.
         kind (str): 'box', 'violin', 'kde'.
         kde_fill (bool): kind='kde'일 때 영역 채우기 여부.
         palette (str|None): 팔레트 이름.
@@ -2043,7 +2155,7 @@ def categorical_target_distribution(
     for j in range(n_plots, len(axes)):
         axes[j].set_visible(False)
 
-    finalize_plot(axes[0], callback, outparams, save_path)
+    finalize_plot(axes[0], callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -2053,6 +2165,7 @@ def roc_curve_plot(
     fit,
     y: np.ndarray | pd.Series = None,
     X: pd.DataFrame | np.ndarray = None,
+    title: str | None = None,
     width: int = config.height,
     height: int = config.height,
     linewidth: float = config.line_width,
@@ -2067,6 +2180,7 @@ def roc_curve_plot(
         fit: statsmodels Logit 결과 객체 (`fit.predict()`로 예측 확률을 계산 가능해야 함).
         y (array-like|None): 외부 데이터의 실제 레이블. 제공 시 이를 실제값으로 사용.
         X (array-like|None): 외부 데이터의 설계행렬(독립변수). 제공 시 해당 데이터로 예측 확률 계산.
+        title (str|None): 그래프 제목.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
@@ -2113,7 +2227,7 @@ def roc_curve_plot(
     ax.set_ylabel('재현율 (True Positive Rate)', fontsize=8)
     ax.set_title('ROC 곡선', fontsize=10, fontweight='bold')
     ax.legend(loc="lower right", fontsize=7)
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -2121,6 +2235,7 @@ def roc_curve_plot(
 # ===================================================================
 def confusion_matrix_plot(
     fit,
+    title: str | None = None,
     threshold: float = 0.5,
     width: int = config.width,
     height: int = config.height,
@@ -2133,6 +2248,7 @@ def confusion_matrix_plot(
 
     Args:
         fit: statsmodels Logit 결과 객체 (`fit.predict()`로 예측 확률을 계산 가능해야 함).
+        title (str|None): 그래프 제목.
         threshold (float): 예측 확률을 이진 분류로 변환할 임계값. 기본값 0.5.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
@@ -2163,7 +2279,7 @@ def confusion_matrix_plot(
 
     ax.set_title(f'혼동행렬 (임계값: {threshold})', fontsize=8, fontweight='bold')
 
-    finalize_plot(ax, callback, outparams, save_path, False)
+    finalize_plot(ax, callback, outparams, save_path, False, title)
 
 
 # ===================================================================
@@ -2173,6 +2289,7 @@ def radarplot(
     df: DataFrame,
     columns: list = None,
     hue: str = None,
+    title: str | None = None,
     normalize: bool = True,
     fill: bool = True,
     fill_alpha: float = 0.25,
@@ -2192,6 +2309,7 @@ def radarplot(
         df (DataFrame): 시각화할 데이터.
         columns (list|None): 레이더 차트에 표시할 컬럼 목록. None이면 모든 숫자형 컬럼 사용.
         hue (str|None): 집단 구분 컬럼. None이면 각 행을 개별 객체로 표시.
+        title (str|None): 그래프 제목.
         normalize (bool): 0-1 범위로 정규화 여부. 기본값 True.
         fill (bool): 영역 채우기 여부.
         fill_alpha (float): 채움 투명도.
@@ -2293,7 +2411,7 @@ def radarplot(
     else:
         ax.set_title('Radar Chart', pad=20)
 
-    finalize_plot(ax, callback, outparams, save_path)
+    finalize_plot(ax, callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -2302,6 +2420,7 @@ def radarplot(
 def distribution_plot(
     data: DataFrame,
     column: str,
+    title: str | None = None,
     clevel: float = 0.95,
     orient: str = "h",
     hue: str | None = None,
@@ -2322,6 +2441,7 @@ def distribution_plot(
     Args:
         data (DataFrame): 시각화할 데이터.
         column (str): 분석할 컬럼명.
+        title (str|None): 그래프 제목.
         clevel (float): KDE 신뢰수준 (0~1). 기본값 0.95.
         orient (str): Boxplot 방향 ('v' 또는 'h'). 기본값 'h'.
         hue (str|None): 명목형 컬럼명. 지정하면 각 범주별로 행을 늘려 KDE와 boxplot을 그림.
