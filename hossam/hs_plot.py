@@ -16,7 +16,7 @@ from pandas import DataFrame
 from scipy.stats import t
 from scipy.spatial import ConvexHull
 from statsmodels.graphics.gofplots import qqplot as sm_qqplot
-from statsmodels.nonparametric.smoothers_lowess import lowess
+from statsmodels.nonparametric.smoothers_lowess import lowess as sm_lowess
 
 # ===================================================================
 from statannotations.Annotator import Annotator
@@ -1740,15 +1740,14 @@ def ols_residplot(
         fig, ax = get_default_ax(width + 150 if mse else width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
-    # 산점도 직접 그리기 (seaborn.residplot보다 훨씬 빠름)
-    ax.scatter(y_pred, resid, edgecolor="white", alpha=0.7, **params)   # type: ignore
+    # 산점도 seaborn으로 그리기
+    sb.scatterplot(x=y_pred, y=resid, ax=ax, s=0.5, edgecolor="white", alpha=config.fill_alpha, **params)
 
     # 기준선 (잔차 = 0)
-    ax.axhline(0, color="gray", linestyle="--", linewidth=linewidth)    # type: ignore
+    ax.axhline(0, color="gray", linestyle="--", linewidth=linewidth*0.7)    # type: ignore
 
     # LOWESS 스무딩 (선택적)
     if lowess:
-        from statsmodels.nonparametric.smoothers_lowess import lowess as sm_lowess
         lowess_result = sm_lowess(resid, y_pred, frac=0.6667)
         ax.plot(lowess_result[:, 0], lowess_result[:, 1],           # type: ignore
                 color="red", linewidth=linewidth, label="LOWESS")   # type: ignore

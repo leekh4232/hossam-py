@@ -5,6 +5,7 @@
 import joblib
 import numpy as np
 from itertools import combinations
+from typing import Any
 
 import pandas as pd
 import jenkspy
@@ -19,7 +20,7 @@ from .hs_util import pretty_table
 # 연속형 변수를 표준정규화(Z-score)로 변환한다
 # ===================================================================
 def standard_scaler(
-    data: any, yname: str | None = None, save_path: str | None = None, load_path: str | None = None
+    data: Any, yname: str | None = None, save_path: str | None = None, load_path: str | None = None
 ) -> DataFrame:
     """연속형 변수에 대해 Standard Scaling을 수행한다.
 
@@ -54,7 +55,7 @@ def standard_scaler(
         sdata = scaler.transform(arr) if load_path else scaler.fit_transform(arr)
         if save_path:
             joblib.dump(value=scaler, filename=save_path)
-        return sdata
+        return sdata # type: ignore
 
     df = data.copy()
 
@@ -90,7 +91,7 @@ def standard_scaler(
 # 연속형 변수를 0부터 1 사이의 값으로 정규화한다
 # ===================================================================
 def minmax_scaler(
-    data: any, yname: str | None = None, save_path: str | None = None, load_path: str | None = None
+    data: Any, yname: str | None = None, save_path: str | None = None, load_path: str | None = None
 ) -> DataFrame:
     """연속형 변수에 대해 MinMax Scaling을 수행한다.
 
@@ -123,7 +124,7 @@ def minmax_scaler(
         sdata = scaler.transform(arr) if load_path else scaler.fit_transform(arr)
         if save_path:
             joblib.dump(scaler, save_path)
-        return sdata
+        return sdata # type: ignore
 
     df = data.copy()
 
@@ -158,7 +159,7 @@ def minmax_scaler(
 # ===================================================================
 # 지정된 컬럼들을 범주형 데이터로 설정한다
 # ===================================================================
-def set_category(data: DataFrame, *args: str, columns: list = None) -> DataFrame:
+def set_category(data: DataFrame, *args: str, columns: list | None = None) -> DataFrame:
     """카테고리 데이터를 설정한다.
 
     Args:
@@ -173,7 +174,7 @@ def set_category(data: DataFrame, *args: str, columns: list = None) -> DataFrame
     if columns is not None:
         if args:
             raise ValueError("args와 columns 인자는 중복 사용할 수 없습니다.")
-        args = columns
+        args = columns # type: ignore
 
     df = data.copy()
 
@@ -226,7 +227,7 @@ def unmelt(
 # ===================================================================
 # 지정된 변수의 이상치 테이블로 반환한다
 # ===================================================================
-def outlier_table(data: DataFrame, *fields: str, columns: list = None) -> DataFrame:
+def outlier_table(data: DataFrame, *fields: str, columns: list | None = None) -> DataFrame:
     """수치형 컬럼에 대한 사분위수 및 IQR 기반 이상치 경계를 계산한다.
 
     전달된 `fields`가 없으면 데이터프레임의 모든 수치형 컬럼을 대상으로 한다.
@@ -246,7 +247,7 @@ def outlier_table(data: DataFrame, *fields: str, columns: list = None) -> DataFr
     """
     # columns 인자가 있으면 args보다 우선한다.
     if columns is not None:
-        if args:
+        if args: # type: ignore
             raise ValueError("args와 columns 인자는 중복 사용할 수 없습니다.")
         args = columns
 
@@ -286,7 +287,7 @@ def outlier_table(data: DataFrame, *fields: str, columns: list = None) -> DataFr
 # ===================================================================
 # 이상치를 대체값(NaN, 0) 또는 중앙값으로 교체한다
 # ===================================================================
-def replace_outliner(data: DataFrame, method: str = "nan", *fields: str, columns: list = None) -> DataFrame:
+def replace_outliner(data: DataFrame, method: str = "nan", *fields: str, columns: list | None = None) -> DataFrame:
     """이상치 경계값을 넘어가는 데이터를 경계값으로 대체한다.
 
     Args:
@@ -305,7 +306,7 @@ def replace_outliner(data: DataFrame, method: str = "nan", *fields: str, columns
     """
     # columns 인자가 있으면 args보다 우선한다.
     if columns is not None:
-        if args:
+        if args: # type: ignore
             raise ValueError("args와 columns 인자는 중복 사용할 수 없습니다.")
         args = columns
 
@@ -354,7 +355,7 @@ def replace_outliner(data: DataFrame, method: str = "nan", *fields: str, columns
 # ===================================================================
 # 중빈 이상치를 제거한 연처리된 데이터프레임을 반환한다
 # ===================================================================
-def drop_outliner(data: DataFrame, *fields: str, columns: list = None) -> DataFrame:
+def drop_outliner(data: DataFrame, *fields: str, columns: list | None = None) -> DataFrame:
     """이상치를 결측치로 변환한 후 모두 삭제한다.
 
     Args:
@@ -367,7 +368,7 @@ def drop_outliner(data: DataFrame, *fields: str, columns: list = None) -> DataFr
     """
     # columns 인자가 있으면 args보다 우선한다.
     if columns is not None:
-        if args:
+        if args: # type: ignore
             raise ValueError("args와 columns 인자는 중복 사용할 수 없습니다.")
         args = columns
 
@@ -378,7 +379,7 @@ def drop_outliner(data: DataFrame, *fields: str, columns: list = None) -> DataFr
 # ===================================================================
 # 범주 변수를 더미 변수(One-Hot 인코딩)로 변환한다
 # ===================================================================
-def get_dummies(data: DataFrame, *args: str, columns: list = None, drop_first: bool = True, dtype: str = "int") -> DataFrame:
+def get_dummies(data: DataFrame, *args: str, columns: list | None = None, drop_first: bool = True, dtype: str = "int") -> DataFrame:
     """명목형 변수를 더미 변수로 변환한다.
 
     컬럼명을 지정하면 그 컬럼들만 더미 변수로 변환하고,
@@ -409,7 +410,7 @@ def get_dummies(data: DataFrame, *args: str, columns: list = None, drop_first: b
     if columns is not None:
         if args:
             raise ValueError("args와 columns 인자는 중복 사용할 수 없습니다.")
-        args = columns
+        args = columns # type: ignore
 
     if not args:
         # args가 없으면 숫자 타입이 아닌 모든 컬럼 자동 선택
@@ -417,13 +418,13 @@ def get_dummies(data: DataFrame, *args: str, columns: list = None, drop_first: b
         for f in data.columns:
             if not pd.api.types.is_numeric_dtype(data[f]):
                 cols_to_convert.append(f)
-        args = cols_to_convert
+        args = cols_to_convert # type: ignore
     else:
         # args가 있으면 그 컬럼들만 사용 (존재 여부 확인)
-        args = [c for c in args if c in data.columns]
+        args = [c for c in args if c in data.columns] # type: ignore
 
     # pandas.get_dummies 사용 (재귀 문제 없음)
-    return pd.get_dummies(data, columns=args, drop_first=drop_first, dtype=dtype) if args else data.copy()
+    return pd.get_dummies(data, columns=args, drop_first=drop_first, dtype=dtype) if args else data.copy() # type: ignore
 
 
 # ===================================================================
@@ -630,7 +631,7 @@ def bin_continuous(
         if apply_labels:
             # 숫자 인덱스 사용 (0, 1, 2, ...)
             numeric_labels = list(range(len(edges) - 1))
-            df[new_col] = pd.cut(series, bins=edges, labels=numeric_labels, include_lowest=True, ordered=False)
+            df[new_col] = pd.cut(series, bins=edges, labels=numeric_labels, include_lowest=True, ordered=False) # type: ignore
         else:
             # 문자 레이블 적용
             if labels is None:
@@ -645,9 +646,9 @@ def bin_continuous(
                     except:
                         pass
                     auto_labels.append(f"{left}~{right}")
-                df[new_col] = pd.cut(series, bins=edges, labels=auto_labels, include_lowest=True, ordered=False)
+                df[new_col] = pd.cut(series, bins=edges, labels=auto_labels, include_lowest=True, ordered=False) # type: ignore
             else:
-                df[new_col] = pd.cut(series, bins=edges, labels=labels, include_lowest=True, ordered=False)
+                df[new_col] = pd.cut(series, bins=edges, labels=labels, include_lowest=True, ordered=False) # type: ignore
 
         df[new_col] = df[new_col].astype("category")
         return df
@@ -671,26 +672,24 @@ def bin_continuous(
             n_bins = len(edges) - 1
             if apply_labels:
                 numeric_labels = list(range(n_bins))
-                df[new_col] = pd.cut(series, bins=edges, labels=numeric_labels, include_lowest=True, ordered=False)
+                df[new_col] = pd.cut(series, bins=edges, labels=numeric_labels, include_lowest=True, ordered=False) # type: ignore
             else:
                 if labels is None:
                     position_labels = [f"Q{i+1}" for i in range(n_bins)]
-                    df[new_col] = pd.cut(
-                        series, bins=edges, labels=position_labels, include_lowest=True, ordered=False
-                    )
+                    df[new_col] = pd.cut(series, bins=edges, labels=position_labels, include_lowest=True, ordered=False) # type: ignore
                 else:
-                    df[new_col] = pd.cut(series, bins=edges, labels=labels, include_lowest=True, ordered=False)
+                    df[new_col] = pd.cut(series, bins=edges, labels=labels, include_lowest=True, ordered=False) # type: ignore
         df[new_col] = df[new_col].astype("category")
         return df
 
     # 자연 구간화 (Jenks) - 의존성 없으면 분위수로 폴백
     if method_key in {"natural_breaks", "natural", "jenks"}:
         k = bins if isinstance(bins, int) and bins > 1 else 5
-        series_nonnull = series.dropna()
+        series_nonnull = series.dropna() # type: ignore
         k = min(k, max(2, series_nonnull.nunique()))
         edges = None
         try:
-            edges = jenkspy.jenks_breaks(series_nonnull.to_list(), nb_class=k)
+            edges = jenkspy.jenks_breaks(series_nonnull.to_list(), nb_class=k) # type: ignore
             edges[0] = -np.inf
             edges[-1] = np.inf
         except Exception:
@@ -730,7 +729,7 @@ def bin_continuous(
             if apply_labels:
                 # 숫자 인덱스 사용
                 numeric_labels = list(range(len(cut_edges) - 1))
-                df[new_col] = pd.cut(series, bins=cut_edges, labels=numeric_labels, include_lowest=True, ordered=False)
+                df[new_col] = pd.cut(series, bins=cut_edges, labels=numeric_labels, include_lowest=True, ordered=False) # type: ignore
             else:
                 if labels is None:
                     auto_labels = []
@@ -744,9 +743,9 @@ def bin_continuous(
                         except:
                             pass
                         auto_labels.append(f"{left}~{right}")
-                    df[new_col] = pd.cut(series, bins=cut_edges, labels=auto_labels, include_lowest=True, ordered=False)
+                    df[new_col] = pd.cut(series, bins=cut_edges, labels=auto_labels, include_lowest=True, ordered=False) # type: ignore
                 else:
-                    df[new_col] = pd.cut(series, bins=cut_edges, labels=labels, include_lowest=True, ordered=False)
+                    df[new_col] = pd.cut(series, bins=cut_edges, labels=labels, include_lowest=True, ordered=False) # type: ignore
             df[new_col] = df[new_col].astype("category")
         return df
 

@@ -122,11 +122,9 @@ def pretty_table(data: DataFrame, tablefmt="simple", headers: str = "keys") -> N
         ```
     """
 
-    tabulate.WIDE_CHARS_MODE = False
+    tabulate.WIDE_CHARS_MODE = False # type: ignore
     print(
-        tabulate(
-            data, headers=headers, tablefmt=tablefmt, showindex=True, numalign="right"
-        )
+        tabulate(data, headers=headers, tablefmt=tablefmt, showindex=True, numalign="right") # type: ignore
     )
 
 
@@ -167,7 +165,7 @@ def __data_info(
 
     if info:
         print("\n✅ 테이블 정보")
-        pretty_table(data.info(), tablefmt="pretty")
+        pretty_table(data.info(), tablefmt="pretty") # type: ignore
 
         print("\n✅ 상위 5개 행")
         pretty_table(data.head(), tablefmt="pretty")
@@ -229,7 +227,7 @@ def load_data(key: str,
     elif k.endswith(".csv"):
         origin = read_csv(key)
     else:
-        origin = _load_data_remote(key, local)
+        origin = _load_data_remote(key, local) # type: ignore
 
     if origin is None:
         raise RuntimeError("Data loading failed: origin is None")
