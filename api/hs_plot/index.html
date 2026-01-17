@@ -10962,8 +10962,7 @@ finalize_plot의 래퍼 함수.</p>
 <span class="normal">1806</span>
 <span class="normal">1807</span>
 <span class="normal">1808</span>
-<span class="normal">1809</span>
-<span class="normal">1810</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_residplot</span><span class="p">(</span>
+<span class="normal">1809</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_residplot</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">lowess</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -11019,15 +11018,14 @@ finalize_plot의 래퍼 함수.</p>
         <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">get_default_ax</span><span class="p">(</span><span class="n">width</span> <span class="o">+</span> <span class="mi">150</span> <span class="k">if</span> <span class="n">mse</span> <span class="k">else</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dpi</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="n">outparams</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="c1"># 산점도 직접 그리기 (seaborn.residplot보다 훨씬 빠름)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>   <span class="c1"># type: ignore</span>
+    <span class="c1"># 산점도 seaborn으로 그리기</span>
+    <span class="n">sb</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">resid</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">fill_alpha</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
 
     <span class="c1"># 기준선 (잔차 = 0)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">)</span>    <span class="c1"># type: ignore</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="o">*</span><span class="mf">0.7</span><span class="p">)</span>    <span class="c1"># type: ignore</span>
 
     <span class="c1"># LOWESS 스무딩 (선택적)</span>
     <span class="k">if</span> <span class="n">lowess</span><span class="p">:</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">statsmodels.nonparametric.smoothers_lowess</span><span class="w"> </span><span class="kn">import</span> <span class="n">lowess</span> <span class="k">as</span> <span class="n">sm_lowess</span>
         <span class="n">lowess_result</span> <span class="o">=</span> <span class="n">sm_lowess</span><span class="p">(</span><span class="n">resid</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.6667</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lowess_result</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">lowess_result</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>           <span class="c1"># type: ignore</span>
                 <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;LOWESS&quot;</span><span class="p">)</span>   <span class="c1"># type: ignore</span>
@@ -11355,7 +11353,8 @@ finalize_plot의 래퍼 함수.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1816</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1815</span>
+<span class="normal">1816</span>
 <span class="normal">1817</span>
 <span class="normal">1818</span>
 <span class="normal">1819</span>
@@ -11436,8 +11435,7 @@ finalize_plot의 래퍼 함수.</p>
 <span class="normal">1894</span>
 <span class="normal">1895</span>
 <span class="normal">1896</span>
-<span class="normal">1897</span>
-<span class="normal">1898</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_qqplot</span><span class="p">(</span>
+<span class="normal">1897</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_qqplot</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">line</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span>
@@ -11805,7 +11803,8 @@ finalize_plot의 래퍼 함수.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1904</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1903</span>
+<span class="normal">1904</span>
 <span class="normal">1905</span>
 <span class="normal">1906</span>
 <span class="normal">1907</span>
@@ -11898,8 +11897,7 @@ finalize_plot의 래퍼 함수.</p>
 <span class="normal">1994</span>
 <span class="normal">1995</span>
 <span class="normal">1996</span>
-<span class="normal">1997</span>
-<span class="normal">1998</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">distribution_by_class</span><span class="p">(</span>
+<span class="normal">1997</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">distribution_by_class</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">xnames</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -12262,7 +12260,8 @@ finalize_plot의 래퍼 함수.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2004</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2003</span>
+<span class="normal">2004</span>
 <span class="normal">2005</span>
 <span class="normal">2006</span>
 <span class="normal">2007</span>
@@ -12329,8 +12328,7 @@ finalize_plot의 래퍼 함수.</p>
 <span class="normal">2068</span>
 <span class="normal">2069</span>
 <span class="normal">2070</span>
-<span class="normal">2071</span>
-<span class="normal">2072</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">scatter_by_class</span><span class="p">(</span>
+<span class="normal">2071</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">scatter_by_class</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">group</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -12684,7 +12682,8 @@ finalize_plot의 래퍼 함수.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2078</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2077</span>
+<span class="normal">2078</span>
 <span class="normal">2079</span>
 <span class="normal">2080</span>
 <span class="normal">2081</span>
@@ -12764,8 +12763,7 @@ finalize_plot의 래퍼 함수.</p>
 <span class="normal">2155</span>
 <span class="normal">2156</span>
 <span class="normal">2157</span>
-<span class="normal">2158</span>
-<span class="normal">2159</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">categorical_target_distribution</span><span class="p">(</span>
+<span class="normal">2158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">categorical_target_distribution</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">hue</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -13088,7 +13086,8 @@ finalize_plot의 래퍼 함수.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2165</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2164</span>
+<span class="normal">2165</span>
 <span class="normal">2166</span>
 <span class="normal">2167</span>
 <span class="normal">2168</span>
@@ -13153,8 +13152,7 @@ finalize_plot의 래퍼 함수.</p>
 <span class="normal">2227</span>
 <span class="normal">2228</span>
 <span class="normal">2229</span>
-<span class="normal">2230</span>
-<span class="normal">2231</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">roc_curve_plot</span><span class="p">(</span>
+<span class="normal">2230</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">roc_curve_plot</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">,</span>
     <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -13420,7 +13418,8 @@ finalize_plot의 래퍼 함수.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2237</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2236</span>
+<span class="normal">2237</span>
 <span class="normal">2238</span>
 <span class="normal">2239</span>
 <span class="normal">2240</span>
@@ -13465,8 +13464,7 @@ finalize_plot의 래퍼 함수.</p>
 <span class="normal">2279</span>
 <span class="normal">2280</span>
 <span class="normal">2281</span>
-<span class="normal">2282</span>
-<span class="normal">2283</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">confusion_matrix_plot</span><span class="p">(</span>
+<span class="normal">2282</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">confusion_matrix_plot</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
@@ -13831,7 +13829,8 @@ finalize_plot의 래퍼 함수.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2289</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2288</span>
+<span class="normal">2289</span>
 <span class="normal">2290</span>
 <span class="normal">2291</span>
 <span class="normal">2292</span>
@@ -13956,8 +13955,7 @@ finalize_plot의 래퍼 함수.</p>
 <span class="normal">2411</span>
 <span class="normal">2412</span>
 <span class="normal">2413</span>
-<span class="normal">2414</span>
-<span class="normal">2415</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">radarplot</span><span class="p">(</span>
+<span class="normal">2414</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">radarplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hue</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -14371,7 +14369,8 @@ finalize_plot의 래퍼 함수.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2421</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2420</span>
+<span class="normal">2421</span>
 <span class="normal">2422</span>
 <span class="normal">2423</span>
 <span class="normal">2424</span>
@@ -14481,8 +14480,7 @@ finalize_plot의 래퍼 함수.</p>
 <span class="normal">2528</span>
 <span class="normal">2529</span>
 <span class="normal">2530</span>
-<span class="normal">2531</span>
-<span class="normal">2532</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">distribution_plot</span><span class="p">(</span>
+<span class="normal">2531</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">distribution_plot</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
