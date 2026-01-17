@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 from types import SimpleNamespace
+from typing import Callable
 
 # ===================================================================
 import numpy as np
 import pandas as pd
 import seaborn as sb
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import Axes
+from matplotlib.pyplot import Axes # type: ignore
 from math import sqrt
 from pandas import DataFrame
 
@@ -30,9 +31,6 @@ from sklearn.metrics import (
 )
 
 # ===================================================================
-if pd.__version__ > "2.0.0":
-    pd.DataFrame.iteritems = pd.DataFrame.items
-
 config = SimpleNamespace(
     dpi=200,
     width=600,
@@ -49,7 +47,7 @@ config = SimpleNamespace(
 # ===================================================================
 # 기본 크기가 설정된 Figure와 Axes를 생성한다
 # ===================================================================
-def get_default_ax(width: int = config.width, height: int = config.height, rows: int = 1, cols: int = 1, dpi: int = config.dpi, flatten: bool = False, ws: int | None = None, hs: int | None = None, title: str = None):
+def get_default_ax(width: int = config.width, height: int = config.height, rows: int = 1, cols: int = 1, dpi: int = config.dpi, flatten: bool = False, ws: int | None = None, hs: int | None = None, title: str | None = None):
     """기본 크기의 Figure와 Axes를 생성한다.
 
     Args:
@@ -95,7 +93,7 @@ def get_default_ax(width: int = config.width, height: int = config.height, rows:
             for spine in a.spines.values():
                 spine.set_linewidth(config.frame_width)
     else:
-        for spine in ax.spines.values():
+        for spine in ax.spines.values():    # type: ignore
             spine.set_linewidth(config.frame_width)
 
     return fig, ax
@@ -104,7 +102,7 @@ def get_default_ax(width: int = config.width, height: int = config.height, rows:
 # ===================================================================
 # 기본 크기가 설정된 Figure와 Axes를 생성한다
 # ===================================================================
-def create_figure(width: int = config.width, height: int = config.height, rows: int = 1, cols: int = 1, dpi: int = config.dpi, flatten: bool = False, ws: int | None = None, hs: int | None = None, title: str = None):
+def create_figure(width: int = config.width, height: int = config.height, rows: int = 1, cols: int = 1, dpi: int = config.dpi, flatten: bool = False, ws: int | None = None, hs: int | None = None, title: str | None = None):
     """기본 크기의 Figure와 Axes를 생성한다. get_default_ax의 래퍼 함수.
 
     Args:
@@ -128,7 +126,7 @@ def create_figure(width: int = config.width, height: int = config.height, rows: 
 # ===================================================================
 # 그래프의 그리드, 레이아웃을 정리하고 필요 시 저장 또는 표시한다
 # ===================================================================
-def finalize_plot(ax: Axes | np.ndarray, callback: any = None, outparams: bool = False, save_path: str = None, grid: bool = True, title: str = None) -> None:
+def finalize_plot(ax: Axes | np.ndarray, callback: Callable | None = None, outparams: bool = False, save_path: str | None = None, grid: bool = True, title: str | None = None) -> None:
     """공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
 
     Args:
@@ -176,7 +174,7 @@ def finalize_plot(ax: Axes | np.ndarray, callback: any = None, outparams: bool =
 # ===================================================================
 # 그래프의 그리드, 레이아웃을 정리하고 필요 시 저장 또는 표시한다
 # ===================================================================
-def show_figure(ax: Axes | np.ndarray, callback: any = None, outparams: bool = False, save_path: str = None, grid: bool = True, title: str = None) -> None:
+def show_figure(ax: Axes | np.ndarray, callback: Callable | None = None, outparams: bool = False, save_path: str | None = None, grid: bool = True, title: str | None = None) -> None:
     """공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
     finalize_plot의 래퍼 함수.
 
@@ -199,19 +197,19 @@ def show_figure(ax: Axes | np.ndarray, callback: any = None, outparams: bool = F
 # ===================================================================
 def lineplot(
     df: DataFrame,
-    xname: str = None,
-    yname: str = None,
-    hue: str = None,
+    xname: str | None = None,
+    yname: str | None = None,
+    hue: str | None = None,
     title: str | None = None,
-    marker: str = None,
-    palette: str = None,
+    marker: str | None = None,
+    palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """선 그래프를 그린다.
@@ -239,7 +237,7 @@ def lineplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -260,7 +258,7 @@ def lineplot(
     lineplot_kwargs.update(params)
 
     sb.lineplot(**lineplot_kwargs, linewidth=linewidth)
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
 
 
 # ===================================================================
@@ -268,18 +266,18 @@ def lineplot(
 # ===================================================================
 def boxplot(
     df: DataFrame,
-    xname: str = None,
-    yname: str = None,
+    xname: str | None = None,
+    yname: str | None = None,
     title: str | None = None,
     orient: str = "v",
-    palette: str = None,
+    palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """상자그림(boxplot)을 그린다.
@@ -306,7 +304,7 @@ def boxplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
         outparams = True
 
     if xname is not None and yname is not None:
@@ -329,9 +327,9 @@ def boxplot(
         boxplot_kwargs.update(params)
         sb.boxplot(**boxplot_kwargs, linewidth=linewidth)
     else:
-        sb.boxplot(data=df, orient=orient, ax=ax, linewidth=linewidth, **params)
+        sb.boxplot(data=df, orient=orient, ax=ax, linewidth=linewidth, **params)    # type: ignore
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
 
 
 # ===================================================================
@@ -339,11 +337,11 @@ def boxplot(
 # ===================================================================
 def kdeplot(
     df: DataFrame,
-    xname: str = None,
-    yname: str = None,
-    hue: str = None,
+    xname: str | None = None,
+    yname: str | None = None,
+    hue: str | None = None,
     title: str | None = None,
-    palette: str = None,
+    palette: str | None = None,
     fill: bool = False,
     fill_alpha: float = config.fill_alpha,
     linewidth: float = config.line_width,
@@ -351,9 +349,9 @@ def kdeplot(
     width: int = config.width,
     height: int = config.height,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """커널 밀도 추정(KDE) 그래프를 그린다.
@@ -434,7 +432,7 @@ def kdeplot(
         return
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
         outparams = True
 
     # 기본 kwargs 설정
@@ -464,7 +462,7 @@ def kdeplot(
 
     sb.kdeplot(**kdeplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
 
 
 # ===================================================================
@@ -477,14 +475,14 @@ def histplot(
     title: str | None = None,
     bins: int | None = None,
     kde: bool = True,
-    palette: str = None,
+    palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """히스토그램을 그리고 필요 시 KDE를 함께 표시한다.
@@ -511,7 +509,7 @@ def histplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
         outparams = True
 
     if bins:
@@ -550,7 +548,7 @@ def histplot(
         histplot_kwargs.update(params)
         sb.histplot(**histplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
 
 
 # ===================================================================
@@ -561,14 +559,14 @@ def stackplot(
     xname: str,
     hue: str,
     title: str | None = None,
-    palette: str = None,
+    palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = 0.25,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """클래스 비율을 100% 누적 막대로 표현한다.
@@ -593,7 +591,7 @@ def stackplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
         outparams = True
 
     df2 = df[[xname, hue]].copy()
@@ -620,11 +618,11 @@ def stackplot(
     sb.histplot(**stackplot_kwargs)
 
     # 그래프의 x축 항목 수 만큼 반복
-    for p in ax.patches:
+    for p in ax.patches:    # type: ignore
         # 각 막대의 위치, 넓이, 높이
-        left, bottom, width, height = p.get_bbox().bounds
+        left, bottom, width, height = p.get_bbox().bounds   # type: ignore
         # 막대의 중앙에 글자 표시하기
-        ax.annotate(
+        ax.annotate(    # type: ignore
             "%0.1f%%" % (height * 100),
             xy=(left + width / 2, bottom + height / 2),
             ha="center",
@@ -633,10 +631,10 @@ def stackplot(
 
     if str(df[xname].dtype) in ["int", "int32", "int64", "float", "float32", "float64"]:
         xticks = list(df[xname].unique())
-        ax.set_xticks(xticks)
-        ax.set_xticklabels(xticks)
+        ax.set_xticks(xticks)       # type: ignore
+        ax.set_xticklabels(xticks)  # type: ignore
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
 
 
 # ===================================================================
@@ -648,14 +646,14 @@ def scatterplot(
     yname: str,
     hue=None,
     title: str | None = None,
-    palette: str = None,
+    palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """산점도를 그린다.
@@ -681,7 +679,7 @@ def scatterplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -703,7 +701,7 @@ def scatterplot(
 
     sb.scatterplot(**scatterplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
 
 
 # ===================================================================
@@ -714,14 +712,14 @@ def regplot(
     xname: str,
     yname: str,
     title: str | None = None,
-    palette: str = None,
+    palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """단순 회귀선이 포함된 산점도를 그린다.
@@ -746,7 +744,7 @@ def regplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
         outparams = True
 
     # regplot은 hue를 지원하지 않으므로 palette를 color로 변환
@@ -771,7 +769,7 @@ def regplot(
 
     sb.regplot(**regplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
 
 
 # ===================================================================
@@ -783,12 +781,12 @@ def lmplot(
     yname: str,
     hue=None,
     title: str | None = None,
-    palette: str = None,
+    palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
+    save_path: str | None = None,
     **params,
 ) -> None:
     """seaborn lmplot으로 선형 모델 시각화를 수행한다.
@@ -835,7 +833,7 @@ def lmplot(
                 continue
             line.set_linewidth(linewidth)
 
-    g.fig.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
+    g.fig.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)  # type: ignore
 
     if title:
         g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight='bold')
@@ -858,12 +856,12 @@ def pairplot(
     title: str | None = None,
     diag_kind: str = "kde",
     hue=None,
-    palette: str = None,
+    palette: str | None = None,
     width: int = config.height,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
+    save_path: str | None = None,
     **params,
 ) -> None:
     """연속형 변수의 숫자형 컬럼 쌍에 대한 관계를 그린다.
@@ -936,7 +934,7 @@ def pairplot(
     g.map_upper(func=sb.scatterplot, linewidth=linewidth)
 
     # KDE 대각선에도 linewidth 적용
-    for ax in g.axes.diag:
+    for ax in g.axes.diag:  # type: ignore
         for line in ax.get_lines():
             line.set_linewidth(linewidth)
 
@@ -957,15 +955,15 @@ def countplot(
     xname: str,
     hue=None,
     title: str | None = None,
-    palette: str = None,
+    palette: str | None = None,
     order: int = 1,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """범주 빈도 막대그래프를 그린다.
@@ -997,7 +995,7 @@ def countplot(
             sort = sorted(list(df[xname].value_counts().index))
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -1020,7 +1018,7 @@ def countplot(
 
     sb.countplot(**countplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
 
 
 # ===================================================================
@@ -1032,14 +1030,14 @@ def barplot(
     yname: str,
     hue=None,
     title: str | None = None,
-    palette: str = None,
+    palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """막대그래프를 그린다.
@@ -1065,7 +1063,7 @@ def barplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -1086,7 +1084,7 @@ def barplot(
     barplot_kwargs.update(params)
 
     sb.barplot(**barplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
 
 
 # ===================================================================
@@ -1098,14 +1096,14 @@ def boxenplot(
     yname: str,
     hue=None,
     title: str | None = None,
-    palette: str = None,
+    palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """박스앤 위스커 확장(boxen) 플롯을 그린다.
@@ -1131,7 +1129,7 @@ def boxenplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
         outparams = True
 
     # palette은 hue가 있을 때만 사용
@@ -1150,7 +1148,7 @@ def boxenplot(
     boxenplot_kwargs.update(params)
 
     sb.boxenplot(**boxenplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
 
 
 # ===================================================================
@@ -1162,14 +1160,14 @@ def violinplot(
     yname: str,
     hue=None,
     title: str | None = None,
-    palette: str = None,
+    palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """바이올린 플롯을 그린다.
@@ -1195,7 +1193,7 @@ def violinplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
         outparams = True
 
     # palette은 hue가 있을 때만 사용
@@ -1213,7 +1211,7 @@ def violinplot(
 
     violinplot_kwargs.update(params)
     sb.violinplot(**violinplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
 
 
 # ===================================================================
@@ -1225,14 +1223,14 @@ def pointplot(
     yname: str,
     hue=None,
     title: str | None = None,
-    palette: str = None,
+    palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """포인트 플롯을 그린다.
@@ -1258,7 +1256,7 @@ def pointplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -1278,7 +1276,7 @@ def pointplot(
 
     pointplot_kwargs.update(params)
     sb.pointplot(**pointplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
 
 
 # ===================================================================
@@ -1290,12 +1288,12 @@ def jointplot(
     yname: str,
     hue=None,
     title: str | None = None,
-    palette: str = None,
+    palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
+    save_path: str | None = None,
     **params,
 ) -> None:
     """공동 분포(joint) 플롯을 그린다.
@@ -1358,14 +1356,14 @@ def jointplot(
 def heatmap(
     data: DataFrame,
     title: str | None = None,
-    palette: str = None,
+    palette: str | None = None,
     width: int | None = None,
     height: int | None = None,
     linewidth: float = 0.25,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """히트맵을 그린다(값 주석 포함).
@@ -1389,10 +1387,10 @@ def heatmap(
 
     if width == None or height == None:
         width = (config.font_size * config.dpi / 72) * 4.5 * len(data.columns)
-        height = width * 0.8
+        height = width * 0.8    # type: ignore
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     heatmatp_kwargs = {
@@ -1410,26 +1408,26 @@ def heatmap(
     # heatmap은 hue를 지원하지 않으므로 cmap에 palette 사용
     sb.heatmap(**heatmatp_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
-# 클러스터별 볼록 ꯐ막(convex hull)을 그린다
+# 클러스터별 볼록 경계막(convex hull)을 그린다
 # ===================================================================
 def convex_hull(
     data: DataFrame,
     xname: str,
     yname: str,
-    hue: str,
+    hue: str | None = None,
     title: str | None = None,
-    palette: str = None,
+    palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ):
     """클러스터별 볼록 껍질(convex hull)과 산점도를 그린다.
@@ -1455,7 +1453,7 @@ def convex_hull(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     # 군집별 값의 종류별로 반복 수행
@@ -1473,10 +1471,10 @@ def convex_hull(
             # 마지막 좌표 이후에 첫 번째 좌표를 연결
             points = np.append(hull.vertices, hull.vertices[0])
 
-            ax.plot(
+            ax.plot(    # type: ignore
                 df_c.iloc[points, 0], df_c.iloc[points, 1], linewidth=linewidth, linestyle=":"
             )
-            ax.fill(df_c.iloc[points, 0], df_c.iloc[points, 1], alpha=0.1)
+            ax.fill(df_c.iloc[points, 0], df_c.iloc[points, 1], alpha=0.1)  # type: ignore
         except:
             pass
 
@@ -1484,7 +1482,7 @@ def convex_hull(
     sb.scatterplot(
         data=data, x=xname, y=yname, hue=hue, palette=palette, ax=ax, **params
     )
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1500,9 +1498,9 @@ def kde_confidence_interval(
     linewidth: float = config.line_width,
     fill: bool = False,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
 ) -> None:
     """각 숫자 컬럼에 대해 KDE와 t-분포 기반 신뢰구간을 그린다.
 
@@ -1572,7 +1570,7 @@ def kde_confidence_interval(
         cmin, cmax = t.interval(clevel, dof, loc=sample_mean, scale=sample_std_error)
 
         # 현재 컬럼에 대한 커널밀도추정
-        sb.kdeplot(data=column, linewidth=linewidth, ax=current_ax, fill=fill, alpha=config.fill_alpha)
+        sb.kdeplot(data=column, linewidth=linewidth, ax=current_ax, fill=fill, alpha=config.fill_alpha) # type: ignore
 
         # 그래프 축의 범위
         xmin, xmax, ymin, ymax = current_ax.get_position().bounds
@@ -1597,7 +1595,7 @@ def kde_confidence_interval(
 
         current_ax.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
 
-    finalize_plot(axes[0] if isinstance(axes, list) and len(axes) > 0 else ax, callback, outparams, save_path, True, title)
+    finalize_plot(axes[0] if isinstance(axes, list) and len(axes) > 0 else ax, callback, outparams, save_path, True, title) # type: ignore
 
 
 # ===================================================================
@@ -1608,7 +1606,7 @@ def pvalue1_anotation(
     target: str,
     hue: str,
     title: str | None = None,
-    pairs: list = None,
+    pairs: list | None = None,
     test: str = "t-test_ind",
     text_format: str = "star",
     loc: str = "outside",
@@ -1616,9 +1614,9 @@ def pvalue1_anotation(
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params
 ) -> None:
     """statannotations를 이용해 상자그림에 p-value 주석을 추가한다.
@@ -1652,7 +1650,7 @@ def pvalue1_anotation(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     # params에서 palette 추출 (있으면)
@@ -1679,7 +1677,7 @@ def pvalue1_anotation(
     annotator.apply_and_annotate()
 
     sb.despine()
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 
@@ -1695,9 +1693,9 @@ def ols_residplot(
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """잔차도를 그린다(선택적으로 MSE 범위와 LOWESS 포함).
@@ -1739,24 +1737,24 @@ def ols_residplot(
     y = y_pred + resid  # 실제값 = 적합값 + 잔차
 
     if ax is None:
-        fig, ax = get_default_ax(width + 150 if mse else width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width + 150 if mse else width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     # 산점도 직접 그리기 (seaborn.residplot보다 훨씬 빠름)
-    ax.scatter(y_pred, resid, edgecolor="white", alpha=0.7, **params)
+    ax.scatter(y_pred, resid, edgecolor="white", alpha=0.7, **params)   # type: ignore
 
     # 기준선 (잔차 = 0)
-    ax.axhline(0, color="gray", linestyle="--", linewidth=linewidth)
+    ax.axhline(0, color="gray", linestyle="--", linewidth=linewidth)    # type: ignore
 
     # LOWESS 스무딩 (선택적)
     if lowess:
         from statsmodels.nonparametric.smoothers_lowess import lowess as sm_lowess
         lowess_result = sm_lowess(resid, y_pred, frac=0.6667)
-        ax.plot(lowess_result[:, 0], lowess_result[:, 1],
-                color="red", linewidth=linewidth, label="LOWESS")
+        ax.plot(lowess_result[:, 0], lowess_result[:, 1],           # type: ignore
+                color="red", linewidth=linewidth, label="LOWESS")   # type: ignore
 
-    ax.set_xlabel("Fitted values")
-    ax.set_ylabel("Residuals")
+    ax.set_xlabel("Fitted values")  # type: ignore
+    ax.set_ylabel("Residuals")      # type: ignore
 
     if mse:
         mse_val = mean_squared_error(y, y_pred)
@@ -1776,40 +1774,40 @@ def ols_residplot(
 
         mse_r = [r1, r2, r3]
 
-        xmin, xmax = ax.get_xlim()
+        xmin, xmax = ax.get_xlim()  # type: ignore
 
         # 구간별 반투명 색상 채우기 (안쪽부터 바깥쪽으로, 진한 색에서 연한 색으로)
         colors = ["red", "green", "blue"]
         alphas = [0.15, 0.10, 0.05]  # 안쪽이 더 진하게
 
         # 3σ 영역 (가장 바깥쪽, 가장 연함)
-        ax.axhspan(-3 * mse_sq, 3 * mse_sq, facecolor=colors[2], alpha=alphas[2], zorder=0)
+        ax.axhspan(-3 * mse_sq, 3 * mse_sq, facecolor=colors[2], alpha=alphas[2], zorder=0) # type: ignore
         # 2σ 영역 (중간)
-        ax.axhspan(-2 * mse_sq, 2 * mse_sq, facecolor=colors[1], alpha=alphas[1], zorder=1)
+        ax.axhspan(-2 * mse_sq, 2 * mse_sq, facecolor=colors[1], alpha=alphas[1], zorder=1) # type: ignore
         # 1σ 영역 (가장 안쪽, 가장 진함)
-        ax.axhspan(-mse_sq, mse_sq, facecolor=colors[0], alpha=alphas[0], zorder=2)
+        ax.axhspan(-mse_sq, mse_sq, facecolor=colors[0], alpha=alphas[0], zorder=2) # type: ignore
 
         # 경계선 그리기
         for i, c in enumerate(["red", "green", "blue"]):
-            ax.axhline(mse_sq * (i + 1), color=c, linestyle="--", linewidth=linewidth/2)
-            ax.axhline(mse_sq * (-(i + 1)), color=c, linestyle="--", linewidth=linewidth/2)
+            ax.axhline(mse_sq * (i + 1), color=c, linestyle="--", linewidth=linewidth/2)    # type: ignore
+            ax.axhline(mse_sq * (-(i + 1)), color=c, linestyle="--", linewidth=linewidth/2)     # type: ignore
 
         target = [68, 95, 99.7]
         for i, c in enumerate(["red", "green", "blue"]):
-            ax.text(
+            ax.text(    # type: ignore
                 s=f"{i+1} sqrt(MSE) = {mse_r[i]:.2f}% ({mse_r[i] - target[i]:.2f}%)",
                 x=xmax + 0.2,
                 y=(i + 1) * mse_sq,
                 color=c,
             )
-            ax.text(
+            ax.text(    # type: ignore
                 s=f"-{i+1} sqrt(MSE) = {mse_r[i]:.2f}% ({mse_r[i] - target[i]:.2f}%)",
                 x=xmax + 0.2,
                 y=-(i + 1) * mse_sq,
                 color=c,
             )
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1823,9 +1821,9 @@ def ols_qqplot(
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """표준화된 잔차의 정규성 확인을 위한 QQ 플롯을 그린다.
@@ -1870,7 +1868,7 @@ def ols_qqplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
         outparams = True
 
     # fit 객체에서 잔차(residuals) 추출
@@ -1885,7 +1883,7 @@ def ols_qqplot(
     sm_qqplot(residuals, line=line, ax=ax, **params)
 
     # 점의 스타일 개선: 연한 내부, 진한 테두리
-    for collection in ax.collections:
+    for collection in ax.collections:   # type: ignore
         # PathCollection (scatter plot의 점들)
         collection.set_facecolor('#4A90E2')  # 연한 파란색 내부
         collection.set_edgecolor('#1E3A8A')  # 진한 파란색 테두리
@@ -1893,11 +1891,11 @@ def ols_qqplot(
         collection.set_alpha(0.7)  # 약간의 투명도
 
     # 선 굵기 조정
-    for line in ax.get_lines():
-        if line.get_linestyle() == '--' or line.get_color() == 'r':
-            line.set_linewidth(linewidth)
+    for line in ax.get_lines():     # type: ignore
+        if line.get_linestyle() == '--' or line.get_color() == 'r': # type: ignore
+            line.set_linewidth(linewidth)   # type: ignore
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1906,18 +1904,18 @@ def ols_qqplot(
 def distribution_by_class(
     data: DataFrame,
     title: str | None = None,
-    xnames: list = None,
-    hue: str = None,
+    xnames: list | None = None,
+    hue: str | None = None,
     type: str = "kde",
-    bins: any = 5,
-    palette: str = None,
+    bins: list[int] | int = 5,
+    palette: str | None = None,
     fill: bool = False,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
 ) -> None:
     """클래스별로 각 숫자형 특징의 분포를 KDE 또는 히스토그램으로 그린다.
 
@@ -1940,9 +1938,9 @@ def distribution_by_class(
         None
     """
     if xnames is None:
-        xnames = data.columns
+        xnames = data.columns   # type: ignore
 
-    for i, v in enumerate(xnames):
+    for i, v in enumerate(xnames):  # type: ignore
         # 종속변수이거나 숫자형이 아닌 경우는 제외
         if v == hue or data[v].dtype not in [
             "int",
@@ -1973,7 +1971,7 @@ def distribution_by_class(
                 df=data,
                 xname=v,
                 hue=hue,
-                bins=bins,
+                bins=bins,          # type: ignore
                 kde=False,
                 palette=palette,
                 width=width,
@@ -1988,7 +1986,7 @@ def distribution_by_class(
                 df=data,
                 xname=v,
                 hue=hue,
-                bins=bins,
+                bins=bins,          # type: ignore
                 kde=True,
                 palette=palette,
                 width=width,
@@ -2015,8 +2013,8 @@ def scatter_by_class(
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
 ) -> None:
     """종속변수(y)와 각 연속형 독립변수(x) 간 산점도/볼록껍질을 그린다.
 
@@ -2071,7 +2069,7 @@ def scatter_by_class(
         for v in group:
             scatterplot(data=data, xname=v[0], yname=v[1], hue=hue, palette=palette,
                         width=width, height=height, linewidth=linewidth, dpi=dpi, callback=callback,
-                        save_path=save_path)
+                        save_path=save_path)    # type: ignore
 
 
 # ===================================================================
@@ -2090,8 +2088,8 @@ def categorical_target_distribution(
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
     cols: int = 2,
-    save_path: str = None,
-    callback: any = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
 ) -> None:
     """명목형 변수별로 종속변수 분포 차이를 시각화한다.
 
@@ -2166,16 +2164,16 @@ def categorical_target_distribution(
 # ===================================================================
 def roc_curve_plot(
     fit,
-    y: np.ndarray | pd.Series = None,
-    X: pd.DataFrame | np.ndarray = None,
+    y: np.ndarray | pd.Series | None = None,
+    X: pd.DataFrame | np.ndarray | None = None,
     title: str | None = None,
     width: int = config.height,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
 ) -> None:
     """로지스틱 회귀 적합 결과의 ROC 곡선을 시각화한다.
 
@@ -2200,7 +2198,7 @@ def roc_curve_plot(
     """
     outparams = False
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
         outparams = True
 
     # 실제값(y_true) 결정
@@ -2221,16 +2219,16 @@ def roc_curve_plot(
     roc_auc = auc(fpr, tpr)
 
     # ROC 곡선 그리기
-    ax.plot(fpr, tpr, color='darkorange', lw=linewidth, label=f'ROC curve (AUC = {roc_auc:.4f})')
-    ax.plot([0, 1], [0, 1], color='navy', lw=linewidth, linestyle='--', label='Random Classifier')
+    ax.plot(fpr, tpr, color='darkorange', lw=linewidth, label=f'ROC curve (AUC = {roc_auc:.4f})')   # type: ignore
+    ax.plot([0, 1], [0, 1], color='navy', lw=linewidth, linestyle='--', label='Random Classifier')  # type: ignore
 
-    ax.set_xlim([0.0, 1.0])
-    ax.set_ylim([0.0, 1.05])
-    ax.set_xlabel('위양성율 (False Positive Rate)', fontsize=8)
-    ax.set_ylabel('재현율 (True Positive Rate)', fontsize=8)
-    ax.set_title('ROC 곡선', fontsize=10, fontweight='bold')
-    ax.legend(loc="lower right", fontsize=7)
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    ax.set_xlim([0.0, 1.0])     # type: ignore
+    ax.set_ylim([0.0, 1.05])    # type: ignore
+    ax.set_xlabel('위양성율 (False Positive Rate)', fontsize=8)     # type: ignore
+    ax.set_ylabel('재현율 (True Positive Rate)', fontsize=8)        # type: ignore
+    ax.set_title('ROC 곡선', fontsize=10, fontweight='bold')        # type: ignore
+    ax.legend(loc="lower right", fontsize=7)                        # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -2243,9 +2241,9 @@ def confusion_matrix_plot(
     width: int = config.width,
     height: int = config.height,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
 ) -> None:
     """로지스틱 회귀 적합 결과의 혼동행렬을 시각화한다.
 
@@ -2264,7 +2262,7 @@ def confusion_matrix_plot(
     """
     outparams = False
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     # 학습 데이터 기반 실제값/예측 확률 결정
@@ -2280,9 +2278,9 @@ def confusion_matrix_plot(
     # 가독성을 위해 텍스트 크기/굵기 조정
     disp.plot(ax=ax, cmap='Blues', values_format='d', text_kw={"fontsize": 16, "weight": "bold"})
 
-    ax.set_title(f'혼동행렬 (임계값: {threshold})', fontsize=8, fontweight='bold')
+    ax.set_title(f'혼동행렬 (임계값: {threshold})', fontsize=8, fontweight='bold') # type: ignore
 
-    finalize_plot(ax, callback, outparams, save_path, False, title)
+    finalize_plot(ax, callback, outparams, save_path, False, title) # type: ignore
 
 
 # ===================================================================
@@ -2290,20 +2288,20 @@ def confusion_matrix_plot(
 # ===================================================================
 def radarplot(
     df: DataFrame,
-    columns: list = None,
-    hue: str = None,
+    columns: list | None = None,
+    hue: str | None = None,
     title: str | None = None,
     normalize: bool = True,
     fill: bool = True,
     fill_alpha: float = 0.25,
-    palette: str = None,
+    palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
-    ax: Axes = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
     **params,
 ) -> None:
     """레이더 차트(방사형 차트)를 그린다.
@@ -2414,7 +2412,7 @@ def radarplot(
     else:
         ax.set_title('Radar Chart', pad=20)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)
+    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
 
 
 # ===================================================================
@@ -2432,8 +2430,8 @@ def distribution_plot(
     height: int = config.height,
     linewidth: float = config.line_width,
     dpi: int = config.dpi,
-    save_path: str = None,
-    callback: any = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
 ) -> None:
     """연속형 데이터의 분포를 KDE와 Boxplot으로 시각화한다.
 
@@ -2480,7 +2478,7 @@ def distribution_plot(
             )
         else:
             boxplot(
-                df=data[column],
+                df=data[column],        # type: ignore
                 linewidth=linewidth,
                 ax=axes[1]
             )
@@ -2518,7 +2516,7 @@ def distribution_plot(
                 )
             else:
                 boxplot(
-                    df=subset[column],
+                    df=subset[column], # type: ignore
                     linewidth=linewidth,
                     ax=right_ax
                 )

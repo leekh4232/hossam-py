@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import annotations
-from typing import overload, Tuple, Literal, Union, Any
+from typing import overload, Tuple, Literal, Union
 
 # -------------------------------------------------------------
 import numpy as np
@@ -24,9 +24,9 @@ from scipy.stats import (
     normaltest,
     bartlett,
     levene,
-    ttest_1samp,    # type: ignore
+    ttest_1samp,
     ttest_ind as scipy_ttest_ind,
-    ttest_rel,      # type: ignore
+    ttest_rel,
     wilcoxon,
     pearsonr,
     spearmanr,
@@ -375,29 +375,29 @@ def describe(data: DataFrame, *fields: str, columns: list | None = None):
         outlier_rate = (outlier_count / len(data)) * 100
 
         # 분포 특성 판정 (왜도 기준)
-        abs_skew = abs(skew)    # type: ignore
-        if abs_skew < 0.5:      # type: ignore
+        abs_skew = abs(skew)
+        if abs_skew < 0.5:
             dist = "거의 대칭"
-        elif abs_skew < 1.0:    # type: ignore
-            if skew > 0:        # type: ignore
+        elif abs_skew < 1.0:
+            if skew > 0:
                 dist = "약한 우측 꼬리"
             else:
                 dist = "약한 좌측 꼬리"
-        elif abs_skew < 2.0:    # type: ignore
-            if skew > 0:        # type: ignore
+        elif abs_skew < 2.0:
+            if skew > 0:
                 dist = "중간 우측 꼬리"
             else:
                 dist = "중간 좌측 꼬리"
         else:
-            if skew > 0:        # type: ignore
+            if skew > 0:
                 dist = "극단 우측 꼬리"
             else:
                 dist = "극단 좌측 꼬리"
 
         # 로그변환 필요성 판정
-        if abs_skew < 0.5:      # type: ignore
+        if abs_skew < 0.5:
             log_need = "낮음"
-        elif abs_skew < 1.0:    # type: ignore
+        elif abs_skew < 1.0:
             log_need = "중간"
         else:
             log_need = "높음"
@@ -473,7 +473,7 @@ def category_describe(data: DataFrame, *fields: str):
     """
     if not fields:
         # 명목형(범주형) 컬럼 선택: object, category, bool 타입
-        fields = data.select_dtypes(include=['object', 'category', 'bool']).columns # type: ignore
+        fields = data.select_dtypes(include=['object', 'category', 'bool']).columns
 
     result = []
     summary = []
@@ -730,7 +730,7 @@ def equal_var_test(data: DataFrame, columns: list | str | None = None, normal_di
         normality_result = normal_test(data[numeric_cols], method="n")
         # 모든 컬럼이 정규분포를 따르는지 확인
         all_normal = normality_result["is_normal"].all()
-        normal_dist = all_normal    # type: ignore
+        normal_dist = all_normal
 
     try:
         if normal_dist:
@@ -829,7 +829,7 @@ def ttest_1samp(data, mean_value: float = 0.0) -> DataFrame:
     else:
         for a in alternative:
             try:
-                s, p = ttest_1samp(col_data, mean_value, alternative=a) # type: ignore
+                s, p = ttest_1samp(col_data, mean_value, alternative=a)
 
                 itp = None
 
@@ -939,26 +939,26 @@ def ttest_ind(x, y, equal_var: bool | None = None) -> DataFrame:
 
     for a in alternative:
         try:
-            s, p = scipy_ttest_ind(x_data, y_data, equal_var=equal_var, alternative=a)  # type: ignore
+            s, p = scipy_ttest_ind(x_data, y_data, equal_var=equal_var, alternative=a)
             n = "t-test_ind" if equal_var else "Welch's t-test"
 
             # 검정 결과 해석
             itp = None
 
             if a == "two-sided":
-                itp = fmt.format("==" if p > 0.05 else "!=")    # type: ignore
+                itp = fmt.format("==" if p > 0.05 else "!=")
             elif a == "less":
-                itp = fmt.format(">=" if p > 0.05 else "<")     # type: ignore
+                itp = fmt.format(">=" if p > 0.05 else "<")
             else:
-                itp = fmt.format("<=" if p > 0.05 else ">")     # type: ignore
+                itp = fmt.format("<=" if p > 0.05 else ">")
 
             result.append({
                 "test": n,
                 "alternative": a,
-                "statistic": round(s, 3),   # type: ignore
-                "p-value": round(p, 4),     # type: ignore
-                "H0": p > 0.05,             # type: ignore
-                "H1": p <= 0.05,            # type: ignore
+                "statistic": round(s, 3),
+                "p-value": round(p, 4),
+                "H0": p > 0.05,
+                "H1": p <= 0.05,
                 "interpretation": itp,
                 "equal_var_checked": var_checked
             })
@@ -1068,7 +1068,7 @@ def ttest_rel(x, y, parametric: bool | None = None) -> DataFrame:
     for a in alternative:
         try:
             if parametric:
-                s, p = ttest_rel(x_data, y_data, alternative=a) # type: ignore
+                s, p = ttest_rel(x_data, y_data, alternative=a)
                 n = "t-test_paired"
             else:
                 # Wilcoxon signed-rank test (대응표본용 비모수 검정)
@@ -1078,19 +1078,19 @@ def ttest_rel(x, y, parametric: bool | None = None) -> DataFrame:
             itp = None
 
             if a == "two-sided":
-                itp = fmt.format("==" if p > 0.05 else "!=")    # type: ignore
+                itp = fmt.format("==" if p > 0.05 else "!=")
             elif a == "less":
-                itp = fmt.format(">=" if p > 0.05 else "<")     # type: ignore
+                itp = fmt.format(">=" if p > 0.05 else "<")
             else:
-                itp = fmt.format("<=" if p > 0.05 else ">")     # type: ignore
+                itp = fmt.format("<=" if p > 0.05 else ">")
 
             result.append({
                 "test": n,
                 "alternative": a,
-                "statistic": round(s, 3) if not np.isnan(s) else s, # type: ignore
-                "p-value": round(p, 4) if not np.isnan(p) else p,   # type: ignore
-                "H0": p > 0.05,     # type: ignore
-                "H1": p <= 0.05,    # type: ignore
+                "statistic": round(s, 3) if not np.isnan(s) else s,
+                "p-value": round(p, 4) if not np.isnan(p) else p,
+                "H0": p > 0.05,
+                "H1": p <= 0.05,
                 "interpretation": itp,
                 "normality_checked": var_checked
             })
@@ -1117,7 +1117,7 @@ def ttest_rel(x, y, parametric: bool | None = None) -> DataFrame:
 # ===================================================================
 def vif_filter(
     data: DataFrame,
-    yname: str | None = None,
+    yname: str = None,
     ignore: list | None = None,
     threshold: float = 10.0,
     verbose: bool = False,
@@ -1182,7 +1182,7 @@ def vif_filter(
         for i, col in enumerate(X_clean.columns, start=0):
             # exog의 첫 열은 상수항이므로 변수 인덱스는 +1
             try:
-                vifs[col] = float(variance_inflation_factor(exog.values, i + 1))# type: ignore
+                vifs[col] = float(variance_inflation_factor(exog.values, i + 1))
             except Exception:
                 # 계산 실패 시 무한대로 처리하여 우선 제거 대상으로
                 vifs[col] = float("inf")
@@ -1220,7 +1220,7 @@ def vif_filter(
 # ===================================================================
 # x, y 데이터에 대한 추세선을 구한다.
 # ===================================================================
-def trend(x: Any, y: Any, degree: int = 1, value_count: int = 100) -> Tuple[np.ndarray, np.ndarray]:
+def trend(x: any, y: any, degree: int = 1, value_count: int = 100) -> Tuple[np.ndarray, np.ndarray]:
     """x, y 데이터에 대한 추세선을 구한다.
 
     Args:
@@ -1324,7 +1324,7 @@ def ols_report(fit, data, full=False, alpha=0.05) -> Union[
     for i, col in enumerate(indi_df.columns, start=1):  # 상수항이 0이므로 1부터 시작
         try:
             with np.errstate(divide='ignore', invalid='ignore'):
-                vif_value = variance_inflation_factor(indi_df_const.values, i)  # type: ignore
+                vif_value = variance_inflation_factor(indi_df_const.values, i)
                 # inf나 매우 큰 값 처리
                 if np.isinf(vif_value) or vif_value > 1e10:
                     vif_dict[col] = np.inf
@@ -1531,11 +1531,11 @@ def ols(df: DataFrame, yname: str, report: bool | str | int = False) -> Union[
         return linear_fit
     elif report == 1 or report == 'summary':
         # 요약 리포트 (full=False)
-        pdf, rdf = ols_report(linear_fit, df, full=False, alpha=0.05)   # type: ignore
+        pdf, rdf = ols_report(linear_fit, df, full=False, alpha=0.05)
         return linear_fit, pdf, rdf
     elif report == 2 or report == 'full' or report is True:
         # 풀 리포트 (full=True)
-        pdf, rdf, result_report, model_report, variable_reports, equation_text = ols_report(linear_fit, df, full=True, alpha=0.05)  # type: ignore
+        pdf, rdf, result_report, model_report, variable_reports, equation_text = ols_report(linear_fit, df, full=True, alpha=0.05)
         return linear_fit, pdf, rdf, result_report, model_report, variable_reports, equation_text
     else:
         # 기본값: 리포트 미사용
@@ -1657,7 +1657,7 @@ def logit_report(
     vif_dict = {}
     x_const = sm.add_constant(x, has_constant="add")
     for i, col in enumerate(x.columns, start=1):  # 상수항이 0이므로 1부터 시작
-        vif_dict[col] = variance_inflation_factor(x_const.values, i)    # type: ignore
+        vif_dict[col] = variance_inflation_factor(x_const.values, i)
 
     for idx, row in tbl.iterrows():
         name = idx
@@ -1770,7 +1770,7 @@ def logit(
         DataFrame,
         str,
         str,
-        list[str]
+        List[str]
     ]
 ]:
     """로지스틱 회귀분석을 수행하고 적합 결과를 반환한다.
@@ -1838,13 +1838,13 @@ def logit(
         return logit_fit
     elif report == 1 or report == 'summary':
         # 요약 리포트 (full=False)
-        cdf, rdf = logit_report(logit_fit, df, threshold=0.5, full=False, alpha=0.05)   # type: ignore
+        cdf, rdf = logit_report(logit_fit, df, threshold=0.5, full=False, alpha=0.05)
         # 요약에서는 result_report와 variable_reports만 포함
         # 간단한 버전으로 result와 variable_reports만 생성
         return logit_fit, rdf
     elif report == 2 or report == 'full' or report is True:
         # 풀 리포트 (full=True)
-        cdf, rdf, result_report, model_report, variable_reports, cm = logit_report(logit_fit, df, threshold=0.5, full=True, alpha=0.05) # type: ignore
+        cdf, rdf, result_report, model_report, variable_reports, cm = logit_report(logit_fit, df, threshold=0.5, full=True, alpha=0.05)
         return logit_fit, cdf, rdf, result_report, model_report, variable_reports
     else:
         # 기본값: 리포트 미사용
@@ -1854,7 +1854,7 @@ def logit(
 # ===================================================================
 # 선형성 검정 (Linearity Test)
 # ===================================================================
-def ols_linearity_test(fit, power: int = 2, alpha: float = 0.05, plot: bool = False, title: str | None = None, save_path: str | None = None) -> DataFrame:
+def ols_linearity_test(fit, power: int = 2, alpha: float = 0.05, plot: bool = False, title: str = None, save_path: str = None) -> DataFrame:
     """회귀모형의 선형성을 Ramsey RESET 검정으로 평가한다.
 
     적합된 회귀모형에 대해 Ramsey RESET(Regression Specification Error Test) 검정을 수행하여
@@ -1961,7 +1961,7 @@ def ols_linearity_test(fit, power: int = 2, alpha: float = 0.05, plot: bool = Fa
 # ===================================================================
 # 정규성 검정 (Normality Test)
 # ===================================================================
-def ols_normality_test(fit, alpha: float = 0.05, plot: bool = False, title: str | None = None, save_path: str | None = None) -> DataFrame:
+def ols_normality_test(fit, alpha: float = 0.05, plot: bool = False, title: str = None, save_path: str = None) -> DataFrame:
     """회귀모형 잔차의 정규성을 검정한다.
 
     회귀모형의 잔차가 정규분포를 따르는지 Shapiro-Wilk 검정과 Jarque-Bera 검정으로 평가한다.
@@ -2029,7 +2029,7 @@ def ols_normality_test(fit, alpha: float = 0.05, plot: bool = False, title: str 
     # 2. Jarque-Bera 검정 (항상 수행)
     try:
         stat_jb, p_jb = jarque_bera(residuals)
-        significant_jb = p_jb <= alpha  # type: ignore
+        significant_jb = p_jb <= alpha
 
         if significant_jb:
             interpretation_jb = f"정규성 위반 (p={p_jb:.4f} <= {alpha})"
@@ -2362,8 +2362,8 @@ def corr_pairwise(
             corr_val, pval = np.nan, np.nan
 
         # 4) 유의성, 강도
-        significant = False if np.isnan(pval) else pval <= alpha    # type: ignore
-        abs_r = abs(corr_val) if not np.isnan(corr_val) else 0      # type: ignore
+        significant = False if np.isnan(pval) else pval <= alpha
+        abs_r = abs(corr_val) if not np.isnan(corr_val) else 0
         if abs_r > 0.7:
             strength = "strong"
         elif abs_r > 0.3:
@@ -2530,13 +2530,13 @@ def oneway_anova(data: DataFrame, dv: str, between: str, alpha: float = 0.05) ->
         anova_df['significant'] = anova_df['p-unc'] <= alpha
 
     # ANOVA 결과가 유의한지 확인
-    p_unc = float(anova_df.loc[0, 'p-unc']) # type: ignore
+    p_unc = float(anova_df.loc[0, 'p-unc'])
     anova_significant = p_unc <= alpha
 
     # ANOVA 보고 문장 생성
     def _safe_get(col: str, default: float = np.nan) -> float:
         try:
-            return float(anova_df.loc[0, col]) if col in anova_df.columns else default  # type: ignore
+            return float(anova_df.loc[0, col]) if col in anova_df.columns else default
         except Exception:
             return default
 
@@ -2851,7 +2851,7 @@ def predict(fit, data: DataFrame | Series) -> DataFrame | Series | float:
 
         # Series 입력인 경우 단일 값 반환
         if is_series:
-            return float(predictions.iloc[0])   # type: ignore
+            return float(predictions.iloc[0])
 
         # DataFrame 입력인 경우
         if isinstance(data, DataFrame):
@@ -2924,7 +2924,8 @@ def corr_effect_size(data: DataFrame, dv: str, *fields: str, alpha: float = 0.05
 
     # fields가 지정되지 않으면 수치형 컬럼 중 dv 제외 모두 사용
     if not fields:
-        fields = [col for col in data.columns if is_numeric_dtype(data[col]) and col != dv] # type: ignore
+        fields = [col for col in data.columns
+                 if is_numeric_dtype(data[col]) and col != dv]
 
     # dv가 수치형인지 확인
     if not is_numeric_dtype(data[dv]):
@@ -2952,8 +2953,8 @@ def corr_effect_size(data: DataFrame, dv: str, *fields: str, alpha: float = 0.05
         normal_y_result = normal_test(data[[dv]], columns=[dv], method=method_y)
 
         # 정규성 판정 (p > alpha면 정규분포 가정)
-        normal_x = normal_x_result.loc[var, 'p-val'] > alpha if var in normal_x_result.index else False     # type: ignore
-        normal_y = normal_y_result.loc[dv, 'p-val'] > alpha if dv in normal_y_result.index else False   # type: ignore
+        normal_x = normal_x_result.loc[var, 'p-val'] > alpha if var in normal_x_result.index else False
+        normal_y = normal_y_result.loc[dv, 'p-val'] > alpha if dv in normal_y_result.index else False
 
         # Pearson (모두 정규) vs Spearman (하나라도 비정규)
         if normal_x and normal_y:
@@ -2965,8 +2966,8 @@ def corr_effect_size(data: DataFrame, dv: str, *fields: str, alpha: float = 0.05
 
         # Cohen's d 계산 (상관계수에서 효과크기로 변환)
         # d = 2*r / sqrt(1-r^2)
-        if r ** 2 < 1:    # type: ignore
-            d = (2 * r) / np.sqrt(1 - r ** 2) # type: ignore
+        if r**2 < 1:
+            d = (2 * r) / np.sqrt(1 - r**2)
         else:
             d = 0
 
