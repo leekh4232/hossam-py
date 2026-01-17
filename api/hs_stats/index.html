@@ -2224,29 +2224,29 @@
         <span class="n">outlier_rate</span> <span class="o">=</span> <span class="p">(</span><span class="n">outlier_count</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span>
 
         <span class="c1"># 분포 특성 판정 (왜도 기준)</span>
-        <span class="n">abs_skew</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">skew</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+        <span class="n">abs_skew</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">skew</span><span class="p">)</span>    <span class="c1"># type: ignore</span>
+        <span class="k">if</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>      <span class="c1"># type: ignore</span>
             <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;거의 대칭&quot;</span>
-        <span class="k">elif</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">skew</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>    <span class="c1"># type: ignore</span>
+            <span class="k">if</span> <span class="n">skew</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>        <span class="c1"># type: ignore</span>
                 <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;약한 우측 꼬리&quot;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;약한 좌측 꼬리&quot;</span>
-        <span class="k">elif</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">2.0</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">skew</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">2.0</span><span class="p">:</span>    <span class="c1"># type: ignore</span>
+            <span class="k">if</span> <span class="n">skew</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>        <span class="c1"># type: ignore</span>
                 <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;중간 우측 꼬리&quot;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;중간 좌측 꼬리&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">skew</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">skew</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>        <span class="c1"># type: ignore</span>
                 <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;극단 우측 꼬리&quot;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;극단 좌측 꼬리&quot;</span>
 
         <span class="c1"># 로그변환 필요성 판정</span>
-        <span class="k">if</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>      <span class="c1"># type: ignore</span>
             <span class="n">log_need</span> <span class="o">=</span> <span class="s2">&quot;낮음&quot;</span>
-        <span class="k">elif</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>    <span class="c1"># type: ignore</span>
             <span class="n">log_need</span> <span class="o">=</span> <span class="s2">&quot;중간&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">log_need</span> <span class="o">=</span> <span class="s2">&quot;높음&quot;</span>
@@ -2537,7 +2537,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">fields</span><span class="p">:</span>
         <span class="c1"># 명목형(범주형) 컬럼 선택: object, category, bool 타입</span>
-        <span class="n">fields</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;bool&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;bool&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span> <span class="c1"># type: ignore</span>
 
     <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">summary</span> <span class="o">=</span> <span class="p">[]</span>
@@ -3362,7 +3362,7 @@
         <span class="n">normality_result</span> <span class="o">=</span> <span class="n">normal_test</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">numeric_cols</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;n&quot;</span><span class="p">)</span>
         <span class="c1"># 모든 컬럼이 정규분포를 따르는지 확인</span>
         <span class="n">all_normal</span> <span class="o">=</span> <span class="n">normality_result</span><span class="p">[</span><span class="s2">&quot;is_normal&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-        <span class="n">normal_dist</span> <span class="o">=</span> <span class="n">all_normal</span>
+        <span class="n">normal_dist</span> <span class="o">=</span> <span class="n">all_normal</span>    <span class="c1"># type: ignore</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">normal_dist</span><span class="p">:</span>
@@ -3718,26 +3718,26 @@
 
     <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">alternative</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">s</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">scipy_ttest_ind</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">,</span> <span class="n">equal_var</span><span class="o">=</span><span class="n">equal_var</span><span class="p">,</span> <span class="n">alternative</span><span class="o">=</span><span class="n">a</span><span class="p">)</span>
+            <span class="n">s</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">scipy_ttest_ind</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">,</span> <span class="n">equal_var</span><span class="o">=</span><span class="n">equal_var</span><span class="p">,</span> <span class="n">alternative</span><span class="o">=</span><span class="n">a</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
             <span class="n">n</span> <span class="o">=</span> <span class="s2">&quot;t-test_ind&quot;</span> <span class="k">if</span> <span class="n">equal_var</span> <span class="k">else</span> <span class="s2">&quot;Welch&#39;s t-test&quot;</span>
 
             <span class="c1"># 검정 결과 해석</span>
             <span class="n">itp</span> <span class="o">=</span> <span class="kc">None</span>
 
             <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="s2">&quot;two-sided&quot;</span><span class="p">:</span>
-                <span class="n">itp</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;==&quot;</span> <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mf">0.05</span> <span class="k">else</span> <span class="s2">&quot;!=&quot;</span><span class="p">)</span>
+                <span class="n">itp</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;==&quot;</span> <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mf">0.05</span> <span class="k">else</span> <span class="s2">&quot;!=&quot;</span><span class="p">)</span>    <span class="c1"># type: ignore</span>
             <span class="k">elif</span> <span class="n">a</span> <span class="o">==</span> <span class="s2">&quot;less&quot;</span><span class="p">:</span>
-                <span class="n">itp</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span> <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mf">0.05</span> <span class="k">else</span> <span class="s2">&quot;&lt;&quot;</span><span class="p">)</span>
+                <span class="n">itp</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;&gt;=&quot;</span> <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mf">0.05</span> <span class="k">else</span> <span class="s2">&quot;&lt;&quot;</span><span class="p">)</span>     <span class="c1"># type: ignore</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">itp</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;&lt;=&quot;</span> <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mf">0.05</span> <span class="k">else</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">)</span>
+                <span class="n">itp</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;&lt;=&quot;</span> <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mf">0.05</span> <span class="k">else</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">)</span>     <span class="c1"># type: ignore</span>
 
             <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
                 <span class="s2">&quot;test&quot;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
                 <span class="s2">&quot;alternative&quot;</span><span class="p">:</span> <span class="n">a</span><span class="p">,</span>
-                <span class="s2">&quot;statistic&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
-                <span class="s2">&quot;p-value&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-                <span class="s2">&quot;H0&quot;</span><span class="p">:</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mf">0.05</span><span class="p">,</span>
-                <span class="s2">&quot;H1&quot;</span><span class="p">:</span> <span class="n">p</span> <span class="o">&lt;=</span> <span class="mf">0.05</span><span class="p">,</span>
+                <span class="s2">&quot;statistic&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>   <span class="c1"># type: ignore</span>
+                <span class="s2">&quot;p-value&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>     <span class="c1"># type: ignore</span>
+                <span class="s2">&quot;H0&quot;</span><span class="p">:</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mf">0.05</span><span class="p">,</span>             <span class="c1"># type: ignore</span>
+                <span class="s2">&quot;H1&quot;</span><span class="p">:</span> <span class="n">p</span> <span class="o">&lt;=</span> <span class="mf">0.05</span><span class="p">,</span>            <span class="c1"># type: ignore</span>
                 <span class="s2">&quot;interpretation&quot;</span><span class="p">:</span> <span class="n">itp</span><span class="p">,</span>
                 <span class="s2">&quot;equal_var_checked&quot;</span><span class="p">:</span> <span class="n">var_checked</span>
             <span class="p">})</span>
@@ -4011,7 +4011,7 @@
 <span class="normal">1215</span>
 <span class="normal">1216</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">vif_filter</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
-    <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">ignore</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -4076,7 +4076,7 @@
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">X_clean</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
             <span class="c1"># exog의 첫 열은 상수항이므로 변수 인덱스는 +1</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">vifs</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">variance_inflation_factor</span><span class="p">(</span><span class="n">exog</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">vifs</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">variance_inflation_factor</span><span class="p">(</span><span class="n">exog</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span><span class="c1"># type: ignore</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="c1"># 계산 실패 시 무한대로 처리하여 우선 제거 대상으로</span>
                 <span class="n">vifs</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
@@ -4278,7 +4278,7 @@
 <span class="normal">1256</span>
 <span class="normal">1257</span>
 <span class="normal">1258</span>
-<span class="normal">1259</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">trend</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">any</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">any</span><span class="p">,</span> <span class="n">degree</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">value_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="normal">1259</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">trend</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">degree</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">value_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;x, y 데이터에 대한 추세선을 구한다.</span>
 
 <span class="sd">    Args:</span>
@@ -4715,7 +4715,7 @@
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indi_df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>  <span class="c1"># 상수항이 0이므로 1부터 시작</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
-                <span class="n">vif_value</span> <span class="o">=</span> <span class="n">variance_inflation_factor</span><span class="p">(</span><span class="n">indi_df_const</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                <span class="n">vif_value</span> <span class="o">=</span> <span class="n">variance_inflation_factor</span><span class="p">(</span><span class="n">indi_df_const</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
                 <span class="c1"># inf나 매우 큰 값 처리</span>
                 <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">vif_value</span><span class="p">)</span> <span class="ow">or</span> <span class="n">vif_value</span> <span class="o">&gt;</span> <span class="mf">1e10</span><span class="p">:</span>
                     <span class="n">vif_dict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
@@ -5172,11 +5172,11 @@
         <span class="k">return</span> <span class="n">linear_fit</span>
     <span class="k">elif</span> <span class="n">report</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">report</span> <span class="o">==</span> <span class="s1">&#39;summary&#39;</span><span class="p">:</span>
         <span class="c1"># 요약 리포트 (full=False)</span>
-        <span class="n">pdf</span><span class="p">,</span> <span class="n">rdf</span> <span class="o">=</span> <span class="n">ols_report</span><span class="p">(</span><span class="n">linear_fit</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="n">pdf</span><span class="p">,</span> <span class="n">rdf</span> <span class="o">=</span> <span class="n">ols_report</span><span class="p">(</span><span class="n">linear_fit</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>   <span class="c1"># type: ignore</span>
         <span class="k">return</span> <span class="n">linear_fit</span><span class="p">,</span> <span class="n">pdf</span><span class="p">,</span> <span class="n">rdf</span>
     <span class="k">elif</span> <span class="n">report</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">report</span> <span class="o">==</span> <span class="s1">&#39;full&#39;</span> <span class="ow">or</span> <span class="n">report</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
         <span class="c1"># 풀 리포트 (full=True)</span>
-        <span class="n">pdf</span><span class="p">,</span> <span class="n">rdf</span><span class="p">,</span> <span class="n">result_report</span><span class="p">,</span> <span class="n">model_report</span><span class="p">,</span> <span class="n">variable_reports</span><span class="p">,</span> <span class="n">equation_text</span> <span class="o">=</span> <span class="n">ols_report</span><span class="p">(</span><span class="n">linear_fit</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="n">pdf</span><span class="p">,</span> <span class="n">rdf</span><span class="p">,</span> <span class="n">result_report</span><span class="p">,</span> <span class="n">model_report</span><span class="p">,</span> <span class="n">variable_reports</span><span class="p">,</span> <span class="n">equation_text</span> <span class="o">=</span> <span class="n">ols_report</span><span class="p">(</span><span class="n">linear_fit</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="k">return</span> <span class="n">linear_fit</span><span class="p">,</span> <span class="n">pdf</span><span class="p">,</span> <span class="n">rdf</span><span class="p">,</span> <span class="n">result_report</span><span class="p">,</span> <span class="n">model_report</span><span class="p">,</span> <span class="n">variable_reports</span><span class="p">,</span> <span class="n">equation_text</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># 기본값: 리포트 미사용</span>
@@ -5680,7 +5680,7 @@
     <span class="n">vif_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">x_const</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">has_constant</span><span class="o">=</span><span class="s2">&quot;add&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>  <span class="c1"># 상수항이 0이므로 1부터 시작</span>
-        <span class="n">vif_dict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">variance_inflation_factor</span><span class="p">(</span><span class="n">x_const</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">vif_dict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">variance_inflation_factor</span><span class="p">(</span><span class="n">x_const</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>    <span class="c1"># type: ignore</span>
 
     <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tbl</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">idx</span>
@@ -5874,7 +5874,7 @@
       <tbody>
           <tr class="doc-section-item">
 <td></td>            <td>
-                  <code><span title="typing.Union">Union</span>[<span title="statsmodels.discrete.discrete_model.BinaryResultsWrapper">BinaryResultsWrapper</span>, <span title="typing.Tuple">Tuple</span>[<span title="statsmodels.discrete.discrete_model.BinaryResultsWrapper">BinaryResultsWrapper</span>, <span title="pandas.DataFrame">DataFrame</span>], <span title="typing.Tuple">Tuple</span>[<span title="statsmodels.discrete.discrete_model.BinaryResultsWrapper">BinaryResultsWrapper</span>, <span title="pandas.DataFrame">DataFrame</span>, <span title="pandas.DataFrame">DataFrame</span>, <span title="str">str</span>, <span title="str">str</span>, <span title="List">List</span>[<span title="str">str</span>]]]</code>
+                  <code><span title="typing.Union">Union</span>[<span title="statsmodels.discrete.discrete_model.BinaryResultsWrapper">BinaryResultsWrapper</span>, <span title="typing.Tuple">Tuple</span>[<span title="statsmodels.discrete.discrete_model.BinaryResultsWrapper">BinaryResultsWrapper</span>, <span title="pandas.DataFrame">DataFrame</span>], <span title="typing.Tuple">Tuple</span>[<span title="statsmodels.discrete.discrete_model.BinaryResultsWrapper">BinaryResultsWrapper</span>, <span title="pandas.DataFrame">DataFrame</span>, <span title="pandas.DataFrame">DataFrame</span>, <span title="str">str</span>, <span title="str">str</span>, <span title="list">list</span>[<span title="str">str</span>]]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6049,7 +6049,7 @@
         <span class="n">DataFrame</span><span class="p">,</span>
         <span class="nb">str</span><span class="p">,</span>
         <span class="nb">str</span><span class="p">,</span>
-        <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+        <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
     <span class="p">]</span>
 <span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;로지스틱 회귀분석을 수행하고 적합 결과를 반환한다.</span>
@@ -6117,13 +6117,13 @@
         <span class="k">return</span> <span class="n">logit_fit</span>
     <span class="k">elif</span> <span class="n">report</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">report</span> <span class="o">==</span> <span class="s1">&#39;summary&#39;</span><span class="p">:</span>
         <span class="c1"># 요약 리포트 (full=False)</span>
-        <span class="n">cdf</span><span class="p">,</span> <span class="n">rdf</span> <span class="o">=</span> <span class="n">logit_report</span><span class="p">(</span><span class="n">logit_fit</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="n">cdf</span><span class="p">,</span> <span class="n">rdf</span> <span class="o">=</span> <span class="n">logit_report</span><span class="p">(</span><span class="n">logit_fit</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>   <span class="c1"># type: ignore</span>
         <span class="c1"># 요약에서는 result_report와 variable_reports만 포함</span>
         <span class="c1"># 간단한 버전으로 result와 variable_reports만 생성</span>
         <span class="k">return</span> <span class="n">logit_fit</span><span class="p">,</span> <span class="n">rdf</span>
     <span class="k">elif</span> <span class="n">report</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">report</span> <span class="o">==</span> <span class="s1">&#39;full&#39;</span> <span class="ow">or</span> <span class="n">report</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
         <span class="c1"># 풀 리포트 (full=True)</span>
-        <span class="n">cdf</span><span class="p">,</span> <span class="n">rdf</span><span class="p">,</span> <span class="n">result_report</span><span class="p">,</span> <span class="n">model_report</span><span class="p">,</span> <span class="n">variable_reports</span><span class="p">,</span> <span class="n">cm</span> <span class="o">=</span> <span class="n">logit_report</span><span class="p">(</span><span class="n">logit_fit</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="n">cdf</span><span class="p">,</span> <span class="n">rdf</span><span class="p">,</span> <span class="n">result_report</span><span class="p">,</span> <span class="n">model_report</span><span class="p">,</span> <span class="n">variable_reports</span><span class="p">,</span> <span class="n">cm</span> <span class="o">=</span> <span class="n">logit_report</span><span class="p">(</span><span class="n">logit_fit</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">full</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span> <span class="c1"># type: ignore</span>
         <span class="k">return</span> <span class="n">logit_fit</span><span class="p">,</span> <span class="n">cdf</span><span class="p">,</span> <span class="n">rdf</span><span class="p">,</span> <span class="n">result_report</span><span class="p">,</span> <span class="n">model_report</span><span class="p">,</span> <span class="n">variable_reports</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># 기본값: 리포트 미사용</span>
@@ -6417,7 +6417,7 @@
 <span class="normal">1955</span>
 <span class="normal">1956</span>
 <span class="normal">1957</span>
-<span class="normal">1958</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_linearity_test</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">power</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">1958</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_linearity_test</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">power</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;회귀모형의 선형성을 Ramsey RESET 검정으로 평가한다.</span>
 
 <span class="sd">    적합된 회귀모형에 대해 Ramsey RESET(Regression Specification Error Test) 검정을 수행하여</span>
@@ -6782,7 +6782,7 @@
 <span class="normal">2056</span>
 <span class="normal">2057</span>
 <span class="normal">2058</span>
-<span class="normal">2059</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_normality_test</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">2059</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_normality_test</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;회귀모형 잔차의 정규성을 검정한다.</span>
 
 <span class="sd">    회귀모형의 잔차가 정규분포를 따르는지 Shapiro-Wilk 검정과 Jarque-Bera 검정으로 평가한다.</span>
@@ -6850,7 +6850,7 @@
     <span class="c1"># 2. Jarque-Bera 검정 (항상 수행)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">stat_jb</span><span class="p">,</span> <span class="n">p_jb</span> <span class="o">=</span> <span class="n">jarque_bera</span><span class="p">(</span><span class="n">residuals</span><span class="p">)</span>
-        <span class="n">significant_jb</span> <span class="o">=</span> <span class="n">p_jb</span> <span class="o">&lt;=</span> <span class="n">alpha</span>
+        <span class="n">significant_jb</span> <span class="o">=</span> <span class="n">p_jb</span> <span class="o">&lt;=</span> <span class="n">alpha</span>  <span class="c1"># type: ignore</span>
 
         <span class="k">if</span> <span class="n">significant_jb</span><span class="p">:</span>
             <span class="n">interpretation_jb</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;정규성 위반 (p=</span><span class="si">{</span><span class="n">p_jb</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> &lt;= </span><span class="si">{</span><span class="n">alpha</span><span class="si">}</span><span class="s2">)&quot;</span>
@@ -7948,8 +7948,8 @@
             <span class="n">corr_val</span><span class="p">,</span> <span class="n">pval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
         <span class="c1"># 4) 유의성, 강도</span>
-        <span class="n">significant</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">pval</span><span class="p">)</span> <span class="k">else</span> <span class="n">pval</span> <span class="o">&lt;=</span> <span class="n">alpha</span>
-        <span class="n">abs_r</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">corr_val</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">corr_val</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="n">significant</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">pval</span><span class="p">)</span> <span class="k">else</span> <span class="n">pval</span> <span class="o">&lt;=</span> <span class="n">alpha</span>    <span class="c1"># type: ignore</span>
+        <span class="n">abs_r</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">corr_val</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">corr_val</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span>      <span class="c1"># type: ignore</span>
         <span class="k">if</span> <span class="n">abs_r</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">:</span>
             <span class="n">strength</span> <span class="o">=</span> <span class="s2">&quot;strong&quot;</span>
         <span class="k">elif</span> <span class="n">abs_r</span> <span class="o">&gt;</span> <span class="mf">0.3</span><span class="p">:</span>
@@ -8480,13 +8480,13 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
         <span class="n">anova_df</span><span class="p">[</span><span class="s1">&#39;significant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">anova_df</span><span class="p">[</span><span class="s1">&#39;p-unc&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">alpha</span>
 
     <span class="c1"># ANOVA 결과가 유의한지 확인</span>
-    <span class="n">p_unc</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">anova_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;p-unc&#39;</span><span class="p">])</span>
+    <span class="n">p_unc</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">anova_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;p-unc&#39;</span><span class="p">])</span> <span class="c1"># type: ignore</span>
     <span class="n">anova_significant</span> <span class="o">=</span> <span class="n">p_unc</span> <span class="o">&lt;=</span> <span class="n">alpha</span>
 
     <span class="c1"># ANOVA 보고 문장 생성</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_safe_get</span><span class="p">(</span><span class="n">col</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">anova_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="p">])</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">anova_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">else</span> <span class="n">default</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">anova_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">col</span><span class="p">])</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">anova_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">else</span> <span class="n">default</span>  <span class="c1"># type: ignore</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">default</span>
 
@@ -9384,7 +9384,7 @@ BinaryResultsWrapper(로지스틱 회귀) 객체를 받아 데이터에 대한
 
         <span class="c1"># Series 입력인 경우 단일 값 반환</span>
         <span class="k">if</span> <span class="n">is_series</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">predictions</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">predictions</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>   <span class="c1"># type: ignore</span>
 
         <span class="c1"># DataFrame 입력인 경우</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">):</span>
@@ -9674,8 +9674,7 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 <span class="normal">2999</span>
 <span class="normal">3000</span>
 <span class="normal">3001</span>
-<span class="normal">3002</span>
-<span class="normal">3003</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">corr_effect_size</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">dv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">3002</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">corr_effect_size</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">dv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;종속변수와의 편상관계수 및 효과크기를 계산한다.</span>
 
 <span class="sd">    각 독립변수와 종속변수 간의 상관계수를 계산하되, 정규성과 선형성을 검사하여</span>
@@ -9712,8 +9711,7 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 
     <span class="c1"># fields가 지정되지 않으면 수치형 컬럼 중 dv 제외 모두 사용</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">fields</span><span class="p">:</span>
-        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span>
-                 <span class="k">if</span> <span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">])</span> <span class="ow">and</span> <span class="n">col</span> <span class="o">!=</span> <span class="n">dv</span><span class="p">]</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">])</span> <span class="ow">and</span> <span class="n">col</span> <span class="o">!=</span> <span class="n">dv</span><span class="p">]</span> <span class="c1"># type: ignore</span>
 
     <span class="c1"># dv가 수치형인지 확인</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">dv</span><span class="p">]):</span>
@@ -9741,8 +9739,8 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
         <span class="n">normal_y_result</span> <span class="o">=</span> <span class="n">normal_test</span><span class="p">(</span><span class="n">data</span><span class="p">[[</span><span class="n">dv</span><span class="p">]],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">dv</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="n">method_y</span><span class="p">)</span>
 
         <span class="c1"># 정규성 판정 (p &gt; alpha면 정규분포 가정)</span>
-        <span class="n">normal_x</span> <span class="o">=</span> <span class="n">normal_x_result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">var</span><span class="p">,</span> <span class="s1">&#39;p-val&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">alpha</span> <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">normal_x_result</span><span class="o">.</span><span class="n">index</span> <span class="k">else</span> <span class="kc">False</span>
-        <span class="n">normal_y</span> <span class="o">=</span> <span class="n">normal_y_result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dv</span><span class="p">,</span> <span class="s1">&#39;p-val&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">alpha</span> <span class="k">if</span> <span class="n">dv</span> <span class="ow">in</span> <span class="n">normal_y_result</span><span class="o">.</span><span class="n">index</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="n">normal_x</span> <span class="o">=</span> <span class="n">normal_x_result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">var</span><span class="p">,</span> <span class="s1">&#39;p-val&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">alpha</span> <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">normal_x_result</span><span class="o">.</span><span class="n">index</span> <span class="k">else</span> <span class="kc">False</span>     <span class="c1"># type: ignore</span>
+        <span class="n">normal_y</span> <span class="o">=</span> <span class="n">normal_y_result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dv</span><span class="p">,</span> <span class="s1">&#39;p-val&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">alpha</span> <span class="k">if</span> <span class="n">dv</span> <span class="ow">in</span> <span class="n">normal_y_result</span><span class="o">.</span><span class="n">index</span> <span class="k">else</span> <span class="kc">False</span>   <span class="c1"># type: ignore</span>
 
         <span class="c1"># Pearson (모두 정규) vs Spearman (하나라도 비정규)</span>
         <span class="k">if</span> <span class="n">normal_x</span> <span class="ow">and</span> <span class="n">normal_y</span><span class="p">:</span>
@@ -9754,8 +9752,8 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 
         <span class="c1"># Cohen&#39;s d 계산 (상관계수에서 효과크기로 변환)</span>
         <span class="c1"># d = 2*r / sqrt(1-r^2)</span>
-        <span class="k">if</span> <span class="n">r</span><span class="o">**</span><span class="mi">2</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>    <span class="c1"># type: ignore</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># type: ignore</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">d</span> <span class="o">=</span> <span class="mi">0</span>
 
