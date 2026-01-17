@@ -15,10 +15,10 @@ from .hs_plot import config
 # 학생들을 관심사와 성적으로 균형잡힌 조로 편성한다
 # ===================================================================
 def cluster_students(
-    df,
+    df: DataFrame | str,
     n_groups: int,
-    score_cols: list = None,
-    interest_col: str = None,
+    score_cols: list | None = None,
+    interest_col: str | None = None,
     max_iter: int = 200,
     score_metric: str = 'total'
 ) -> DataFrame:
@@ -173,7 +173,7 @@ def cluster_students(
             df_main,
             actual_n_groups,
             score_cols,
-            interest_col,
+            interest_col,   # type: ignore
             max_iter
         )
     else:
@@ -219,8 +219,8 @@ def cluster_students(
 def _balance_groups(
     df: DataFrame,
     n_groups: int,
-    score_cols: list,
-    interest_col: str = None,
+    score_cols: list | None = None,
+    interest_col: str | None = None,
     max_iter: int = 200
 ) -> DataFrame:
     """조 내 인원과 성적 균형을 조정하는 내부 함수.
@@ -281,7 +281,7 @@ def _balance_groups(
                 count = grade_counts.loc[g, grade]
                 min_g, max_g = grade_bounds[grade]
 
-                if count <= max_g:
+                if count <= max_g:  # type: ignore
                     continue
 
                 donors = group[group['성적그룹'] == grade]
@@ -291,12 +291,12 @@ def _balance_groups(
                     if og == g:
                         continue
                     other_count = grade_counts.loc[og, grade]
-                    if other_count >= min_g:
+                    if other_count >= min_g:    # type: ignore
                         continue
                     other_group = df[df['조'] == og]
 
                     og_interest = dominant_interest(other_group)
-                    need_groups.append((min_g - other_count, og, og_interest))
+                    need_groups.append((min_g - other_count, og, og_interest))  # type: ignore
 
                 need_groups.sort(reverse=True)
 
@@ -392,14 +392,14 @@ def _balance_group_sizes_only(
 # ===================================================================
 # 조 편성 결과의 인원, 관심사, 점수 분포를 시각화한다
 # ===================================================================
-def report_summary(df: DataFrame, interest_col: str = None, width: int = config.width, height: int = config.height, dpi: int = config.dpi) -> None:
+def report_summary(df: DataFrame, interest_col: str | None = None, width: int = config.width, height: int = config.height, dpi: int = config.dpi) -> None:
     """조 편성 결과의 요약 통계를 시각화합니다.
 
     조별 인원 분포, 관심사 분포, 평균점수 분포를 나타냅니다.
 
     Args:
         df (DataFrame): cluster_students 함수의 반환 결과 데이터프레임.
-        interest_col (str): 관심사 컬럼명
+        interest_col (str | None): 관심사 컬럼명
         width (int): 그래프 넓이. 기본값: config.width
         height (int): 그래프 높이. 기본값: config.height
         dpi (int): 그래프 해상도. 기본값: config.dpi
@@ -540,24 +540,24 @@ def report_summary(df: DataFrame, interest_col: str = None, width: int = config.
         plot_idx += 1
 
     # hs_plot.finalize_plot을 사용하여 마무리
-    hs_plot.finalize_plot(axes, outparams=True, grid=False)
+    hs_plot.finalize_plot(axes, outparams=True, grid=False) # type: ignore
 
 
 # ===================================================================
 # 조별 점수 분포를 커널 밀도 추정(KDE) 그래프로 시각화한다
 # ===================================================================
-def report_kde(df: DataFrame, metric: str = 'average', width: int = config.width, height: int = config.height, dpi: int = config.dpi) -> None:
+def report_kde(df: DataFrame | str, metric: str = 'average', width: int = config.width, height: int = config.height, dpi: int = config.dpi) -> None:
     """조별 점수 분포를 KDE(Kernel Density Estimation)로 시각화합니다.
 
     각 조의 점수 분포를 커널 밀도 추정으로 표시하고 평균 및 95% 신뢰구간을 나타냅니다.
 
     Args:
-        df: cluster_students 함수의 반환 결과 데이터프레임.
-        metric: 점수 기준 선택 ('total' 또는 'average').
+        df (DataFrame | str): cluster_students 함수의 반환 결과 데이터프레임.
+        metric (str): 점수 기준 선택 ('total' 또는 'average').
             'total'이면 총점, 'average'이면 평균점수. 기본값: 'average'
-        width: 그래프 넓이. 기본값: config.width
-        height: 그래프 높이. 기본값: config.height
-        dpi: 그래프 해상도. 기본값: config.dpi
+        width (int): 그래프 넓이. 기본값: config.width
+        height (int): 그래프 높이. 기본값: config.height
+        dpi (int): 그래프 해상도. 기본값: config.dpi
 
     Examples:
         ```python
@@ -570,17 +570,17 @@ def report_kde(df: DataFrame, metric: str = 'average', width: int = config.width
         print("데이터프레임이 비어있습니다")
         return
 
-    if '조' not in df.columns:
+    if '조' not in df.columns:  # type: ignore
         print("데이터프레임에 '조' 컬럼이 없습니다")
         return
 
-    has_score = '총점' in df.columns
-    has_avg = '평균점수' in df.columns
+    has_score = '총점' in df.columns    # type: ignore
+    has_avg = '평균점수' in df.columns  # type: ignore
     if not has_score:
         print("점수 데이터가 없습니다")
         return
 
-    labels = df['조'].unique().tolist()
+    labels = df['조'].unique().tolist() # type: ignore
     def _sort_key(v):
         try:
             return (0, int(v))
@@ -596,18 +596,18 @@ def report_kde(df: DataFrame, metric: str = 'average', width: int = config.width
 
     plot_idx = 0
     metric_col = '평균점수' if (metric or '').lower() == 'average' else '총점'
-    if metric_col not in df.columns:
+    if metric_col not in df.columns:    # type: ignore
         print(f"'{metric_col}' 컬럼이 없습니다")
         return
 
     for group in ordered_labels:
-        group_df = df[df['조'] == group]
-        group_series = group_df[metric_col].dropna()
+        group_df = df[df['조'] == group]    # type: ignore
+        group_series = group_df[metric_col].dropna()    # type: ignore
         n = group_series.size
         if n == 0:
             continue
 
-        hs_plot.kde_confidence_interval(data=group_df, xnames=metric_col, ax=axes[plot_idx], callback=lambda ax: ax.set_title(f"{group}조"))
+        hs_plot.kde_confidence_interval(data=group_df, xnames=metric_col, ax=axes[plot_idx], callback=lambda ax: ax.set_title(f"{group}조"))    # type: ignore
 
         plot_idx += 1
 
@@ -615,7 +615,7 @@ def report_kde(df: DataFrame, metric: str = 'average', width: int = config.width
     for idx in range(plot_idx, len(axes)):
         fig.delaxes(axes[idx])
 
-    hs_plot.finalize_plot(axes)
+    hs_plot.finalize_plot(axes) # type: ignore
 
 
 # ===================================================================
@@ -690,10 +690,10 @@ def group_summary(df: DataFrame, name_col: str = '학생이름') -> DataFrame:
 # 학생 조 편성부터 시각화까지의 전체 분석 프로세스를 일괄 실행한다
 # ===================================================================
 def analyze_classroom(
-    df,
+    df: DataFrame | str,
     n_groups: int,
-    score_cols: list = None,
-    interest_col: str = None,
+    score_cols: list | None = None,
+    interest_col: str | None = None,
     max_iter: int = 200,
     score_metric: str = 'average',
     name_col: str = '학생이름',

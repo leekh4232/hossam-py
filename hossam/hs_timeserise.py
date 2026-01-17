@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # -------------------------------------------------------------
+from typing import Callable
 import numpy as np
 import datetime as dt
 import concurrent.futures as futures
@@ -13,7 +14,7 @@ from matplotlib import pyplot as plt
 
 # -------------------------------------------------------------
 from statsmodels.tsa.stattools import adfuller
-from statsmodels.tsa.seasonal import seasonal_decompose
+from statsmodels.tsa.seasonal import seasonal_decompose         # type: ignore
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from statsmodels.tsa.arima.model import ARIMA
 
@@ -40,10 +41,10 @@ def diff(
     data: DataFrame,
     yname: str,
     plot: bool = True,
-    max_diff: int = None,
+    max_diff: int | None = None,
     figsize: tuple = (10, 5),
     dpi: int = 100,
-) -> None:
+) -> DataFrame:
     """시계열 데이터의 정상성을 검정하고 차분을 통해 정상성을 확보한다.
 
     ADF(Augmented Dickey-Fuller) 검정을 사용하여 시계열 데이터의 정상성을 확인한다.
@@ -55,7 +56,7 @@ def diff(
         yname (str): 정상성 검정 및 차분을 수행할 대상 컬럼명.
         plot (bool, optional): 각 차분 단계마다 시계열 그래프를 표시할지 여부.
             기본값은 True.
-        max_diff (int, optional): 최대 차분 횟수 제한. None이면 정상성을 만족할 때까지 반복.
+        max_diff (int | None, optional): 최대 차분 횟수 제한. None이면 정상성을 만족할 때까지 반복.
             과도한 차분을 방지하기 위해 설정 권장. 기본값은 None.
         figsize (tuple, optional): 그래프 크기 (width, height). 기본값은 (10, 5).
         dpi (int, optional): 그래프 해상도. 기본값은 100.
@@ -106,7 +107,7 @@ def diff(
             df = df.diff().dropna()
 
         if plot:
-            lineplot(df=df, yname=yname, xname=df.index, figsize=figsize, dpi=dpi)
+            lineplot(df=df, yname=yname, xname=df.index, figsize=figsize, dpi=dpi)  # type: ignore
 
         # ADF Test
         ar = adfuller(df[yname])
@@ -118,7 +119,7 @@ def diff(
             "관측치 개수(num of observations)": [ar[3]],
         }
 
-        for key, value in ar[4].items():
+        for key, value in ar[4].items():    # type: ignore
             ardict["기각값(Critical Values) %s" % key] = value
 
         stationarity = ar[1] <= 0.05
@@ -131,7 +132,7 @@ def diff(
         count += 1
 
         # 최대 차분 횟수가 지정되어 있고, 반복회차가 최대 차분 횟수에 도달하면 종료
-        if max_diff and count == max_diff:
+        if max_diff is not None and count == max_diff:
             break
 
     return df
@@ -190,8 +191,8 @@ def rolling(
 
         lineplot(
             df=df,
-            yname=rolling.name,
-            xname=df.index,
+            yname=rolling.name,     # type: ignore
+            xname=df.index,         # type: ignore
             figsize=figsize,
             dpi=dpi,
             callback=lambda ax: ax.set_title(f"Rolling (window={window})"),
@@ -250,8 +251,8 @@ def ewm(
 
         lineplot(
             df=df,
-            yname=ewm.name,
-            xname=df.index,
+            yname=ewm.name,     # type: ignore
+            xname=df.index,     # type: ignore
             figsize=figsize,
             dpi=dpi,
             callback=lambda ax: ax.set_title(f"Ewm (span={span})"),
@@ -357,7 +358,7 @@ def seasonal_decompose(
 # ===================================================================
 # 시계열 데이터에 대한 학습/테스트 데이터 분할
 # ===================================================================
-def train_test_split(data: DataFrame, test_size: float = 0.2) -> tuple:
+def train_test_split(data: DataFrame, test_size: float = 0.2) -> tuple[DataFrame, DataFrame]:
     """시계열 데이터를 시간 순서를 유지하며 학습/테스트 세트로 분할한다.
 
     일반적인 random split과 달리 시간 순서를 엄격히 유지하여 분할한다.
@@ -411,7 +412,7 @@ def train_test_split(data: DataFrame, test_size: float = 0.2) -> tuple:
 # 자기상관함수(ACF, Autocorrelation Function) 그래프 시각화
 # ===================================================================
 def acf_plot(
-    data: Series, figsize: tuple = (10, 5), dpi: int = 100, callback: any = None
+    data: Series, figsize: tuple = (10, 5), dpi: int = 100, callback: Callable | None = None
 ):
     """자기상관함수(ACF, Autocorrelation Function) 그래프를 시각화한다.
 
@@ -463,7 +464,7 @@ def acf_plot(
 # 편자기상관함수(PACF, Partial Autocorrelation Function) 그래프 시각화
 # ===================================================================
 def pacf_plot(
-    data: Series, figsize: tuple = (10, 5), dpi: int = 100, callback: any = None
+    data: Series, figsize: tuple = (10, 5), dpi: int = 100, callback: Callable | None = None
 ):
     """편자기상관함수(PACF, Partial Autocorrelation Function) 그래프를 시각화한다.
 
@@ -515,7 +516,7 @@ def pacf_plot(
 # ACF와 PACF 그래프 동시 시각화
 # ===================================================================
 def acf_pacf_plot(
-    data: Series, figsize: tuple = (10, 5), dpi: int = 100, callback: any = None
+    data: Series, figsize: tuple = (10, 5), dpi: int = 100, callback: Callable | None = None
 ):
     """ACF와 PACF 그래프를 동시에 시각화하여 ARIMA 차수를 결정한다.
 
@@ -577,7 +578,7 @@ def arima(
     p: int = 3,
     d: int = 3,
     q: int = 3,
-    s: int = None,
+    s: int | None = None,
     periods: int = 0,
     figsize: tuple = (15, 5),
     dpi: int = 100,
@@ -600,7 +601,7 @@ def arima(
             diff() 결과를 참고하여 결정. 기본값은 3.
         q (int, optional): MA(Moving Average) 차수. 과거 오차의 영향을 모델링.
             ACF 그래프를 참고하여 결정. auto=True일 때 max_q로 사용. 기본값은 3.
-        s (int, optional): 계절 주기(Seasonality). None이면 비계절 ARIMA.
+        s (int | None, optional): 계절 주기(Seasonality). None이면 비계절 ARIMA.
             예: 월별 데이터는 s=12, 주별 데이터는 s=52.
             설정 시 SARIMA(p,d,q)(P,D,Q,s) 모델 사용. 기본값은 None.
         periods (int, optional): test 기간 이후 추가 예측 기간 수.
@@ -692,17 +693,15 @@ def arima(
     fig = plt.figure(figsize=figsize, dpi=dpi)
     ax = fig.gca()
 
-    sb.lineplot(data=train, x=train.index, y=train.columns[0], label="Train", ax=ax)
-    sb.lineplot(data=test, x=test.index, y=test.columns[0], label="Test", ax=ax)
+    sb.lineplot(data=train, x=train.index, y=train.columns[0], label="Train", ax=ax)    # type: ignore
+    sb.lineplot(data=test, x=test.index, y=test.columns[0], label="Test", ax=ax)        # type: ignore
 
     if auto:
         sb.lineplot(
             x=pred.index, y=pred.values, label="Prediction", linestyle="--", ax=ax
         )
     else:
-        sb.lineplot(
-            x=test_pred.index, y=test_pred, label="Prediction", linestyle="--", ax=ax
-        )
+        sb.lineplot(x=test_pred.index, y=test_pred, label="Prediction", linestyle="--", ax=ax) # type: ignore
         sb.lineplot(x=pred.index, y=pred, label="Forecast", linestyle="--", ax=ax)
 
     ax.grid()
@@ -719,10 +718,10 @@ def arima(
 # ===================================================================
 def __prophet_execute(
     train: DataFrame,
-    test: DataFrame = None,
+    test: DataFrame | None = None,
     periods: int = 0,
     freq: str = "D",
-    callback: any = None,
+    callback: Callable | None = None,
     **params,
 ):
     """Prophet 모델을 생성한다.
@@ -732,7 +731,7 @@ def __prophet_execute(
         test (DataFrame, optional): 검증데이터. Defaults to None.
         periods (int, optional): 예측기간. Defaults to 0.
         freq (str, optional): 예측주기(D,M,Y). Defaults to "D".
-        callback (any, optional): 콜백함수. Defaults to None.
+        callback (Callable, optional): 콜백함수. Defaults to None.
         **params (dict, optional): 하이퍼파라미터. Defaults to None.
 
     Returns:
@@ -753,10 +752,10 @@ def __prophet_execute(
 
     if test is not None:
         pred = forecast[["ds", "yhat"]][-size:]
-        score = np.sqrt(mean_squared_error(test["y"].values, pred["yhat"].values))
+        score = np.sqrt(mean_squared_error(test["y"].values, pred["yhat"].values))  # type: ignore
     else:
         pred = forecast[["ds", "yhat"]]
-        score = np.sqrt(mean_squared_error(train["y"].values, pred["yhat"].values))
+        score = np.sqrt(mean_squared_error(train["y"].values, pred["yhat"].values)) # type: ignore
 
     return model, score, dict(params), forecast, pred
 
@@ -766,16 +765,16 @@ def __prophet_execute(
 # ===================================================================
 def prophet(
     train: DataFrame,
-    test: DataFrame = None,
+    test: DataFrame | None = None,
     periods: int = 0,
     freq: str = "D",
     report: bool = True,
     print_forecast: bool = False,
     figsize=(20, 8),
     dpi: int = 200,
-    callback: any = None,
+    callback: Callable | None = None,
     **params,
-) -> DataFrame:
+) -> tuple[Prophet, dict, float, DataFrame, DataFrame]:
     """Facebook Prophet 모델을 학습하고 최적 모델을 반환한다.
 
     Facebook(Meta)의 Prophet 라이브러리를 사용하여 시계열 예측 모델을 구축한다.
@@ -897,7 +896,7 @@ def prophet(
 
     else:
         m, score, params, forecast, pred = __prophet_execute(
-            train=train, test=test, periods=periods, freq=freq, callback=callback, **p
+            train=train, test=test, periods=periods, freq=freq, callback=callback, **p  # type: ignore
         )
         result.append(
             {
@@ -925,7 +924,7 @@ def prophet(
     # )
 
     if report:
-        hs_prophet_report(
+        hs_prophet_report(  # type: ignore
             best_model, best_forecast, best_pred, test, print_forecast, figsize, dpi
         )
 
@@ -939,11 +938,11 @@ def prophet_report(
     model: Prophet,
     forecast: DataFrame,
     pred: DataFrame,
-    test: DataFrame = None,
+    test: DataFrame | None = None,
     print_forecast: bool = False,
     figsize: tuple = (20, 8),
     dpi: int = 100,
-) -> DataFrame:
+) -> None:
     """Prophet 모델의 예측 결과와 성분 분해를 시각화하고 성능을 평가한다.
 
     학습된 Prophet 모델의 예측 결과, 변화점(changepoints), 신뢰구간을 시각화하고,
@@ -1017,7 +1016,7 @@ def prophet_report(
             linestyle="--",
         )
 
-    ax.set_ylim([forecast["yhat"].min() * 0.95, forecast["yhat"].max() * 1.05])
+    ax.set_ylim([forecast["yhat"].min() * 0.95, forecast["yhat"].max() * 1.05]) # type: ignore
 
     plt.legend()
     plt.show()
@@ -1041,9 +1040,9 @@ def prophet_report(
         y = test["y"].values
 
         result = {
-            "평균절대오차(MAE)": mean_absolute_error(y, yhat),
-            "평균제곱오차(MSE)": mean_squared_error(y, yhat),
-            "평균오차(RMSE)": np.sqrt(mean_squared_error(y, yhat)),
+            "평균절대오차(MAE)": mean_absolute_error(y, yhat),  # type: ignore
+            "평균제곱오차(MSE)": mean_squared_error(y, yhat),   # type: ignore
+            "평균오차(RMSE)": np.sqrt(mean_squared_error(y, yhat))  # type: ignore
         }
 
         pretty_table(DataFrame(result, index=["Prophet"]).T)
@@ -1052,7 +1051,7 @@ def prophet_report(
 # ===================================================================
 # 주말 날짜를 포함하는 휴일 데이터프레임을 생성
 # ===================================================================
-def get_weekend_df(start: any, end: any = None) -> DataFrame:
+def get_weekend_df(start: dt.datetime | str, end: dt.datetime | str | None = None) -> DataFrame:
     """주말 날짜를 포함하는 휴일 데이터프레임을 생성한다.
 
     Prophet 모델의 holidays 파라미터에 사용할 수 있는 형식의 주말 휴일

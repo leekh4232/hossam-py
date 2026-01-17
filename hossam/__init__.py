@@ -6,7 +6,8 @@ from . import hs_prep
 from . import hs_stats
 from . import hs_timeserise
 from . import hs_util
-from .data_loader import load_data, load_info
+from .hs_util import load_info
+from .hs_util import _load_data_remote as load_data
 
 # py-modules
 import sys

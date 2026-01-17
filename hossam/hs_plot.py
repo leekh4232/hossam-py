@@ -73,7 +73,7 @@ def get_default_ax(width: int = config.width, height: int = config.height, rows:
     if is_array and (ws != None and hs != None):
         fig.subplots_adjust(wspace=ws, hspace=hs)
 
-    if title and not is_array:
+    if title and is_array:
         fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight='bold')
 
     if flatten == True:
@@ -756,7 +756,12 @@ def regplot(
         "data": df,
         "x": xname,
         "y": yname,
-        "scatter_kws": {"color": scatter_color} if scatter_color else {},
+        "scatter_kws": {
+            "s": 20,
+            "linewidths": 0.5,
+            "edgecolor": "w",
+            "color": scatter_color
+        },
         "line_kws": {
             "color": "red",
             "linestyle": "--",
@@ -1741,7 +1746,7 @@ def ols_residplot(
         outparams = True
 
     # 산점도 seaborn으로 그리기
-    sb.scatterplot(x=y_pred, y=resid, ax=ax, s=0.5, edgecolor="white", alpha=config.fill_alpha, **params)
+    sb.scatterplot(x=y_pred, y=resid, ax=ax, s=20, edgecolor="white", **params)
 
     # 기준선 (잔차 = 0)
     ax.axhline(0, color="gray", linestyle="--", linewidth=linewidth*0.7)    # type: ignore
@@ -2146,7 +2151,7 @@ def categorical_target_distribution(
             plot_kwargs.update({"x": yname, "hue": col, "palette": palette, "fill": kde_fill, "common_norm": False, "linewidth": linewidth})
             sb.kdeplot(**plot_kwargs)
         else:  # box
-            plot_kwargs.update({"x": col, "y": yname, "palette": palette})
+            plot_kwargs.update({"x": col, "y": yname, "hue": col, "palette": palette})
             sb.boxplot(**plot_kwargs, linewidth=linewidth)
 
         ax.set_title(f"{col} vs {yname}")
@@ -2419,8 +2424,7 @@ def radarplot(
 # ===================================================================
 def distribution_plot(
     data: DataFrame,
-    column: str,
-    title: str | None = None,
+    column: str | list[str],
     clevel: float = 0.95,
     orient: str = "h",
     hue: str | None = None,
@@ -2441,7 +2445,6 @@ def distribution_plot(
     Args:
         data (DataFrame): 시각화할 데이터.
         column (str): 분석할 컬럼명.
-        title (str|None): 그래프 제목.
         clevel (float): KDE 신뢰수준 (0~1). 기본값 0.95.
         orient (str): Boxplot 방향 ('v' 또는 'h'). 기본값 'h'.
         hue (str|None): 명목형 컬럼명. 지정하면 각 범주별로 행을 늘려 KDE와 boxplot을 그림.
@@ -2456,76 +2459,82 @@ def distribution_plot(
     Returns:
         None
     """
-    if hue is None:
-        # 1행 2열 서브플롯 생성
-        fig, axes = get_default_ax(width, height, rows=1, cols=2, dpi=dpi)
+    if isinstance(column, str):
+        column = [column]
 
-        kde_confidence_interval(
-            data=data,
-            xnames=column,
-            clevel=clevel,
-            linewidth=linewidth,
-            ax=axes[0],
-        )
+    for c in column:
+        title = f"Distribution Plot of {c}"
 
-        if kind == "hist":
-            histplot(
-                df=data,
-                xname=column,
-                linewidth=linewidth,
-                ax=axes[1]
-            )
-        else:
-            boxplot(
-                df=data[column],        # type: ignore
-                linewidth=linewidth,
-                ax=axes[1]
-            )
-
-        fig.suptitle(f"Distribution of {column}", fontsize=14, y=1.02)
-    else:
-        if hue not in data.columns:
-            raise ValueError(f"hue column '{hue}' not found in DataFrame")
-
-        categories = list(pd.Series(data[hue].dropna().unique()).sort_values())
-        n_cat = len(categories) if categories else 1
-
-        fig, axes = get_default_ax(width, height, rows=n_cat, cols=2, dpi=dpi)
-        axes_2d = np.atleast_2d(axes)
-
-        for idx, cat in enumerate(categories):
-            subset = data[data[hue] == cat]
-            left_ax, right_ax = axes_2d[idx, 0], axes_2d[idx, 1]
+        if hue is None:
+            # 1행 2열 서브플롯 생성
+            fig, axes = get_default_ax(width, height, rows=1, cols=2, dpi=dpi, title=title)
 
             kde_confidence_interval(
-                data=subset,
-                xnames=column,
+                data=data,
+                xnames=c,
                 clevel=clevel,
                 linewidth=linewidth,
-                ax=left_ax,
+                ax=axes[0],
             )
-            left_ax.set_title(f"{hue} = {cat}")
 
             if kind == "hist":
                 histplot(
-                    df=subset,
-                    xname=column,
+                    df=data,
+                    xname=c,
                     linewidth=linewidth,
-                    ax=right_ax,
+                    ax=axes[1]
                 )
             else:
                 boxplot(
-                    df=subset[column], # type: ignore
+                    df=data[column],        # type: ignore
                     linewidth=linewidth,
-                    ax=right_ax
+                    ax=axes[1]
                 )
 
-        fig.suptitle(f"Distribution of {column} by {hue}", fontsize=14, y=1.02)
+            fig.suptitle(title, fontsize=14, y=1.02)
+        else:
+            if hue not in data.columns:
+                raise ValueError(f"hue column '{hue}' not found in DataFrame")
 
-    plt.tight_layout()
+            categories = list(pd.Series(data[hue].dropna().unique()).sort_values())
+            n_cat = len(categories) if categories else 1
 
-    if save_path:
-        plt.savefig(save_path, bbox_inches='tight', dpi=dpi)
-        plt.close()
-    else:
-        plt.show()
+            fig, axes = get_default_ax(width, height, rows=n_cat, cols=2, dpi=dpi, title=title)
+            axes_2d = np.atleast_2d(axes)
+
+            for idx, cat in enumerate(categories):
+                subset = data[data[hue] == cat]
+                left_ax, right_ax = axes_2d[idx, 0], axes_2d[idx, 1]
+
+                kde_confidence_interval(
+                    data=subset,
+                    xnames=c,
+                    clevel=clevel,
+                    linewidth=linewidth,
+                    ax=left_ax,
+                )
+                left_ax.set_title(f"{hue} = {cat}")
+
+                if kind == "hist":
+                    histplot(
+                        df=subset,
+                        xname=c,
+                        linewidth=linewidth,
+                        ax=right_ax,
+                    )
+                else:
+                    boxplot(
+                        df=subset[c], # type: ignore
+                        linewidth=linewidth,
+                        ax=right_ax
+                    )
+
+            fig.suptitle(f"{title} by {hue}", fontsize=14, y=1.02)
+
+            plt.tight_layout()
+
+            if save_path:
+                plt.savefig(save_path, bbox_inches='tight', dpi=dpi)
+                plt.close()
+            else:
+                plt.show()
