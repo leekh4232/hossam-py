@@ -920,13 +920,13 @@
     <table>
       <thead>
         <tr>
-          <th>Type</th>
+<th>Name</th>          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td>
+<td><code>DataFrame</code></td>            <td>
                   <code><span title="pandas.DataFrame">DataFrame</span></code>
             </td>
             <td>
@@ -1045,12 +1045,12 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;주소 컬럼을 일괄 지오코딩하여 위도/경도 컬럼을 추가합니다.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        df: 입력 `DataFrame`.</span>
-<span class="sd">        addr: 주소가 들어있는 컬럼명.</span>
-<span class="sd">        key: VWorld API 키.</span>
+<span class="sd">        df (DataFrame): 입력 `DataFrame`.</span>
+<span class="sd">        addr (str): 주소가 들어있는 컬럼명.</span>
+<span class="sd">        key (str): VWorld API 키.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        위도(`latitude`), 경도(`longitude`) 컬럼이 추가된 `DataFrame`.</span>
+<span class="sd">        DataFrame: 위도(`latitude`), 경도(`longitude`) 컬럼이 추가된 `DataFrame`.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        Exception: 지오코딩 과정에서 발생한 예외를 전파합니다.</span>
@@ -1184,13 +1184,13 @@
     <table>
       <thead>
         <tr>
-          <th>Type</th>
+<th>Name</th>          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td>
+<td><code>GeoDataFrame</code></td>            <td>
                   <code><span title="geopandas.GeoDataFrame">GeoDataFrame</span></code>
             </td>
             <td>
@@ -1277,11 +1277,11 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Shapefile을 읽어 `GeoDataFrame`으로 로드합니다.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        path: 읽을 Shapefile(.shp) 경로.</span>
-<span class="sd">        info: True면 데이터 프리뷰와 통계를 출력.</span>
+<span class="sd">        path (str): 읽을 Shapefile(.shp) 경로.</span>
+<span class="sd">        info (bool): True면 데이터 프리뷰와 통계를 출력.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        로드된 `GeoDataFrame`.</span>
+<span class="sd">        GeoDataFrame: 로드된 `GeoDataFrame`.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        FileNotFoundError: 파일이 존재하지 않는 경우.</span>
@@ -1299,7 +1299,7 @@
 
     <span class="k">if</span> <span class="n">info</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">✅ 테이블 정보&quot;</span><span class="p">)</span>
-        <span class="n">pretty_table</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">info</span><span class="p">(),</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;pretty&quot;</span><span class="p">)</span>
+        <span class="n">pretty_table</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">info</span><span class="p">(),</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;pretty&quot;</span><span class="p">)</span> <span class="c1"># type: ignore</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">✅ 상위 5개 행&quot;</span><span class="p">)</span>
         <span class="n">pretty_table</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">(),</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;pretty&quot;</span><span class="p">)</span>
@@ -1451,29 +1451,8 @@
           </tr>
       </tbody>
     </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>None</code></td>            <td>
-                  <code>None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>파일을 저장하고 반환값이 없습니다.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Returns:
+    None: 파일을 저장하고 반환값이 없습니다.</p>
 
 
 <p><span class="doc-section-title">Raises:</span></p>
@@ -1609,8 +1588,7 @@
 <span class="normal">301</span>
 <span class="normal">302</span>
 <span class="normal">303</span>
-<span class="normal">304</span>
-<span class="normal">305</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">save_shape</span><span class="p">(</span>
+<span class="normal">304</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">save_shape</span><span class="p">(</span>
     <span class="n">gdf</span><span class="p">:</span> <span class="n">GeoDataFrame</span> <span class="o">|</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">crs</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1632,12 +1610,11 @@
 <span class="sd">      - 확장자 없으면 .shp로 저장</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        gdf: 저장할 `GeoDataFrame` 또는 `DataFrame`.</span>
-<span class="sd">        path: 저장 경로(.shp 또는 .gpkg, 확장자 없으면 .shp 자동 추가).</span>
-<span class="sd">        crs: 좌표계 문자열(e.g., &quot;EPSG:4326&quot;). 미지정 시 WGS84.</span>
-<span class="sd">        lat_col: DataFrame 입력 시 위도 컬럼명.</span>
-<span class="sd">        lon_col: DataFrame 입력 시 경도 컬럼명.</span>
-
+<span class="sd">        gdf (GeoDataFrame | DataFrame): 저장할 `GeoDataFrame` 또는 `DataFrame`.</span>
+<span class="sd">        path (str): 저장 경로(.shp 또는 .gpkg, 확장자 없으면 .shp 자동 추가).</span>
+<span class="sd">        crs (str | None): 좌표계 문자열(e.g., &quot;EPSG:4326&quot;). 미지정 시 WGS84.</span>
+<span class="sd">        lat_col (str): DataFrame 입력 시 위도 컬럼명.</span>
+<span class="sd">        lon_col (str): DataFrame 입력 시 경도 컬럼명.</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        None: 파일을 저장하고 반환값이 없습니다.</span>
 
