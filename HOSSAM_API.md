@@ -611,6 +611,32 @@ def log_transform(data: DataFrame, *fields: str) -> DataFrame
 자연로그(ln)를 사용하여 변환하며, 0 또는 음수 값이 있을 경우
 최소값을 기준으로 보정(shift)을 적용한다.
 
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant log_transform
+    participant DataFrame
+
+    User->>log_transform: DataFrame, *fields
+    log_transform->>log_transform: DataFrame 복사(df)
+    alt fields 지정 안함
+        log_transform->>DataFrame: 수치형 컬럼 선택
+    else fields 지정
+        log_transform->>DataFrame: 지정 컬럼만 선택
+    end
+    loop 각 컬럼별
+        log_transform->>DataFrame: 컬럼 존재/수치형 확인
+        log_transform->>DataFrame: min_val 계산
+        alt min_val <= 0
+            log_transform->>DataFrame: shift 적용 후 np.log
+        else
+            log_transform->>DataFrame: np.log 바로 적용
+        end
+    end
+    log_transform-->>User: 변환된 DataFrame 반환
+```
+
 **Arguments**:
 
 - `data` _DataFrame_ - 변환할 데이터프레임.
@@ -4340,14 +4366,14 @@ def geocode(df: DataFrame, addr: str, key: str) -> DataFrame
 
 **Arguments**:
 
-- `df` - 입력 `DataFrame`.
-- `addr` - 주소가 들어있는 컬럼명.
-- `key` - VWorld API 키.
+- `df` _DataFrame_ - 입력 `DataFrame`.
+- `addr` _str_ - 주소가 들어있는 컬럼명.
+- `key` _str_ - VWorld API 키.
   
 
 **Returns**:
 
-  위도(`latitude`), 경도(`longitude`) 컬럼이 추가된 `DataFrame`.
+- `DataFrame` - 위도(`latitude`), 경도(`longitude`) 컬럼이 추가된 `DataFrame`.
   
 
 **Raises**:
@@ -4376,13 +4402,13 @@ Shapefile을 읽어 `GeoDataFrame`으로 로드합니다.
 
 **Arguments**:
 
-- `path` - 읽을 Shapefile(.shp) 경로.
-- `info` - True면 데이터 프리뷰와 통계를 출력.
+- `path` _str_ - 읽을 Shapefile(.shp) 경로.
+- `info` _bool_ - True면 데이터 프리뷰와 통계를 출력.
   
 
 **Returns**:
 
-  로드된 `GeoDataFrame`.
+- `GeoDataFrame` - 로드된 `GeoDataFrame`.
   
 
 **Raises**:
@@ -4425,12 +4451,11 @@ def save_shape(gdf: GeoDataFrame | DataFrame,
 
 **Arguments**:
 
-- `gdf` - 저장할 `GeoDataFrame` 또는 `DataFrame`.
-- `path` - 저장 경로(.shp 또는 .gpkg, 확장자 없으면 .shp 자동 추가).
-- `crs` - 좌표계 문자열(e.g., "EPSG:4326"). 미지정 시 WGS84.
-- `lat_col` - DataFrame 입력 시 위도 컬럼명.
-- `lon_col` - DataFrame 입력 시 경도 컬럼명.
-  
+- `gdf` _GeoDataFrame | DataFrame_ - 저장할 `GeoDataFrame` 또는 `DataFrame`.
+- `path` _str_ - 저장 경로(.shp 또는 .gpkg, 확장자 없으면 .shp 자동 추가).
+- `crs` _str | None_ - 좌표계 문자열(e.g., "EPSG:4326"). 미지정 시 WGS84.
+- `lat_col` _str_ - DataFrame 입력 시 위도 컬럼명.
+- `lon_col` _str_ - DataFrame 입력 시 경도 컬럼명.
 
 **Returns**:
 
@@ -4452,7 +4477,8 @@ def save_shape(gdf: GeoDataFrame | DataFrame,
 ### load\_info
 
 ```python
-def load_info(search: str = None, local: str = None) -> DataFrame
+def load_info(search: str | None = None,
+              local: str | None = None) -> DataFrame
 ```
 
 메타데이터에서 사용 가능한 데이터셋 정보를 로드한다.
@@ -4481,7 +4507,7 @@ list(info.columns) #['name', 'chapter', 'desc', 'url']
 ### load\_data
 
 ```python
-def load_data(key: str, local: str = None) -> Optional[DataFrame]
+def load_data(key: str, local: str | None = None) -> Optional[DataFrame]
 ```
 
 키로 지정된 데이터셋을 로드한다.
