@@ -770,6 +770,31 @@ def log_transform(data: DataFrame, *fields: str) -> DataFrame:
     자연로그(ln)를 사용하여 변환하며, 0 또는 음수 값이 있을 경우
     최소값을 기준으로 보정(shift)을 적용한다.
 
+    ```mermaid
+    sequenceDiagram
+        participant User
+        participant log_transform
+        participant DataFrame
+
+        User->>log_transform: DataFrame, *fields
+        log_transform->>log_transform: DataFrame 복사(df)
+        alt fields 지정 안함
+            log_transform->>DataFrame: 수치형 컬럼 선택
+        else fields 지정
+            log_transform->>DataFrame: 지정 컬럼만 선택
+        end
+        loop 각 컬럼별
+            log_transform->>DataFrame: 컬럼 존재/수치형 확인
+            log_transform->>DataFrame: min_val 계산
+            alt min_val <= 0
+                log_transform->>DataFrame: shift 적용 후 np.log
+            else
+                log_transform->>DataFrame: np.log 바로 적용
+            end
+        end
+        log_transform-->>User: 변환된 DataFrame 반환
+    ```
+
     Args:
         data (DataFrame): 변환할 데이터프레임.
         *fields (str): 변환할 컬럼명 목록. 지정하지 않으면 모든 수치형 컬럼을 처리.

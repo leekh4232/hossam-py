@@ -6,8 +6,8 @@ import json
 from os.path import join, exists
 from io import BytesIO
 from pandas import DataFrame, read_csv, read_excel
-from typing import Optional
-from typing import Optional
+from typing import Optional, Tuple, Any
+from .hs_util import pretty_table
 
 BASE_URL = "https://data.hossam.kr"
 
@@ -35,8 +35,7 @@ def __get_df(path: str, index_col=None) -> DataFrame:
                 info = read_excel(BytesIO(data_bytes), sheet_name='metadata', index_col=0)
                 #print("\033[94m[metadata]\033[0m")
                 print()
-                from .util import hs_pretty_table
-                hs_pretty_table(info)
+                pretty_table(info)
                 print()
             except Exception:
                 #print(f"\033[91m[!] Cannot read metadata\033[0m")
@@ -48,8 +47,7 @@ def __get_df(path: str, index_col=None) -> DataFrame:
                 info = read_excel(path, sheet_name='metadata', index_col=0)
                 #print("\033[94m[metadata]\033[0m")
                 print()
-                from .util import hs_pretty_table
-                hs_pretty_table(info)
+                pretty_table(info)
                 print()
             except:
                 #print(f"\033[91m[!] Cannot read metadata\033[0m")
@@ -60,7 +58,7 @@ def __get_df(path: str, index_col=None) -> DataFrame:
     return df
 
 # -------------------------------------------------------------
-def __get_data_url(key: str, local: str = None) -> str:
+def __get_data_url(key: str, local: str | None = None) -> Tuple[str, Any, Any]:
     global BASE_URL
 
     path = None
@@ -96,7 +94,7 @@ def __get_data_url(key: str, local: str = None) -> str:
     return path, info.get('desc'), info.get('index')
 
 # -------------------------------------------------------------
-def load_info(search: str = None, local: str = None) -> DataFrame:
+def load_info(search: str | None = None, local: str | None = None) -> DataFrame:
     """메타데이터에서 사용 가능한 데이터셋 정보를 로드한다.
 
     Args:
@@ -160,7 +158,7 @@ def load_info(search: str = None, local: str = None) -> DataFrame:
     return my_df2
 
 # -------------------------------------------------------------
-def load_data(key: str, local: str = None) -> Optional[DataFrame]:
+def load_data(key: str, local: str | None = None) -> Optional[DataFrame]:
     """키로 지정된 데이터셋을 로드한다.
 
     Args:

@@ -22,10 +22,10 @@ def __geocode_item(session: requests.Session, index: int, addr: str, key: str) -
     """단일 주소를 VWorld API로 지오코딩합니다.
 
     Args:
-        session: 재사용할 `requests.Session` 인스턴스.
-        index: 입력 데이터의 인덱스(로그용).
-        addr: 지오코딩할 도로명 주소 문자열.
-        key: VWorld API 키.
+        session (requests.Session): 재사용할 `requests.Session` 인스턴스.
+        index (int): 입력 데이터의 인덱스(로그용).
+        addr (str): 지오코딩할 도로명 주소 문자열.
+        key (str): VWorld API 키.
 
     Returns:
         (latitude, longitude) 튜플.
@@ -90,12 +90,12 @@ def geocode(df: DataFrame, addr: str, key: str) -> DataFrame:
     """주소 컬럼을 일괄 지오코딩하여 위도/경도 컬럼을 추가합니다.
 
     Args:
-        df: 입력 `DataFrame`.
-        addr: 주소가 들어있는 컬럼명.
-        key: VWorld API 키.
+        df (DataFrame): 입력 `DataFrame`.
+        addr (str): 주소가 들어있는 컬럼명.
+        key (str): VWorld API 키.
 
     Returns:
-        위도(`latitude`), 경도(`longitude`) 컬럼이 추가된 `DataFrame`.
+        DataFrame: 위도(`latitude`), 경도(`longitude`) 컬럼이 추가된 `DataFrame`.
 
     Raises:
         Exception: 지오코딩 과정에서 발생한 예외를 전파합니다.
@@ -164,11 +164,11 @@ def load_shape(path: str, info: bool = True) -> GeoDataFrame:
     """Shapefile을 읽어 `GeoDataFrame`으로 로드합니다.
 
     Args:
-        path: 읽을 Shapefile(.shp) 경로.
-        info: True면 데이터 프리뷰와 통계를 출력.
+        path (str): 읽을 Shapefile(.shp) 경로.
+        info (bool): True면 데이터 프리뷰와 통계를 출력.
 
     Returns:
-        로드된 `GeoDataFrame`.
+        GeoDataFrame: 로드된 `GeoDataFrame`.
 
     Raises:
         FileNotFoundError: 파일이 존재하지 않는 경우.
@@ -186,7 +186,7 @@ def load_shape(path: str, info: bool = True) -> GeoDataFrame:
 
     if info:
         print("\n✅ 테이블 정보")
-        pretty_table(data.info(), tablefmt="pretty")
+        pretty_table(data.info(), tablefmt="pretty") # type: ignore
 
         print("\n✅ 상위 5개 행")
         pretty_table(data.head(), tablefmt="pretty")
@@ -226,12 +226,11 @@ def save_shape(
       - 확장자 없으면 .shp로 저장
 
     Args:
-        gdf: 저장할 `GeoDataFrame` 또는 `DataFrame`.
-        path: 저장 경로(.shp 또는 .gpkg, 확장자 없으면 .shp 자동 추가).
-        crs: 좌표계 문자열(e.g., "EPSG:4326"). 미지정 시 WGS84.
-        lat_col: DataFrame 입력 시 위도 컬럼명.
-        lon_col: DataFrame 입력 시 경도 컬럼명.
-
+        gdf (GeoDataFrame | DataFrame): 저장할 `GeoDataFrame` 또는 `DataFrame`.
+        path (str): 저장 경로(.shp 또는 .gpkg, 확장자 없으면 .shp 자동 추가).
+        crs (str | None): 좌표계 문자열(e.g., "EPSG:4326"). 미지정 시 WGS84.
+        lat_col (str): DataFrame 입력 시 위도 컬럼명.
+        lon_col (str): DataFrame 입력 시 경도 컬럼명.
     Returns:
         None: 파일을 저장하고 반환값이 없습니다.
 
