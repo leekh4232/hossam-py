@@ -225,7 +225,7 @@ print(summary)
 ### standard\_scaler
 
 ```python
-def standard_scaler(data: any,
+def standard_scaler(data: Any,
                     yname: str | None = None,
                     save_path: str | None = None,
                     load_path: str | None = None) -> DataFrame
@@ -262,7 +262,7 @@ std_df = hs_prep.standard_scaler(df, yname="y", save_path="std.pkl")
 ### minmax\_scaler
 
 ```python
-def minmax_scaler(data: any,
+def minmax_scaler(data: Any,
                   yname: str | None = None,
                   save_path: str | None = None,
                   load_path: str | None = None) -> DataFrame
@@ -300,7 +300,7 @@ mm_df = hs_prep.minmax_scaler(df, yname="y")
 ```python
 def set_category(data: DataFrame,
                  *args: str,
-                 columns: list = None) -> DataFrame
+                 columns: list | None = None) -> DataFrame
 ```
 
 카테고리 데이터를 설정한다.
@@ -364,7 +364,7 @@ result = hs_prep.unmelt(df, id_vars='group', value_vars='value')
 ```python
 def outlier_table(data: DataFrame,
                   *fields: str,
-                  columns: list = None) -> DataFrame
+                  columns: list | None = None) -> DataFrame
 ```
 
 수치형 컬럼에 대한 사분위수 및 IQR 기반 이상치 경계를 계산한다.
@@ -397,7 +397,7 @@ def outlier_table(data: DataFrame,
 def replace_outliner(data: DataFrame,
                      method: str = "nan",
                      *fields: str,
-                     columns: list = None) -> DataFrame
+                     columns: list | None = None) -> DataFrame
 ```
 
 이상치 경계값을 넘어가는 데이터를 경계값으로 대체한다.
@@ -426,7 +426,7 @@ def replace_outliner(data: DataFrame,
 ```python
 def drop_outliner(data: DataFrame,
                   *fields: str,
-                  columns: list = None) -> DataFrame
+                  columns: list | None = None) -> DataFrame
 ```
 
 이상치를 결측치로 변환한 후 모두 삭제한다.
@@ -449,7 +449,7 @@ def drop_outliner(data: DataFrame,
 ```python
 def get_dummies(data: DataFrame,
                 *args: str,
-                columns: list = None,
+                columns: list | None = None,
                 drop_first: bool = True,
                 dtype: str = "int") -> DataFrame
 ```
