@@ -1239,7 +1239,7 @@ result = hs_stats.ttest_rel(s1, s2, parametric=False)
 
 ```python
 def vif_filter(data: DataFrame,
-               yname: str = None,
+               yname: str | None = None,
                ignore: list | None = None,
                threshold: float = 10.0,
                verbose: bool = False) -> DataFrame
@@ -1274,8 +1274,8 @@ filtered = hs_stats.vif_filter(df, yname="target", ignore=["id"], threshold=10.0
 ### trend
 
 ```python
-def trend(x: any,
-          y: any,
+def trend(x: Any,
+          y: Any,
           degree: int = 1,
           value_count: int = 100) -> Tuple[np.ndarray, np.ndarray]
 ```
@@ -1505,7 +1505,7 @@ def logit(
     yname: str,
     report: Union[bool, str, int] = False
 ) -> Union[BinaryResultsWrapper, Tuple[BinaryResultsWrapper, DataFrame], Tuple[
-        BinaryResultsWrapper, DataFrame, DataFrame, str, str, List[str]]]
+        BinaryResultsWrapper, DataFrame, DataFrame, str, str, list[str]]]
 ```
 
 로지스틱 회귀분석을 수행하고 적합 결과를 반환한다.
@@ -1574,8 +1574,8 @@ def ols_linearity_test(fit,
                        power: int = 2,
                        alpha: float = 0.05,
                        plot: bool = False,
-                       title: str = None,
-                       save_path: str = None) -> DataFrame
+                       title: str | None = None,
+                       save_path: str | None = None) -> DataFrame
 ```
 
 회귀모형의 선형성을 Ramsey RESET 검정으로 평가한다.
@@ -1627,8 +1627,8 @@ result = hs_stats.ols_linearity_test(fit)
 def ols_normality_test(fit,
                        alpha: float = 0.05,
                        plot: bool = False,
-                       title: str = None,
-                       save_path: str = None) -> DataFrame
+                       title: str | None = None,
+                       save_path: str | None = None) -> DataFrame
 ```
 
 회귀모형 잔차의 정규성을 검정한다.
@@ -2055,7 +2055,7 @@ def get_default_ax(width: int = config.width,
                    flatten: bool = False,
                    ws: int | None = None,
                    hs: int | None = None,
-                   title: str = None)
+                   title: str | None = None)
 ```
 
 기본 크기의 Figure와 Axes를 생성한다.
@@ -2090,7 +2090,7 @@ def create_figure(width: int = config.width,
                   flatten: bool = False,
                   ws: int | None = None,
                   hs: int | None = None,
-                  title: str = None)
+                  title: str | None = None)
 ```
 
 기본 크기의 Figure와 Axes를 생성한다. get_default_ax의 래퍼 함수.
@@ -2118,11 +2118,11 @@ def create_figure(width: int = config.width,
 
 ```python
 def finalize_plot(ax: Axes | np.ndarray,
-                  callback: any = None,
+                  callback: Callable | None = None,
                   outparams: bool = False,
-                  save_path: str = None,
+                  save_path: str | None = None,
                   grid: bool = True,
-                  title: str = None) -> None
+                  title: str | None = None) -> None
 ```
 
 공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
@@ -2146,11 +2146,11 @@ def finalize_plot(ax: Axes | np.ndarray,
 
 ```python
 def show_figure(ax: Axes | np.ndarray,
-                callback: any = None,
+                callback: Callable | None = None,
                 outparams: bool = False,
-                save_path: str = None,
+                save_path: str | None = None,
                 grid: bool = True,
-                title: str = None) -> None
+                title: str | None = None) -> None
 ```
 
 공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
@@ -2176,19 +2176,19 @@ finalize_plot의 래퍼 함수.
 
 ```python
 def lineplot(df: DataFrame,
-             xname: str = None,
-             yname: str = None,
-             hue: str = None,
+             xname: str | None = None,
+             yname: str | None = None,
+             hue: str | None = None,
              title: str | None = None,
-             marker: str = None,
-             palette: str = None,
+             marker: str | None = None,
+             palette: str | None = None,
              width: int = config.width,
              height: int = config.height,
              linewidth: float = config.line_width,
              dpi: int = config.dpi,
-             save_path: str = None,
-             callback: any = None,
-             ax: Axes = None,
+             save_path: str | None = None,
+             callback: Callable | None = None,
+             ax: Axes | None = None,
              **params) -> None
 ```
 
@@ -2223,18 +2223,18 @@ def lineplot(df: DataFrame,
 
 ```python
 def boxplot(df: DataFrame,
-            xname: str = None,
-            yname: str = None,
+            xname: str | None = None,
+            yname: str | None = None,
             title: str | None = None,
             orient: str = "v",
-            palette: str = None,
+            palette: str | None = None,
             width: int = config.width,
             height: int = config.height,
             linewidth: float = config.line_width,
             dpi: int = config.dpi,
-            save_path: str = None,
-            callback: any = None,
-            ax: Axes = None,
+            save_path: str | None = None,
+            callback: Callable | None = None,
+            ax: Axes | None = None,
             **params) -> None
 ```
 
@@ -2268,11 +2268,11 @@ def boxplot(df: DataFrame,
 
 ```python
 def kdeplot(df: DataFrame,
-            xname: str = None,
-            yname: str = None,
-            hue: str = None,
+            xname: str | None = None,
+            yname: str | None = None,
+            hue: str | None = None,
             title: str | None = None,
-            palette: str = None,
+            palette: str | None = None,
             fill: bool = False,
             fill_alpha: float = config.fill_alpha,
             linewidth: float = config.line_width,
@@ -2280,9 +2280,9 @@ def kdeplot(df: DataFrame,
             width: int = config.width,
             height: int = config.height,
             dpi: int = config.dpi,
-            save_path: str = None,
-            callback: any = None,
-            ax: Axes = None,
+            save_path: str | None = None,
+            callback: Callable | None = None,
+            ax: Axes | None = None,
             **params) -> None
 ```
 
@@ -2326,14 +2326,14 @@ def histplot(df: DataFrame,
              title: str | None = None,
              bins: int | None = None,
              kde: bool = True,
-             palette: str = None,
+             palette: str | None = None,
              width: int = config.width,
              height: int = config.height,
              linewidth: float = config.line_width,
              dpi: int = config.dpi,
-             save_path: str = None,
-             callback: any = None,
-             ax: Axes = None,
+             save_path: str | None = None,
+             callback: Callable | None = None,
+             ax: Axes | None = None,
              **params) -> None
 ```
 
@@ -2370,14 +2370,14 @@ def stackplot(df: DataFrame,
               xname: str,
               hue: str,
               title: str | None = None,
-              palette: str = None,
+              palette: str | None = None,
               width: int = config.width,
               height: int = config.height,
               linewidth: float = 0.25,
               dpi: int = config.dpi,
-              save_path: str = None,
-              callback: any = None,
-              ax: Axes = None,
+              save_path: str | None = None,
+              callback: Callable | None = None,
+              ax: Axes | None = None,
               **params) -> None
 ```
 
@@ -2413,14 +2413,14 @@ def scatterplot(df: DataFrame,
                 yname: str,
                 hue=None,
                 title: str | None = None,
-                palette: str = None,
+                palette: str | None = None,
                 width: int = config.width,
                 height: int = config.height,
                 linewidth: float = config.line_width,
                 dpi: int = config.dpi,
-                save_path: str = None,
-                callback: any = None,
-                ax: Axes = None,
+                save_path: str | None = None,
+                callback: Callable | None = None,
+                ax: Axes | None = None,
                 **params) -> None
 ```
 
@@ -2456,14 +2456,14 @@ def regplot(df: DataFrame,
             xname: str,
             yname: str,
             title: str | None = None,
-            palette: str = None,
+            palette: str | None = None,
             width: int = config.width,
             height: int = config.height,
             linewidth: float = config.line_width,
             dpi: int = config.dpi,
-            save_path: str = None,
-            callback: any = None,
-            ax: Axes = None,
+            save_path: str | None = None,
+            callback: Callable | None = None,
+            ax: Axes | None = None,
             **params) -> None
 ```
 
@@ -2499,12 +2499,12 @@ def lmplot(df: DataFrame,
            yname: str,
            hue=None,
            title: str | None = None,
-           palette: str = None,
+           palette: str | None = None,
            width: int = config.width,
            height: int = config.height,
            linewidth: float = config.line_width,
            dpi: int = config.dpi,
-           save_path: str = None,
+           save_path: str | None = None,
            **params) -> None
 ```
 
@@ -2539,12 +2539,12 @@ def pairplot(df: DataFrame,
              title: str | None = None,
              diag_kind: str = "kde",
              hue=None,
-             palette: str = None,
+             palette: str | None = None,
              width: int = config.height,
              height: int = config.height,
              linewidth: float = config.line_width,
              dpi: int = config.dpi,
-             save_path: str = None,
+             save_path: str | None = None,
              **params) -> None
 ```
 
@@ -2582,15 +2582,15 @@ def countplot(df: DataFrame,
               xname: str,
               hue=None,
               title: str | None = None,
-              palette: str = None,
+              palette: str | None = None,
               order: int = 1,
               width: int = config.width,
               height: int = config.height,
               linewidth: float = config.line_width,
               dpi: int = config.dpi,
-              save_path: str = None,
-              callback: any = None,
-              ax: Axes = None,
+              save_path: str | None = None,
+              callback: Callable | None = None,
+              ax: Axes | None = None,
               **params) -> None
 ```
 
@@ -2627,14 +2627,14 @@ def barplot(df: DataFrame,
             yname: str,
             hue=None,
             title: str | None = None,
-            palette: str = None,
+            palette: str | None = None,
             width: int = config.width,
             height: int = config.height,
             linewidth: float = config.line_width,
             dpi: int = config.dpi,
-            save_path: str = None,
-            callback: any = None,
-            ax: Axes = None,
+            save_path: str | None = None,
+            callback: Callable | None = None,
+            ax: Axes | None = None,
             **params) -> None
 ```
 
@@ -2671,14 +2671,14 @@ def boxenplot(df: DataFrame,
               yname: str,
               hue=None,
               title: str | None = None,
-              palette: str = None,
+              palette: str | None = None,
               width: int = config.width,
               height: int = config.height,
               linewidth: float = config.line_width,
               dpi: int = config.dpi,
-              save_path: str = None,
-              callback: any = None,
-              ax: Axes = None,
+              save_path: str | None = None,
+              callback: Callable | None = None,
+              ax: Axes | None = None,
               **params) -> None
 ```
 
@@ -2715,14 +2715,14 @@ def violinplot(df: DataFrame,
                yname: str,
                hue=None,
                title: str | None = None,
-               palette: str = None,
+               palette: str | None = None,
                width: int = config.width,
                height: int = config.height,
                linewidth: float = config.line_width,
                dpi: int = config.dpi,
-               save_path: str = None,
-               callback: any = None,
-               ax: Axes = None,
+               save_path: str | None = None,
+               callback: Callable | None = None,
+               ax: Axes | None = None,
                **params) -> None
 ```
 
@@ -2759,14 +2759,14 @@ def pointplot(df: DataFrame,
               yname: str,
               hue=None,
               title: str | None = None,
-              palette: str = None,
+              palette: str | None = None,
               width: int = config.width,
               height: int = config.height,
               linewidth: float = config.line_width,
               dpi: int = config.dpi,
-              save_path: str = None,
-              callback: any = None,
-              ax: Axes = None,
+              save_path: str | None = None,
+              callback: Callable | None = None,
+              ax: Axes | None = None,
               **params) -> None
 ```
 
@@ -2803,12 +2803,12 @@ def jointplot(df: DataFrame,
               yname: str,
               hue=None,
               title: str | None = None,
-              palette: str = None,
+              palette: str | None = None,
               width: int = config.width,
               height: int = config.height,
               linewidth: float = config.line_width,
               dpi: int = config.dpi,
-              save_path: str = None,
+              save_path: str | None = None,
               **params) -> None
 ```
 
@@ -2840,14 +2840,14 @@ def jointplot(df: DataFrame,
 ```python
 def heatmap(data: DataFrame,
             title: str | None = None,
-            palette: str = None,
+            palette: str | None = None,
             width: int | None = None,
             height: int | None = None,
             linewidth: float = 0.25,
             dpi: int = config.dpi,
-            save_path: str = None,
-            callback: any = None,
-            ax: Axes = None,
+            save_path: str | None = None,
+            callback: Callable | None = None,
+            ax: Axes | None = None,
             **params) -> None
 ```
 
@@ -2879,16 +2879,16 @@ def heatmap(data: DataFrame,
 def convex_hull(data: DataFrame,
                 xname: str,
                 yname: str,
-                hue: str,
+                hue: str | None = None,
                 title: str | None = None,
-                palette: str = None,
+                palette: str | None = None,
                 width: int = config.width,
                 height: int = config.height,
                 linewidth: float = config.line_width,
                 dpi: int = config.dpi,
-                save_path: str = None,
-                callback: any = None,
-                ax: Axes = None,
+                save_path: str | None = None,
+                callback: Callable | None = None,
+                ax: Axes | None = None,
                 **params)
 ```
 
@@ -2929,9 +2929,9 @@ def kde_confidence_interval(data: DataFrame,
                             linewidth: float = config.line_width,
                             fill: bool = False,
                             dpi: int = config.dpi,
-                            save_path: str = None,
-                            callback: any = None,
-                            ax: Axes = None) -> None
+                            save_path: str | None = None,
+                            callback: Callable | None = None,
+                            ax: Axes | None = None) -> None
 ```
 
 각 숫자 컬럼에 대해 KDE와 t-분포 기반 신뢰구간을 그린다.
@@ -2968,7 +2968,7 @@ def pvalue1_anotation(data: DataFrame,
                       target: str,
                       hue: str,
                       title: str | None = None,
-                      pairs: list = None,
+                      pairs: list | None = None,
                       test: str = "t-test_ind",
                       text_format: str = "star",
                       loc: str = "outside",
@@ -2976,9 +2976,9 @@ def pvalue1_anotation(data: DataFrame,
                       height: int = config.height,
                       linewidth: float = config.line_width,
                       dpi: int = config.dpi,
-                      save_path: str = None,
-                      callback: any = None,
-                      ax: Axes = None,
+                      save_path: str | None = None,
+                      callback: Callable | None = None,
+                      ax: Axes | None = None,
                       **params) -> None
 ```
 
@@ -3020,9 +3020,9 @@ def ols_residplot(fit,
                   height: int = config.height,
                   linewidth: float = config.line_width,
                   dpi: int = config.dpi,
-                  save_path: str = None,
-                  callback: any = None,
-                  ax: Axes = None,
+                  save_path: str | None = None,
+                  callback: Callable | None = None,
+                  ax: Axes | None = None,
                   **params) -> None
 ```
 
@@ -3074,9 +3074,9 @@ def ols_qqplot(fit,
                height: int = config.height,
                linewidth: float = config.line_width,
                dpi: int = config.dpi,
-               save_path: str = None,
-               callback: any = None,
-               ax: Axes = None,
+               save_path: str | None = None,
+               callback: Callable | None = None,
+               ax: Axes | None = None,
                **params) -> None
 ```
 
@@ -3131,18 +3131,18 @@ qqplot(fit, line='45')
 ```python
 def distribution_by_class(data: DataFrame,
                           title: str | None = None,
-                          xnames: list = None,
-                          hue: str = None,
+                          xnames: list | None = None,
+                          hue: str | None = None,
                           type: str = "kde",
-                          bins: any = 5,
-                          palette: str = None,
+                          bins: list[int] | int = 5,
+                          palette: str | None = None,
                           fill: bool = False,
                           width: int = config.width,
                           height: int = config.height,
                           linewidth: float = config.line_width,
                           dpi: int = config.dpi,
-                          save_path: str = None,
-                          callback: any = None) -> None
+                          save_path: str | None = None,
+                          callback: Callable | None = None) -> None
 ```
 
 클래스별로 각 숫자형 특징의 분포를 KDE 또는 히스토그램으로 그린다.
@@ -3184,8 +3184,8 @@ def scatter_by_class(data: DataFrame,
                      height: int = config.height,
                      linewidth: float = config.line_width,
                      dpi: int = config.dpi,
-                     save_path: str = None,
-                     callback: any = None) -> None
+                     save_path: str | None = None,
+                     callback: Callable | None = None) -> None
 ```
 
 종속변수(y)와 각 연속형 독립변수(x) 간 산점도/볼록껍질을 그린다.
@@ -3227,8 +3227,8 @@ def categorical_target_distribution(data: DataFrame,
                                     linewidth: float = config.line_width,
                                     dpi: int = config.dpi,
                                     cols: int = 2,
-                                    save_path: str = None,
-                                    callback: any = None) -> None
+                                    save_path: str | None = None,
+                                    callback: Callable | None = None) -> None
 ```
 
 명목형 변수별로 종속변수 분포 차이를 시각화한다.
@@ -3260,16 +3260,16 @@ def categorical_target_distribution(data: DataFrame,
 
 ```python
 def roc_curve_plot(fit,
-                   y: np.ndarray | pd.Series = None,
-                   X: pd.DataFrame | np.ndarray = None,
+                   y: np.ndarray | pd.Series | None = None,
+                   X: pd.DataFrame | np.ndarray | None = None,
                    title: str | None = None,
                    width: int = config.height,
                    height: int = config.height,
                    linewidth: float = config.line_width,
                    dpi: int = config.dpi,
-                   save_path: str = None,
-                   callback: any = None,
-                   ax: Axes = None) -> None
+                   save_path: str | None = None,
+                   callback: Callable | None = None,
+                   ax: Axes | None = None) -> None
 ```
 
 로지스틱 회귀 적합 결과의 ROC 곡선을 시각화한다.
@@ -3309,9 +3309,9 @@ def confusion_matrix_plot(fit,
                           width: int = config.width,
                           height: int = config.height,
                           dpi: int = config.dpi,
-                          save_path: str = None,
-                          callback: any = None,
-                          ax: Axes = None) -> None
+                          save_path: str | None = None,
+                          callback: Callable | None = None,
+                          ax: Axes | None = None) -> None
 ```
 
 로지스틱 회귀 적합 결과의 혼동행렬을 시각화한다.
@@ -3338,20 +3338,20 @@ def confusion_matrix_plot(fit,
 
 ```python
 def radarplot(df: DataFrame,
-              columns: list = None,
-              hue: str = None,
+              columns: list | None = None,
+              hue: str | None = None,
               title: str | None = None,
               normalize: bool = True,
               fill: bool = True,
               fill_alpha: float = 0.25,
-              palette: str = None,
+              palette: str | None = None,
               width: int = config.width,
               height: int = config.height,
               linewidth: float = config.line_width,
               dpi: int = config.dpi,
-              save_path: str = None,
-              callback: any = None,
-              ax: Axes = None,
+              save_path: str | None = None,
+              callback: Callable | None = None,
+              ax: Axes | None = None,
               **params) -> None
 ```
 
@@ -3396,8 +3396,8 @@ def distribution_plot(data: DataFrame,
                       height: int = config.height,
                       linewidth: float = config.line_width,
                       dpi: int = config.dpi,
-                      save_path: str = None,
-                      callback: any = None) -> None
+                      save_path: str | None = None,
+                      callback: Callable | None = None) -> None
 ```
 
 연속형 데이터의 분포를 KDE와 Boxplot으로 시각화한다.
