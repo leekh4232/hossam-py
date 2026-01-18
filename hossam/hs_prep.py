@@ -764,7 +764,7 @@ def bin_continuous(
 # ===================================================================
 # 지정된 변수에 로그 먼저 변환을 적용한다
 # ===================================================================
-def log_transform(data: DataFrame, *fields: str) -> DataFrame:
+def log_transform(data: DataFrame, *fields: str, columns: list | None = None) -> DataFrame:
     """수치형 변수에 대해 로그 변환을 수행한다.
 
     자연로그(ln)를 사용하여 변환하며, 0 또는 음수 값이 있을 경우
@@ -773,6 +773,7 @@ def log_transform(data: DataFrame, *fields: str) -> DataFrame:
     Args:
         data (DataFrame): 변환할 데이터프레임.
         *fields (str): 변환할 컬럼명 목록. 지정하지 않으면 모든 수치형 컬럼을 처리.
+        columns (list, optional): 변환할 컬럼명 목록. fields와 중복 사용 불가.
 
     Returns:
         DataFrame: 로그 변환된 데이터프레임.
@@ -798,6 +799,11 @@ def log_transform(data: DataFrame, *fields: str) -> DataFrame:
         - 변환 공식: log(x + shift), 여기서 shift = 1 - min(x) (min(x) <= 0인 경우)
     """
     df = data.copy()
+
+    if columns is not None:
+        if fields:
+            raise ValueError("fields와 columns 인자는 중복 사용할 수 없습니다.")
+        fields = columns # type: ignore
 
     # 대상 컬럼 결정
     if not fields:

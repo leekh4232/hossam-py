@@ -126,7 +126,7 @@ def create_figure(width: int = config.width, height: int = config.height, rows: 
 # ===================================================================
 # 그래프의 그리드, 레이아웃을 정리하고 필요 시 저장 또는 표시한다
 # ===================================================================
-def finalize_plot(ax: Axes | np.ndarray, callback: Callable | None = None, outparams: bool = False, save_path: str | None = None, grid: bool = True, title: str | None = None) -> None:
+def finalize_plot(ax: Axes | np.ndarray | list, callback: Callable | None = None, outparams: bool = False, save_path: str | None = None, grid: bool = True, title: str | None = None) -> None:
     """공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
 
     Args:
@@ -337,6 +337,9 @@ def boxplot(
 
         # 통계 검정 추가
         if stat_test is not None:
+            if stat_pairs is None:
+                stat_pairs = [df[xname].dropna().unique().tolist()]
+
             annotator = Annotator(ax, data=df, x=xname, y=yname, pairs=stat_pairs, orient=orient)
             annotator.configure(test=stat_test, text_format=stat_text_format, loc=stat_loc)
             annotator.apply_and_annotate()
@@ -1778,13 +1781,13 @@ def ols_residplot(
         for i, c in enumerate(["red", "green", "blue"]):
             ax.text(    # type: ignore
                 s=f"{i+1} sqrt(MSE) = {mse_r[i]:.2f}% ({mse_r[i] - target[i]:.2f}%)",
-                x=xmax + 0.2,
+                x=xmax + 0.05,
                 y=(i + 1) * mse_sq,
                 color=c,
             )
             ax.text(    # type: ignore
                 s=f"-{i+1} sqrt(MSE) = {mse_r[i]:.2f}% ({mse_r[i] - target[i]:.2f}%)",
-                x=xmax + 0.2,
+                x=xmax + 0.05,
                 y=-(i + 1) * mse_sq,
                 color=c,
             )

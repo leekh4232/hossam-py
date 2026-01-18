@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import annotations
-from typing import overload, Tuple, Literal, Union, Any
+from typing import overload, Tuple, Literal, LiteralString, Union, Any
 
 # -------------------------------------------------------------
 import numpy as np
@@ -44,7 +44,7 @@ from statsmodels.discrete.discrete_model import BinaryResults
 
 from pingouin import anova, pairwise_tukey, welch_anova, pairwise_gameshowell
 
-from .hs_plot import ols_residplot, ols_qqplot
+from .hs_plot import ols_residplot, ols_qqplot, get_default_ax, finalize_plot
 from .hs_prep import unmelt
 
 # ===================================================================
@@ -1128,1307 +1128,6 @@ def ttest_rel(x, y, parametric: bool | None = None) -> DataFrame:
     return rdf
 
 
-# ===================================================================
-# 독립변수간 다중공선성 제거
-# ===================================================================
-def vif_filter(
-    data: DataFrame,
-    yname: str | None = None,
-    ignore: list | None = None,
-    threshold: float = 10.0,
-    verbose: bool = False,
-) -> DataFrame:
-    """독립변수 간 다중공선성을 검사하여 VIF가 threshold 이상인 변수를 반복적으로 제거한다.
-
-    Args:
-        data (DataFrame): 데이터프레임
-        yname (str, optional): 종속변수 컬럼명. Defaults to None.
-        ignore (list | None, optional): 제외할 컬럼 목록. Defaults to None.
-        threshold (float, optional): VIF 임계값. Defaults to 10.0.
-        verbose (bool, optional): True일 경우 각 단계의 VIF를 출력한다. Defaults to False.
-
-    Returns:
-        DataFrame: VIF가 threshold 이하인 변수만 남은 데이터프레임 (원본 컬럼 순서 유지)
-
-    Examples:
-        ```python
-        # 기본 사용 예
-        from hossam import *
-        filtered = hs_stats.vif_filter(df, yname="target", ignore=["id"], threshold=10.0)
-        ```
-    """
-
-    df = data.copy()
-
-    # y 분리 (있다면)
-    y = None
-    if yname and yname in df.columns:
-        y = df[yname]
-        df = df.drop(columns=[yname])
-
-    # 제외할 목록 정리
-    ignore = ignore or []
-    ignore_cols_present = [c for c in ignore if c in df.columns]
-
-    # VIF 대상 수치형 컬럼 선택 (bool은 연속형이 아니므로 제외)
-    numeric_df = df.select_dtypes(include=[np.number])
-    numeric_cols = [c for c in numeric_df.columns if not is_bool_dtype(numeric_df[c])]
-
-    # VIF 대상 X 구성 (수치형에서 제외 목록 제거)
-    X = df[numeric_cols]
-    if ignore_cols_present:
-        X = X.drop(columns=ignore_cols_present, errors="ignore")
-
-    # 수치형 변수가 없으면 바로 반환
-    if X.shape[1] == 0:
-        result = data.copy()
-        return result
-
-    def _compute_vifs(X_: DataFrame) -> dict:
-        # NA 제거 후 상수항 추가
-        X_clean = X_.dropna()
-        if X_clean.shape[0] == 0:
-            # 데이터가 모두 NA인 경우 VIF 계산 불가: NaN 반환
-            return {col: np.nan for col in X_.columns}
-        if X_clean.shape[1] == 1:
-            # 단일 예측변수의 경우 다른 설명변수가 없으므로 VIF는 1로 간주
-            return {col: 1.0 for col in X_clean.columns}
-        exog = sm.add_constant(X_clean, prepend=True)
-        vifs = {}
-        for i, col in enumerate(X_clean.columns, start=0):
-            # exog의 첫 열은 상수항이므로 변수 인덱스는 +1
-            try:
-                vifs[col] = float(variance_inflation_factor(exog.values, i + 1))# type: ignore
-            except Exception:
-                # 계산 실패 시 무한대로 처리하여 우선 제거 대상으로
-                vifs[col] = float("inf")
-        return vifs
-
-    # 반복 제거 루프
-    while True:
-        if X.shape[1] == 0:
-            break
-        vifs = _compute_vifs(X)
-        if verbose:
-            print(vifs)
-        # 모든 변수가 임계값 이하이면 종료
-        max_key = max(vifs, key=lambda k: (vifs[k] if not np.isnan(vifs[k]) else -np.inf))
-        max_vif = vifs[max_key]
-        if np.isnan(max_vif) or max_vif <= threshold:
-            break
-        # 가장 큰 VIF 변수 제거
-        X = X.drop(columns=[max_key])
-
-    # 출력 옵션이 False일 경우 최종 값만 출력
-    if not verbose:
-        final_vifs = _compute_vifs(X) if X.shape[1] > 0 else {}
-        print(final_vifs)
-
-    # 원본 컬럼 순서 유지하며 제거된 수치형 컬럼만 제외
-    kept_numeric_cols = list(X.columns)
-    removed_numeric_cols = [c for c in numeric_cols if c not in kept_numeric_cols]
-    result = data.drop(columns=removed_numeric_cols, errors="ignore")
-
-    return result
-
-
-
-# ===================================================================
-# x, y 데이터에 대한 추세선을 구한다.
-# ===================================================================
-def trend(x: Any, y: Any, degree: int = 1, value_count: int = 100) -> Tuple[np.ndarray, np.ndarray]:
-    """x, y 데이터에 대한 추세선을 구한다.
-
-    Args:
-        x (_type_): 산점도 그래프에 대한 x 데이터
-        y (_type_): 산점도 그래프에 대한 y 데이터
-        degree (int, optional): 추세선 방정식의 차수. Defaults to 1.
-        value_count (int, optional): x 데이터의 범위 안에서 간격 수. Defaults to 100.
-
-    Returns:
-        tuple: (v_trend, t_trend)
-
-    Examples:
-        ```python
-        # 2차 다항 회귀 추세선
-        from hossam import *
-        vx, vy = hs_stats.trend(x, y, degree=2, value_count=200)
-        print(len(vx), len(vy)) # 200, 200
-        ```
-    """
-    # [ a, b, c ] ==> ax^2 + bx + c
-    x_arr = np.asarray(x)
-    y_arr = np.asarray(y)
-
-    if x_arr.ndim == 0 or y_arr.ndim == 0:
-        raise ValueError("x, y는 1차원 이상의 배열이어야 합니다.")
-
-    coeff = np.polyfit(x_arr, y_arr, degree)
-
-    minx = np.min(x_arr)
-    maxx = np.max(x_arr)
-    v_trend = np.linspace(minx, maxx, value_count)
-
-    # np.polyval 사용으로 간결하게 추세선 계산
-    t_trend = np.polyval(coeff, v_trend)
-
-    return (v_trend, t_trend)
-
-
-# ===================================================================
-# 선형회귀 요약 리포트
-# ===================================================================
-def ols_report(fit, data, full=False, alpha=0.05) -> Union[
-    Tuple[DataFrame, DataFrame],
-    Tuple[DataFrame, DataFrame, str, str, list[str], str]
-]:
-    """선형회귀 적합 결과를 요약 리포트로 변환한다.
-
-    Args:
-        fit: statsmodels OLS 등 선형회귀 결과 객체 (`fit.summary()`를 지원해야 함).
-        data: 종속변수와 독립변수를 모두 포함한 DataFrame.
-        full: True이면 6개 값 반환, False이면 회귀계수 테이블(rdf)만 반환. 기본값 True.
-        alpha: 유의수준. 기본값 0.05.
-
-    Returns:
-        tuple: full=True일 때 다음 요소를 포함한다.
-            - 성능 지표 표 (`pdf`, DataFrame): R, R², Adj. R², F, p-value, Durbin-Watson.
-            - 회귀계수 표 (`rdf`, DataFrame): 변수별 B, 표준오차, Beta, t, p-value, significant, 공차, VIF.
-            - 적합도 요약 (`result_report`, str): R, R², F, p-value, Durbin-Watson 등 핵심 지표 문자열.
-            - 모형 보고 문장 (`model_report`, str): F-검정 유의성에 기반한 서술형 문장.
-            - 변수별 보고 리스트 (`variable_reports`, list[str]): 각 예측변수에 대한 서술형 문장.
-            - 회귀식 문자열 (`equation_text`, str): 상수항과 계수를 포함한 회귀식 표현.
-
-        full=False일 때:
-            - 성능 지표 표 (`pdf`, DataFrame): R, R², Adj. R², F, p-value, Durbin-Watson.
-            - 회귀계수 표 (`rdf`, DataFrame)
-
-    Examples:
-        ```python
-        from hossam import *
-
-        df = hs_util.load_data("some_data.csv")
-        fit = hs_stats.ols(df, yname="target")
-
-        # 전체 리포트
-        pdf, rdf, result_report, model_report, variable_reports, eq = hs_stats.ols_report(fit, data, full=True)
-
-        # 간단한 버전 (성능지표, 회귀계수 테이블만)
-        pdf, rdf = hs_stats.ols_report(fit, data)
-        ```
-    """
-
-    # summary2() 결과에서 실제 회귀계수 DataFrame 추출
-    summary_obj = fit.summary2()
-    tbl = summary_obj.tables[1]  # 회귀계수 테이블은 tables[1]에 위치
-
-    # 종속변수 이름
-    yname = fit.model.endog_names
-
-    # 독립변수 이름(상수항 제외)
-    xnames = [n for n in fit.model.exog_names if n != "const"]
-
-    # 독립변수 부분 데이터 (VIF 계산용)
-    indi_df = data.filter(xnames)
-
-    # 독립변수 결과를 누적
-    variables = []
-
-    # VIF 계산 (상수항 포함 설계행렬 사용)
-    vif_dict = {}
-    indi_df_const = sm.add_constant(indi_df, has_constant="add")
-    for i, col in enumerate(indi_df.columns, start=1):  # 상수항이 0이므로 1부터 시작
-        try:
-            with np.errstate(divide='ignore', invalid='ignore'):
-                vif_value = variance_inflation_factor(indi_df_const.values, i)  # type: ignore
-                # inf나 매우 큰 값 처리
-                if np.isinf(vif_value) or vif_value > 1e10:
-                    vif_dict[col] = np.inf
-                else:
-                    vif_dict[col] = vif_value
-        except:
-            vif_dict[col] = np.inf
-
-    for idx, row in tbl.iterrows():
-        name = idx
-        if name not in xnames:
-            continue
-
-        b = float(row['Coef.'])
-        se = float(row['Std.Err.'])
-        t = float(row['t'])
-        p = float(row['P>|t|'])
-
-        # 표준화 회귀계수(β) 계산
-        beta = b * (data[name].std(ddof=1) / data[yname].std(ddof=1))
-
-        # VIF 값
-        vif = vif_dict.get(name, np.nan)
-
-        # 유의확률과 별표 표시
-        stars = "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else ""
-
-        # 한 변수에 대한 보고 정보 추가
-        variables.append(
-            {
-                "종속변수": yname,  # 종속변수 이름
-                "독립변수": name,  # 독립변수 이름
-                "B": f"{b:.6f}",  # 비표준화 회귀계수(B)
-                "표준오차": f"{se:.6f}",  # 계수 표준오차
-                "Beta": beta,  # 표준화 회귀계수(β)
-                "t": f"{t:.3f}{stars}",  # t-통계량(+별표)
-                "p-value": p,  # 계수 유의확률
-                "significant": p <= alpha,  # 유의성 여부 (boolean)
-                "공차": 1 / vif,  # 공차(Tolerance = 1/VIF)
-                "vif": vif,  # 분산팽창계수
-            }
-        )
-
-    rdf = DataFrame(variables)
-
-    # summary 표에서 적합도 정보를 key-value로 추출
-    result_dict = {}
-    summary_main = fit.summary()
-    for i in [0, 2]:
-        for item in summary_main.tables[i].data:
-            n = len(item)
-            for i in range(0, n, 2):
-                key = item[i].strip()[:-1]
-                value = item[i + 1].strip()
-                if not key or not value:
-                    continue
-                result_dict[key] = value
-
-    # 적합도 보고 문자열 구성
-    result_report = f"𝑅({result_dict['R-squared']}), 𝑅^2({result_dict['Adj. R-squared']}), 𝐹({result_dict['F-statistic']}), 유의확률({result_dict['Prob (F-statistic)']}), Durbin-Watson({result_dict['Durbin-Watson']})"
-
-    # 모형 보고 문장 구성
-    tpl = "%s에 대하여 %s로 예측하는 회귀분석을 실시한 결과, 이 회귀모형은 통계적으로 %s(F(%s,%s) = %s, p %s 0.05)."
-    model_report = tpl % (
-        rdf["종속변수"][0],
-        ",".join(list(rdf["독립변수"])),
-        (
-            "유의하다"
-            if float(result_dict["Prob (F-statistic)"]) <= 0.05
-            else "유의하지 않다"
-        ),
-        result_dict["Df Model"],
-        result_dict["Df Residuals"],
-        result_dict["F-statistic"],
-        "<=" if float(result_dict["Prob (F-statistic)"]) <= 0.05 else ">",
-    )
-
-    # 변수별 보고 문장 리스트 구성
-    variable_reports = []
-    s = "%s의 회귀계수는 %s(p %s 0.05)로, %s에 대하여 %s 예측변인인 것으로 나타났다."
-
-    for i in rdf.index:
-        row = rdf.iloc[i]
-        variable_reports.append(
-            s
-            % (
-                row["독립변수"],
-                row["B"],
-                "<=" if float(row["p-value"]) < 0.05 else ">",
-                row["종속변수"],
-                "유의미한" if float(row["p-value"]) < 0.05 else "유의하지 않은",
-            )
-        )
-
-    # -----------------------------
-    # 회귀식 자동 출력
-    # -----------------------------
-    intercept = fit.params["const"]
-    terms = []
-
-    for name in xnames:
-        coef = fit.params[name]
-        sign = "+" if coef >= 0 else "-"
-        terms.append(f" {sign} {abs(coef):.3f}·{name}")
-
-    equation_text = f"{yname} = {intercept:.3f}" + "".join(terms)
-
-    # 성능 지표 표 생성 (pdf)
-    pdf = DataFrame(
-        {
-            "R": [float(result_dict.get('R-squared', np.nan))],
-            "R²": [float(result_dict.get('Adj. R-squared', np.nan))],
-            "F": [float(result_dict.get('F-statistic', np.nan))],
-            "p-value": [float(result_dict.get('Prob (F-statistic)', np.nan))],
-            "Durbin-Watson": [float(result_dict.get('Durbin-Watson', np.nan))],
-        }
-    )
-
-    if full:
-        return pdf, rdf, result_report, model_report, variable_reports, equation_text
-    else:
-        return pdf, rdf
-
-
-# ===================================================================
-# 선형회귀
-# ===================================================================
-def ols(df: DataFrame, yname: str, report: bool | str | int = False) -> Union[
-    RegressionResultsWrapper,
-    Tuple[RegressionResultsWrapper, DataFrame, DataFrame],
-    Tuple[
-        RegressionResultsWrapper,
-        DataFrame,
-        DataFrame,
-        str,
-        str,
-        list[str],
-        str
-    ]
-]:
-    """선형회귀분석을 수행하고 적합 결과를 반환한다.
-
-    OLS(Ordinary Least Squares) 선형회귀분석을 실시한다.
-    필요시 상세한 통계 보고서를 함께 제공한다.
-
-    Args:
-        df (DataFrame): 종속변수와 독립변수를 모두 포함한 데이터프레임.
-        yname (str): 종속변수 컬럼명.
-        report (bool | str | int): 리포트 모드 설정. 다음 값 중 하나:
-            - False (기본값): 리포트 미사용. fit 객체만 반환.
-            - 1 또는 'summary': 요약 리포트 반환 (full=False).
-            - 2 또는 'full': 풀 리포트 반환 (full=True).
-            - True: 풀 리포트 반환 (2와 동일).
-
-    Returns:
-        statsmodels.regression.linear_model.RegressionResultsWrapper: report=False일 때.
-            선형회귀 적합 결과 객체. fit.summary()로 상세 결과 확인 가능.
-
-        tuple (6개): report=1 또는 'summary'일 때.
-            (fit, rdf, result_report, model_report, variable_reports, equation_text) 형태로 (pdf 제외).
-
-        tuple (7개): report=2, 'full' 또는 True일 때.
-            (fit, pdf, rdf, result_report, model_report, variable_reports, equation_text) 형태로:
-            - fit: 선형회귀 적합 결과 객체
-            - pdf: 성능 지표 표 (DataFrame): R, R², F, p-value, Durbin-Watson
-            - rdf: 회귀계수 표 (DataFrame)
-            - result_report: 적합도 요약 (str)
-            - model_report: 모형 보고 문장 (str)
-            - variable_reports: 변수별 보고 문장 리스트 (list[str])
-            - equation_text: 회귀식 문자열 (str)
-
-    Examples:
-        ```python
-        from hossam import *
-        from pandas import DataFrame
-        import numpy as np
-
-        df = DataFrame({
-            'target': np.random.normal(100, 10, 100),
-            'x1': np.random.normal(0, 1, 100),
-            'x2': np.random.normal(0, 1, 100)
-        })
-
-        # 적합 결과만 반환
-        fit = hs_stats.ols(df, 'target')
-
-        # 요약 리포트 반환
-        fit, pdf, rdf = hs_stats.ols(df, 'target', report='summary')
-
-        # 풀 리포트 반환
-        fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_stats.ols(df, 'target', report='full')
-        ```
-    """
-    x = df.drop(yname, axis=1)
-    y = df[yname]
-
-    X_const = sm.add_constant(x)
-    linear_model = sm.OLS(y, X_const)
-    linear_fit = linear_model.fit()
-
-    # report 파라미터에 따른 처리
-    if not report or report is False:
-        # 리포트 미사용
-        return linear_fit
-    elif report == 1 or report == 'summary':
-        # 요약 리포트 (full=False)
-        pdf, rdf = ols_report(linear_fit, df, full=False, alpha=0.05)   # type: ignore
-        return linear_fit, pdf, rdf
-    elif report == 2 or report == 'full' or report is True:
-        # 풀 리포트 (full=True)
-        pdf, rdf, result_report, model_report, variable_reports, equation_text = ols_report(linear_fit, df, full=True, alpha=0.05)  # type: ignore
-        return linear_fit, pdf, rdf, result_report, model_report, variable_reports, equation_text
-    else:
-        # 기본값: 리포트 미사용
-        return linear_fit
-
-
-# ===================================================================
-# 로지스틱 회귀 요약 리포트
-# ===================================================================
-def logit_report(
-    fit: BinaryResultsWrapper,
-    data: DataFrame,
-    threshold: float = 0.5,
-    full: Union[bool, str, int] = False,
-    alpha: float = 0.05
-) -> Union[
-    Tuple[DataFrame, DataFrame],
-    Tuple[
-        DataFrame,
-        DataFrame,
-        str,
-        str,
-        list[str],
-        np.ndarray
-    ]
-]:
-    """로지스틱 회귀 적합 결과를 상세 리포트로 변환한다.
-
-    Args:
-        fit: statsmodels Logit 결과 객체 (`fit.summary()`와 예측 확률을 지원해야 함).
-        data (DataFrame): 종속변수와 독립변수를 모두 포함한 DataFrame.
-        threshold (float): 예측 확률을 이진 분류로 변환할 임계값. 기본값 0.5.
-        full (bool | str | int): True이면 6개 값 반환, False이면 주요 2개(cdf, rdf)만 반환. 기본값 False.
-        alpha (float): 유의수준. 기본값 0.05.
-
-    Returns:
-        tuple: full=True일 때 다음 요소를 포함한다.
-            - 성능 지표 표 (`cdf`, DataFrame): McFadden Pseudo R², Accuracy, Precision, Recall, FPR, TNR, AUC, F1.
-            - 회귀계수 표 (`rdf`, DataFrame): B, 표준오차, z, p-value, significant, OR, 95% CI, VIF 등.
-            - 적합도 및 예측 성능 요약 (`result_report`, str): Pseudo R², LLR χ², p-value, Accuracy, AUC.
-            - 모형 보고 문장 (`model_report`, str): LLR p-value에 기반한 서술형 문장.
-            - 변수별 보고 리스트 (`variable_reports`, list[str]): 각 예측변수의 오즈비 해석 문장.
-            - 혼동행렬 (`cm`, ndarray): 예측 결과와 실제값의 혼동행렬 [[TN, FP], [FN, TP]].
-
-        full=False일 때:
-            - 성능 지표 표 (`cdf`, DataFrame)
-            - 회귀계수 표 (`rdf`, DataFrame)
-
-    Examples:
-        ```python
-        from hossam import *
-        from pandas import DataFrame
-        import numpy as np
-
-        df = DataFrame({
-            'target': np.random.binomial(1, 0.5, 100),
-            'x1': np.random.normal(0, 1, 100),
-            'x2': np.random.normal(0, 1, 100)
-        })
-
-        # 로지스틱 회귀 적합
-        fit = hs_stats.logit(df, yname="target")
-
-        # 전체 리포트
-        cdf, rdf, result_report, model_report, variable_reports, cm = hs_stats.logit_report(fit, df, full=True)
-
-        # 간단한 버전 (주요 테이블만)
-        cdf, rdf = hs_stats.logit_report(fit, df)
-        ```
-    """
-
-    # -----------------------------
-    # 성능평가지표
-    # -----------------------------
-    yname = fit.model.endog_names
-    y_true = data[yname]
-    y_pred = fit.predict(fit.model.exog)
-    y_pred_fix = (y_pred >= threshold).astype(int)
-
-    # 혼동행렬
-    cm = confusion_matrix(y_true, y_pred_fix)
-    tn, fp, fn, tp = cm.ravel()
-
-    acc = accuracy_score(y_true, y_pred_fix)  # 정확도
-    pre = precision_score(y_true, y_pred_fix)  # 정밀도
-    tpr = recall_score(y_true, y_pred_fix)  # 재현율
-    fpr = fp / (fp + tn)  # 위양성율
-    tnr = 1 - fpr  # 특이성
-    f1 = f1_score(y_true, y_pred_fix)  # f1-score
-    ras = roc_auc_score(y_true, y_pred)  # auc score
-
-    cdf = DataFrame(
-        {
-            "설명력(P-Rsqe)": [fit.prsquared],
-            "정확도(Accuracy)": [acc],
-            "정밀도(Precision)": [pre],
-            "재현율(Recall,TPR)": [tpr],
-            "위양성율(Fallout,FPR)": [fpr],
-            "특이성(Specif city,TNR)": [tnr],
-            "RAS(auc score)": [ras],
-            "F1": [f1],
-        }
-    )
-
-    # -----------------------------
-    # 회귀계수 표 구성 (OR 중심)
-    # -----------------------------
-    tbl = fit.summary2().tables[1]
-
-    # 독립변수 이름(상수항 제외)
-    xnames = [n for n in fit.model.exog_names if n != "const"]
-
-    # 독립변수
-    x = data[xnames]
-
-    variables = []
-
-    # VIF 계산 (상수항 포함 설계행렬 사용)
-    vif_dict = {}
-    x_const = sm.add_constant(x, has_constant="add")
-    for i, col in enumerate(x.columns, start=1):  # 상수항이 0이므로 1부터 시작
-        vif_dict[col] = variance_inflation_factor(x_const.values, i)    # type: ignore
-
-    for idx, row in tbl.iterrows():
-        name = idx
-        if name not in xnames:
-            continue
-
-        beta = float(row['Coef.'])
-        se = float(row['Std.Err.'])
-        z = float(row['z'])
-        p = float(row['P>|z|'])
-
-        or_val = np.exp(beta)
-        ci_low = np.exp(beta - 1.96 * se)
-        ci_high = np.exp(beta + 1.96 * se)
-
-        stars = "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else ""
-
-        variables.append(
-            {
-                "종속변수": yname,
-                "독립변수": name,
-                "B(β)": beta,
-                "표준오차": se,
-                "z": f"{z:.3f}{stars}",
-                "p-value": p,
-                "significant": p <= alpha,
-                "OR": or_val,
-                "CI_lower": ci_low,
-                "CI_upper": ci_high,
-                "VIF": vif_dict.get(name, np.nan),
-            }
-        )
-
-    rdf = DataFrame(variables)
-
-    # ---------------------------------
-    # 모델 적합도 + 예측 성능 지표
-    # ---------------------------------
-    auc = roc_auc_score(y_true, y_pred)
-
-    result_report = (
-        f"Pseudo R²(McFadden) = {fit.prsquared:.3f}, "
-        f"LLR χ²({int(fit.df_model)}) = {fit.llr:.3f}, "
-        f"p-value = {fit.llr_pvalue:.4f}, "
-        f"Accuracy = {acc:.3f}, "
-        f"AUC = {auc:.3f}"
-    )
-
-    # -----------------------------
-    # 모형 보고 문장
-    # -----------------------------
-    tpl = (
-        "%s에 대하여 %s로 예측하는 로지스틱 회귀분석을 실시한 결과, "
-        "모형은 통계적으로 %s(χ²(%s) = %.3f, p %s 0.05)하였다."
-    )
-
-    model_report = tpl % (
-        yname,
-        ", ".join(xnames),
-        "유의" if fit.llr_pvalue <= 0.05 else "유의하지 않음",
-        int(fit.df_model),
-        fit.llr,
-        "<=" if fit.llr_pvalue <= 0.05 else ">",
-    )
-
-    # -----------------------------
-    # 변수별 보고 문장
-    # -----------------------------
-    variable_reports = []
-
-    s = (
-        "%s의 오즈비는 %.3f(p %s 0.05)로, "
-        "%s 발생 odds에 %s 영향을 미치는 것으로 나타났다."
-    )
-
-    for _, row in rdf.iterrows():
-        variable_reports.append(
-            s
-            % (
-                row["독립변수"],
-                row["OR"],
-                "<=" if row["p-value"] < 0.05 else ">",
-                row["종속변수"],
-                "유의미한" if row["p-value"] < 0.05 else "유의하지 않은",
-            )
-        )
-
-    if full:
-        return cdf, rdf, result_report, model_report, variable_reports, cm
-    else:
-        return cdf, rdf
-
-
-# ===================================================================
-# 로지스틱 회귀
-# ===================================================================
-def logit(
-    df: DataFrame,
-    yname: str,
-    report: Union[bool, str, int] = False
-) -> Union[
-    BinaryResultsWrapper,
-    Tuple[
-        BinaryResultsWrapper,
-        DataFrame
-    ],
-    Tuple[
-        BinaryResultsWrapper,
-        DataFrame,
-        DataFrame,
-        str,
-        str,
-        list[str]
-    ]
-]:
-    """로지스틱 회귀분석을 수행하고 적합 결과를 반환한다.
-
-    종속변수가 이항(binary) 형태일 때 로지스틱 회귀분석을 실시한다.
-    필요시 상세한 통계 보고서를 함께 제공한다.
-
-    Args:
-        df (DataFrame): 종속변수와 독립변수를 모두 포함한 데이터프레임.
-        yname (str): 종속변수 컬럼명. 이항 변수여야 한다.
-        report: 리포트 모드 설정. 다음 값 중 하나:
-            - False (기본값): 리포트 미사용. fit 객체만 반환.
-            - 1 또는 'summary': 요약 리포트 반환 (full=False).
-            - 2 또는 'full': 풀 리포트 반환 (full=True).
-            - True: 풀 리포트 반환 (2와 동일).
-
-    Returns:
-        statsmodels.genmod.generalized_linear_model.BinomialResults: report=False일 때.
-            로지스틱 회귀 적합 결과 객체. fit.summary()로 상세 결과 확인 가능.
-
-        tuple (4개): report=1 또는 'summary'일 때.
-            (fit, rdf, result_report, variable_reports) 형태로 (cdf 제외).
-
-        tuple (6개): report=2, 'full' 또는 True일 때.
-            (fit, cdf, rdf, result_report, model_report, variable_reports) 형태로:
-            - fit: 로지스틱 회귀 적합 결과 객체
-            - cdf: 성능 지표 표 (DataFrame)
-            - rdf: 회귀계수 표 (DataFrame)
-            - result_report: 적합도 및 예측 성능 요약 (str)
-            - model_report: 모형 보고 문장 (str)
-            - variable_reports: 변수별 보고 문장 리스트 (list[str])
-
-    Examples:
-        ```python
-        from hossam import *
-        from pandas import DataFrame
-        import numpy as np
-
-        df = DataFrame({
-            'target': np.random.binomial(1, 0.5, 100),
-            'x1': np.random.normal(0, 1, 100),
-            'x2': np.random.normal(0, 1, 100)
-        })
-
-        # 적합 결과만 반환
-        fit = hs_stats.logit(df, 'target')
-
-        # 요약 리포트 반환
-        fit, rdf, result_report, var_reports = hs_stats.logit(df, 'target', report='summary')
-
-        # 풀 리포트 반환
-        fit, cdf, rdf, result_report, model_report, var_reports = hs_stats.logit(df, 'target', report='full')
-        ```
-    """
-    x = df.drop(yname, axis=1)
-    y = df[yname]
-
-    X_const = sm.add_constant(x)
-    logit_model = sm.Logit(y, X_const)
-    logit_fit = logit_model.fit(disp=False)
-
-    # report 파라미터에 따른 처리
-    if not report or report is False:
-        # 리포트 미사용
-        return logit_fit
-    elif report == 1 or report == 'summary':
-        # 요약 리포트 (full=False)
-        cdf, rdf = logit_report(logit_fit, df, threshold=0.5, full=False, alpha=0.05)   # type: ignore
-        # 요약에서는 result_report와 variable_reports만 포함
-        # 간단한 버전으로 result와 variable_reports만 생성
-        return logit_fit, rdf
-    elif report == 2 or report == 'full' or report is True:
-        # 풀 리포트 (full=True)
-        cdf, rdf, result_report, model_report, variable_reports, cm = logit_report(logit_fit, df, threshold=0.5, full=True, alpha=0.05) # type: ignore
-        return logit_fit, cdf, rdf, result_report, model_report, variable_reports
-    else:
-        # 기본값: 리포트 미사용
-        return logit_fit
-
-
-# ===================================================================
-# 선형성 검정 (Linearity Test)
-# ===================================================================
-def ols_linearity_test(fit, power: int = 2, alpha: float = 0.05, plot: bool = False, title: str | None = None, save_path: str | None = None) -> DataFrame:
-    """회귀모형의 선형성을 Ramsey RESET 검정으로 평가한다.
-
-    적합된 회귀모형에 대해 Ramsey RESET(Regression Specification Error Test) 검정을 수행하여
-    모형의 선형성 가정이 타당한지를 검정한다. 귀무가설은 '모형이 선형이다'이다.
-
-    Args:
-        fit: 회귀 모형 객체 (statsmodels의 RegressionResultsWrapper).
-             OLS 또는 WLS 모형이어야 한다.
-        power (int, optional): RESET 검정에 사용할 거듭제곱 수. 기본값 2.
-                               power=2일 때 예측값의 제곱항이 추가됨.
-                               power가 클수록 더 높은 차수의 비선형성을 감지.
-        alpha (float, optional): 유의수준. 기본값 0.05.
-        plot (bool, optional): True이면 잔차 플롯을 출력. 기본값 False.
-        title (str, optional): 플롯 제목. 기본값 None.
-        save_path (str, optional): 플롯을 저장할 경로. 기본값 None
-
-    Returns:
-        DataFrame: 선형성 검정 결과를 포함한 데이터프레임.
-                   - 검정통계량: F-statistic
-                   - p-value: 검정의 p값
-                   - 유의성: alpha 기준 결과 (bool)
-                   - 해석: 선형성 판정 (문자열)
-
-    Examples:
-        ```python
-        from hossam import *
-        fit = hs_stats.logit(df, 'target')
-        result = hs_stats.ols_linearity_test(fit)
-        ```
-
-    Notes:
-        - p-value > alpha: 선형성 가정을 만족 (귀무가설 채택)
-        - p-value <= alpha: 선형성 가정 위반 가능 (귀무가설 기각)
-    """
-    import re
-
-    # Ramsey RESET 검정 수행
-    reset_result = linear_reset(fit, power=power)
-
-    # ContrastResults 객체에서 결과 추출
-    test_stat = None
-    p_value = None
-
-    try:
-        # 문자열 표현에서 숫자 추출 시도
-        result_str = str(reset_result)
-
-        # 정규식으로 숫자값들 추출 (F-statistic과 p-value)
-        numbers = re.findall(r'\d+\.?\d*[eE]?-?\d*', result_str)
-
-        if len(numbers) >= 2:
-            # 일반적으로 첫 번째는 F-statistic, 마지막은 p-value
-            test_stat = float(numbers[0])
-            p_value = float(numbers[-1])
-    except (ValueError, IndexError, AttributeError):
-        pass
-
-    # 정규식 실패 시 직접 속성 접근
-    if test_stat is None or p_value is None:
-        attr_pairs = [
-            ('statistic', 'pvalue'),
-            ('test_stat', 'pvalue'),
-            ('fvalue', 'pvalue'),
-        ]
-
-        for attr_stat, attr_pval in attr_pairs:
-            if hasattr(reset_result, attr_stat) and hasattr(reset_result, attr_pval):
-                try:
-                    test_stat = float(getattr(reset_result, attr_stat))
-                    p_value = float(getattr(reset_result, attr_pval))
-                    break
-                except (ValueError, TypeError):
-                    continue
-
-    # 여전히 값을 못 찾으면 에러
-    if test_stat is None or p_value is None:
-        raise ValueError(f"linear_reset 결과를 해석할 수 없습니다. 반환값: {reset_result}")
-
-    # 유의성 판정
-    significant = p_value <= alpha
-
-    # 해석 문구
-    if significant:
-        interpretation = f"선형성 가정 위반 (p={p_value:.4f} <= {alpha})"
-    else:
-        interpretation = f"선형성 가정 만족 (p={p_value:.4f} > {alpha})"
-
-    # 결과를 DataFrame으로 반환
-    result_df = DataFrame({
-        "검정": ["Ramsey RESET"],
-        "검정통계량 (F)": [f"{test_stat:.4f}"],
-        "p-value": [f"{p_value:.4f}"],
-        "유의수준": [alpha],
-        "선형성_위반": [significant],  # True: 선형성 위반, False: 선형성 만족
-        "해석": [interpretation]
-    })
-
-    if plot:
-        ols_residplot(fit, lowess=True, mse=True, title=title, save_path=save_path)
-
-    return result_df
-
-
-# ===================================================================
-# 정규성 검정 (Normality Test)
-# ===================================================================
-def ols_normality_test(fit, alpha: float = 0.05, plot: bool = False, title: str | None = None, save_path: str | None = None) -> DataFrame:
-    """회귀모형 잔차의 정규성을 검정한다.
-
-    회귀모형의 잔차가 정규분포를 따르는지 Shapiro-Wilk 검정과 Jarque-Bera 검정으로 평가한다.
-    정규성 가정은 회귀분석의 추론(신뢰구간, 가설검정)이 타당하기 위한 중요한 가정이다.
-
-    Args:
-        fit: 회귀 모형 객체 (statsmodels의 RegressionResultsWrapper).
-        alpha (float, optional): 유의수준. 기본값 0.05.
-        plot (bool, optional): True이면 Q-Q 플롯을 출력. 기본값 False.
-        title (str, optional): 플롯 제목. 기본값 None.
-        save_path (str, optional): 플롯을 저장할 경로. 기본값 None
-
-    Returns:
-        DataFrame: 정규성 검정 결과를 포함한 데이터프레임.
-                   - 검정명: 사용된 검정 방법
-                   - 검정통계량: 검정 통계량 값
-                   - p-value: 검정의 p값
-                   - 유의수준: 설정된 유의수준
-                   - 정규성_위반: alpha 기준 결과 (bool)
-                   - 해석: 정규성 판정 (문자열)
-
-    Examples:
-        ```python
-        from hossam import *
-        fit = hs_stats.logit(df, 'target')
-        result = hs_stats.ols_normality_test(fit)
-        ```
-
-    Notes:
-        - Shapiro-Wilk: 샘플 크기가 작을 때 (< 5000) 강력한 검정
-        - Jarque-Bera: 왜도(skewness)와 첨도(kurtosis) 기반 검정
-        - p-value > alpha: 정규성 가정 만족 (귀무가설 채택)
-        - p-value <= alpha: 정규성 가정 위반 (귀무가설 기각)
-    """
-    from scipy.stats import jarque_bera
-
-    # fit 객체에서 잔차 추출
-    residuals = fit.resid
-    n = len(residuals)
-
-    results = []
-
-    # 1. Shapiro-Wilk 검정 (샘플 크기 < 5000일 때 권장)
-    if n < 5000:
-        try:
-            stat_sw, p_sw = shapiro(residuals)
-            significant_sw = p_sw <= alpha
-
-            if significant_sw:
-                interpretation_sw = f"정규성 위반 (p={p_sw:.4f} <= {alpha})"
-            else:
-                interpretation_sw = f"정규성 만족 (p={p_sw:.4f} > {alpha})"
-
-            results.append({
-                "검정": "Shapiro-Wilk",
-                "검정통계량": f"{stat_sw:.4f}",
-                "p-value": f"{p_sw:.4f}",
-                "유의수준": alpha,
-                "정규성_위반": significant_sw,
-                "해석": interpretation_sw
-            })
-        except Exception as e:
-            pass
-
-    # 2. Jarque-Bera 검정 (항상 수행)
-    try:
-        stat_jb, p_jb = jarque_bera(residuals)
-        significant_jb = p_jb <= alpha  # type: ignore
-
-        if significant_jb:
-            interpretation_jb = f"정규성 위반 (p={p_jb:.4f} <= {alpha})"
-        else:
-            interpretation_jb = f"정규성 만족 (p={p_jb:.4f} > {alpha})"
-
-        results.append({
-            "검정": "Jarque-Bera",
-            "검정통계량": f"{stat_jb:.4f}",
-            "p-value": f"{p_jb:.4f}",
-            "유의수준": alpha,
-            "정규성_위반": significant_jb,
-            "해석": interpretation_jb
-        })
-    except Exception as e:
-        pass
-
-    # 결과를 DataFrame으로 반환
-    if not results:
-        raise ValueError("정규성 검정을 수행할 수 없습니다.")
-
-
-    if plot:
-        ols_qqplot(fit, title=title, save_path=save_path)
-
-    result_df = DataFrame(results)
-    return result_df
-
-
-# ===================================================================
-# 등분산성 검정 (Homoscedasticity Test)
-# ===================================================================
-def ols_variance_test(fit, alpha: float = 0.05) -> DataFrame:
-    """회귀모형의 등분산성 가정을 검정한다.
-
-    잔차의 분산이 예측값의 수준에 관계없이 일정한지 Breusch-Pagan 검정과 White 검정으로 평가한다.
-    등분산성 가정은 회귀분석의 추론(표준오차, 검정통계량)이 정확하기 위한 중요한 가정이다.
-
-    Args:
-        fit: 회귀 모형 객체 (statsmodels의 RegressionResultsWrapper).
-        alpha (float, optional): 유의수준. 기본값 0.05.
-
-    Returns:
-        DataFrame: 등분산성 검정 결과를 포함한 데이터프레임.
-                   - 검정명: 사용된 검정 방법
-                   - 검정통계량: 검정 통계량 값 (LM 또는 F)
-                   - p-value: 검정의 p값
-                   - 유의수준: 설정된 유의수준
-                   - 등분산성_위반: alpha 기준 결과 (bool)
-                   - 해석: 등분산성 판정 (문자열)
-
-    Examples:
-        ```python
-        from hossam import *
-        fit = hs_stats.logit(df, 'target')
-        result = hs_stats.ols_variance_test(fit)
-        ```
-
-    Notes:
-        - Breusch-Pagan: 잔차 제곱과 독립변수의 선형관계 검정
-        - White: 잔차 제곱과 독립변수 및 그 제곱, 교차항의 관계 검정
-        - p-value > alpha: 등분산성 가정 만족 (귀무가설 채택)
-        - p-value <= alpha: 이분산성 존재 (귀무가설 기각)
-    """
-
-    # fit 객체에서 필요한 정보 추출
-    exog = fit.model.exog  # 설명변수 (상수항 포함)
-    resid = fit.resid      # 잔차
-
-    results = []
-
-    # 1. Breusch-Pagan 검정
-    try:
-        lm, lm_pvalue, fvalue, f_pvalue = het_breuschpagan(resid, exog)
-        significant_bp = lm_pvalue <= alpha
-
-        if significant_bp:
-            interpretation_bp = f"등분산성 위반 (p={lm_pvalue:.4f} <= {alpha})"
-        else:
-            interpretation_bp = f"등분산성 만족 (p={lm_pvalue:.4f} > {alpha})"
-
-        results.append({
-            "검정": "Breusch-Pagan",
-            "검정통계량 (LM)": f"{lm:.4f}",
-            "p-value": f"{lm_pvalue:.4f}",
-            "유의수준": alpha,
-            "등분산성_위반": significant_bp,
-            "해석": interpretation_bp
-        })
-    except Exception as e:
-        pass
-
-    # 2. White 검정
-    try:
-        lm, lm_pvalue, fvalue, f_pvalue = het_white(resid, exog)
-        significant_white = lm_pvalue <= alpha
-
-        if significant_white:
-            interpretation_white = f"등분산성 위반 (p={lm_pvalue:.4f} <= {alpha})"
-        else:
-            interpretation_white = f"등분산성 만족 (p={lm_pvalue:.4f} > {alpha})"
-
-        results.append({
-            "검정": "White",
-            "검정통계량 (LM)": f"{lm:.4f}",
-            "p-value": f"{lm_pvalue:.4f}",
-            "유의수준": alpha,
-            "등분산성_위반": significant_white,
-            "해석": interpretation_white
-        })
-    except Exception as e:
-        pass
-
-    # 결과를 DataFrame으로 반환
-    if not results:
-        raise ValueError("등분산성 검정을 수행할 수 없습니다.")
-
-    result_df = DataFrame(results)
-    return result_df
-
-
-# ===================================================================
-# 독립성 검정 (Independence Test - Durbin-Watson)
-# ===================================================================
-def ols_independence_test(fit, alpha: float = 0.05) -> DataFrame:
-    """회귀모형의 독립성 가정(자기상관 없음)을 검정한다.
-
-    Durbin-Watson 검정을 사용하여 잔차의 1차 자기상관 여부를 검정한다.
-    시계열 데이터나 순서가 있는 데이터에서 주로 사용된다.
-
-    Args:
-        fit: statsmodels 회귀분석 결과 객체 (RegressionResultsWrapper).
-        alpha (float, optional): 유의수준. 기본값은 0.05.
-
-    Returns:
-        DataFrame: 검정 결과 데이터프레임.
-            - 검정: 검정 방법명
-            - 검정통계량(DW): Durbin-Watson 통계량 (0~4 범위, 2에 가까울수록 자기상관 없음)
-            - 독립성_위반: 자기상관 의심 여부 (True/False)
-            - 해석: 검정 결과 해석
-
-    Examples:
-        ```python
-        from hossam import *
-        fit = hs_stats.logit(df, 'target')
-        result = hs_stats.ols_independence_test(fit)
-        ```
-
-    Notes:
-        - Durbin-Watson 통계량 해석:
-          * 2에 가까우면: 자기상관 없음 (독립성 만족)
-          * 0에 가까우면: 양의 자기상관 (독립성 위반)
-          * 4에 가까우면: 음의 자기상관 (독립성 위반)
-        - 일반적으로 1.5~2.5 범위를 자기상관 없음으로 판단
-        - 시계열 데이터나 관측치에 순서가 있는 경우 중요한 검정
-    """
-    from pandas import DataFrame
-
-    # Durbin-Watson 통계량 계산
-    dw_stat = durbin_watson(fit.resid)
-
-    # 자기상관 판단 (1.5 < DW < 2.5 범위를 독립성 만족으로 판단)
-    is_autocorrelated = dw_stat < 1.5 or dw_stat > 2.5
-
-    # 해석 메시지 생성
-    if dw_stat < 1.5:
-        interpretation = f"DW={dw_stat:.4f} < 1.5 (양의 자기상관)"
-    elif dw_stat > 2.5:
-        interpretation = f"DW={dw_stat:.4f} > 2.5 (음의 자기상관)"
-    else:
-        interpretation = f"DW={dw_stat:.4f} (독립성 가정 만족)"
-
-    # 결과 데이터프레임 생성
-    result_df = DataFrame(
-        {
-            "검정": ["Durbin-Watson"],
-            "검정통계량(DW)": [dw_stat],
-            "독립성_위반": [is_autocorrelated],
-            "해석": [interpretation],
-        }
-    )
-
-    return result_df
-
-# ===================================================================
-# 쌍별 상관분석 (선형성/이상치 점검 후 Pearson/Spearman 자동 선택)
-# ===================================================================
-def corr_pairwise(
-    data: DataFrame,
-    fields: list[str] | None = None,
-    alpha: float = 0.05,
-    z_thresh: float = 3.0,
-    min_n: int = 8,
-    linearity_power: tuple[int, ...] = (2,),
-    p_adjust: str = "none",
-) -> tuple[DataFrame, DataFrame]:
-    """각 변수 쌍에 대해 선형성·이상치 여부를 점검한 뒤 Pearson/Spearman을 자동 선택해 상관을 요약한다.
-
-    절차:
-    1) z-score 기준(|z|>z_thresh)으로 각 변수의 이상치 존재 여부를 파악
-    2) 단순회귀 y~x에 대해 Ramsey RESET(linearity_power)로 선형성 검정 (모든 p>alpha → 선형성 충족)
-    3) 선형성 충족이고 양쪽 변수에서 |z|>z_thresh 이상치가 없으면 Pearson, 그 외엔 Spearman 선택
-    4) 상관계수/유의확률, 유의성 여부, 강도(strong/medium/weak/no correlation) 기록
-    5) 선택적으로 다중비교 보정(p_adjust="fdr_bh" 등) 적용하여 pval_adj와 significant_adj 추가
-
-    Args:
-        data (DataFrame): 분석 대상 데이터프레임.
-        fields (list[str]|None): 분석할 숫자형 컬럼 이름 리스트. None이면 모든 숫자형 컬럼 사용. 기본값 None.
-        alpha (float, optional): 유의수준. 기본 0.05.
-        z_thresh (float, optional): 이상치 판단 임계값(|z| 기준). 기본 3.0.
-        min_n (int, optional): 쌍별 최소 표본 크기. 미만이면 계산 생략. 기본 8.
-        linearity_power (tuple[int,...], optional): RESET 검정에서 포함할 차수 집합. 기본 (2,).
-        p_adjust (str, optional): 다중비교 보정 방법. "none" 또는 statsmodels.multipletests 지원값 중 하나(e.g., "fdr_bh"). 기본 "none".
-
-    Returns:
-        tuple[DataFrame, DataFrame]: 두 개의 데이터프레임을 반환.
-            [0] result_df: 각 변수쌍별 결과 테이블. 컬럼:
-                var_a, var_b, n, linearity(bool), outlier_flag(bool), chosen('pearson'|'spearman'),
-                corr, pval, significant(bool), strength(str), (보정 사용 시) pval_adj, significant_adj
-            [1] corr_matrix: 상관계수 행렬 (행과 열에 변수명, 값에 상관계수)
-
-    Examples:
-        ```python
-        from hossam import *
-        from pandas import DataFrame
-
-        df = DataFrame({'x1': [1,2,3,4,5], 'x2': [2,4,5,4,6], 'x3': [10,20,25,24,30]})
-        # 전체 숫자형 컬럼에 대해 상관분석
-        result_df, corr_matrix = hs_stats.corr_pairwise(df)
-        # 특정 컬럼만 분석
-        result_df, corr_matrix = hs_stats.corr_pairwise(df, fields=['x1', 'x2'])
-        ```
-    """
-
-    # 0) 컬럼 선정 (숫자형만)
-    if fields is None:
-        # None이면 모든 숫자형 컬럼 사용
-        cols = data.select_dtypes(include=[np.number]).columns.tolist()
-    else:
-        # fields 리스트에서 데이터에 있는 것만 선택하되, 숫자형만 필터링
-        cols = [c for c in fields if c in data.columns and is_numeric_dtype(data[c])]
-
-    # 사용 가능한 컬럼이 2개 미만이면 상관분석 불가능
-    if len(cols) < 2:
-        empty_df = DataFrame(columns=["var_a", "var_b", "n", "linearity", "outlier_flag", "chosen", "corr", "pval", "significant", "strength"])
-        return empty_df, DataFrame()
-
-    # z-score 기반 이상치 유무 계산
-    z_outlier_flags = {}
-    for c in cols:
-        col = data[c].dropna()
-        if col.std(ddof=1) == 0:
-            z_outlier_flags[c] = False
-            continue
-        z = (col - col.mean()) / col.std(ddof=1)
-        z_outlier_flags[c] = (z.abs() > z_thresh).any()
-
-    rows = []
-
-    for a, b in combinations(cols, 2):
-        # 공통 관측치 사용
-        pair_df = data[[a, b]].dropna()
-        if len(pair_df) < max(3, min_n):
-            # 표본이 너무 적으면 계산하지 않음
-            rows.append(
-                {
-                    "var_a": a,
-                    "var_b": b,
-                    "n": len(pair_df),
-                    "linearity": False,
-                    "outlier_flag": True,
-                    "chosen": None,
-                    "corr": np.nan,
-                    "pval": np.nan,
-                    "significant": False,
-                    "strength": "no correlation",
-                }
-            )
-            continue
-
-        x = pair_df[a]
-        y = pair_df[b]
-
-        # 상수열/분산 0 체크 → 상관계수 계산 불가
-        if x.nunique(dropna=True) <= 1 or y.nunique(dropna=True) <= 1:
-            rows.append(
-                {
-                    "var_a": a,
-                    "var_b": b,
-                    "n": len(pair_df),
-                    "linearity": False,
-                    "outlier_flag": True,
-                    "chosen": None,
-                    "corr": np.nan,
-                    "pval": np.nan,
-                    "significant": False,
-                    "strength": "no correlation",
-                }
-            )
-            continue
-
-        # 1) 선형성: Ramsey RESET (지정 차수 전부 p>alpha 여야 통과)
-        linearity_ok = False
-        try:
-            X_const = sm.add_constant(x)
-            model = sm.OLS(y, X_const).fit()
-            pvals = []
-            for pwr in linearity_power:
-                reset = linear_reset(model, power=pwr, use_f=True)
-                pvals.append(reset.pvalue)
-            # 모든 차수에서 유의하지 않을 때 선형성 충족으로 간주
-            if len(pvals) > 0:
-                linearity_ok = all([pv > alpha for pv in pvals])
-        except Exception:
-            linearity_ok = False
-
-        # 2) 이상치 플래그 (두 변수 중 하나라도 z-outlier 있으면 True)
-        outlier_flag = bool(z_outlier_flags.get(a, False) or z_outlier_flags.get(b, False))
-
-        # 3) 상관 계산: 선형·무이상치면 Pearson, 아니면 Spearman
-        try:
-            if linearity_ok and not outlier_flag:
-                chosen = "pearson"
-                corr_val, pval = pearsonr(x, y)
-            else:
-                chosen = "spearman"
-                corr_val, pval = spearmanr(x, y)
-        except Exception:
-            chosen = None
-            corr_val, pval = np.nan, np.nan
-
-        # 4) 유의성, 강도
-        significant = False if np.isnan(pval) else pval <= alpha    # type: ignore
-        abs_r = abs(corr_val) if not np.isnan(corr_val) else 0      # type: ignore
-        if abs_r > 0.7:
-            strength = "strong"
-        elif abs_r > 0.3:
-            strength = "medium"
-        elif abs_r > 0:
-            strength = "weak"
-        else:
-            strength = "no correlation"
-
-        rows.append(
-            {
-                "var_a": a,
-                "var_b": b,
-                "n": len(pair_df),
-                "linearity": linearity_ok,
-                "outlier_flag": outlier_flag,
-                "chosen": chosen,
-                "corr": corr_val,
-                "pval": pval,
-                "significant": significant,
-                "strength": strength,
-            }
-        )
-
-    result_df = DataFrame(rows)
-
-    # 5) 다중비교 보정 (선택)
-    if p_adjust.lower() != "none" and not result_df.empty:
-        # 유효한 p만 보정
-        mask = result_df["pval"].notna()
-        if mask.any():
-            _, p_adj, _, _ = multipletests(result_df.loc[mask, "pval"], alpha=alpha, method=p_adjust)
-            result_df.loc[mask, "pval_adj"] = p_adj
-            result_df["significant_adj"] = result_df["pval_adj"] <= alpha
-
-    # 6) 상관행렬 생성 (result_df 기반)
-    # 모든 변수를 행과 열로 하는 대칭 행렬 생성
-    corr_matrix = DataFrame(np.nan, index=cols, columns=cols)
-    # 대각선: 1 (자기상관)
-    for c in cols:
-        corr_matrix.loc[c, c] = 1.0
-    # 쌍별 상관계수 채우기 (대칭성 유지)
-    if not result_df.empty:
-        for _, row in result_df.iterrows():
-            a, b, corr_val = row["var_a"], row["var_b"], row["corr"]
-            corr_matrix.loc[a, b] = corr_val
-            corr_matrix.loc[b, a] = corr_val  # 대칭성
-
-    return result_df, corr_matrix
 
 
 # ===================================================================
@@ -2776,6 +1475,1520 @@ def twoway_anova(
     return anova_df, anova_report, posthoc_df, posthoc_report
 
 
+
+# ===================================================================
+# 종속변수에 대한 편상관계수 및 효과크기 분석 (Correlation & Effect Size)
+# ===================================================================
+def corr_effect_size(data: DataFrame, dv: str, *fields: str, alpha: float = 0.05) -> DataFrame:
+    """종속변수와의 편상관계수 및 효과크기를 계산한다.
+
+    각 독립변수와 종속변수 간의 상관계수를 계산하되, 정규성과 선형성을 검사하여
+    Pearson 또는 Spearman 상관계수를 적절히 선택한다.
+    Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.
+
+    Args:
+        data (DataFrame): 분석 대상 데이터프레임.
+        dv (str): 종속변수 컬럼 이름.
+        *fields (str): 독립변수 컬럼 이름들. 지정하지 않으면 수치형 컬럼 중 dv 제외 모두 사용.
+        alpha (float, optional): 유의수준. 기본 0.05.
+
+    Returns:
+        DataFrame: 다음 컬럼을 포함한 데이터프레임:
+            - Variable (str): 독립변수 이름
+            - Correlation (float): 상관계수 (Pearson 또는 Spearman)
+            - Corr_Type (str): 선택된 상관계수 종류 ('Pearson' 또는 'Spearman')
+            - P-value (float): 상관계수의 유의확률
+            - Cohens_d (float): 표준화된 효과크기
+            - Effect_Size (str): 효과크기 분류 ('Large', 'Medium', 'Small', 'Negligible')
+
+    Examples:
+        ```python
+        from hossam import *
+        from pandas import DataFrame
+
+        df = DataFrame({'age': [20, 30, 40, 50],
+                   'bmi': [22, 25, 28, 30],
+                   'charges': [1000, 2000, 3000, 4000]})
+
+        result = hs_stats.corr_effect_size(df, 'charges', 'age', 'bmi')
+        ```
+    """
+
+    # fields가 지정되지 않으면 수치형 컬럼 중 dv 제외 모두 사용
+    if not fields:
+        fields = [col for col in data.columns if is_numeric_dtype(data[col]) and col != dv] # type: ignore
+
+    # dv가 수치형인지 확인
+    if not is_numeric_dtype(data[dv]):
+        raise ValueError(f"Dependent variable '{dv}' must be numeric type")
+
+    results = []
+
+    for var in fields:
+        if not is_numeric_dtype(data[var]):
+            continue
+
+        # 결측치 제거
+        valid_idx = data[[var, dv]].notna().all(axis=1)
+        x = data.loc[valid_idx, var].values
+        y = data.loc[valid_idx, dv].values
+
+        if len(x) < 3:
+            continue
+
+        # 정규성 검사 (Shapiro-Wilk: n <= 5000 권장, 그 외 D'Agostino)
+        method_x = 's' if len(x) <= 5000 else 'n'
+        method_y = 's' if len(y) <= 5000 else 'n'
+
+        normal_x_result = normal_test(data[[var]], columns=[var], method=method_x)
+        normal_y_result = normal_test(data[[dv]], columns=[dv], method=method_y)
+
+        # 정규성 판정 (p > alpha면 정규분포 가정)
+        normal_x = normal_x_result.loc[var, 'p-val'] > alpha if var in normal_x_result.index else False     # type: ignore
+        normal_y = normal_y_result.loc[dv, 'p-val'] > alpha if dv in normal_y_result.index else False   # type: ignore
+
+        # Pearson (모두 정규) vs Spearman (하나라도 비정규)
+        if normal_x and normal_y:
+            r, p = pearsonr(x, y)
+            corr_type = 'Pearson'
+        else:
+            r, p = spearmanr(x, y)
+            corr_type = 'Spearman'
+
+        # Cohen's d 계산 (상관계수에서 효과크기로 변환)
+        # d = 2*r / sqrt(1-r^2)
+        if r ** 2 < 1:    # type: ignore
+            d = (2 * r) / np.sqrt(1 - r ** 2) # type: ignore
+        else:
+            d = 0
+
+        # 효과크기 분류 (Cohen's d 기준)
+        # Small: 0.2 < |d| <= 0.5
+        # Medium: 0.5 < |d| <= 0.8
+        # Large: |d| > 0.8
+        abs_d = abs(d)
+        if abs_d > 0.8:
+            effect_size = 'Large'
+        elif abs_d > 0.5:
+            effect_size = 'Medium'
+        elif abs_d > 0.2:
+            effect_size = 'Small'
+        else:
+            effect_size = 'Negligible'
+
+        results.append({
+            'Variable': var,
+            'Correlation': r,
+            'Corr_Type': corr_type,
+            'P-value': p,
+            'Cohens_d': d,
+            'Effect_Size': effect_size
+        })
+
+    result_df = DataFrame(results)
+
+    # 상관계수로 정렬 (절댓값 기준 내림차순)
+    if len(result_df) > 0:
+        result_df = result_df.sort_values('Correlation', key=lambda x: x.abs(), ascending=False).reset_index(drop=True)
+
+    return result_df
+
+
+# ===================================================================
+# 쌍별 상관분석 (선형성/이상치 점검 후 Pearson/Spearman 자동 선택)
+# ===================================================================
+def corr_pairwise(
+    data: DataFrame,
+    fields: list[str] | None = None,
+    alpha: float = 0.05,
+    z_thresh: float = 3.0,
+    min_n: int = 8,
+    linearity_power: tuple[int, ...] = (2,),
+    p_adjust: str = "none",
+) -> tuple[DataFrame, DataFrame]:
+    """각 변수 쌍에 대해 선형성·이상치 여부를 점검한 뒤 Pearson/Spearman을 자동 선택해 상관을 요약한다.
+
+    절차:
+    1) z-score 기준(|z|>z_thresh)으로 각 변수의 이상치 존재 여부를 파악
+    2) 단순회귀 y~x에 대해 Ramsey RESET(linearity_power)로 선형성 검정 (모든 p>alpha → 선형성 충족)
+    3) 선형성 충족이고 양쪽 변수에서 |z|>z_thresh 이상치가 없으면 Pearson, 그 외엔 Spearman 선택
+    4) 상관계수/유의확률, 유의성 여부, 강도(strong/medium/weak/no correlation) 기록
+    5) 선택적으로 다중비교 보정(p_adjust="fdr_bh" 등) 적용하여 pval_adj와 significant_adj 추가
+
+    Args:
+        data (DataFrame): 분석 대상 데이터프레임.
+        fields (list[str]|None): 분석할 숫자형 컬럼 이름 리스트. None이면 모든 숫자형 컬럼 사용. 기본값 None.
+        alpha (float, optional): 유의수준. 기본 0.05.
+        z_thresh (float, optional): 이상치 판단 임계값(|z| 기준). 기본 3.0.
+        min_n (int, optional): 쌍별 최소 표본 크기. 미만이면 계산 생략. 기본 8.
+        linearity_power (tuple[int,...], optional): RESET 검정에서 포함할 차수 집합. 기본 (2,).
+        p_adjust (str, optional): 다중비교 보정 방법. "none" 또는 statsmodels.multipletests 지원값 중 하나(e.g., "fdr_bh"). 기본 "none".
+
+    Returns:
+        tuple[DataFrame, DataFrame]: 두 개의 데이터프레임을 반환.
+            [0] result_df: 각 변수쌍별 결과 테이블. 컬럼:
+                var_a, var_b, n, linearity(bool), outlier_flag(bool), chosen('pearson'|'spearman'),
+                corr, pval, significant(bool), strength(str), (보정 사용 시) pval_adj, significant_adj
+            [1] corr_matrix: 상관계수 행렬 (행과 열에 변수명, 값에 상관계수)
+
+    Examples:
+        ```python
+        from hossam import *
+        from pandas import DataFrame
+
+        df = DataFrame({'x1': [1,2,3,4,5], 'x2': [2,4,5,4,6], 'x3': [10,20,25,24,30]})
+        # 전체 숫자형 컬럼에 대해 상관분석
+        result_df, corr_matrix = hs_stats.corr_pairwise(df)
+        # 특정 컬럼만 분석
+        result_df, corr_matrix = hs_stats.corr_pairwise(df, fields=['x1', 'x2'])
+        ```
+    """
+
+    # 0) 컬럼 선정 (숫자형만)
+    if fields is None:
+        # None이면 모든 숫자형 컬럼 사용
+        cols = data.select_dtypes(include=[np.number]).columns.tolist()
+    else:
+        # fields 리스트에서 데이터에 있는 것만 선택하되, 숫자형만 필터링
+        cols = [c for c in fields if c in data.columns and is_numeric_dtype(data[c])]
+
+    # 사용 가능한 컬럼이 2개 미만이면 상관분석 불가능
+    if len(cols) < 2:
+        empty_df = DataFrame(columns=["var_a", "var_b", "n", "linearity", "outlier_flag", "chosen", "corr", "pval", "significant", "strength"])
+        return empty_df, DataFrame()
+
+    # z-score 기반 이상치 유무 계산
+    z_outlier_flags = {}
+    for c in cols:
+        col = data[c].dropna()
+        if col.std(ddof=1) == 0:
+            z_outlier_flags[c] = False
+            continue
+        z = (col - col.mean()) / col.std(ddof=1)
+        z_outlier_flags[c] = (z.abs() > z_thresh).any()
+
+    rows = []
+
+    for a, b in combinations(cols, 2):
+        # 공통 관측치 사용
+        pair_df = data[[a, b]].dropna()
+        if len(pair_df) < max(3, min_n):
+            # 표본이 너무 적으면 계산하지 않음
+            rows.append(
+                {
+                    "var_a": a,
+                    "var_b": b,
+                    "n": len(pair_df),
+                    "linearity": False,
+                    "outlier_flag": True,
+                    "chosen": None,
+                    "corr": np.nan,
+                    "pval": np.nan,
+                    "significant": False,
+                    "strength": "no correlation",
+                }
+            )
+            continue
+
+        x = pair_df[a]
+        y = pair_df[b]
+
+        # 상수열/분산 0 체크 → 상관계수 계산 불가
+        if x.nunique(dropna=True) <= 1 or y.nunique(dropna=True) <= 1:
+            rows.append(
+                {
+                    "var_a": a,
+                    "var_b": b,
+                    "n": len(pair_df),
+                    "linearity": False,
+                    "outlier_flag": True,
+                    "chosen": None,
+                    "corr": np.nan,
+                    "pval": np.nan,
+                    "significant": False,
+                    "strength": "no correlation",
+                }
+            )
+            continue
+
+        # 1) 선형성: Ramsey RESET (지정 차수 전부 p>alpha 여야 통과)
+        linearity_ok = False
+        try:
+            X_const = sm.add_constant(x)
+            model = sm.OLS(y, X_const).fit()
+            pvals = []
+            for pwr in linearity_power:
+                reset = linear_reset(model, power=pwr, use_f=True)
+                pvals.append(reset.pvalue)
+            # 모든 차수에서 유의하지 않을 때 선형성 충족으로 간주
+            if len(pvals) > 0:
+                linearity_ok = all([pv > alpha for pv in pvals])
+        except Exception:
+            linearity_ok = False
+
+        # 2) 이상치 플래그 (두 변수 중 하나라도 z-outlier 있으면 True)
+        outlier_flag = bool(z_outlier_flags.get(a, False) or z_outlier_flags.get(b, False))
+
+        # 3) 상관 계산: 선형·무이상치면 Pearson, 아니면 Spearman
+        try:
+            if linearity_ok and not outlier_flag:
+                chosen = "pearson"
+                corr_val, pval = pearsonr(x, y)
+            else:
+                chosen = "spearman"
+                corr_val, pval = spearmanr(x, y)
+        except Exception:
+            chosen = None
+            corr_val, pval = np.nan, np.nan
+
+        # 4) 유의성, 강도
+        significant = False if np.isnan(pval) else pval <= alpha    # type: ignore
+        abs_r = abs(corr_val) if not np.isnan(corr_val) else 0      # type: ignore
+        if abs_r > 0.7:
+            strength = "strong"
+        elif abs_r > 0.3:
+            strength = "medium"
+        elif abs_r > 0:
+            strength = "weak"
+        else:
+            strength = "no correlation"
+
+        rows.append(
+            {
+                "var_a": a,
+                "var_b": b,
+                "n": len(pair_df),
+                "linearity": linearity_ok,
+                "outlier_flag": outlier_flag,
+                "chosen": chosen,
+                "corr": corr_val,
+                "pval": pval,
+                "significant": significant,
+                "strength": strength,
+            }
+        )
+
+    result_df = DataFrame(rows)
+
+    # 5) 다중비교 보정 (선택)
+    if p_adjust.lower() != "none" and not result_df.empty:
+        # 유효한 p만 보정
+        mask = result_df["pval"].notna()
+        if mask.any():
+            _, p_adj, _, _ = multipletests(result_df.loc[mask, "pval"], alpha=alpha, method=p_adjust)
+            result_df.loc[mask, "pval_adj"] = p_adj
+            result_df["significant_adj"] = result_df["pval_adj"] <= alpha
+
+    # 6) 상관행렬 생성 (result_df 기반)
+    # 모든 변수를 행과 열로 하는 대칭 행렬 생성
+    corr_matrix = DataFrame(np.nan, index=cols, columns=cols)
+    # 대각선: 1 (자기상관)
+    for c in cols:
+        corr_matrix.loc[c, c] = 1.0
+    # 쌍별 상관계수 채우기 (대칭성 유지)
+    if not result_df.empty:
+        for _, row in result_df.iterrows():
+            a, b, corr_val = row["var_a"], row["var_b"], row["corr"]
+            corr_matrix.loc[a, b] = corr_val
+            corr_matrix.loc[b, a] = corr_val  # 대칭성
+
+    return result_df, corr_matrix
+
+
+
+# ===================================================================
+# 독립변수간 다중공선성 제거
+# ===================================================================
+def vif_filter(
+    data: DataFrame,
+    yname: str | None = None,
+    ignore: list | None = None,
+    threshold: float = 10.0,
+    verbose: bool = False,
+) -> DataFrame:
+    """독립변수 간 다중공선성을 검사하여 VIF가 threshold 이상인 변수를 반복적으로 제거한다.
+
+    Args:
+        data (DataFrame): 데이터프레임
+        yname (str, optional): 종속변수 컬럼명. Defaults to None.
+        ignore (list | None, optional): 제외할 컬럼 목록. Defaults to None.
+        threshold (float, optional): VIF 임계값. Defaults to 10.0.
+        verbose (bool, optional): True일 경우 각 단계의 VIF를 출력한다. Defaults to False.
+
+    Returns:
+        DataFrame: VIF가 threshold 이하인 변수만 남은 데이터프레임 (원본 컬럼 순서 유지)
+
+    Examples:
+        ```python
+        # 기본 사용 예
+        from hossam import *
+        filtered = hs_stats.vif_filter(df, yname="target", ignore=["id"], threshold=10.0)
+        ```
+    """
+
+    df = data.copy()
+
+    # y 분리 (있다면)
+    y = None
+    if yname and yname in df.columns:
+        y = df[yname]
+        df = df.drop(columns=[yname])
+
+    # 제외할 목록 정리
+    ignore = ignore or []
+    ignore_cols_present = [c for c in ignore if c in df.columns]
+
+    # VIF 대상 수치형 컬럼 선택 (bool은 연속형이 아니므로 제외)
+    numeric_df = df.select_dtypes(include=[np.number])
+    numeric_cols = [c for c in numeric_df.columns if not is_bool_dtype(numeric_df[c])]
+
+    # VIF 대상 X 구성 (수치형에서 제외 목록 제거)
+    X = df[numeric_cols]
+    if ignore_cols_present:
+        X = X.drop(columns=ignore_cols_present, errors="ignore")
+
+    # 수치형 변수가 없으면 바로 반환
+    if X.shape[1] == 0:
+        result = data.copy()
+        return result
+
+    def _compute_vifs(X_: DataFrame) -> dict:
+        # NA 제거 후 상수항 추가
+        X_clean = X_.dropna()
+        if X_clean.shape[0] == 0:
+            # 데이터가 모두 NA인 경우 VIF 계산 불가: NaN 반환
+            return {col: np.nan for col in X_.columns}
+        if X_clean.shape[1] == 1:
+            # 단일 예측변수의 경우 다른 설명변수가 없으므로 VIF는 1로 간주
+            return {col: 1.0 for col in X_clean.columns}
+        exog = sm.add_constant(X_clean, prepend=True)
+        vifs = {}
+        for i, col in enumerate(X_clean.columns, start=0):
+            # exog의 첫 열은 상수항이므로 변수 인덱스는 +1
+            try:
+                vifs[col] = float(variance_inflation_factor(exog.values, i + 1))# type: ignore
+            except Exception:
+                # 계산 실패 시 무한대로 처리하여 우선 제거 대상으로
+                vifs[col] = float("inf")
+        return vifs
+
+    # 반복 제거 루프
+    while True:
+        if X.shape[1] == 0:
+            break
+        vifs = _compute_vifs(X)
+        if verbose:
+            print(vifs)
+        # 모든 변수가 임계값 이하이면 종료
+        max_key = max(vifs, key=lambda k: (vifs[k] if not np.isnan(vifs[k]) else -np.inf))
+        max_vif = vifs[max_key]
+        if np.isnan(max_vif) or max_vif <= threshold:
+            break
+        # 가장 큰 VIF 변수 제거
+        X = X.drop(columns=[max_key])
+
+    # 출력 옵션이 False일 경우 최종 값만 출력
+    if not verbose:
+        final_vifs = _compute_vifs(X) if X.shape[1] > 0 else {}
+        print(final_vifs)
+
+    # 원본 컬럼 순서 유지하며 제거된 수치형 컬럼만 제외
+    kept_numeric_cols = list(X.columns)
+    removed_numeric_cols = [c for c in numeric_cols if c not in kept_numeric_cols]
+    result = data.drop(columns=removed_numeric_cols, errors="ignore")
+
+    return result
+
+
+
+# ===================================================================
+# x, y 데이터에 대한 추세선을 구한다.
+# ===================================================================
+def trend(x: Any, y: Any, degree: int = 1, value_count: int = 100) -> Tuple[np.ndarray, np.ndarray]:
+    """x, y 데이터에 대한 추세선을 구한다.
+
+    Args:
+        x (_type_): 산점도 그래프에 대한 x 데이터
+        y (_type_): 산점도 그래프에 대한 y 데이터
+        degree (int, optional): 추세선 방정식의 차수. Defaults to 1.
+        value_count (int, optional): x 데이터의 범위 안에서 간격 수. Defaults to 100.
+
+    Returns:
+        tuple: (v_trend, t_trend)
+
+    Examples:
+        ```python
+        # 2차 다항 회귀 추세선
+        from hossam import *
+        vx, vy = hs_stats.trend(x, y, degree=2, value_count=200)
+        print(len(vx), len(vy)) # 200, 200
+        ```
+    """
+    # [ a, b, c ] ==> ax^2 + bx + c
+    x_arr = np.asarray(x)
+    y_arr = np.asarray(y)
+
+    if x_arr.ndim == 0 or y_arr.ndim == 0:
+        raise ValueError("x, y는 1차원 이상의 배열이어야 합니다.")
+
+    coeff = np.polyfit(x_arr, y_arr, degree)
+
+    minx = np.min(x_arr)
+    maxx = np.max(x_arr)
+    v_trend = np.linspace(minx, maxx, value_count)
+
+    # np.polyval 사용으로 간결하게 추세선 계산
+    t_trend = np.polyval(coeff, v_trend)
+
+    return (v_trend, t_trend)
+
+
+# ===================================================================
+# 선형회귀 요약 리포트
+# ===================================================================
+@overload
+def ols_report(
+    fit: RegressionResultsWrapper,
+    data: DataFrame,
+    full: Literal[False],
+    alpha: float = 0.05
+) -> tuple[DataFrame, DataFrame]: ...
+
+@overload
+def ols_report(
+    fit: RegressionResultsWrapper,
+    data: DataFrame,
+    full: Literal[True],
+    alpha: float = 0.05
+) -> tuple[
+    DataFrame,
+    DataFrame,
+    str,
+    LiteralString,
+    list[str],
+    str
+]: ...
+
+def ols_report(
+    fit: RegressionResultsWrapper,
+    data: DataFrame,
+    full: bool = False,
+    alpha: float = 0.05
+):
+    """선형회귀 적합 결과를 요약 리포트로 변환한다.
+
+    Args:
+        fit: statsmodels OLS 등 선형회귀 결과 객체 (`fit.summary()`를 지원해야 함).
+        data: 종속변수와 독립변수를 모두 포함한 DataFrame.
+        full: True이면 6개 값 반환, False이면 회귀계수 테이블(rdf)만 반환. 기본값 True.
+        alpha: 유의수준. 기본값 0.05.
+
+    Returns:
+        tuple: full=True일 때 다음 요소를 포함한다.
+            - 성능 지표 표 (`pdf`, DataFrame): R, R², Adj. R², F, p-value, Durbin-Watson.
+            - 회귀계수 표 (`rdf`, DataFrame): 변수별 B, 표준오차, Beta, t, p-value, significant, 공차, VIF.
+            - 적합도 요약 (`result_report`, str): R, R², F, p-value, Durbin-Watson 등 핵심 지표 문자열.
+            - 모형 보고 문장 (`model_report`, str): F-검정 유의성에 기반한 서술형 문장.
+            - 변수별 보고 리스트 (`variable_reports`, list[str]): 각 예측변수에 대한 서술형 문장.
+            - 회귀식 문자열 (`equation_text`, str): 상수항과 계수를 포함한 회귀식 표현.
+
+        full=False일 때:
+            - 성능 지표 표 (`pdf`, DataFrame): R, R², Adj. R², F, p-value, Durbin-Watson.
+            - 회귀계수 표 (`rdf`, DataFrame)
+
+    Examples:
+        ```python
+        from hossam import *
+
+        df = hs_util.load_data("some_data.csv")
+        fit = hs_stats.ols(df, yname="target")
+
+        # 전체 리포트
+        pdf, rdf, result_report, model_report, variable_reports, eq = hs_stats.ols_report(fit, data, full=True)
+
+        # 간단한 버전 (성능지표, 회귀계수 테이블만)
+        pdf, rdf = hs_stats.ols_report(fit, data)
+        ```
+    """
+
+    # summary2() 결과에서 실제 회귀계수 DataFrame 추출
+    summary_obj = fit.summary2()
+    tbl = summary_obj.tables[1]  # 회귀계수 테이블은 tables[1]에 위치
+
+    # 종속변수 이름
+    yname = fit.model.endog_names
+
+    # 독립변수 이름(상수항 제외)
+    xnames = [n for n in fit.model.exog_names if n != "const"]
+
+    # 독립변수 부분 데이터 (VIF 계산용)
+    indi_df = data.filter(xnames)
+
+    # 독립변수 결과를 누적
+    variables = []
+
+    # VIF 계산 (상수항 포함 설계행렬 사용)
+    vif_dict = {}
+    indi_df_const = sm.add_constant(indi_df, has_constant="add")
+    for i, col in enumerate(indi_df.columns, start=1):  # 상수항이 0이므로 1부터 시작
+        try:
+            with np.errstate(divide='ignore', invalid='ignore'):
+                vif_value = variance_inflation_factor(indi_df_const.values, i)  # type: ignore
+                # inf나 매우 큰 값 처리
+                if np.isinf(vif_value) or vif_value > 1e10:
+                    vif_dict[col] = np.inf
+                else:
+                    vif_dict[col] = vif_value
+        except:
+            vif_dict[col] = np.inf
+
+    for idx, row in tbl.iterrows():
+        name = idx
+        if name not in xnames:
+            continue
+
+        b = float(row['Coef.'])
+        se = float(row['Std.Err.'])
+        t = float(row['t'])
+        p = float(row['P>|t|'])
+
+        # 표준화 회귀계수(β) 계산
+        beta = b * (data[name].std(ddof=1) / data[yname].std(ddof=1))
+
+        # VIF 값
+        vif = vif_dict.get(name, np.nan)
+
+        # 유의확률과 별표 표시
+        stars = "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else ""
+
+        # 한 변수에 대한 보고 정보 추가
+        variables.append(
+            {
+                "종속변수": yname,  # 종속변수 이름
+                "독립변수": name,  # 독립변수 이름
+                "B": f"{b:.6f}",  # 비표준화 회귀계수(B)
+                "표준오차": f"{se:.6f}",  # 계수 표준오차
+                "Beta": beta,  # 표준화 회귀계수(β)
+                "t": f"{t:.3f}{stars}",  # t-통계량(+별표)
+                "p-value": p,  # 계수 유의확률
+                "significant": p <= alpha,  # 유의성 여부 (boolean)
+                "공차": 1 / vif,  # 공차(Tolerance = 1/VIF)
+                "vif": vif,  # 분산팽창계수
+            }
+        )
+
+    rdf = DataFrame(variables)
+
+    # summary 표에서 적합도 정보를 key-value로 추출
+    result_dict = {}
+    summary_main = fit.summary()
+    for i in [0, 2]:
+        for item in summary_main.tables[i].data:
+            n = len(item)
+            for i in range(0, n, 2):
+                key = item[i].strip()[:-1]
+                value = item[i + 1].strip()
+                if not key or not value:
+                    continue
+                result_dict[key] = value
+
+    # 적합도 보고 문자열 구성
+    result_report = f"𝑅({result_dict['R-squared']}), 𝑅^2({result_dict['Adj. R-squared']}), 𝐹({result_dict['F-statistic']}), 유의확률({result_dict['Prob (F-statistic)']}), Durbin-Watson({result_dict['Durbin-Watson']})"
+
+    # 모형 보고 문장 구성
+    tpl = "%s에 대하여 %s로 예측하는 회귀분석을 실시한 결과, 이 회귀모형은 통계적으로 %s(F(%s,%s) = %s, p %s 0.05)."
+    model_report = tpl % (
+        rdf["종속변수"][0],
+        ",".join(list(rdf["독립변수"])),
+        (
+            "유의하다"
+            if float(result_dict["Prob (F-statistic)"]) <= 0.05
+            else "유의하지 않다"
+        ),
+        result_dict["Df Model"],
+        result_dict["Df Residuals"],
+        result_dict["F-statistic"],
+        "<=" if float(result_dict["Prob (F-statistic)"]) <= 0.05 else ">",
+    )
+
+    # 변수별 보고 문장 리스트 구성
+    variable_reports = []
+    s = "%s의 회귀계수는 %s(p %s 0.05)로, %s에 대하여 %s 예측변인인 것으로 나타났다."
+
+    for i in rdf.index:
+        row = rdf.iloc[i]
+        variable_reports.append(
+            s
+            % (
+                row["독립변수"],
+                row["B"],
+                "<=" if float(row["p-value"]) < 0.05 else ">",
+                row["종속변수"],
+                "유의미한" if float(row["p-value"]) < 0.05 else "유의하지 않은",
+            )
+        )
+
+    # -----------------------------
+    # 회귀식 자동 출력
+    # -----------------------------
+    intercept = fit.params["const"]
+    terms = []
+
+    for name in xnames:
+        coef = fit.params[name]
+        sign = "+" if coef >= 0 else "-"
+        terms.append(f" {sign} {abs(coef):.3f}·{name}")
+
+    equation_text = f"{yname} = {intercept:.3f}" + "".join(terms)
+
+    # 성능 지표 표 생성 (pdf)
+    pdf = DataFrame(
+        {
+            "R": [float(result_dict.get('R-squared', np.nan))],
+            "R²": [float(result_dict.get('Adj. R-squared', np.nan))],
+            "F": [float(result_dict.get('F-statistic', np.nan))],
+            "p-value": [float(result_dict.get('Prob (F-statistic)', np.nan))],
+            "Durbin-Watson": [float(result_dict.get('Durbin-Watson', np.nan))],
+        }
+    )
+
+    if full:
+        return pdf, rdf, result_report, model_report, variable_reports, equation_text
+    else:
+        return pdf, rdf
+
+
+# ===================================================================
+# 선형회귀
+# ===================================================================
+@overload
+def ols(
+    df: DataFrame,
+    yname: str,
+    report: Literal[False]
+) -> RegressionResultsWrapper: ...
+
+@overload
+def ols(
+    df: DataFrame,
+    yname: str,
+    report: Literal["summary"]
+) -> tuple[RegressionResultsWrapper, DataFrame, DataFrame]: ...
+
+@overload
+def ols(
+    df: DataFrame,
+    yname: str,
+    report: Literal["full"]
+) -> tuple[
+    RegressionResultsWrapper,
+    DataFrame,
+    DataFrame,
+    str,
+    str,
+    list[str],
+    str
+]: ...
+
+def ols(df: DataFrame, yname: str, report: Literal[False, "summary", "full"] = "summary") -> Union[
+    Tuple[RegressionResultsWrapper, DataFrame, DataFrame],
+    Tuple[
+        RegressionResultsWrapper,
+        DataFrame,
+        DataFrame,
+        str,
+        str,
+        list[str],
+        str
+    ],
+    RegressionResultsWrapper
+]:
+    """선형회귀분석을 수행하고 적합 결과를 반환한다.
+
+    OLS(Ordinary Least Squares) 선형회귀분석을 실시한다.
+    필요시 상세한 통계 보고서를 함께 제공한다.
+
+    Args:
+        df (DataFrame): 종속변수와 독립변수를 모두 포함한 데이터프레임.
+        yname (str): 종속변수 컬럼명.
+        report (bool | str): 리포트 모드 설정. 다음 값 중 하나:
+            - False (기본값): 리포트 미사용. fit 객체만 반환.
+            - 1 또는 'summary': 요약 리포트 반환 (full=False).
+            - 2 또는 'full': 풀 리포트 반환 (full=True).
+            - True: 풀 리포트 반환 (2와 동일).
+
+    Returns:
+        statsmodels.regression.linear_model.RegressionResultsWrapper: report=False일 때.
+            선형회귀 적합 결과 객체. fit.summary()로 상세 결과 확인 가능.
+
+        tuple (6개): report=1 또는 'summary'일 때.
+            (fit, rdf, result_report, model_report, variable_reports, equation_text) 형태로 (pdf 제외).
+
+        tuple (7개): report=2, 'full' 또는 True일 때.
+            (fit, pdf, rdf, result_report, model_report, variable_reports, equation_text) 형태로:
+            - fit: 선형회귀 적합 결과 객체
+            - pdf: 성능 지표 표 (DataFrame): R, R², F, p-value, Durbin-Watson
+            - rdf: 회귀계수 표 (DataFrame)
+            - result_report: 적합도 요약 (str)
+            - model_report: 모형 보고 문장 (str)
+            - variable_reports: 변수별 보고 문장 리스트 (list[str])
+            - equation_text: 회귀식 문자열 (str)
+
+    Examples:
+        ```python
+        from hossam import *
+        from pandas import DataFrame
+        import numpy as np
+
+        df = DataFrame({
+            'target': np.random.normal(100, 10, 100),
+            'x1': np.random.normal(0, 1, 100),
+            'x2': np.random.normal(0, 1, 100)
+        })
+
+        # 적합 결과만 반환
+        fit = hs_stats.ols(df, 'target')
+
+        # 요약 리포트 반환
+        fit, pdf, rdf = hs_stats.ols(df, 'target', report='summary')
+
+        # 풀 리포트 반환
+        fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_stats.ols(df, 'target', report='full')
+        ```
+    """
+    x = df.drop(yname, axis=1)
+    y = df[yname]
+
+    X_const = sm.add_constant(x)
+    linear_model = sm.OLS(y, X_const)
+    linear_fit = linear_model.fit()
+
+    # report 파라미터에 따른 처리
+    if not report or report is False:
+        # 리포트 미사용
+        return linear_fit
+    elif report == 'full':
+        # 풀 리포트 (full=True)
+        pdf, rdf, result_report, model_report, variable_reports, equation_text = ols_report(linear_fit, df, full=True, alpha=0.05)  # type: ignore
+        return linear_fit, pdf, rdf, result_report, model_report, variable_reports, equation_text
+    else:
+        # 요약 리포트 (full=False) -> report == 1 or report == 'summary':
+        pdf, rdf = ols_report(linear_fit, df, full=False, alpha=0.05)   # type: ignore
+        return linear_fit, pdf, rdf
+
+
+# ===================================================================
+# 선형성 검정 (Linearity Test)
+# ===================================================================
+def ols_linearity_test(fit: RegressionResultsWrapper, power: int = 2, alpha: float = 0.05) -> DataFrame:
+    """회귀모형의 선형성을 Ramsey RESET 검정으로 평가한다.
+
+    적합된 회귀모형에 대해 Ramsey RESET(Regression Specification Error Test) 검정을 수행하여
+    모형의 선형성 가정이 타당한지를 검정한다. 귀무가설은 '모형이 선형이다'이다.
+
+    Args:
+        fit: 회귀 모형 객체 (statsmodels의 RegressionResultsWrapper).
+             OLS 또는 WLS 모형이어야 한다.
+        power (int, optional): RESET 검정에 사용할 거듭제곱 수. 기본값 2.
+                               power=2일 때 예측값의 제곱항이 추가됨.
+                               power가 클수록 더 높은 차수의 비선형성을 감지.
+        alpha (float, optional): 유의수준. 기본값 0.05
+
+    Returns:
+        DataFrame: 선형성 검정 결과를 포함한 데이터프레임.
+                   - 검정통계량: F-statistic
+                   - p-value: 검정의 p값
+                   - 유의성: alpha 기준 결과 (bool)
+                   - 해석: 선형성 판정 (문자열)
+
+    Examples:
+        ```python
+        from hossam import *
+        fit = hs_stats.logit(df, 'target')
+        result = hs_stats.ols_linearity_test(fit)
+        ```
+
+    Notes:
+        - p-value > alpha: 선형성 가정을 만족 (귀무가설 채택)
+        - p-value <= alpha: 선형성 가정 위반 가능 (귀무가설 기각)
+    """
+    import re
+
+    # Ramsey RESET 검정 수행
+    reset_result = linear_reset(fit, power=power)
+
+    # ContrastResults 객체에서 결과 추출
+    test_stat = None
+    p_value = None
+
+    try:
+        # 문자열 표현에서 숫자 추출 시도
+        result_str = str(reset_result)
+
+        # 정규식으로 숫자값들 추출 (F-statistic과 p-value)
+        numbers = re.findall(r'\d+\.?\d*[eE]?-?\d*', result_str)
+
+        if len(numbers) >= 2:
+            # 일반적으로 첫 번째는 F-statistic, 마지막은 p-value
+            test_stat = float(numbers[0])
+            p_value = float(numbers[-1])
+    except (ValueError, IndexError, AttributeError):
+        pass
+
+    # 정규식 실패 시 직접 속성 접근
+    if test_stat is None or p_value is None:
+        attr_pairs = [
+            ('statistic', 'pvalue'),
+            ('test_stat', 'pvalue'),
+            ('fvalue', 'pvalue'),
+        ]
+
+        for attr_stat, attr_pval in attr_pairs:
+            if hasattr(reset_result, attr_stat) and hasattr(reset_result, attr_pval):
+                try:
+                    test_stat = float(getattr(reset_result, attr_stat))
+                    p_value = float(getattr(reset_result, attr_pval))
+                    break
+                except (ValueError, TypeError):
+                    continue
+
+    # 여전히 값을 못 찾으면 에러
+    if test_stat is None or p_value is None:
+        raise ValueError(f"linear_reset 결과를 해석할 수 없습니다. 반환값: {reset_result}")
+
+    # 유의성 판정
+    significant = p_value <= alpha
+
+    # 해석 문구
+    if significant:
+        interpretation = f"선형성 가정 위반 (p={p_value:.4f} <= {alpha})"
+    else:
+        interpretation = f"선형성 가정 만족 (p={p_value:.4f} > {alpha})"
+
+    # 결과를 DataFrame으로 반환
+    result_df = DataFrame({
+        "검정": ["Ramsey RESET"],
+        "검정통계량 (F)": [f"{test_stat:.4f}"],
+        "p-value": [f"{p_value:.4f}"],
+        "유의수준": [alpha],
+        "선형성_위반": [significant],  # True: 선형성 위반, False: 선형성 만족
+        "해석": [interpretation]
+    })
+
+    return result_df
+
+
+# ===================================================================
+# 정규성 검정 (Normality Test)
+# ===================================================================
+def ols_normality_test(fit: RegressionResultsWrapper, alpha: float = 0.05, plot: bool = False, title: str | None = None, save_path: str | None = None) -> DataFrame:
+    """회귀모형 잔차의 정규성을 검정한다.
+
+    회귀모형의 잔차가 정규분포를 따르는지 Shapiro-Wilk 검정과 Jarque-Bera 검정으로 평가한다.
+    정규성 가정은 회귀분석의 추론(신뢰구간, 가설검정)이 타당하기 위한 중요한 가정이다.
+
+    Args:
+        fit: 회귀 모형 객체 (statsmodels의 RegressionResultsWrapper).
+        alpha (float, optional): 유의수준. 기본값 0.05.
+        plot (bool, optional): True이면 Q-Q 플롯을 출력. 기본값 False.
+        title (str, optional): 플롯 제목. 기본값 None.
+        save_path (str, optional): 플롯을 저장할 경로. 기본값 None
+
+    Returns:
+        DataFrame: 정규성 검정 결과를 포함한 데이터프레임.
+                   - 검정명: 사용된 검정 방법
+                   - 검정통계량: 검정 통계량 값
+                   - p-value: 검정의 p값
+                   - 유의수준: 설정된 유의수준
+                   - 정규성_위반: alpha 기준 결과 (bool)
+                   - 해석: 정규성 판정 (문자열)
+
+    Examples:
+        ```python
+        from hossam import *
+        fit = hs_stats.logit(df, 'target')
+        result = hs_stats.ols_normality_test(fit)
+        ```
+
+    Notes:
+        - Shapiro-Wilk: 샘플 크기가 작을 때 (< 5000) 강력한 검정
+        - Jarque-Bera: 왜도(skewness)와 첨도(kurtosis) 기반 검정
+        - p-value > alpha: 정규성 가정 만족 (귀무가설 채택)
+        - p-value <= alpha: 정규성 가정 위반 (귀무가설 기각)
+    """
+    from scipy.stats import jarque_bera
+
+    # fit 객체에서 잔차 추출
+    residuals = fit.resid
+    n = len(residuals)
+
+    results = []
+
+    # 1. Shapiro-Wilk 검정 (샘플 크기 < 5000일 때 권장)
+    if n < 5000:
+        try:
+            stat_sw, p_sw = shapiro(residuals)
+            significant_sw = p_sw <= alpha
+
+            if significant_sw:
+                interpretation_sw = f"정규성 위반 (p={p_sw:.4f} <= {alpha})"
+            else:
+                interpretation_sw = f"정규성 만족 (p={p_sw:.4f} > {alpha})"
+
+            results.append({
+                "검정": "Shapiro-Wilk",
+                "검정통계량": f"{stat_sw:.4f}",
+                "p-value": f"{p_sw:.4f}",
+                "유의수준": alpha,
+                "정규성_위반": significant_sw,
+                "해석": interpretation_sw
+            })
+        except Exception as e:
+            pass
+
+    # 2. Jarque-Bera 검정 (항상 수행)
+    try:
+        stat_jb, p_jb = jarque_bera(residuals)
+        significant_jb = p_jb <= alpha  # type: ignore
+
+        if significant_jb:
+            interpretation_jb = f"정규성 위반 (p={p_jb:.4f} <= {alpha})"
+        else:
+            interpretation_jb = f"정규성 만족 (p={p_jb:.4f} > {alpha})"
+
+        results.append({
+            "검정": "Jarque-Bera",
+            "검정통계량": f"{stat_jb:.4f}",
+            "p-value": f"{p_jb:.4f}",
+            "유의수준": alpha,
+            "정규성_위반": significant_jb,
+            "해석": interpretation_jb
+        })
+    except Exception as e:
+        pass
+
+    # 결과를 DataFrame으로 반환
+    if not results:
+        raise ValueError("정규성 검정을 수행할 수 없습니다.")
+
+
+    if plot:
+        ols_qqplot(fit, title=title, save_path=save_path)
+
+    result_df = DataFrame(results)
+    return result_df
+
+
+# ===================================================================
+# 등분산성 검정 (Homoscedasticity Test)
+# ===================================================================
+def ols_variance_test(fit: RegressionResultsWrapper, alpha: float = 0.05, plot: bool = False, title: str | None = None, save_path: str | None = None) -> DataFrame:
+    """회귀모형의 등분산성 가정을 검정한다.
+
+    잔차의 분산이 예측값의 수준에 관계없이 일정한지 Breusch-Pagan 검정과 White 검정으로 평가한다.
+    등분산성 가정은 회귀분석의 추론(표준오차, 검정통계량)이 정확하기 위한 중요한 가정이다.
+
+    Args:
+        fit: 회귀 모형 객체 (statsmodels의 RegressionResultsWrapper).
+        alpha (float, optional): 유의수준. 기본값 0.05.
+        plot (bool, optional): True이면 Q-Q 플롯을 출력. 기본값 False.
+        title (str, optional): 플롯 제목. 기본값 None.
+        save_path (str, optional): 플롯을 저장할 경로. 기본값 None
+
+    Returns:
+        DataFrame: 등분산성 검정 결과를 포함한 데이터프레임.
+                   - 검정명: 사용된 검정 방법
+                   - 검정통계량: 검정 통계량 값 (LM 또는 F)
+                   - p-value: 검정의 p값
+                   - 유의수준: 설정된 유의수준
+                   - 등분산성_위반: alpha 기준 결과 (bool)
+                   - 해석: 등분산성 판정 (문자열)
+
+    Examples:
+        ```python
+        from hossam import *
+        fit = hs_stats.logit(df, 'target')
+        result = hs_stats.ols_variance_test(fit)
+        ```
+
+    Notes:
+        - Breusch-Pagan: 잔차 제곱과 독립변수의 선형관계 검정
+        - White: 잔차 제곱과 독립변수 및 그 제곱, 교차항의 관계 검정
+        - p-value > alpha: 등분산성 가정 만족 (귀무가설 채택)
+        - p-value <= alpha: 이분산성 존재 (귀무가설 기각)
+    """
+
+    # fit 객체에서 필요한 정보 추출
+    exog = fit.model.exog  # 설명변수 (상수항 포함)
+    resid = fit.resid      # 잔차
+
+    results = []
+
+    # 1. Breusch-Pagan 검정
+    try:
+        lm, lm_pvalue, fvalue, f_pvalue = het_breuschpagan(resid, exog)
+        significant_bp = lm_pvalue <= alpha
+
+        if significant_bp:
+            interpretation_bp = f"등분산성 위반 (p={lm_pvalue:.4f} <= {alpha})"
+        else:
+            interpretation_bp = f"등분산성 만족 (p={lm_pvalue:.4f} > {alpha})"
+
+        results.append({
+            "검정": "Breusch-Pagan",
+            "검정통계량 (LM)": f"{lm:.4f}",
+            "p-value": f"{lm_pvalue:.4f}",
+            "유의수준": alpha,
+            "등분산성_위반": significant_bp,
+            "해석": interpretation_bp
+        })
+    except Exception as e:
+        pass
+
+    # 2. White 검정
+    try:
+        lm, lm_pvalue, fvalue, f_pvalue = het_white(resid, exog)
+        significant_white = lm_pvalue <= alpha
+
+        if significant_white:
+            interpretation_white = f"등분산성 위반 (p={lm_pvalue:.4f} <= {alpha})"
+        else:
+            interpretation_white = f"등분산성 만족 (p={lm_pvalue:.4f} > {alpha})"
+
+        results.append({
+            "검정": "White",
+            "검정통계량 (LM)": f"{lm:.4f}",
+            "p-value": f"{lm_pvalue:.4f}",
+            "유의수준": alpha,
+            "등분산성_위반": significant_white,
+            "해석": interpretation_white
+        })
+    except Exception as e:
+        pass
+
+    # 결과를 DataFrame으로 반환
+    if not results:
+        raise ValueError("등분산성 검정을 수행할 수 없습니다.")
+
+    if plot:
+        ols_residplot(fit, lowess=True, mse=True, title=title, save_path=save_path)
+
+    result_df = DataFrame(results)
+    return result_df
+
+
+# ===================================================================
+# 독립성 검정 (Independence Test - Durbin-Watson)
+# ===================================================================
+def ols_independence_test(fit: RegressionResultsWrapper, alpha: float = 0.05) -> DataFrame:
+    """회귀모형의 독립성 가정(자기상관 없음)을 검정한다.
+
+    Durbin-Watson 검정을 사용하여 잔차의 1차 자기상관 여부를 검정한다.
+    시계열 데이터나 순서가 있는 데이터에서 주로 사용된다.
+
+    Args:
+        fit: statsmodels 회귀분석 결과 객체 (RegressionResultsWrapper).
+        alpha (float, optional): 유의수준. 기본값은 0.05.
+
+    Returns:
+        DataFrame: 검정 결과 데이터프레임.
+            - 검정: 검정 방법명
+            - 검정통계량(DW): Durbin-Watson 통계량 (0~4 범위, 2에 가까울수록 자기상관 없음)
+            - 독립성_위반: 자기상관 의심 여부 (True/False)
+            - 해석: 검정 결과 해석
+
+    Examples:
+        ```python
+        from hossam import *
+        fit = hs_stats.logit(df, 'target')
+        result = hs_stats.ols_independence_test(fit)
+        ```
+
+    Notes:
+        - Durbin-Watson 통계량 해석:
+          * 2에 가까우면: 자기상관 없음 (독립성 만족)
+          * 0에 가까우면: 양의 자기상관 (독립성 위반)
+          * 4에 가까우면: 음의 자기상관 (독립성 위반)
+        - 일반적으로 1.5~2.5 범위를 자기상관 없음으로 판단
+        - 시계열 데이터나 관측치에 순서가 있는 경우 중요한 검정
+    """
+    from pandas import DataFrame
+
+    # Durbin-Watson 통계량 계산
+    dw_stat = durbin_watson(fit.resid)
+
+    # 자기상관 판단 (1.5 < DW < 2.5 범위를 독립성 만족으로 판단)
+    is_autocorrelated = dw_stat < 1.5 or dw_stat > 2.5
+
+    # 해석 메시지 생성
+    if dw_stat < 1.5:
+        interpretation = f"DW={dw_stat:.4f} < 1.5 (양의 자기상관)"
+    elif dw_stat > 2.5:
+        interpretation = f"DW={dw_stat:.4f} > 2.5 (음의 자기상관)"
+    else:
+        interpretation = f"DW={dw_stat:.4f} (독립성 가정 만족)"
+
+    # 결과 데이터프레임 생성
+    result_df = DataFrame(
+        {
+            "검정": ["Durbin-Watson"],
+            "검정통계량(DW)": [dw_stat],
+            "독립성_위반": [is_autocorrelated],
+            "해석": [interpretation],
+        }
+    )
+
+    return result_df
+
+
+
+def ols_tests(fit: RegressionResultsWrapper, alpha: float = 0.05, plot: bool = False, title: str | None = None, save_path: str | None = None) -> None:
+    """회귀모형의 가정 검정을 종합적으로 수행한다.
+
+    선형성, 정규성, 등분산성, 독립성 검정을 순차적으로 실시하고 결과를 하나의 데이터프레임으로 반환한다.
+
+    Args:
+        fit: 회귀 모형 객체 (statsmodels의 RegressionResultsWrapper).
+        alpha (float, optional): 유의수준. 기본값 0.05.
+        plot (bool, optional): True이면 정규성 검정 시 Q-Q 플롯을 출력. 기본값 False.
+        title (str, optional): 플롯 제목. 기본값 None.
+        save_path (str, optional): 플롯을 저장할 경로. 기본값 None.
+
+    Returns:
+        None
+
+    Examples:
+        ```python
+        from hossam import *
+        fit = hs_stats.ols(df, 'target')
+        hs_stats.ols_tests(fit)
+        ```
+    """
+    # 각 검정 함수 호출
+    linearity_df = ols_linearity_test(fit, alpha=alpha)
+    normality_df = ols_normality_test(fit, alpha=alpha, plot=False)
+    variance_df = ols_variance_test(fit, alpha=alpha, plot=False)
+    independence_df = ols_independence_test(fit, alpha=alpha)
+
+    from IPython.display import display
+    display(linearity_df)
+    display(normality_df)
+    display(variance_df)
+    display(independence_df)
+
+    if plot:
+        fig, ax = get_default_ax(rows=1, cols=2, title=title)
+        ols_qqplot(fit, ax=ax[0])
+        ols_residplot(fit, lowess=True, mse=True, ax=ax[1])
+        finalize_plot(ax)
+
+
+# ===================================================================
+# 로지스틱 회귀 요약 리포트
+# ===================================================================
+def logit_report(
+    fit: BinaryResultsWrapper,
+    data: DataFrame,
+    threshold: float = 0.5,
+    full: Union[bool, str, int] = False,
+    alpha: float = 0.05
+) -> Union[
+    Tuple[DataFrame, DataFrame],
+    Tuple[
+        DataFrame,
+        DataFrame,
+        str,
+        str,
+        list[str],
+        np.ndarray
+    ]
+]:
+    """로지스틱 회귀 적합 결과를 상세 리포트로 변환한다.
+
+    Args:
+        fit: statsmodels Logit 결과 객체 (`fit.summary()`와 예측 확률을 지원해야 함).
+        data (DataFrame): 종속변수와 독립변수를 모두 포함한 DataFrame.
+        threshold (float): 예측 확률을 이진 분류로 변환할 임계값. 기본값 0.5.
+        full (bool | str | int): True이면 6개 값 반환, False이면 주요 2개(cdf, rdf)만 반환. 기본값 False.
+        alpha (float): 유의수준. 기본값 0.05.
+
+    Returns:
+        tuple: full=True일 때 다음 요소를 포함한다.
+            - 성능 지표 표 (`cdf`, DataFrame): McFadden Pseudo R², Accuracy, Precision, Recall, FPR, TNR, AUC, F1.
+            - 회귀계수 표 (`rdf`, DataFrame): B, 표준오차, z, p-value, significant, OR, 95% CI, VIF 등.
+            - 적합도 및 예측 성능 요약 (`result_report`, str): Pseudo R², LLR χ², p-value, Accuracy, AUC.
+            - 모형 보고 문장 (`model_report`, str): LLR p-value에 기반한 서술형 문장.
+            - 변수별 보고 리스트 (`variable_reports`, list[str]): 각 예측변수의 오즈비 해석 문장.
+            - 혼동행렬 (`cm`, ndarray): 예측 결과와 실제값의 혼동행렬 [[TN, FP], [FN, TP]].
+
+        full=False일 때:
+            - 성능 지표 표 (`cdf`, DataFrame)
+            - 회귀계수 표 (`rdf`, DataFrame)
+
+    Examples:
+        ```python
+        from hossam import *
+        from pandas import DataFrame
+        import numpy as np
+
+        df = DataFrame({
+            'target': np.random.binomial(1, 0.5, 100),
+            'x1': np.random.normal(0, 1, 100),
+            'x2': np.random.normal(0, 1, 100)
+        })
+
+        # 로지스틱 회귀 적합
+        fit = hs_stats.logit(df, yname="target")
+
+        # 전체 리포트
+        cdf, rdf, result_report, model_report, variable_reports, cm = hs_stats.logit_report(fit, df, full=True)
+
+        # 간단한 버전 (주요 테이블만)
+        cdf, rdf = hs_stats.logit_report(fit, df)
+        ```
+    """
+
+    # -----------------------------
+    # 성능평가지표
+    # -----------------------------
+    yname = fit.model.endog_names
+    y_true = data[yname]
+    y_pred = fit.predict(fit.model.exog)
+    y_pred_fix = (y_pred >= threshold).astype(int)
+
+    # 혼동행렬
+    cm = confusion_matrix(y_true, y_pred_fix)
+    tn, fp, fn, tp = cm.ravel()
+
+    acc = accuracy_score(y_true, y_pred_fix)  # 정확도
+    pre = precision_score(y_true, y_pred_fix)  # 정밀도
+    tpr = recall_score(y_true, y_pred_fix)  # 재현율
+    fpr = fp / (fp + tn)  # 위양성율
+    tnr = 1 - fpr  # 특이성
+    f1 = f1_score(y_true, y_pred_fix)  # f1-score
+    ras = roc_auc_score(y_true, y_pred)  # auc score
+
+    cdf = DataFrame(
+        {
+            "설명력(P-Rsqe)": [fit.prsquared],
+            "정확도(Accuracy)": [acc],
+            "정밀도(Precision)": [pre],
+            "재현율(Recall,TPR)": [tpr],
+            "위양성율(Fallout,FPR)": [fpr],
+            "특이성(Specif city,TNR)": [tnr],
+            "RAS(auc score)": [ras],
+            "F1": [f1],
+        }
+    )
+
+    # -----------------------------
+    # 회귀계수 표 구성 (OR 중심)
+    # -----------------------------
+    tbl = fit.summary2().tables[1]
+
+    # 독립변수 이름(상수항 제외)
+    xnames = [n for n in fit.model.exog_names if n != "const"]
+
+    # 독립변수
+    x = data[xnames]
+
+    variables = []
+
+    # VIF 계산 (상수항 포함 설계행렬 사용)
+    vif_dict = {}
+    x_const = sm.add_constant(x, has_constant="add")
+    for i, col in enumerate(x.columns, start=1):  # 상수항이 0이므로 1부터 시작
+        vif_dict[col] = variance_inflation_factor(x_const.values, i)    # type: ignore
+
+    for idx, row in tbl.iterrows():
+        name = idx
+        if name not in xnames:
+            continue
+
+        beta = float(row['Coef.'])
+        se = float(row['Std.Err.'])
+        z = float(row['z'])
+        p = float(row['P>|z|'])
+
+        or_val = np.exp(beta)
+        ci_low = np.exp(beta - 1.96 * se)
+        ci_high = np.exp(beta + 1.96 * se)
+
+        stars = "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else ""
+
+        variables.append(
+            {
+                "종속변수": yname,
+                "독립변수": name,
+                "B(β)": beta,
+                "표준오차": se,
+                "z": f"{z:.3f}{stars}",
+                "p-value": p,
+                "significant": p <= alpha,
+                "OR": or_val,
+                "CI_lower": ci_low,
+                "CI_upper": ci_high,
+                "VIF": vif_dict.get(name, np.nan),
+            }
+        )
+
+    rdf = DataFrame(variables)
+
+    # ---------------------------------
+    # 모델 적합도 + 예측 성능 지표
+    # ---------------------------------
+    auc = roc_auc_score(y_true, y_pred)
+
+    result_report = (
+        f"Pseudo R²(McFadden) = {fit.prsquared:.3f}, "
+        f"LLR χ²({int(fit.df_model)}) = {fit.llr:.3f}, "
+        f"p-value = {fit.llr_pvalue:.4f}, "
+        f"Accuracy = {acc:.3f}, "
+        f"AUC = {auc:.3f}"
+    )
+
+    # -----------------------------
+    # 모형 보고 문장
+    # -----------------------------
+    tpl = (
+        "%s에 대하여 %s로 예측하는 로지스틱 회귀분석을 실시한 결과, "
+        "모형은 통계적으로 %s(χ²(%s) = %.3f, p %s 0.05)하였다."
+    )
+
+    model_report = tpl % (
+        yname,
+        ", ".join(xnames),
+        "유의" if fit.llr_pvalue <= 0.05 else "유의하지 않음",
+        int(fit.df_model),
+        fit.llr,
+        "<=" if fit.llr_pvalue <= 0.05 else ">",
+    )
+
+    # -----------------------------
+    # 변수별 보고 문장
+    # -----------------------------
+    variable_reports = []
+
+    s = (
+        "%s의 오즈비는 %.3f(p %s 0.05)로, "
+        "%s 발생 odds에 %s 영향을 미치는 것으로 나타났다."
+    )
+
+    for _, row in rdf.iterrows():
+        variable_reports.append(
+            s
+            % (
+                row["독립변수"],
+                row["OR"],
+                "<=" if row["p-value"] < 0.05 else ">",
+                row["종속변수"],
+                "유의미한" if row["p-value"] < 0.05 else "유의하지 않은",
+            )
+        )
+
+    if full:
+        return cdf, rdf, result_report, model_report, variable_reports, cm
+    else:
+        return cdf, rdf
+
+
+# ===================================================================
+# 로지스틱 회귀
+# ===================================================================
+def logit(
+    df: DataFrame,
+    yname: str,
+    report: bool | str = 'summary'
+) -> Union[
+    BinaryResultsWrapper,
+    Tuple[
+        BinaryResultsWrapper,
+        DataFrame
+    ],
+    Tuple[
+        BinaryResultsWrapper,
+        DataFrame,
+        DataFrame,
+        str,
+        str,
+        list[str]
+    ]
+]:
+    """로지스틱 회귀분석을 수행하고 적합 결과를 반환한다.
+
+    종속변수가 이항(binary) 형태일 때 로지스틱 회귀분석을 실시한다.
+    필요시 상세한 통계 보고서를 함께 제공한다.
+
+    Args:
+        df (DataFrame): 종속변수와 독립변수를 모두 포함한 데이터프레임.
+        yname (str): 종속변수 컬럼명. 이항 변수여야 한다.
+        report: 리포트 모드 설정. 다음 값 중 하나:
+            - False (기본값): 리포트 미사용. fit 객체만 반환.
+            - 1 또는 'summary': 요약 리포트 반환 (full=False).
+            - 2 또는 'full': 풀 리포트 반환 (full=True).
+            - True: 풀 리포트 반환 (2와 동일).
+
+    Returns:
+        statsmodels.genmod.generalized_linear_model.BinomialResults: report=False일 때.
+            로지스틱 회귀 적합 결과 객체. fit.summary()로 상세 결과 확인 가능.
+
+        tuple (4개): report=1 또는 'summary'일 때.
+            (fit, rdf, result_report, variable_reports) 형태로 (cdf 제외).
+
+        tuple (6개): report=2, 'full' 또는 True일 때.
+            (fit, cdf, rdf, result_report, model_report, variable_reports) 형태로:
+            - fit: 로지스틱 회귀 적합 결과 객체
+            - cdf: 성능 지표 표 (DataFrame)
+            - rdf: 회귀계수 표 (DataFrame)
+            - result_report: 적합도 및 예측 성능 요약 (str)
+            - model_report: 모형 보고 문장 (str)
+            - variable_reports: 변수별 보고 문장 리스트 (list[str])
+
+    Examples:
+        ```python
+        from hossam import *
+        from pandas import DataFrame
+        import numpy as np
+
+        df = DataFrame({
+            'target': np.random.binomial(1, 0.5, 100),
+            'x1': np.random.normal(0, 1, 100),
+            'x2': np.random.normal(0, 1, 100)
+        })
+
+        # 적합 결과만 반환
+        fit = hs_stats.logit(df, 'target')
+
+        # 요약 리포트 반환
+        fit, rdf, result_report, var_reports = hs_stats.logit(df, 'target', report='summary')
+
+        # 풀 리포트 반환
+        fit, cdf, rdf, result_report, model_report, var_reports = hs_stats.logit(df, 'target', report='full')
+        ```
+    """
+    x = df.drop(yname, axis=1)
+    y = df[yname]
+
+    X_const = sm.add_constant(x)
+    logit_model = sm.Logit(y, X_const)
+    logit_fit = logit_model.fit(disp=False)
+
+    # report 파라미터에 따른 처리
+    if not report or report is False:
+        # 리포트 미사용
+        return logit_fit
+    elif report == 'full':
+        # 풀 리포트 (full=True)
+        cdf, rdf, result_report, model_report, variable_reports, cm = logit_report(logit_fit, df, threshold=0.5, full=True, alpha=0.05) # type: ignore
+        return logit_fit, cdf, rdf, result_report, model_report, variable_reports
+    else:
+        # 요약 리포트 (report == 'summary')
+        cdf, rdf = logit_report(logit_fit, df, threshold=0.5, full=False, alpha=0.05)   # type: ignore
+        # 요약에서는 result_report와 variable_reports만 포함
+        # 간단한 버전으로 result와 variable_reports만 생성
+        return logit_fit, rdf
+
+
 # ===================================================================
 # 모델 예측 (Model Prediction)
 # ===================================================================
@@ -2898,121 +3111,3 @@ def predict(fit, data: DataFrame | Series) -> DataFrame | Series | float:
             f"모형 학습 시 사용한 특성과 입력 데이터의 특성이 일치하는지 확인하세요.\n"
             f"원본 오류: {str(e)}"
         )
-
-
-# ===================================================================
-# 상관계수 및 효과크기 분석 (Correlation & Effect Size)
-# ===================================================================
-def corr_effect_size(data: DataFrame, dv: str, *fields: str, alpha: float = 0.05) -> DataFrame:
-    """종속변수와의 편상관계수 및 효과크기를 계산한다.
-
-    각 독립변수와 종속변수 간의 상관계수를 계산하되, 정규성과 선형성을 검사하여
-    Pearson 또는 Spearman 상관계수를 적절히 선택한다.
-    Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.
-
-    Args:
-        data (DataFrame): 분석 대상 데이터프레임.
-        dv (str): 종속변수 컬럼 이름.
-        *fields (str): 독립변수 컬럼 이름들. 지정하지 않으면 수치형 컬럼 중 dv 제외 모두 사용.
-        alpha (float, optional): 유의수준. 기본 0.05.
-
-    Returns:
-        DataFrame: 다음 컬럼을 포함한 데이터프레임:
-            - Variable (str): 독립변수 이름
-            - Correlation (float): 상관계수 (Pearson 또는 Spearman)
-            - Corr_Type (str): 선택된 상관계수 종류 ('Pearson' 또는 'Spearman')
-            - P-value (float): 상관계수의 유의확률
-            - Cohens_d (float): 표준화된 효과크기
-            - Effect_Size (str): 효과크기 분류 ('Large', 'Medium', 'Small', 'Negligible')
-
-    Examples:
-        ```python
-        from hossam import *
-        from pandas import DataFrame
-
-        df = DataFrame({'age': [20, 30, 40, 50],
-                   'bmi': [22, 25, 28, 30],
-                   'charges': [1000, 2000, 3000, 4000]})
-
-        result = hs_stats.corr_effect_size(df, 'charges', 'age', 'bmi')
-        ```
-    """
-
-    # fields가 지정되지 않으면 수치형 컬럼 중 dv 제외 모두 사용
-    if not fields:
-        fields = [col for col in data.columns if is_numeric_dtype(data[col]) and col != dv] # type: ignore
-
-    # dv가 수치형인지 확인
-    if not is_numeric_dtype(data[dv]):
-        raise ValueError(f"Dependent variable '{dv}' must be numeric type")
-
-    results = []
-
-    for var in fields:
-        if not is_numeric_dtype(data[var]):
-            continue
-
-        # 결측치 제거
-        valid_idx = data[[var, dv]].notna().all(axis=1)
-        x = data.loc[valid_idx, var].values
-        y = data.loc[valid_idx, dv].values
-
-        if len(x) < 3:
-            continue
-
-        # 정규성 검사 (Shapiro-Wilk: n <= 5000 권장, 그 외 D'Agostino)
-        method_x = 's' if len(x) <= 5000 else 'n'
-        method_y = 's' if len(y) <= 5000 else 'n'
-
-        normal_x_result = normal_test(data[[var]], columns=[var], method=method_x)
-        normal_y_result = normal_test(data[[dv]], columns=[dv], method=method_y)
-
-        # 정규성 판정 (p > alpha면 정규분포 가정)
-        normal_x = normal_x_result.loc[var, 'p-val'] > alpha if var in normal_x_result.index else False     # type: ignore
-        normal_y = normal_y_result.loc[dv, 'p-val'] > alpha if dv in normal_y_result.index else False   # type: ignore
-
-        # Pearson (모두 정규) vs Spearman (하나라도 비정규)
-        if normal_x and normal_y:
-            r, p = pearsonr(x, y)
-            corr_type = 'Pearson'
-        else:
-            r, p = spearmanr(x, y)
-            corr_type = 'Spearman'
-
-        # Cohen's d 계산 (상관계수에서 효과크기로 변환)
-        # d = 2*r / sqrt(1-r^2)
-        if r ** 2 < 1:    # type: ignore
-            d = (2 * r) / np.sqrt(1 - r ** 2) # type: ignore
-        else:
-            d = 0
-
-        # 효과크기 분류 (Cohen's d 기준)
-        # Small: 0.2 < |d| <= 0.5
-        # Medium: 0.5 < |d| <= 0.8
-        # Large: |d| > 0.8
-        abs_d = abs(d)
-        if abs_d > 0.8:
-            effect_size = 'Large'
-        elif abs_d > 0.5:
-            effect_size = 'Medium'
-        elif abs_d > 0.2:
-            effect_size = 'Small'
-        else:
-            effect_size = 'Negligible'
-
-        results.append({
-            'Variable': var,
-            'Correlation': r,
-            'Corr_Type': corr_type,
-            'P-value': p,
-            'Cohens_d': d,
-            'Effect_Size': effect_size
-        })
-
-    result_df = DataFrame(results)
-
-    # 상관계수로 정렬 (절댓값 기준 내림차순)
-    if len(result_df) > 0:
-        result_df = result_df.sort_values('Correlation', key=lambda x: x.abs(), ascending=False).reset_index(drop=True)
-
-    return result_df
