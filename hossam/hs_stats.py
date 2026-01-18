@@ -45,6 +45,7 @@ from statsmodels.discrete.discrete_model import BinaryResults
 from pingouin import anova, pairwise_tukey, welch_anova, pairwise_gameshowell
 
 from .hs_plot import ols_residplot, ols_qqplot
+from .hs_prep import unmelt
 
 # ===================================================================
 # MCAR(결측치 무작위성) 검정
@@ -867,15 +868,24 @@ def ttest_1samp(data, mean_value: float = 0.0) -> DataFrame:
 # ===================================================================
 # 독립표본 t-검정 또는 Welch's t-test
 # ===================================================================
-def ttest_ind(x, y, equal_var: bool | None = None) -> DataFrame:
+def ttest_ind(
+        data: DataFrame | None = None,
+        x : Series | list | np.ndarray | str | None = None,
+        y : Series | list | np.ndarray | str | None = None,
+        equal_var: bool | None = None
+) -> DataFrame:
     """두 독립 집단의 평균 차이를 검정한다 (독립표본 t-검정 또는 Welch's t-test).
 
     독립표본 t-검정은 두 독립된 집단의 평균이 같은지를 검정한다.
     귀무가설(H0): μ1 = μ2 (두 집단의 평균이 같다)
 
     Args:
-        x (array-like): 첫 번째 집단의 연속형 데이터 (리스트, Series, ndarray 등).
-        y (array-like): 두 번째 집단의 연속형 데이터 (리스트, Series, ndarray 등).
+        data (DataFrame | None, optional): x와 y가 컬럼명인 경우 사용할 데이터프레임.
+            기본값은 None.
+        x (Series | list | np.ndarray | str | None, optional): 첫 번째 집단의 데이터 또는
+            data가 주어진 경우 연속형 변수의 컬럼명. 기본값은 None.
+        y (Series | list | np.ndarray | str | None, optional): 두 번째 집단의 데이터 또는
+            data가 주어진 경우 명목형 변수의 컬럼명. 기본값은 None.
         equal_var (bool | None, optional): 등분산성 가정 여부.
             - True: 독립표본 t-검정 (등분산 가정)
             - False: Welch's t-test (등분산 가정하지 않음, 더 강건함)
@@ -909,6 +919,12 @@ def ttest_ind(x, y, equal_var: bool | None = None) -> DataFrame:
         result = hs_stats.ttest_ind(s1, s2, equal_var=False)
         ```
     """
+    # data가 주어지고 x, y가 컬럼명인 경우 데이터 추출
+    if data is not None and isinstance(x, str) and isinstance(y, str):
+        df = unmelt(data=data, value_vars=x, id_vars=y)
+        x = df[df.columns[0]]
+        y = df[df.columns[1]]
+
     # 데이터를 Series로 변환
     if isinstance(x, Series):
         x_data = x.dropna()
@@ -955,12 +971,12 @@ def ttest_ind(x, y, equal_var: bool | None = None) -> DataFrame:
             result.append({
                 "test": n,
                 "alternative": a,
+                "interpretation": itp,
+                "equal_var_checked": var_checked,
                 "statistic": round(s, 3),   # type: ignore
                 "p-value": round(p, 4),     # type: ignore
                 "H0": p > 0.05,             # type: ignore
                 "H1": p <= 0.05,            # type: ignore
-                "interpretation": itp,
-                "equal_var_checked": var_checked
             })
         except Exception as e:
             result.append({

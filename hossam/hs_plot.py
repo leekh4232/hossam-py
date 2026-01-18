@@ -270,6 +270,10 @@ def boxplot(
     yname: str | None = None,
     title: str | None = None,
     orient: str = "v",
+    stat_test: str | None = None,
+    stat_pairs: list[tuple] | None = None,
+    stat_text_format: str = "star",
+    stat_loc: str = "inside",
     palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
@@ -288,6 +292,10 @@ def boxplot(
         yname (str|None): y축 값 컬럼명.
         title (str|None): 그래프 제목.
         orient (str): 'v' 또는 'h' 방향.
+        stat_test (str|None): 통계 검정 방법. None이면 검정 안함. xname과 yname이 모두 지정되어야 함.
+        stat_pairs (list[tuple]|None): 통계 검정할 그룹 쌍 목록.
+        stat_text_format (str): 통계 결과 표시 형식.
+        stat_loc (str): 통계 결과 위치.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
@@ -326,10 +334,62 @@ def boxplot(
 
         boxplot_kwargs.update(params)
         sb.boxplot(**boxplot_kwargs, linewidth=linewidth)
+
+        # 통계 검정 추가
+        if stat_test is not None:
+            annotator = Annotator(ax, data=df, x=xname, y=yname, pairs=stat_pairs, orient=orient)
+            annotator.configure(test=stat_test, text_format=stat_text_format, loc=stat_loc)
+            annotator.apply_and_annotate()
     else:
         sb.boxplot(data=df, orient=orient, ax=ax, linewidth=linewidth, **params)    # type: ignore
 
     finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+
+
+# ===================================================================
+# 상자그림에 p-value 주석을 추가한다
+# ===================================================================
+def pvalue1_anotation(
+    data: DataFrame,
+    target: str,
+    hue: str,
+    title: str | None = None,
+    pairs: list | None = None,
+    test: str = "t-test_ind",
+    text_format: str = "star",
+    loc: str = "outside",
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
+    **params
+) -> None:
+    """
+    boxplot의 wrapper 함수로, 상자그림에 p-value 주석을 추가한다.
+    """
+    boxplot(
+        data,
+        xname=hue,
+        yname=target,
+        title=title,
+        orient="v",
+        stat_test=test,
+        stat_pairs=pairs,
+        stat_text_format=text_format,
+        stat_loc=loc,
+        palette=None,
+        width=width,
+        height=height,
+        linewidth=linewidth,
+        dpi=dpi,
+        save_path=save_path,
+        callback=callback,
+        ax=ax,
+        **params
+    )
 
 
 # ===================================================================
@@ -1093,7 +1153,7 @@ def barplot(
 
 
 # ===================================================================
-# 바이올린 플롯을 그린다
+# boxen 플롯을 그린다
 # ===================================================================
 def boxenplot(
     df: DataFrame,
@@ -1601,88 +1661,6 @@ def kde_confidence_interval(
         current_ax.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
 
     finalize_plot(axes[0] if isinstance(axes, list) and len(axes) > 0 else ax, callback, outparams, save_path, True, title) # type: ignore
-
-
-# ===================================================================
-# 상자그림에 p-value 주석을 추가한다
-# ===================================================================
-def pvalue1_anotation(
-    data: DataFrame,
-    target: str,
-    hue: str,
-    title: str | None = None,
-    pairs: list | None = None,
-    test: str = "t-test_ind",
-    text_format: str = "star",
-    loc: str = "outside",
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    dpi: int = config.dpi,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-    ax: Axes | None = None,
-    **params
-) -> None:
-    """statannotations를 이용해 상자그림에 p-value 주석을 추가한다.
-
-    Args:
-        data (DataFrame): 시각화할 데이터.
-        target (str): 값 컬럼명.
-        hue (str): 그룹 컬럼명.
-        title (str|None): 그래프 제목.
-        pairs (list|None): 비교할 (group_a, group_b) 튜플 목록. None이면 hue 컬럼의 모든 고유값 조합을 자동 생성.
-        test (str): 적용할 통계 검정 이름.
-        text_format (str): 주석 형식('star' 등).
-        loc (str): 주석 위치.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
-        callback (Callable|None): Axes 후처리 콜백.
-        ax (Axes|None): 외부에서 전달한 Axes.
-        **params: seaborn boxplot 추가 인자.
-
-    Returns:
-        None
-    """
-    # pairs가 None이면 hue 컬럼의 고유값으로 모든 조합 생성
-    if pairs is None:
-        from itertools import combinations
-        unique_values = sorted(data[hue].unique())
-        pairs = list(combinations(unique_values, 2))
-
-    outparams = False
-
-    if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
-        outparams = True
-
-    # params에서 palette 추출 (있으면)
-    palette_value = params.pop("palette", None)
-
-    # boxplot kwargs 구성
-    boxplot_kwargs = {
-        "data": data,
-        "x": hue,
-        "y": target,
-        "linewidth": linewidth,
-        "ax": ax,
-    }
-
-    # palette가 있으면 추가 (hue는 x에 이미 할당됨)
-    if palette_value is not None:
-        boxplot_kwargs["palette"] = palette_value
-
-    boxplot_kwargs.update(params)
-
-    sb.boxplot(**boxplot_kwargs)
-    annotator = Annotator(ax, data=data, x=hue, y=target, pairs=pairs)
-    annotator.configure(test=test, text_format=text_format, loc=loc)
-    annotator.apply_and_annotate()
-
-    sb.despine()
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 
