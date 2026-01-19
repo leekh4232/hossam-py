@@ -1973,15 +1973,17 @@ def ols_report(
     fit: RegressionResultsWrapper,
     data: DataFrame,
     full: bool = False,
-    alpha: float = 0.05
-):
+    alpha: float = 0.05,
+    logvar: bool = False
+    ):
     """선형회귀 적합 결과를 요약 리포트로 변환한다.
 
     Args:
-        fit: statsmodels OLS 등 선형회귀 결과 객체 (`fit.summary()`를 지원해야 함).
-        data: 종속변수와 독립변수를 모두 포함한 DataFrame.
-        full: True이면 6개 값 반환, False이면 회귀계수 테이블(rdf)만 반환. 기본값 True.
-        alpha: 유의수준. 기본값 0.05.
+        fit (RegressionResultsWrapper): statsmodels OLS 등 선형회귀 결과 객체 (`fit.summary()`를 지원해야 함).
+        data (DataFrame): 종속변수와 독립변수를 모두 포함한 DataFrame.
+        full (bool): True이면 6개 값 반환, False이면 회귀계수 테이블(rdf)만 반환. 기본값 True.
+        alpha (float): 유의수준. 기본값 0.05.
+        logvar (bool): 종속변수에 로그가 적용되어 있는지 여부 (True일 때 독립변수 해석에 로그를 반영함)
 
     Returns:
         tuple: full=True일 때 다음 요소를 포함한다.
@@ -2062,20 +2064,24 @@ def ols_report(
         stars = "***" if p < 0.001 else "**" if p < 0.01 else "*" if p < 0.05 else ""
 
         # 한 변수에 대한 보고 정보 추가
-        variables.append(
-            {
-                "종속변수": yname,  # 종속변수 이름
-                "독립변수": name,  # 독립변수 이름
-                "B": f"{b:.6f}",  # 비표준화 회귀계수(B)
-                "표준오차": f"{se:.6f}",  # 계수 표준오차
-                "Beta": beta,  # 표준화 회귀계수(β)
-                "t": f"{t:.3f}{stars}",  # t-통계량(+별표)
-                "p-value": p,  # 계수 유의확률
-                "significant": p <= alpha,  # 유의성 여부 (boolean)
-                "공차": 1 / vif,  # 공차(Tolerance = 1/VIF)
-                "vif": vif,  # 분산팽창계수
-            }
-        )
+        var_row = {
+            "종속변수": yname,  # 종속변수 이름
+            "독립변수": name,  # 독립변수 이름
+            "B": f"{b:.6f}",  # 비표준화 회귀계수(B)
+        }
+        # logvar가 True면 exp(B) 컬럼 추가
+        if 'logvar' in locals() and logvar:
+            var_row["exp(B)"] = f"{np.exp(b):.6f}"
+        var_row.update({
+            "표준오차": f"{se:.6f}",  # 계수 표준오차
+            "Beta": beta,  # 표준화 회귀계수(β)
+            "t": f"{t:.3f}{stars}",  # t-통계량(+별표)
+            "p-value": p,  # 계수 유의확률
+            "significant": p <= alpha,  # 유의성 여부 (boolean)
+            "공차": 1 / vif,  # 공차(Tolerance = 1/VIF)
+            "vif": vif,  # 분산팽창계수
+        })
+        variables.append(var_row)
 
     rdf = DataFrame(variables)
 
@@ -2113,20 +2119,34 @@ def ols_report(
 
     # 변수별 보고 문장 리스트 구성
     variable_reports = []
-    s = "%s의 회귀계수는 %s(p %s 0.05)로, %s에 대하여 %s 예측변인인 것으로 나타났다."
+    s_normal = "%s가 1 증가하면 %s가 %.2f만큼 변하는 것으로 나타남. (p %s 0.05, %s)"
+    s_log = "%s가 1 증가하면 %s가 약 %.2f배 변하는 것으로 나타남. (p %s 0.05, %s)"
 
     for i in rdf.index:
         row = rdf.iloc[i]
-        variable_reports.append(
-            s
-            % (
-                row["독립변수"],
-                row["B"],
-                "<=" if float(row["p-value"]) < 0.05 else ">",
-                row["종속변수"],
-                "유의미한" if float(row["p-value"]) < 0.05 else "유의하지 않은",
+        if logvar:
+            effect = np.exp(float(row["B"]))
+            variable_reports.append(
+                s_log
+                % (
+                    row["독립변수"],
+                    row["종속변수"],
+                    effect,
+                    "<=" if float(row["p-value"]) < 0.05 else ">",
+                    "유의함" if float(row["p-value"]) < 0.05 else "유의하지 않음",
+                )
             )
-        )
+        else:
+            variable_reports.append(
+                s_normal
+                % (
+                    row["독립변수"],
+                    row["종속변수"],
+                    float(row["B"]),
+                    "<=" if float(row["p-value"]) < 0.05 else ">",
+                    "유의함" if float(row["p-value"]) < 0.05 else "유의하지 않음",
+                )
+            )
 
     # -----------------------------
     # 회귀식 자동 출력
@@ -2903,6 +2923,7 @@ def logit(
     BinaryResultsWrapper,
     Tuple[
         BinaryResultsWrapper,
+        DataFrame,
         DataFrame
     ],
     Tuple[
@@ -2986,7 +3007,7 @@ def logit(
         cdf, rdf = logit_report(logit_fit, df, threshold=0.5, full=False, alpha=0.05)   # type: ignore
         # 요약에서는 result_report와 variable_reports만 포함
         # 간단한 버전으로 result와 variable_reports만 생성
-        return logit_fit, rdf
+        return logit_fit, cdf, rdf
 
 
 # ===================================================================
