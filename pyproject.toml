@@ -42,7 +42,7 @@ dependencies = [
     "flask",
     "xgboost",
     "lightgbm",
-    "catboost","
+    "catboost",
     "kneed"
 ]
 
