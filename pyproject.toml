@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hossam"
-version = "0.4.6"
+version = "0.4.7"
 description = "Hossam Data Helper"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.13.9"
 authors = [{ name = "Lee Kwang-Ho", email = "leekh4232@gmail.com" }]
 license = "MIT"
 classifiers = [
@@ -42,7 +42,8 @@ dependencies = [
     "flask",
     "xgboost",
     "lightgbm",
-    "catboost"
+    "catboost","
+    "kneed"
 ]
 
 [project.urls]
