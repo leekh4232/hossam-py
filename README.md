@@ -29,7 +29,7 @@ title: 🎓 Hossam Data Helper
 pip install hossam
 ```
 
-**요구사항**: Python 3.8 이상
+**요구사항**: Python 3.13.9 이상
 
 ## 📚 전체 문서
 
@@ -39,9 +39,9 @@ pip install hossam
 
 - **hs_plot**: 25+ 시각화 함수 (선 그래프, 산점도, 히스토그램, 박스플롯, 히트맵 등)
 - **hs_stats**: 회귀/분류 분석, 교차검증, 정규성 검정, 상관분석 등
-- **hs_prep**: 결측치 처리, 이상치 탐지, 스케일링, 인코딩
+- **hs_prep**: 결측치 처리, 이상치 탐지, 스케일링, 인코딩 등의 데이터 전처리 기능
+- **hs_timeseries**: 시계열 분석 기능 지원
 - **hs_gis**: GIS 데이터 로드 및 시각화 (대한민국 지도 지원)
-- **hs_classroom**: 학습용 이진분류, 다중분류, 회귀 데이터 생성
 - **hs_util**: 예쁜 테이블 출력, 그리드 서치 등
 
 자세한 사용법은 [API 문서](https://py.hossam.kr/api/hossam/)를 참고하세요.
