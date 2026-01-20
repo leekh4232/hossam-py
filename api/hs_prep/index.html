@@ -416,7 +416,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../data_loader/" class="md-nav__link">
+      <a href="../data_loader.md" class="md-nav__link">
         
   
   
@@ -3803,7 +3803,7 @@ hs_prep.outlier_table(df, "value")</p>
 
 
 <a href="#hossam.hs_prep.log_transform" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">log_transform</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">log_transform</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3854,6 +3854,22 @@ hs_prep.outlier_table(df, "value")</p>
             </td>
             <td>
                   <code>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>columns</code>
+            </td>
+            <td>
+                  <code><span title="list">list</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>변환할 컬럼명 목록. fields와 중복 사용 불가.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -3970,7 +3986,13 @@ hs_prep.outlier_table(df, "value")</p>
 <span class="normal">825</span>
 <span class="normal">826</span>
 <span class="normal">827</span>
-<span class="normal">828</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">log_transform</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">828</span>
+<span class="normal">829</span>
+<span class="normal">830</span>
+<span class="normal">831</span>
+<span class="normal">832</span>
+<span class="normal">833</span>
+<span class="normal">834</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">log_transform</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;수치형 변수에 대해 로그 변환을 수행한다.</span>
 
 <span class="sd">    자연로그(ln)를 사용하여 변환하며, 0 또는 음수 값이 있을 경우</span>
@@ -3979,6 +4001,7 @@ hs_prep.outlier_table(df, "value")</p>
 <span class="sd">    Args:</span>
 <span class="sd">        data (DataFrame): 변환할 데이터프레임.</span>
 <span class="sd">        *fields (str): 변환할 컬럼명 목록. 지정하지 않으면 모든 수치형 컬럼을 처리.</span>
+<span class="sd">        columns (list, optional): 변환할 컬럼명 목록. fields와 중복 사용 불가.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        DataFrame: 로그 변환된 데이터프레임.</span>
@@ -4004,6 +4027,11 @@ hs_prep.outlier_table(df, "value")</p>
 <span class="sd">        - 변환 공식: log(x + shift), 여기서 shift = 1 - min(x) (min(x) &lt;= 0인 경우)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;fields와 columns 인자는 중복 사용할 수 없습니다.&quot;</span><span class="p">)</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">columns</span> <span class="c1"># type: ignore</span>
 
     <span class="c1"># 대상 컬럼 결정</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">fields</span><span class="p">:</span>
@@ -4153,13 +4181,7 @@ None이면 모든 수치형 컬럼의 2-way 상호작용을 생성.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_prep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">834</span>
-<span class="normal">835</span>
-<span class="normal">836</span>
-<span class="normal">837</span>
-<span class="normal">838</span>
-<span class="normal">839</span>
-<span class="normal">840</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">840</span>
 <span class="normal">841</span>
 <span class="normal">842</span>
 <span class="normal">843</span>
@@ -4239,7 +4261,13 @@ None이면 모든 수치형 컬럼의 2-way 상호작용을 생성.</p>
 <span class="normal">917</span>
 <span class="normal">918</span>
 <span class="normal">919</span>
-<span class="normal">920</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_interaction</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">pairs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">920</span>
+<span class="normal">921</span>
+<span class="normal">922</span>
+<span class="normal">923</span>
+<span class="normal">924</span>
+<span class="normal">925</span>
+<span class="normal">926</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_interaction</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">pairs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;데이터프레임에 상호작용(interaction) 항을 추가한다.</span>
 
 <span class="sd">    수치형 및 명목형 변수 간의 상호작용 항을 생성하여 데이터프레임에 추가한다.</span>
