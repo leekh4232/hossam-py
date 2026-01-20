@@ -123,7 +123,7 @@ def diff(
             ardict["기각값(Critical Values) %s" % key] = value
 
         stationarity = ar[1] <= 0.05
-        ardict["데이터 정상성 여부"] = "정상" if stationarity else "비정상"
+        ardict["데이터 정상성 여부"] = "정상" if stationarity else "비정상" # type: ignore
 
         ardf = DataFrame(ardict, index=["ADF Test"]).T
         pretty_table(ardf)
