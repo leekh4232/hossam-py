@@ -22,12 +22,16 @@ from statsmodels.nonparametric.smoothers_lowess import lowess as sm_lowess
 from statannotations.Annotator import Annotator
 
 # ===================================================================
+from sklearn.cluster._kmeans import KMeans
+
 from sklearn.metrics import (
     mean_squared_error,
     ConfusionMatrixDisplay,
     roc_curve,
     auc,
-    confusion_matrix
+    confusion_matrix,
+    silhouette_score,
+    silhouette_samples
 )
 
 # ===================================================================
@@ -708,6 +712,7 @@ def scatterplot(
     xname: str,
     yname: str,
     hue=None,
+    outline: bool = False,
     title: str | None = None,
     palette: str | None = None,
     width: int = config.width,
@@ -726,6 +731,7 @@ def scatterplot(
         xname (str): x축 컬럼.
         yname (str): y축 컬럼.
         hue (str|None): 범주 컬럼.
+        outline (bool): 점 외곽선 표시 여부.
         title (str|None): 그래프 제목.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
@@ -744,6 +750,30 @@ def scatterplot(
     if ax is None:
         fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
         outparams = True
+
+
+    if outline and hue is not None:
+        # 군집별 값의 종류별로 반복 수행
+        for c in df[hue].unique():
+            if c == -1:
+                continue
+
+            # 한 종류만 필터링한 결과에서 두 변수만 선택
+            df_c = df.loc[df[hue] == c, [xname, yname]]
+
+            try:
+                # 외각선 좌표 계산
+                hull = ConvexHull(df_c)
+
+                # 마지막 좌표 이후에 첫 번째 좌표를 연결
+                points = np.append(hull.vertices, hull.vertices[0])
+
+                ax.plot(    # type: ignore
+                    df_c.iloc[points, 0], df_c.iloc[points, 1], linewidth=linewidth, linestyle=":"
+                )
+                ax.fill(df_c.iloc[points, 0], df_c.iloc[points, 1], alpha=0.1)  # type: ignore
+            except:
+                pass
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
     scatterplot_kwargs = {
@@ -1479,79 +1509,6 @@ def heatmap(
     finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
-# ===================================================================
-# 클러스터별 볼록 경계막(convex hull)을 그린다
-# ===================================================================
-def convex_hull(
-    data: DataFrame,
-    xname: str,
-    yname: str,
-    hue: str | None = None,
-    title: str | None = None,
-    palette: str | None = None,
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    dpi: int = config.dpi,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-    ax: Axes | None = None,
-    **params,
-):
-    """클러스터별 볼록 껍질(convex hull)과 산점도를 그린다.
-
-    Args:
-        data (DataFrame): 시각화할 데이터.
-        xname (str): x축 컬럼.
-        yname (str): y축 컬럼.
-        hue (str): 클러스터/범주 컬럼.
-        title (str|None): 그래프 제목.
-        palette (str|None): 팔레트 이름.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
-        callback (Callable|None): Axes 후처리 콜백.
-        ax (Axes|None): 외부에서 전달한 Axes.
-        **params: seaborn scatterplot 추가 인자.
-
-    Returns:
-        None
-    """
-    outparams = False
-
-    if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
-        outparams = True
-
-    # 군집별 값의 종류별로 반복 수행
-    for c in data[hue].unique():
-        if c == -1:
-            continue
-
-        # 한 종류만 필터링한 결과에서 두 변수만 선택
-        df_c = data.loc[data[hue] == c, [xname, yname]]
-
-        try:
-            # 외각선 좌표 계산
-            hull = ConvexHull(df_c)
-
-            # 마지막 좌표 이후에 첫 번째 좌표를 연결
-            points = np.append(hull.vertices, hull.vertices[0])
-
-            ax.plot(    # type: ignore
-                df_c.iloc[points, 0], df_c.iloc[points, 1], linewidth=linewidth, linestyle=":"
-            )
-            ax.fill(df_c.iloc[points, 0], df_c.iloc[points, 1], alpha=0.1)  # type: ignore
-        except:
-            pass
-
-    # convex_hull은 hue가 필수이므로 palette를 그대로 사용
-    sb.scatterplot(
-        data=data, x=xname, y=yname, hue=hue, palette=palette, ax=ax, **params
-    )
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
-
 
 # ===================================================================
 # KDE와 신뢰구간을 나타낸 그래프를 그린다
@@ -2045,16 +2002,8 @@ def scatter_by_class(
                 processed.append([item, yname])
         group = processed
 
-    if outline:
-        for v in group:
-            convex_hull(data=data, xname=v[0], yname=v[1], hue=hue, palette=palette,
-                        width=width, height=height, linewidth=linewidth, dpi=dpi, callback=callback,
-                        save_path=save_path)
-    else:
-        for v in group:
-            scatterplot(data=data, xname=v[0], yname=v[1], hue=hue, palette=palette,
-                        width=width, height=height, linewidth=linewidth, dpi=dpi, callback=callback,
-                        save_path=save_path)    # type: ignore
+    for v in group:
+        scatterplot(data=data, xname=v[0], yname=v[1], outline=outline, hue=hue, palette=palette, width=width, height=height, linewidth=linewidth, dpi=dpi, callback=callback, save_path=save_path)    # type: ignore
 
 
 # ===================================================================
@@ -2519,3 +2468,218 @@ def distribution_plot(
                 plt.close()
             else:
                 plt.show()
+
+
+def silhouette_plot(
+        estimator: KMeans,
+        data: DataFrame,
+        title: str | None = None,
+        width: int = config.width,
+        height: int = config.height,
+        linewidth: float = config.line_width,
+        dpi: int = config.dpi,
+        save_path: str | None = None,
+        callback: Callable | None = None,
+        ax: Axes | None = None,
+    ) -> None:
+    """
+    군집분석 결과의 실루엣 플롯을 시각화함.
+
+    Args:
+        estimator (KMeans): 학습된 KMeans 군집 모델 객체.
+        data (DataFrame): 군집분석에 사용된 입력 데이터 (n_samples, n_features).
+        title (str, optional): 플롯 제목. None이면 자동 생성.
+        width (int, optional): 플롯 가로 크기 (inch 단위).
+        height (int, optional): 플롯 세로 크기 (inch 단위).
+        linewidth (float, optional): 기준선 등 선 두께.
+        dpi (int, optional): 플롯 해상도(DPI).
+        save_path (str, optional): 저장 경로 지정 시 파일로 저장.
+        callback (Callable, optional): 추가 커스텀 콜백 함수.
+        ax (Axes, optional): 기존 matplotlib Axes 객체. None이면 새로 생성.
+
+    Returns:
+        None
+
+    Note:
+        - 각 군집별 실루엣 계수 분포를 막대그래프로 시각화
+        - 군집 품질(응집도/분리도) 평가에 활용
+        - 붉은색 세로선은 전체 평균 실루엣 스코어를 의미
+    """
+
+    outparams = False
+    if ax is None:
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        outparams = True
+
+    sil_avg = silhouette_score(X=data, labels=estimator.labels_)
+    sil_values = silhouette_samples(X=data, labels=estimator.labels_)
+
+    y_lower = 10
+
+    # 클러스터링 갯수별로 fill_betweenx( )형태의 막대 그래프 표현.
+    for i in range(estimator.n_clusters):   # type: ignore
+        ith_cluster_sil_values = sil_values[estimator.labels_ == i] # type: ignore
+        ith_cluster_sil_values.sort()   # type: ignore
+
+        size_cluster_i = ith_cluster_sil_values.shape[0]    # type: ignore
+        y_upper = y_lower + size_cluster_i
+
+        ax.fill_betweenx(   # type: ignore
+            np.arange(y_lower, y_upper),
+            0,
+            ith_cluster_sil_values,
+            alpha=0.7,
+        )
+        ax.text(-0.05, y_lower + 0.5 * size_cluster_i, str(i))  # type: ignore
+        y_lower = y_upper + 10
+
+    ax.axvline(x=sil_avg, color="red", linestyle="--", linewidth=linewidth)  # type: ignore
+
+    ax.set_xlabel("The silhouette coefficient values")  # type: ignore
+    ax.set_ylabel("Cluster label")  # type: ignore
+    ax.set_xlim([-0.1, 1])  # type: ignore
+    ax.set_ylim([0, len(data) + (estimator.n_clusters + 1) * 10])  # type: ignore
+    ax.set_yticks([])  # type: ignore
+    ax.set_xticks([0, 0.2, 0.4, 0.6, 0.8, 1]) # type: ignore
+
+    if title is None:
+        title = "Number of Cluster : " + str(estimator.n_clusters) + ", Silhouette Score :" + str(round(sil_avg, 3))    # type: ignore
+
+    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+
+
+def cluster_plot(
+    estimator: KMeans,
+    data: DataFrame,
+    xname: str | None = None,
+    yname: str | None = None,
+    hue: str | None = None,
+    title: str | None = None,
+    palette: str | None = None,
+    outline: bool = False,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
+    save_path: str | None = None,
+    ax: Axes | None = None,
+) -> None:
+
+    """
+    2차원 공간에서 군집분석 결과를 산점도로 시각화함.
+
+    Args:
+        estimator (KMeans): 학습된 KMeans 군집 모델 객체.
+        data (DataFrame): 군집분석에 사용된 입력 데이터 (n_samples, n_features).
+        xname (str, optional): x축에 사용할 컬럼명. None이면 첫 번째 컬럼 사용.
+        yname (str, optional): y축에 사용할 컬럼명. None이면 두 번째 컬럼 사용.
+        hue (str, optional): 군집 구분에 사용할 컬럼명. None이면 'cluster' 자동 생성.
+        title (str, optional): 플롯 제목. None이면 기본값 사용.
+        palette (str, optional): 색상 팔레트.
+        outline (bool, optional): 외곽선 표시 여부.
+        width (int, optional): 플롯 가로 크기 (inch 단위).
+        height (int, optional): 플롯 세로 크기 (inch 단위).
+        linewidth (float, optional): 중심점 등 선 두께.
+        dpi (int, optional): 플롯 해상도(DPI).
+        save_path (str, optional): 저장 경로 지정 시 파일로 저장.
+        ax (Axes, optional): 기존 matplotlib Axes 객체. None이면 새로 생성.
+
+    Returns:
+        None
+
+    Example:
+        ```python
+        cluster_plot(estimator, data, xname='Sepal.Length', yname='Sepal.Width')
+        ```
+
+    Note:
+        - 각 군집별 산점도와 중심점(빨간색 원/숫자) 표시
+        - 2차원 특성 공간에서 군집 분포와 분리도 시각화
+    """
+    outparams = False
+    if ax is None:
+        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        outparams = True
+
+    df = data.copy()
+
+    if not hue:
+        df['cluster'] = estimator.labels_   # type: ignore
+        hue = 'cluster'
+
+    if xname is None:
+        xname = df.columns[0]   # type: ignore
+
+    if yname is None:
+        yname = df.columns[1]   # type: ignore
+
+    xindex = df.columns.get_loc(xname)   # type: ignore
+    yindex = df.columns.get_loc(yname)   # type: ignore
+
+    def callback(ax: Axes) -> None:
+        # 클러스터 중심점 표시
+        centers = estimator.cluster_centers_   # type: ignore
+        ax.scatter(    # type: ignore
+            centers[:, xindex],
+            centers[:, yindex],
+            marker="o",
+            color="white",
+            alpha=1,
+            s=200,
+            edgecolor="r",
+            linewidth=linewidth
+        )
+
+        for i, c in enumerate(centers):
+            ax.scatter(c[xindex], c[yindex], marker="$%d$" % i, alpha=1, s=50, edgecolor="k")
+
+        ax.set_xlabel("Feature space for the " + xname)
+        ax.set_ylabel("Feature space for the " + yname)
+
+    scatterplot(
+        df=df,
+        xname=xname,
+        yname=yname,
+        hue=hue,
+        title="The visualization of the clustered data." if title is None else title,
+        outline=outline,
+        palette=palette,
+        width=width,
+        height=height,
+        linewidth=linewidth,
+        dpi=dpi,
+        save_path=save_path,
+        callback=callback,
+        ax=ax
+    )
+
+def visualize_silhouette(estimator: KMeans, data: DataFrame) -> None:
+    """
+    군집분석 결과의 실루엣 플롯과 군집 산점도를 한 화면에 함께 시각화함.
+
+    Args:
+        estimator (KMeans): 학습된 KMeans 군집 모델 객체.
+        data (DataFrame): 군집분석에 사용된 입력 데이터 (n_samples, n_features).
+
+    Returns:
+        None
+
+    Note:
+        - 실루엣 플롯(왼쪽)과 2차원 군집 산점도(오른쪽)를 동시에 확인 가능
+        - 군집 품질과 분포를 한눈에 비교·분석할 때 유용
+    """
+    fig, ax = get_default_ax(rows=1, cols=2)
+
+    silhouette_plot(
+        estimator=estimator,
+        data=data,
+        ax=ax[0],
+    )
+
+    cluster_plot(
+        estimator=estimator,
+        data=data,
+        ax=ax[1],
+    )
+
+    finalize_plot(ax)

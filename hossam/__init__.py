@@ -8,6 +8,7 @@ from . import hs_timeserise
 from . import hs_util
 from .hs_util import load_info
 from .hs_util import _load_data_remote as load_data
+from .hs_plot import visualize_silhouette
 
 # py-modules
 import sys
@@ -24,7 +25,7 @@ except Exception:
 
 my_dpi = hs_plot.config.dpi
 
-__all__ = ["my_dpi", "load_data", "load_info", "hs_classroom", "hs_gis", "hs_plot", "hs_prep", "hs_stats", "hs_timeserise", "hs_util"]
+__all__ = ["my_dpi", "load_data", "load_info", "hs_classroom", "hs_gis", "hs_plot", "hs_prep", "hs_stats", "hs_timeserise", "hs_util", "visualize_silhouette"]
 
 # 내부 모듈에서 hs_fig를 사용할 때는 아래와 같이 import 하세요.
 # from hossam import hs_fig
