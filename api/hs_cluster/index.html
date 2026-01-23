@@ -12,13 +12,11 @@
         <meta name="author" content="HOSSAM">
       
       
-        <link rel="canonical" href="https://py.hossam.kr/api/hs_plot/">
+        <link rel="canonical" href="https://py.hossam.kr/api/hs_cluster/">
       
       
-        <link rel="prev" href="../hs_gis/">
+        <link rel="prev" href="../hs_timeserise/">
       
-      
-        <link rel="next" href="../hs_prep/">
       
       
         
@@ -29,7 +27,7 @@
     
     
       
-        <title>hossam.hs_plot - HOSSAM API Docs</title>
+        <title>hossam.hs_cluster - HOSSAM API Docs</title>
       
     
     
@@ -82,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#hossamhs_plot" class="md-skip">
+        <a href="#hossamhs_cluster" class="md-skip">
           콘텐츠로 이동
         </a>
       
@@ -116,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              hossam.hs_plot
+              hossam.hs_cluster
             
           </span>
         </div>
@@ -471,37 +469,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    hs_plot
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../hs_plot/" class="md-nav__link">
         
   
   
@@ -517,417 +488,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="목차">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      목차
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#hossam.hs_plot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        hs_plot
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="hs_plot">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.get_default_ax" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_default_ax
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.create_figure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        create_figure
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.finalize_plot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        finalize_plot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.show_figure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        show_figure
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.lineplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        lineplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.boxplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        boxplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.pvalue1_anotation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        pvalue1_anotation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.kdeplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        kdeplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.histplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        histplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.stackplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        stackplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.scatterplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        scatterplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.regplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        regplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.lmplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        lmplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.pairplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        pairplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.countplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        countplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.barplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        barplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.boxenplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        boxenplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.violinplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        violinplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.pointplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        pointplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.jointplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        jointplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.heatmap" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        heatmap
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.kde_confidence_interval" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        kde_confidence_interval
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.ols_residplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ols_residplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.ols_qqplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ols_qqplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.distribution_by_class" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        distribution_by_class
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.scatter_by_class" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        scatter_by_class
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.categorical_target_distribution" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        categorical_target_distribution
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.roc_curve_plot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        roc_curve_plot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.confusion_matrix_plot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        confusion_matrix_plot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.radarplot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        radarplot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.distribution_plot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        distribution_plot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.silhouette_plot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        silhouette_plot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.cluster_plot" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        cluster_plot
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.hs_plot.visualize_silhouette" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        visualize_silhouette
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1049,10 +609,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../hs_cluster/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hs_cluster
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1068,6 +655,428 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#hossam.hs_cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hs_cluster
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="hs_cluster">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.get_default_ax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_default_ax
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.create_figure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_figure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.finalize_plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        finalize_plot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.show_figure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        show_figure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.lineplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lineplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.boxplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        boxplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.pvalue1_anotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pvalue1_anotation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.kdeplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        kdeplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.histplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        histplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.stackplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        stackplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.scatterplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scatterplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.regplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        regplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.lmplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lmplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.pairplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pairplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.countplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        countplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.barplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        barplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.boxenplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        boxenplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.violinplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        violinplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.pointplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pointplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.jointplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        jointplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.heatmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        heatmap
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.kde_confidence_interval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        kde_confidence_interval
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.ols_residplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ols_residplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.ols_qqplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ols_qqplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.distribution_by_class" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        distribution_by_class
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.scatter_by_class" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scatter_by_class
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.categorical_target_distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        categorical_target_distribution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.roc_curve_plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        roc_curve_plot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.confusion_matrix_plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        confusion_matrix_plot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.radarplot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        radarplot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.distribution_plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        distribution_plot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.silhouette_plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        silhouette_plot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.cluster_plot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cluster_plot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.visualize_silhouette" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        visualize_silhouette
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.elbow_point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        elbow_point
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1107,19 +1116,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#hossam.hs_plot" class="md-nav__link">
+  <a href="#hossam.hs_cluster" class="md-nav__link">
     <span class="md-ellipsis">
       
-        hs_plot
+        hs_cluster
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="hs_plot">
+    <nav class="md-nav" aria-label="hs_cluster">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.get_default_ax" class="md-nav__link">
+  <a href="#hossam.hs_cluster.get_default_ax" class="md-nav__link">
     <span class="md-ellipsis">
       
         get_default_ax
@@ -1130,7 +1139,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.create_figure" class="md-nav__link">
+  <a href="#hossam.hs_cluster.create_figure" class="md-nav__link">
     <span class="md-ellipsis">
       
         create_figure
@@ -1141,7 +1150,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.finalize_plot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.finalize_plot" class="md-nav__link">
     <span class="md-ellipsis">
       
         finalize_plot
@@ -1152,7 +1161,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.show_figure" class="md-nav__link">
+  <a href="#hossam.hs_cluster.show_figure" class="md-nav__link">
     <span class="md-ellipsis">
       
         show_figure
@@ -1163,7 +1172,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.lineplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.lineplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         lineplot
@@ -1174,7 +1183,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.boxplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.boxplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         boxplot
@@ -1185,7 +1194,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.pvalue1_anotation" class="md-nav__link">
+  <a href="#hossam.hs_cluster.pvalue1_anotation" class="md-nav__link">
     <span class="md-ellipsis">
       
         pvalue1_anotation
@@ -1196,7 +1205,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.kdeplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.kdeplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         kdeplot
@@ -1207,7 +1216,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.histplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.histplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         histplot
@@ -1218,7 +1227,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.stackplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.stackplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         stackplot
@@ -1229,7 +1238,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.scatterplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.scatterplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         scatterplot
@@ -1240,7 +1249,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.regplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.regplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         regplot
@@ -1251,7 +1260,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.lmplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.lmplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         lmplot
@@ -1262,7 +1271,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.pairplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.pairplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         pairplot
@@ -1273,7 +1282,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.countplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.countplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         countplot
@@ -1284,7 +1293,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.barplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.barplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         barplot
@@ -1295,7 +1304,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.boxenplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.boxenplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         boxenplot
@@ -1306,7 +1315,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.violinplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.violinplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         violinplot
@@ -1317,7 +1326,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.pointplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.pointplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         pointplot
@@ -1328,7 +1337,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.jointplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.jointplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         jointplot
@@ -1339,7 +1348,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.heatmap" class="md-nav__link">
+  <a href="#hossam.hs_cluster.heatmap" class="md-nav__link">
     <span class="md-ellipsis">
       
         heatmap
@@ -1350,7 +1359,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.kde_confidence_interval" class="md-nav__link">
+  <a href="#hossam.hs_cluster.kde_confidence_interval" class="md-nav__link">
     <span class="md-ellipsis">
       
         kde_confidence_interval
@@ -1361,7 +1370,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.ols_residplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.ols_residplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         ols_residplot
@@ -1372,7 +1381,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.ols_qqplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.ols_qqplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         ols_qqplot
@@ -1383,7 +1392,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.distribution_by_class" class="md-nav__link">
+  <a href="#hossam.hs_cluster.distribution_by_class" class="md-nav__link">
     <span class="md-ellipsis">
       
         distribution_by_class
@@ -1394,7 +1403,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.scatter_by_class" class="md-nav__link">
+  <a href="#hossam.hs_cluster.scatter_by_class" class="md-nav__link">
     <span class="md-ellipsis">
       
         scatter_by_class
@@ -1405,7 +1414,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.categorical_target_distribution" class="md-nav__link">
+  <a href="#hossam.hs_cluster.categorical_target_distribution" class="md-nav__link">
     <span class="md-ellipsis">
       
         categorical_target_distribution
@@ -1416,7 +1425,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.roc_curve_plot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.roc_curve_plot" class="md-nav__link">
     <span class="md-ellipsis">
       
         roc_curve_plot
@@ -1427,7 +1436,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.confusion_matrix_plot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.confusion_matrix_plot" class="md-nav__link">
     <span class="md-ellipsis">
       
         confusion_matrix_plot
@@ -1438,7 +1447,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.radarplot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.radarplot" class="md-nav__link">
     <span class="md-ellipsis">
       
         radarplot
@@ -1449,7 +1458,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.distribution_plot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.distribution_plot" class="md-nav__link">
     <span class="md-ellipsis">
       
         distribution_plot
@@ -1460,7 +1469,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.silhouette_plot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.silhouette_plot" class="md-nav__link">
     <span class="md-ellipsis">
       
         silhouette_plot
@@ -1471,7 +1480,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.cluster_plot" class="md-nav__link">
+  <a href="#hossam.hs_cluster.cluster_plot" class="md-nav__link">
     <span class="md-ellipsis">
       
         cluster_plot
@@ -1482,10 +1491,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.hs_plot.visualize_silhouette" class="md-nav__link">
+  <a href="#hossam.hs_cluster.visualize_silhouette" class="md-nav__link">
     <span class="md-ellipsis">
       
         visualize_silhouette
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.elbow_point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        elbow_point
       
     </span>
   </a>
@@ -1514,18 +1534,18 @@
 
 
 
-<h1 id="hossamhs_plot">hossam.hs_plot<a class="headerlink" href="#hossamhs_plot" title="Permanent link">&para;</a></h1>
+<h1 id="hossamhs_cluster">hossam.hs_cluster<a class="headerlink" href="#hossamhs_cluster" title="Permanent link">&para;</a></h1>
 
 
 <div class="doc doc-object doc-module">
 
 
 
-<h2 id="hossam.hs_plot" class="doc doc-heading">
-            <span class="doc doc-object-name doc-module-name">hossam.hs_plot</span>
+<h2 id="hossam.hs_cluster" class="doc doc-heading">
+            <span class="doc doc-object-name doc-module-name">hossam.hs_cluster</span>
 
 
-<a href="#hossam.hs_plot" class="headerlink" title="Permanent link">&para;</a></h2>
+<a href="#hossam.hs_cluster" class="headerlink" title="Permanent link">&para;</a></h2>
 
     <div class="doc doc-contents first">
 
@@ -1552,11 +1572,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.get_default_ax" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.get_default_ax" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">get_default_ax</span>
 
 
-<a href="#hossam.hs_plot.get_default_ax" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.get_default_ax" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_default_ax</span><span class="p">(</span>
     <span class="n">width</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
     <span class="n">height</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
@@ -1866,11 +1886,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.create_figure" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.create_figure" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">create_figure</span>
 
 
-<a href="#hossam.hs_plot.create_figure" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.create_figure" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">create_figure</span><span class="p">(</span>
     <span class="n">width</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
     <span class="n">height</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
@@ -2118,11 +2138,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.finalize_plot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.finalize_plot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">finalize_plot</span>
 
 
-<a href="#hossam.hs_plot.finalize_plot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.finalize_plot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">finalize_plot</span><span class="p">(</span>
     <span class="n">ax</span><span class="p">,</span>
     <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -2347,11 +2367,11 @@
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.show_figure" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.show_figure" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">show_figure</span>
 
 
-<a href="#hossam.hs_plot.show_figure" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.show_figure" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">show_figure</span><span class="p">(</span>
     <span class="n">ax</span><span class="p">,</span>
     <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -2544,11 +2564,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.lineplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.lineplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">lineplot</span>
 
 
-<a href="#hossam.hs_plot.lineplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.lineplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">lineplot</span><span class="p">(</span>
     <span class="n">df</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">xname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -2988,11 +3008,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.boxplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.boxplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">boxplot</span>
 
 
-<a href="#hossam.hs_plot.boxplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.boxplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">boxplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">xname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -3521,11 +3541,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.pvalue1_anotation" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.pvalue1_anotation" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">pvalue1_anotation</span>
 
 
-<a href="#hossam.hs_plot.pvalue1_anotation" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.pvalue1_anotation" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">pvalue1_anotation</span><span class="p">(</span>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">target</span><span class="p">,</span>
@@ -3643,11 +3663,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.kdeplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.kdeplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">kdeplot</span>
 
 
-<a href="#hossam.hs_plot.kdeplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.kdeplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">kdeplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">xname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -4235,11 +4255,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.histplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.histplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">histplot</span>
 
 
-<a href="#hossam.hs_plot.histplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.histplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">histplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">,</span>
@@ -4697,11 +4717,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.stackplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.stackplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">stackplot</span>
 
 
-<a href="#hossam.hs_plot.stackplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.stackplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">stackplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">,</span>
@@ -5125,11 +5145,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.scatterplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.scatterplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">scatterplot</span>
 
 
-<a href="#hossam.hs_plot.scatterplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.scatterplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">scatterplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">,</span>
@@ -5666,11 +5686,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.regplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.regplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">regplot</span>
 
 
-<a href="#hossam.hs_plot.regplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.regplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">regplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">,</span>
@@ -6068,11 +6088,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.lmplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.lmplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">lmplot</span>
 
 
-<a href="#hossam.hs_plot.lmplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.lmplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">lmplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">,</span>
@@ -6457,11 +6477,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.pairplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.pairplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">pairplot</span>
 
 
-<a href="#hossam.hs_plot.pairplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.pairplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">pairplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">xnames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -6900,11 +6920,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.countplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.countplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">countplot</span>
 
 
-<a href="#hossam.hs_plot.countplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.countplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">countplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">,</span>
@@ -7321,11 +7341,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.barplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.barplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">barplot</span>
 
 
-<a href="#hossam.hs_plot.barplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.barplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">barplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">,</span>
@@ -7726,11 +7746,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.boxenplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.boxenplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">boxenplot</span>
 
 
-<a href="#hossam.hs_plot.boxenplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.boxenplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">boxenplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">,</span>
@@ -8127,11 +8147,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.violinplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.violinplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">violinplot</span>
 
 
-<a href="#hossam.hs_plot.violinplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.violinplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">violinplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">,</span>
@@ -8526,11 +8546,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.pointplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.pointplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">pointplot</span>
 
 
-<a href="#hossam.hs_plot.pointplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.pointplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">pointplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">,</span>
@@ -8929,11 +8949,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.jointplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.jointplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">jointplot</span>
 
 
-<a href="#hossam.hs_plot.jointplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.jointplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">jointplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">,</span>
@@ -9310,11 +9330,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.heatmap" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.heatmap" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">heatmap</span>
 
 
-<a href="#hossam.hs_plot.heatmap" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.heatmap" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">heatmap</span><span class="p">(</span>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -9654,11 +9674,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.kde_confidence_interval" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.kde_confidence_interval" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">kde_confidence_interval</span>
 
 
-<a href="#hossam.hs_plot.kde_confidence_interval" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.kde_confidence_interval" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">kde_confidence_interval</span><span class="p">(</span>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">xnames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -10124,11 +10144,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.ols_residplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.ols_residplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">ols_residplot</span>
 
 
-<a href="#hossam.hs_plot.ols_residplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.ols_residplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">ols_residplot</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -10645,11 +10665,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.ols_qqplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.ols_qqplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">ols_qqplot</span>
 
 
-<a href="#hossam.hs_plot.ols_qqplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.ols_qqplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">ols_qqplot</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -11078,11 +11098,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.distribution_by_class" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.distribution_by_class" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">distribution_by_class</span>
 
 
-<a href="#hossam.hs_plot.distribution_by_class" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.distribution_by_class" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">distribution_by_class</span><span class="p">(</span>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -11552,11 +11572,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.scatter_by_class" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.scatter_by_class" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">scatter_by_class</span>
 
 
-<a href="#hossam.hs_plot.scatter_by_class" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.scatter_by_class" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">scatter_by_class</span><span class="p">(</span>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">,</span>
@@ -11941,11 +11961,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.categorical_target_distribution" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.categorical_target_distribution" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">categorical_target_distribution</span>
 
 
-<a href="#hossam.hs_plot.categorical_target_distribution" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.categorical_target_distribution" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">categorical_target_distribution</span><span class="p">(</span>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">,</span>
@@ -12389,11 +12409,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.roc_curve_plot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.roc_curve_plot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">roc_curve_plot</span>
 
 
-<a href="#hossam.hs_plot.roc_curve_plot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.roc_curve_plot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">roc_curve_plot</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">,</span>
     <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -12763,11 +12783,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.confusion_matrix_plot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.confusion_matrix_plot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">confusion_matrix_plot</span>
 
 
-<a href="#hossam.hs_plot.confusion_matrix_plot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.confusion_matrix_plot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">confusion_matrix_plot</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -13055,11 +13075,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.radarplot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.radarplot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">radarplot</span>
 
 
-<a href="#hossam.hs_plot.radarplot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.radarplot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">radarplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span>
     <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -13626,11 +13646,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.distribution_plot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.distribution_plot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">distribution_plot</span>
 
 
-<a href="#hossam.hs_plot.distribution_plot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.distribution_plot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">distribution_plot</span><span class="p">(</span>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">column</span><span class="p">,</span>
@@ -14127,11 +14147,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.silhouette_plot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.silhouette_plot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">silhouette_plot</span>
 
 
-<a href="#hossam.hs_plot.silhouette_plot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.silhouette_plot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">silhouette_plot</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">,</span>
     <span class="n">data</span><span class="p">,</span>
@@ -14520,11 +14540,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.cluster_plot" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.cluster_plot" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">cluster_plot</span>
 
 
-<a href="#hossam.hs_plot.cluster_plot" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.cluster_plot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">cluster_plot</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">,</span>
     <span class="n">data</span><span class="p">,</span>
@@ -15042,11 +15062,11 @@ finalize_plot의 래퍼 함수.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.hs_plot.visualize_silhouette" class="doc doc-heading">
+<h3 id="hossam.hs_cluster.visualize_silhouette" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">visualize_silhouette</span>
 
 
-<a href="#hossam.hs_plot.visualize_silhouette" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#hossam.hs_cluster.visualize_silhouette" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">visualize_silhouette</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </code></pre></div>
 
@@ -15194,6 +15214,548 @@ finalize_plot의 래퍼 함수.</p>
     <span class="p">)</span>
 
     <span class="n">finalize_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.hs_cluster.elbow_point" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">elbow_point</span>
+
+
+<a href="#hossam.hs_cluster.elbow_point" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">elbow_point</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="nb">dir</span><span class="o">=</span><span class="s2">&quot;left,down&quot;</span><span class="p">,</span>
+    <span class="n">S</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">marker</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+    <span class="n">dpi</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">,</span>
+    <span class="n">linewidth</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">line_width</span><span class="p">,</span>
+    <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">params</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>엘보우(Elbow) 포인트를 자동으로 탐지하는 함수.</p>
+<p>주어진 x, y 값의 곡선에서 KneeLocator를 활용해 엘보우(혹은 니) 포인트를 탐지하고, 필요시 시각화까지 지원함.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>x</code>
+            </td>
+            <td>
+                  <code><span title="hossam.hs_plot.Series">Series</span> | <span title="hossam.hs_plot.np.ndarray">ndarray</span> | <span title="list">list</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>x축 값(일반적으로 K값 등).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>y</code>
+            </td>
+            <td>
+                  <code><span title="hossam.hs_plot.Series">Series</span> | <span title="hossam.hs_plot.np.ndarray">ndarray</span> | <span title="list">list</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>y축 값(일반적으로 inertia, SSE 등).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>dir</code>
+            </td>
+            <td>
+                  <code><span title="typing.Literal">Literal</span>[&#39;left,down&#39;, &#39;left,up&#39;, &#39;right,down&#39;, &#39;right,up&#39;]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>곡선의 방향 및 형태 지정. 기본값은 "left,down".
+- "left,down": 왼쪽에서 오른쪽으로 감소(볼록)
+- "left,up": 왼쪽에서 오른쪽으로 증가(오목)
+- "right,down": 오른쪽에서 왼쪽으로 감소(볼록)
+- "right,up": 오른쪽에서 왼쪽으로 증가(오목)</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;left,down&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>S</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>KneeLocator의 민감도 파라미터. 기본값 0.1.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>plot</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True면 결과를 시각화함. 기본값 True.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>title</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>플롯 제목.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>marker</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>마커 스타일.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>width</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>플롯 가로 크기.</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="hossam.hs_plot.config.width">width</span></code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>height</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>플롯 세로 크기.</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="hossam.hs_plot.config.height">height</span></code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>dpi</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>플롯 해상도.</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="hossam.hs_plot.config.dpi">dpi</span></code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>linewidth</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>선 두께.</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="hossam.hs_plot.config.line_width">line_width</span></code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>save_path</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>저장 경로 지정시 파일로 저장.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ax</code>
+            </td>
+            <td>
+                  <code><span title="hossam.hs_plot.Axes">Axes</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>기존 matplotlib Axes 객체. None이면 새로 생성.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>**params</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>lineplot에 전달할 추가 파라미터.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>tuple</code></td>            <td>
+                  <code><span title="tuple">tuple</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>(best_x, best_y)
+- best_x: 엘보우 포인트의 x값(예: 최적 K)
+- best_y: 엘보우 포인트의 y값</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">44</span><span class="p">,</span> <span class="mi">43</span><span class="p">]</span>
+<span class="n">elbow_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</code></pre></div>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <ul>
+<li>KneeLocator는 kneed 패키지의 클래스로, 곡선의 형태(curve)와 방향(direction)에 따라 엘보우 포인트를 탐지함.</li>
+<li>dir 파라미터에 따라 curve/direction이 자동 지정됨.</li>
+<li>plot=True일 때, 엘보우 포인트에 수직/수평선과 텍스트가 표시됨.</li>
+</ul>
+</details>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/hs_cluster.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">  7</span>
+<span class="normal">  8</span>
+<span class="normal">  9</span>
+<span class="normal"> 10</span>
+<span class="normal"> 11</span>
+<span class="normal"> 12</span>
+<span class="normal"> 13</span>
+<span class="normal"> 14</span>
+<span class="normal"> 15</span>
+<span class="normal"> 16</span>
+<span class="normal"> 17</span>
+<span class="normal"> 18</span>
+<span class="normal"> 19</span>
+<span class="normal"> 20</span>
+<span class="normal"> 21</span>
+<span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
+<span class="normal"> 26</span>
+<span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
+<span class="normal"> 36</span>
+<span class="normal"> 37</span>
+<span class="normal"> 38</span>
+<span class="normal"> 39</span>
+<span class="normal"> 40</span>
+<span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">elbow_point</span><span class="p">(</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">Series</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">:</span> <span class="n">Series</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="nb">dir</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;left,down&quot;</span><span class="p">,</span> <span class="s2">&quot;left,up&quot;</span><span class="p">,</span> <span class="s2">&quot;right,down&quot;</span><span class="p">,</span> <span class="s2">&quot;right,up&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;left,down&quot;</span><span class="p">,</span>
+        <span class="n">S</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">marker</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+        <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">,</span>
+        <span class="n">linewidth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">line_width</span><span class="p">,</span>
+        <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ax</span><span class="p">:</span> <span class="n">Axes</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">params</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    엘보우(Elbow) 포인트를 자동으로 탐지하는 함수.</span>
+
+<span class="sd">    주어진 x, y 값의 곡선에서 KneeLocator를 활용해 엘보우(혹은 니) 포인트를 탐지하고, 필요시 시각화까지 지원함.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (Series | np.ndarray | list): x축 값(일반적으로 K값 등).</span>
+<span class="sd">        y (Series | np.ndarray | list): y축 값(일반적으로 inertia, SSE 등).</span>
+<span class="sd">        dir (Literal[&quot;left,down&quot;, &quot;left,up&quot;, &quot;right,down&quot;, &quot;right,up&quot;], optional):</span>
+<span class="sd">            곡선의 방향 및 형태 지정. 기본값은 &quot;left,down&quot;.</span>
+<span class="sd">            - &quot;left,down&quot;: 왼쪽에서 오른쪽으로 감소(볼록)</span>
+<span class="sd">            - &quot;left,up&quot;: 왼쪽에서 오른쪽으로 증가(오목)</span>
+<span class="sd">            - &quot;right,down&quot;: 오른쪽에서 왼쪽으로 감소(볼록)</span>
+<span class="sd">            - &quot;right,up&quot;: 오른쪽에서 왼쪽으로 증가(오목)</span>
+<span class="sd">        S (float, optional): KneeLocator의 민감도 파라미터. 기본값 0.1.</span>
+<span class="sd">        plot (bool, optional): True면 결과를 시각화함. 기본값 True.</span>
+<span class="sd">        title (str, optional): 플롯 제목.</span>
+<span class="sd">        marker (str, optional): 마커 스타일.</span>
+<span class="sd">        width (int, optional): 플롯 가로 크기.</span>
+<span class="sd">        height (int, optional): 플롯 세로 크기.</span>
+<span class="sd">        dpi (int, optional): 플롯 해상도.</span>
+<span class="sd">        linewidth (int, optional): 선 두께.</span>
+<span class="sd">        save_path (str | None, optional): 저장 경로 지정시 파일로 저장.</span>
+<span class="sd">        ax (Axes | None, optional): 기존 matplotlib Axes 객체. None이면 새로 생성.</span>
+<span class="sd">        **params: lineplot에 전달할 추가 파라미터.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: (best_x, best_y)</span>
+<span class="sd">            - best_x: 엘보우 포인트의 x값(예: 최적 K)</span>
+<span class="sd">            - best_y: 엘보우 포인트의 y값</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        ```python</span>
+<span class="sd">        x = [1, 2, 3, 4, 5, 6]</span>
+<span class="sd">        y = [100, 80, 60, 45, 44, 43]</span>
+<span class="sd">        elbow_point(x, y)</span>
+<span class="sd">        ```</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        - KneeLocator는 kneed 패키지의 클래스로, 곡선의 형태(curve)와 방향(direction)에 따라 엘보우 포인트를 탐지함.</span>
+<span class="sd">        - dir 파라미터에 따라 curve/direction이 자동 지정됨.</span>
+<span class="sd">        - plot=True일 때, 엘보우 포인트에 수직/수평선과 텍스트가 표시됨.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">dir</span> <span class="o">==</span> <span class="s2">&quot;left,down&quot;</span><span class="p">:</span>
+        <span class="n">curve</span> <span class="o">=</span> <span class="s2">&quot;convex&quot;</span>
+        <span class="n">direction</span> <span class="o">=</span> <span class="s2">&quot;decreasing&quot;</span>
+    <span class="k">elif</span> <span class="nb">dir</span> <span class="o">==</span> <span class="s2">&quot;left,up&quot;</span><span class="p">:</span>
+        <span class="n">curve</span> <span class="o">=</span> <span class="s2">&quot;concave&quot;</span>
+        <span class="n">direction</span> <span class="o">=</span> <span class="s2">&quot;increasing&quot;</span>
+    <span class="k">elif</span> <span class="nb">dir</span> <span class="o">==</span> <span class="s2">&quot;right,down&quot;</span><span class="p">:</span>
+        <span class="n">curve</span> <span class="o">=</span> <span class="s2">&quot;convex&quot;</span>
+        <span class="n">direction</span> <span class="o">=</span> <span class="s2">&quot;increasing&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">curve</span> <span class="o">=</span> <span class="s2">&quot;concave&quot;</span>
+        <span class="n">direction</span> <span class="o">=</span> <span class="s2">&quot;decreasing&quot;</span>
+
+    <span class="n">kn</span> <span class="o">=</span> <span class="n">KneeLocator</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">curve</span><span class="o">=</span><span class="n">curve</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">direction</span><span class="p">,</span> <span class="n">S</span><span class="o">=</span><span class="n">S</span><span class="p">)</span>
+
+    <span class="n">best_x</span> <span class="o">=</span> <span class="n">kn</span><span class="o">.</span><span class="n">elbow</span>
+    <span class="n">best_y</span> <span class="o">=</span> <span class="n">kn</span><span class="o">.</span><span class="n">elbow_y</span>
+
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">hvline</span><span class="p">(</span><span class="n">ax</span><span class="p">):</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">best_x</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">best_y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                <span class="n">best_x</span> <span class="o">+</span> <span class="mf">0.1</span><span class="p">,</span>
+                <span class="n">best_y</span> <span class="o">+</span> <span class="mf">0.1</span><span class="p">,</span>
+                <span class="s2">&quot;Best K=</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">best_x</span><span class="p">,</span>
+                <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span>
+                <span class="n">va</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">lineplot</span><span class="p">(</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">xname</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span>
+                <span class="n">yname</span> <span class="o">=</span> <span class="n">y</span><span class="p">,</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="n">title</span><span class="p">,</span>
+                <span class="n">marker</span> <span class="o">=</span> <span class="n">marker</span><span class="p">,</span>
+                <span class="n">width</span> <span class="o">=</span> <span class="n">width</span><span class="p">,</span>
+                <span class="n">height</span> <span class="o">=</span> <span class="n">height</span><span class="p">,</span>
+                <span class="n">linewidth</span> <span class="o">=</span> <span class="n">linewidth</span><span class="p">,</span>
+                <span class="n">dpi</span> <span class="o">=</span> <span class="n">dpi</span><span class="p">,</span>
+                <span class="n">save_path</span> <span class="o">=</span> <span class="n">save_path</span><span class="p">,</span>
+                <span class="n">callback</span> <span class="o">=</span> <span class="n">hvline</span><span class="p">,</span>
+                <span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">params</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">best_x</span><span class="p">,</span> <span class="n">best_y</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
