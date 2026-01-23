@@ -85,3 +85,4 @@ nav:
       - hs_stats: api/hs_stats.md
       - hs_util: api/hs_util.md
       - hs_timeserise: api/hs_timeserise.md
+      - hs_cluster: api/hs_cluster.md

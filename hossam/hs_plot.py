@@ -5,10 +5,10 @@ from typing import Callable
 
 # ===================================================================
 import numpy as np
-import pandas as pd
 import seaborn as sb
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import Axes # type: ignore
+from pandas import Series, DataFrame
 from math import sqrt
 from pandas import DataFrame
 
@@ -200,9 +200,9 @@ def show_figure(ax: Axes | np.ndarray, callback: Callable | None = None, outpara
 # 선 그래프를 그린다
 # ===================================================================
 def lineplot(
-    df: DataFrame,
-    xname: str | None = None,
-    yname: str | None = None,
+    df: DataFrame | None = None,
+    xname: str | Series | np.ndarray | list | None = None,
+    yname: str | Series | np.ndarray | list | None = None,
     hue: str | None = None,
     title: str | None = None,
     marker: str | None = None,
@@ -219,13 +219,13 @@ def lineplot(
     """선 그래프를 그린다.
 
     Args:
-        df (DataFrame): 시각화할 데이터.
-        xname (str|None): x축 컬럼명.
-        yname (str|None): y축 컬럼명.
-        hue (str|None): 범주 구분 컬럼명.
-        title (str|None): 그래프 제목.
-        marker (str|None): 마커 모양.
-        palette (str|None): 팔레트 이름.
+        df (DataFrame | None): 시각화할 데이터.
+        xname (str | Series | np.ndarray | list | None): x축 컬럼명 혹은 x축 값 시퀀스.
+        yname (str | Series | np.ndarray | list | None): y축 컬럼명 혹은 y축 값 시퀀스.
+        hue (str | None): 범주 구분 컬럼명.
+        title (str | None): 그래프 제목.
+        marker (str | None): 마커 모양.
+        palette (str | None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
@@ -2122,8 +2122,8 @@ def categorical_target_distribution(
 # ===================================================================
 def roc_curve_plot(
     fit,
-    y: np.ndarray | pd.Series | None = None,
-    X: pd.DataFrame | np.ndarray | None = None,
+    y: np.ndarray | Series | None = None,
+    X: DataFrame | np.ndarray | None = None,
     title: str | None = None,
     width: int = config.height,
     height: int = config.height,
@@ -2450,7 +2450,7 @@ def distribution_plot(
             if hue not in data.columns:
                 raise ValueError(f"hue column '{hue}' not found in DataFrame")
 
-            categories = list(pd.Series(data[hue].dropna().unique()).sort_values())
+            categories = list(Series(data[hue].dropna().unique()).sort_values())
             n_cat = len(categories) if categories else 1
 
             fig, axes = get_default_ax(width, height, rows=n_cat, cols=2, dpi=dpi, title=title)

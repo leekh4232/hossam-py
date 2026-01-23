@@ -17,9 +17,9 @@ title: 🎓 Hossam Data Helper
 
 - 📊 **풍부한 시각화**: 25+ 시각화 함수 (Seaborn/Matplotlib 기반)
 - 🎯 **통계 분석**: 회귀, 분류, 시계열 분석 도구
+- 🤖 **머신 러닝**: 예측, 분류, 군집 학습 모델 구축 및 성능 평가
 - 📦 **샘플 데이터**: 학습용 데이터셋 즉시 로드
 - 🔧 **데이터 전처리**: 결측치 처리, 이상치 탐지, 스케일링
-- 🤖 **MCP 서버**: VSCode/Copilot과 통합 가능한 Model Context Protocol 지원
 - 📈 **교육용 최적화**: 데이터 분석 교육에 특화된 설계
 
 
@@ -43,6 +43,8 @@ pip install hossam
 - **hs_timeserise**: 시계열 분석 기능 지원
 - **hs_gis**: GIS 데이터 로드 및 시각화 (대한민국 지도 지원)
 - **hs_util**: 예쁜 테이블 출력, 그리드 서치 등
+- **hs_cluster**: 군집분석, PCA 등 (작업중)
+- **hs_ml**: 예측, 분류 분석 (예정)
 
 자세한 사용법은 [API 문서](https://py.hossam.kr/api/hossam/)를 참고하세요.
 
