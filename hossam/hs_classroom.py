@@ -8,8 +8,8 @@ from kmodes.kmodes import KModes
 from matplotlib import pyplot as plt
 import seaborn as sns
 from .hs_util import load_data, pretty_table
-from . import hs_plot
 from .hs_plot import config
+from . import hs_plot
 
 # ===================================================================
 # 학생들을 관심사와 성적으로 균형잡힌 조로 편성한다

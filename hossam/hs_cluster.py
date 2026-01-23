@@ -2,7 +2,10 @@ from typing import Literal
 from kneed import KneeLocator
 from pandas import Series
 from matplotlib.pyplot import Axes # type: ignore
-from .hs_plot import *
+
+from . import hs_plot
+
+import numpy as np
 
 def elbow_point(
         x: Series | np.ndarray | list,
@@ -12,10 +15,10 @@ def elbow_point(
         plot: bool = True,
         title: str = None,
         marker: str = None,
-        width: int = config.width,
-        height: int = config.height,
-        dpi: int = config.dpi,
-        linewidth: int = config.line_width,
+        width: int = hs_plot.config.width,
+        height: int = hs_plot.config.height,
+        dpi: int = hs_plot.config.dpi,
+        linewidth: int = hs_plot.config.line_width,
         save_path: str | None = None,
         ax: Axes | None = None,
         **params,
@@ -97,7 +100,7 @@ def elbow_point(
                 color="r",
             )
 
-        lineplot(
+        hs_plot.lineplot(
                 df = None,
                 xname = x,
                 yname = y,
