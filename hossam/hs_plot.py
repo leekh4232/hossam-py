@@ -712,7 +712,7 @@ def scatterplot(
     xname: str,
     yname: str,
     hue=None,
-    hue_outlier: bool | int = False,
+    vector: str | None = None,
     outline: bool = False,
     title: str | None = None,
     palette: str | None = None,
@@ -732,7 +732,7 @@ def scatterplot(
         xname (str): x축 컬럼.
         yname (str): y축 컬럼.
         hue (str|None): 범주 컬럼.
-        hue_outlier (bool|int): 이상치 표시 여부. False면 처리 안함, 숫자면 해당 값에 해당하는 데이터를 이상치로 여기고 X로 표시함
+        vector (str|None): 벡터 종류 컬럼.
         outline (bool): 점 외곽선 표시 여부.
         title (str|None): 그래프 제목.
         palette (str|None): 팔레트 이름.
@@ -777,23 +777,8 @@ def scatterplot(
             except:
                 pass
 
-    outlier_df = None
-    target_df = None
-
-    # 이상치(outlier)가 전달되지 않은 경우에는 원본 데이터를 그대로 사용
-    if hue_outlier is False:
-        target_df = df
-
-    # 이상치가 전달된 경우에는 이상치를 제외한 데이터로 산점도 그림
-    elif isinstance(hue_outlier, int):
-        target_df = df[df[hue] != hue_outlier]
-
-        # 이상치 데이터만 별도로 추출
-        outlier_df = df[df[hue] == hue_outlier]
-
     # hue가 있을 때만 palette 사용, 없으면 color 사용
     scatterplot_kwargs = {
-        "data": target_df,
         "x": xname,
         "y": yname,
         "hue": hue,
@@ -808,21 +793,30 @@ def scatterplot(
 
     scatterplot_kwargs.update(params)
 
-    sb.scatterplot(**scatterplot_kwargs)
+    # 백터 종류 구분 필드가 전달되지 않은 경우에는 원본 데이터를 그대로 사용
+    if vector is None:
+        sb.scatterplot(data=df, **scatterplot_kwargs)
+    else:
+        # 핵심벡터
+        scatterplot_kwargs['edgecolor'] = '#ffffff'
+        sb.scatterplot(data=df[df[vector] == "core"], **scatterplot_kwargs)
 
-    # 이상치가 있는 경우 별도로 표시
-    if outlier_df is not None and not outlier_df.empty:
-        sb.scatterplot(
-            data=outlier_df,
-            x=xname,
-            y=yname,
-            color="red",
-            marker="X",
-            s=50,
-            edgecolor="black",
-            linewidth=linewidth/2,
-            ax=ax,
-        )
+        # 외곽백터
+        scatterplot_kwargs['edgecolor'] = '#000000'
+        scatterplot_kwargs['s'] = 25
+        scatterplot_kwargs['marker'] = '^'
+        scatterplot_kwargs['linewidth'] = 0.8
+        sb.scatterplot(data=df[df[vector] == "border"], **scatterplot_kwargs)
+
+        # 노이즈벡터
+        scatterplot_kwargs['edgecolor'] = None
+        scatterplot_kwargs['s'] = 25
+        scatterplot_kwargs['marker'] = 'x'
+        scatterplot_kwargs['linewidth'] = 2
+        scatterplot_kwargs['color'] = '#ff0000'
+        scatterplot_kwargs['hue'] = None
+        sb.scatterplot(data=df[df[vector] == "noise"], **scatterplot_kwargs)
+
 
     finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
 

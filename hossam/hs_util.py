@@ -2,6 +2,10 @@
 # -------------------------------------------------------------
 import requests
 import json
+import tempfile
+import zipfile
+import shutil
+from pathlib import Path
 from typing import TYPE_CHECKING
 from importlib.metadata import distributions
 import pandas as pd
@@ -20,6 +24,42 @@ BASE_URL = "https://data.hossam.kr"
 def __get_df(path: str, index_col=None) -> DataFrame:
     p = path.rfind(".")
     exec = path[p+1:].lower()
+
+    # 파일 확장자가 압축파일인 경우 로컬에 파일을 다운로드 후 압축 해제
+    if exec == "zip":
+        tmp_dir = Path(tempfile.mkdtemp())
+        zip_path = tmp_dir / "data.zip"
+
+        # 원격 URL인 경우 파일 다운로드
+        if path.lower().startswith(('http://', 'https://')):
+            path = path.replace("\\", "/")
+            with requests.Session() as session:
+                r = session.get(path)
+
+                if r.status_code != 200:
+                    raise Exception(f"HTTP {r.status_code} Error - {r.reason} > {path}")
+
+                with open(zip_path, "wb") as f:
+                    f.write(r.content)
+        else:
+            zip_path = Path(path)
+
+        # 압축 해제
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(tmp_dir)
+
+        # 압축 해제된 파일 중 첫 번째 파일을 데이터로 로드
+        extracted_files = list(tmp_dir.glob('*'))
+        if not extracted_files:
+            raise FileNotFoundError("압축 파일 내에 데이터 파일이 없습니다.")
+
+        path = str(extracted_files[0])
+        p = path.rfind(".")
+        exec = path[p+1:].lower()
+
+        # 생성된 임시 디렉토리 삭제
+        shutil.rmtree(tmp_dir)
+
 
     if exec == 'xlsx':
         # If path is a remote URL, fetch the file once and reuse the bytes
