@@ -1,3 +1,6 @@
+import importlib.metadata
+import requests
+
 # submodules
 from . import hs_classroom
 from . import hs_gis
@@ -28,8 +31,26 @@ my_dpi = hs_plot.config.dpi
 
 __all__ = ["my_dpi", "load_data", "load_info", "hs_classroom", "hs_gis", "hs_plot", "hs_prep", "hs_stats", "hs_timeserise", "hs_util", "hs_cluster", "visualize_silhouette"]
 
-# 내부 모듈에서 hs_fig를 사용할 때는 아래와 같이 import 하세요.
-# from hossam import hs_fig
+
+def check_pypi_latest(package_name: str):
+    # 설치된 버전
+    installed = importlib.metadata.version(package_name)
+
+    try:
+        # PyPI 최신 버전
+        url = f"https://pypi.org/pypi/{package_name}/json"
+        resp = requests.get(url, timeout=5)
+        resp.raise_for_status()
+        latest = resp.json()["info"]["version"]
+    except Exception:
+        latest = None
+
+    return {
+        "package": package_name,
+        "installed": installed,
+        "latest": latest,
+        "outdated": installed != latest
+    }
 
 
 def _init_korean_font():
@@ -69,6 +90,17 @@ def _init_korean_font():
 
 
 def _init():
+
+    version_info = check_pypi_latest("hossam")
+
+    if version_info["outdated"]:
+        print(
+            f"\n⚠️  'hossam' 패키지의 최신 버전이 출시되었습니다! (설치된 버전: {version_info['installed']}, 최신 버전: {version_info['latest']})"
+        )
+        print("   최신 버전으로 업데이트하려면 다음 명령어를 실행하세요:")
+        print("   pip install --upgrade hossam\n")
+
+        raise Warning("hossam 패키지가 최신 버전이 아닙니다.")
 
     # 안내 메시지 (블릿 리스트)
     messages = [
