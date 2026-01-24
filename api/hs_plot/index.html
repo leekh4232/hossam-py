@@ -10675,7 +10675,7 @@ finalize_plot의 래퍼 함수.</p>
     <span class="c1"># LOWESS 스무딩 (선택적)</span>
     <span class="k">if</span> <span class="n">lowess</span><span class="p">:</span>
         <span class="n">lowess_result</span> <span class="o">=</span> <span class="n">sm_lowess</span><span class="p">(</span><span class="n">resid</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mf">0.6667</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>    <span class="c1"># type: ignore</span>
             <span class="n">lowess_result</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
             <span class="n">lowess_result</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>  <span class="c1"># type: ignore</span>
             <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span>
@@ -14656,8 +14656,8 @@ finalize_plot의 래퍼 함수.</p>
 
 <a href="#hossam.hs_plot.cluster_plot" class="headerlink" title="Permanent link">&para;</a></h3>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">cluster_plot</span><span class="p">(</span>
-    <span class="n">estimator</span><span class="p">,</span>
-    <span class="n">data</span><span class="p">,</span>
+    <span class="n">estimator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">xname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">yname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">hue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -14702,7 +14702,7 @@ finalize_plot의 래퍼 함수.</p>
               </div>
             </td>
             <td>
-                <em>required</em>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -14718,7 +14718,7 @@ finalize_plot의 래퍼 함수.</p>
               </div>
             </td>
             <td>
-                <em>required</em>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -15061,8 +15061,8 @@ finalize_plot의 래퍼 함수.</p>
 <span class="normal">2741</span>
 <span class="normal">2742</span>
 <span class="normal">2743</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cluster_plot</span><span class="p">(</span>
-    <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span><span class="p">,</span>
-    <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hue</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -15112,7 +15112,7 @@ finalize_plot의 래퍼 함수.</p>
         <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">get_default_ax</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dpi</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
         <span class="n">outparams</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>  <span class="c1"># type: ignore</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">hue</span><span class="p">:</span>
         <span class="n">df</span><span class="p">[</span><span class="s2">&quot;cluster&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">labels_</span>  <span class="c1"># type: ignore</span>
@@ -15150,7 +15150,7 @@ finalize_plot의 래퍼 함수.</p>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Feature space for the &quot;</span> <span class="o">+</span> <span class="n">yname</span><span class="p">)</span>
 
     <span class="n">scatterplot</span><span class="p">(</span>
-        <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+        <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>          <span class="c1"># type: ignore</span>
         <span class="n">xname</span><span class="o">=</span><span class="n">xname</span><span class="p">,</span>
         <span class="n">yname</span><span class="o">=</span><span class="n">yname</span><span class="p">,</span>
         <span class="n">hue</span><span class="o">=</span><span class="n">hue</span><span class="p">,</span>
