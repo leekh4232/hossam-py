@@ -10,6 +10,7 @@ from . import hs_stats
 from . import hs_timeserise
 from . import hs_util
 from . import hs_cluster
+from . import hs_study
 from .hs_util import load_info
 from .hs_util import _load_data_remote as load_data
 from .hs_plot import visualize_silhouette
@@ -17,6 +18,7 @@ from .hs_plot import visualize_silhouette
 # py-modules
 import sys
 import warnings
+import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib import font_manager as fm
 from importlib.resources import files, as_file
@@ -29,7 +31,7 @@ except Exception:
 
 my_dpi = hs_plot.config.dpi
 
-__all__ = ["my_dpi", "load_data", "load_info", "hs_classroom", "hs_gis", "hs_plot", "hs_prep", "hs_stats", "hs_timeserise", "hs_util", "hs_cluster", "visualize_silhouette"]
+__all__ = ["my_dpi", "load_data", "load_info", "hs_classroom", "hs_gis", "hs_plot", "hs_prep", "hs_stats", "hs_timeserise", "hs_util", "hs_cluster", "hs_study", "visualize_silhouette"]
 
 
 def check_pypi_latest(package_name: str):
@@ -80,27 +82,16 @@ def _init_korean_font():
                 "pdf.fonttype": 42,
                 "ps.fonttype": 42,
             })
-            if sys.stdout.isatty():
-                print(
-                    "\n✅ 시각화를 위한 한글 글꼴(NotoSansKR-Regular)이 자동 적용되었습니다."
-                )
+
+            print(
+                "\n✅ 시각화를 위한 한글 글꼴(NotoSansKR-Regular)이 자동 적용되었습니다."
+            )
             return
     except Exception as e:
         warnings.warn(f"\n한글 폰트 초기화: 패키지 폰트 사용 실패 ({e}).")
 
 
 def _init():
-
-    version_info = check_pypi_latest("hossam")
-
-    if version_info["outdated"]:
-        print(
-            f"\n⚠️  'hossam' 패키지의 최신 버전이 출시되었습니다! (설치된 버전: {version_info['installed']}, 최신 버전: {version_info['latest']})"
-        )
-        print("   최신 버전으로 업데이트하려면 다음 명령어를 실행하세요:")
-        print("   pip install --upgrade hossam\n")
-
-        raise Warning("hossam 패키지가 최신 버전이 아닙니다.")
 
     # 안내 메시지 (블릿 리스트)
     messages = [
@@ -115,7 +106,23 @@ def _init():
     for msg in messages:
         print(f"{msg}")
 
+    version_info = check_pypi_latest("hossam")
+
+    if version_info["outdated"]:
+        print(
+            f"\n⚠️  'hossam' 패키지의 최신 버전이 출시되었습니다! (설치된 버전: {version_info['installed']}, 최신 버전: {version_info['latest']})"
+        )
+        print("   최신 버전으로 업데이트하려면 다음 명령어를 실행하세요:")
+        print("   pip install --upgrade hossam\n")
+
+        raise Warning("hossam 패키지가 최신 버전이 아닙니다.")
+
     _init_korean_font()
+
+    # 컬럼 생략 금지
+    pd.set_option("display.max_columns", None)
+    # 행 최대 출력 수 100개로 수정
+    pd.set_option("display.max_rows", 100)
 
 
 _init()

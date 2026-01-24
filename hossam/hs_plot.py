@@ -1765,7 +1765,7 @@ def ols_residplot(
     # LOWESS 스무딩 (선택적)
     if lowess:
         lowess_result = sm_lowess(resid, y_pred, frac=0.6667)
-        ax.plot(
+        ax.plot(    # type: ignore
             lowess_result[:, 0],
             lowess_result[:, 1],  # type: ignore
             color="red",
@@ -2637,8 +2637,8 @@ def silhouette_plot(
 
 
 def cluster_plot(
-    estimator: KMeans,
-    data: DataFrame,
+    estimator: KMeans | None = None,
+    data: DataFrame | None = None,
     xname: str | None = None,
     yname: str | None = None,
     hue: str | None = None,
@@ -2688,7 +2688,7 @@ def cluster_plot(
         fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
-    df = data.copy()
+    df = data.copy() if data is not None else None  # type: ignore
 
     if not hue:
         df["cluster"] = estimator.labels_  # type: ignore
@@ -2726,7 +2726,7 @@ def cluster_plot(
         ax.set_ylabel("Feature space for the " + yname)
 
     scatterplot(
-        df=df,
+        df=df,          # type: ignore
         xname=xname,
         yname=yname,
         hue=hue,
