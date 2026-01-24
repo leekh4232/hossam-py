@@ -7,7 +7,7 @@ from typing import Callable
 import numpy as np
 import seaborn as sb
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import Axes # type: ignore
+from matplotlib.pyplot import Axes  # type: ignore
 from pandas import Series, DataFrame
 from math import sqrt
 from pandas import DataFrame
@@ -31,7 +31,7 @@ from sklearn.metrics import (
     auc,
     confusion_matrix,
     silhouette_score,
-    silhouette_samples
+    silhouette_samples,
 )
 
 # ===================================================================
@@ -45,13 +45,24 @@ config = SimpleNamespace(
     line_width=1,
     grid_alpha=0.3,
     grid_width=0.5,
-    fill_alpha=0.3
+    fill_alpha=0.3,
 )
+
 
 # ===================================================================
 # 기본 크기가 설정된 Figure와 Axes를 생성한다
 # ===================================================================
-def get_default_ax(width: int = config.width, height: int = config.height, rows: int = 1, cols: int = 1, dpi: int = config.dpi, flatten: bool = False, ws: int | None = None, hs: int | None = None, title: str | None = None):
+def get_default_ax(
+    width: int = config.width,
+    height: int = config.height,
+    rows: int = 1,
+    cols: int = 1,
+    dpi: int = config.dpi,
+    flatten: bool = False,
+    ws: int | None = None,
+    hs: int | None = None,
+    title: str | None = None,
+):
     """기본 크기의 Figure와 Axes를 생성한다.
 
     Args:
@@ -78,7 +89,7 @@ def get_default_ax(width: int = config.width, height: int = config.height, rows:
         fig.subplots_adjust(wspace=ws, hspace=hs)
 
     if title and is_array:
-        fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight='bold')
+        fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight="bold")
 
     if flatten == True:
         # 단일 Axes인 경우 리스트로 변환
@@ -97,7 +108,7 @@ def get_default_ax(width: int = config.width, height: int = config.height, rows:
             for spine in a.spines.values():
                 spine.set_linewidth(config.frame_width)
     else:
-        for spine in ax.spines.values():    # type: ignore
+        for spine in ax.spines.values():  # type: ignore
             spine.set_linewidth(config.frame_width)
 
     return fig, ax
@@ -106,7 +117,17 @@ def get_default_ax(width: int = config.width, height: int = config.height, rows:
 # ===================================================================
 # 기본 크기가 설정된 Figure와 Axes를 생성한다
 # ===================================================================
-def create_figure(width: int = config.width, height: int = config.height, rows: int = 1, cols: int = 1, dpi: int = config.dpi, flatten: bool = False, ws: int | None = None, hs: int | None = None, title: str | None = None):
+def create_figure(
+    width: int = config.width,
+    height: int = config.height,
+    rows: int = 1,
+    cols: int = 1,
+    dpi: int = config.dpi,
+    flatten: bool = False,
+    ws: int | None = None,
+    hs: int | None = None,
+    title: str | None = None,
+):
     """기본 크기의 Figure와 Axes를 생성한다. get_default_ax의 래퍼 함수.
 
     Args:
@@ -130,7 +151,14 @@ def create_figure(width: int = config.width, height: int = config.height, rows: 
 # ===================================================================
 # 그래프의 그리드, 레이아웃을 정리하고 필요 시 저장 또는 표시한다
 # ===================================================================
-def finalize_plot(ax: Axes | np.ndarray | list, callback: Callable | None = None, outparams: bool = False, save_path: str | None = None, grid: bool = True, title: str | None = None) -> None:
+def finalize_plot(
+    ax: Axes | np.ndarray | list,
+    callback: Callable | None = None,
+    outparams: bool = False,
+    save_path: str | None = None,
+    grid: bool = True,
+    title: str | None = None,
+) -> None:
     """공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
 
     Args:
@@ -149,7 +177,7 @@ def finalize_plot(ax: Axes | np.ndarray | list, callback: Callable | None = None
     # callback 실행
     if callback:
         if is_array:
-            for a in (ax.flat if isinstance(ax, np.ndarray) else ax):
+            for a in ax.flat if isinstance(ax, np.ndarray) else ax:
                 callback(a)
         else:
             callback(ax)
@@ -157,7 +185,7 @@ def finalize_plot(ax: Axes | np.ndarray | list, callback: Callable | None = None
     # grid 설정
     if grid:
         if is_array:
-            for a in (ax.flat if isinstance(ax, np.ndarray) else ax):
+            for a in ax.flat if isinstance(ax, np.ndarray) else ax:
                 a.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
         else:
             ax.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
@@ -165,10 +193,10 @@ def finalize_plot(ax: Axes | np.ndarray | list, callback: Callable | None = None
     plt.tight_layout()
 
     if title and not is_array:
-        ax.set_title(title, fontsize=config.font_size * 1.3, pad=7, fontweight='bold')
+        ax.set_title(title, fontsize=config.font_size * 1.3, pad=7, fontweight="bold")
 
     if save_path is not None:
-        plt.savefig(save_path, dpi=config.dpi * 2, bbox_inches='tight')
+        plt.savefig(save_path, dpi=config.dpi * 2, bbox_inches="tight")
 
     if outparams:
         plt.show()
@@ -178,7 +206,14 @@ def finalize_plot(ax: Axes | np.ndarray | list, callback: Callable | None = None
 # ===================================================================
 # 그래프의 그리드, 레이아웃을 정리하고 필요 시 저장 또는 표시한다
 # ===================================================================
-def show_figure(ax: Axes | np.ndarray, callback: Callable | None = None, outparams: bool = False, save_path: str | None = None, grid: bool = True, title: str | None = None) -> None:
+def show_figure(
+    ax: Axes | np.ndarray,
+    callback: Callable | None = None,
+    outparams: bool = False,
+    save_path: str | None = None,
+    grid: bool = True,
+    title: str | None = None,
+) -> None:
     """공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
     finalize_plot의 래퍼 함수.
 
@@ -241,7 +276,7 @@ def lineplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -262,7 +297,7 @@ def lineplot(
     lineplot_kwargs.update(params)
 
     sb.lineplot(**lineplot_kwargs, linewidth=linewidth)
-    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -316,7 +351,7 @@ def boxplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     if xname is not None and yname is not None:
@@ -344,13 +379,17 @@ def boxplot(
             if stat_pairs is None:
                 stat_pairs = [df[xname].dropna().unique().tolist()]
 
-            annotator = Annotator(ax, data=df, x=xname, y=yname, pairs=stat_pairs, orient=orient)
-            annotator.configure(test=stat_test, text_format=stat_text_format, loc=stat_loc)
+            annotator = Annotator(
+                ax, data=df, x=xname, y=yname, pairs=stat_pairs, orient=orient
+            )
+            annotator.configure(
+                test=stat_test, text_format=stat_text_format, loc=stat_loc
+            )
             annotator.apply_and_annotate()
     else:
-        sb.boxplot(data=df, orient=orient, ax=ax, linewidth=linewidth, **params)    # type: ignore
+        sb.boxplot(data=df, orient=orient, ax=ax, linewidth=linewidth, **params)  # type: ignore
 
-    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -372,7 +411,7 @@ def pvalue1_anotation(
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
-    **params
+    **params,
 ) -> None:
     """
     boxplot의 wrapper 함수로, 상자그림에 p-value 주석을 추가한다.
@@ -395,7 +434,7 @@ def pvalue1_anotation(
         save_path=save_path,
         callback=callback,
         ax=ax,
-        **params
+        **params,
     )
 
 
@@ -452,7 +491,9 @@ def kdeplot(
     # 사분위수 분할 전용 처리 (1D KDE만 지원)
     if quartile_split:
         if yname is not None:
-            raise ValueError("quartile_split은 1차원 KDE(xname)에서만 사용할 수 있습니다.")
+            raise ValueError(
+                "quartile_split은 1차원 KDE(xname)에서만 사용할 수 있습니다."
+            )
 
         series = df[xname].dropna()
         if series.empty:
@@ -499,7 +540,7 @@ def kdeplot(
         return
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     # 기본 kwargs 설정
@@ -529,7 +570,7 @@ def kdeplot(
 
     sb.kdeplot(**kdeplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -576,7 +617,7 @@ def histplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     if bins:
@@ -604,7 +645,7 @@ def histplot(
             "hue": hue,
             "kde": kde,
             "linewidth": linewidth,
-            "ax": ax
+            "ax": ax,
         }
 
         if hue is not None and palette is not None:
@@ -615,7 +656,7 @@ def histplot(
         histplot_kwargs.update(params)
         sb.histplot(**histplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -658,7 +699,7 @@ def stackplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     df2 = df[[xname, hue]].copy()
@@ -685,11 +726,11 @@ def stackplot(
     sb.histplot(**stackplot_kwargs)
 
     # 그래프의 x축 항목 수 만큼 반복
-    for p in ax.patches:    # type: ignore
+    for p in ax.patches:  # type: ignore
         # 각 막대의 위치, 넓이, 높이
-        left, bottom, width, height = p.get_bbox().bounds   # type: ignore
+        left, bottom, width, height = p.get_bbox().bounds  # type: ignore
         # 막대의 중앙에 글자 표시하기
-        ax.annotate(    # type: ignore
+        ax.annotate(  # type: ignore
             "%0.1f%%" % (height * 100),
             xy=(left + width / 2, bottom + height / 2),
             ha="center",
@@ -698,10 +739,10 @@ def stackplot(
 
     if str(df[xname].dtype) in ["int", "int32", "int64", "float", "float32", "float64"]:
         xticks = list(df[xname].unique())
-        ax.set_xticks(xticks)       # type: ignore
+        ax.set_xticks(xticks)  # type: ignore
         ax.set_xticklabels(xticks)  # type: ignore
 
-    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -750,9 +791,8 @@ def scatterplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
-
 
     if outline and hue is not None:
         # 군집별 값의 종류별로 반복 수행
@@ -770,8 +810,11 @@ def scatterplot(
                 # 마지막 좌표 이후에 첫 번째 좌표를 연결
                 points = np.append(hull.vertices, hull.vertices[0])
 
-                ax.plot(    # type: ignore
-                    df_c.iloc[points, 0], df_c.iloc[points, 1], linewidth=linewidth, linestyle=":"
+                ax.plot(  # type: ignore
+                    df_c.iloc[points, 0],
+                    df_c.iloc[points, 1],
+                    linewidth=linewidth,
+                    linestyle=":",
                 )
                 ax.fill(df_c.iloc[points, 0], df_c.iloc[points, 1], alpha=0.1)  # type: ignore
             except:
@@ -798,27 +841,26 @@ def scatterplot(
         sb.scatterplot(data=df, **scatterplot_kwargs)
     else:
         # 핵심벡터
-        scatterplot_kwargs['edgecolor'] = '#ffffff'
+        scatterplot_kwargs["edgecolor"] = "#ffffff"
         sb.scatterplot(data=df[df[vector] == "core"], **scatterplot_kwargs)
 
         # 외곽백터
-        scatterplot_kwargs['edgecolor'] = '#000000'
-        scatterplot_kwargs['s'] = 25
-        scatterplot_kwargs['marker'] = '^'
-        scatterplot_kwargs['linewidth'] = 0.8
+        scatterplot_kwargs["edgecolor"] = "#000000"
+        scatterplot_kwargs["s"] = 25
+        scatterplot_kwargs["marker"] = "^"
+        scatterplot_kwargs["linewidth"] = 0.8
         sb.scatterplot(data=df[df[vector] == "border"], **scatterplot_kwargs)
 
         # 노이즈벡터
-        scatterplot_kwargs['edgecolor'] = None
-        scatterplot_kwargs['s'] = 25
-        scatterplot_kwargs['marker'] = 'x'
-        scatterplot_kwargs['linewidth'] = 2
-        scatterplot_kwargs['color'] = '#ff0000'
-        scatterplot_kwargs['hue'] = None
+        scatterplot_kwargs["edgecolor"] = None
+        scatterplot_kwargs["s"] = 25
+        scatterplot_kwargs["marker"] = "x"
+        scatterplot_kwargs["linewidth"] = 2
+        scatterplot_kwargs["color"] = "#ff0000"
+        scatterplot_kwargs["hue"] = None
         sb.scatterplot(data=df[df[vector] == "noise"], **scatterplot_kwargs)
 
-
-    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -861,7 +903,7 @@ def regplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     # regplot은 hue를 지원하지 않으므로 palette를 color로 변환
@@ -877,13 +919,9 @@ def regplot(
             "s": 20,
             "linewidths": 0.5,
             "edgecolor": "w",
-            "color": scatter_color
+            "color": scatter_color,
         },
-        "line_kws": {
-            "color": "red",
-            "linestyle": "--",
-            "linewidth": linewidth
-        },
+        "line_kws": {"color": "red", "linestyle": "--", "linewidth": linewidth},
         "ax": ax,
     }
 
@@ -891,7 +929,7 @@ def regplot(
 
     sb.regplot(**regplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -951,19 +989,19 @@ def lmplot(
     # 회귀선에 linewidth 적용
     for ax in g.axes.flat:
         for line in ax.get_lines():
-            if line.get_marker() == 'o':  # 산점도는 건너뛰기
+            if line.get_marker() == "o":  # 산점도는 건너뛰기
                 continue
             line.set_linewidth(linewidth)
 
     g.fig.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)  # type: ignore
 
     if title:
-        g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight='bold')
+        g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight="bold")
 
     plt.tight_layout()
 
     if save_path is not None:
-        plt.savefig(save_path, dpi=dpi*2, bbox_inches='tight')
+        plt.savefig(save_path, dpi=dpi * 2, bbox_inches="tight")
 
     plt.show()
     plt.close()
@@ -1012,7 +1050,7 @@ def pairplot(
     if xnames is None:
         # 모든 연속형(숫자형) 컬럼 선택 (명목형/카테고리 제외)
         numeric_cols = df.select_dtypes(include=[np.number]).columns
-        target_cols = [col for col in numeric_cols if df[col].dtype.name != 'category']
+        target_cols = [col for col in numeric_cols if df[col].dtype.name != "category"]
     elif isinstance(xnames, str):
         # 문자열: 해당 컬럼만
         target_cols = [xnames]
@@ -1022,7 +1060,7 @@ def pairplot(
     else:
         # 기본값으로 연속형 컬럼
         numeric_cols = df.select_dtypes(include=[np.number]).columns
-        target_cols = [col for col in numeric_cols if df[col].dtype.name != 'category']
+        target_cols = [col for col in numeric_cols if df[col].dtype.name != "category"]
 
     # hue 컬럼이 있으면 target_cols에 포함시키기 (pairplot 자체에서 필요)
     if hue is not None and hue not in target_cols:
@@ -1050,9 +1088,11 @@ def pairplot(
     g.fig.set_dpi(dpi)
 
     if title:
-        g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight='bold')
+        g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight="bold")
 
-    g.map_lower(func=sb.kdeplot, fill=True, alpha=config.fill_alpha, linewidth=linewidth)
+    g.map_lower(
+        func=sb.kdeplot, fill=True, alpha=config.fill_alpha, linewidth=linewidth
+    )
     g.map_upper(func=sb.scatterplot, linewidth=linewidth)
 
     # KDE 대각선에도 linewidth 적용
@@ -1063,7 +1103,7 @@ def pairplot(
     plt.tight_layout()
 
     if save_path is not None:
-        plt.savefig(save_path, dpi=dpi*2, bbox_inches='tight')
+        plt.savefig(save_path, dpi=dpi * 2, bbox_inches="tight")
 
     plt.show()
     plt.close()
@@ -1117,7 +1157,7 @@ def countplot(
             sort = sorted(list(df[xname].value_counts().index))
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -1140,7 +1180,7 @@ def countplot(
 
     sb.countplot(**countplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1185,7 +1225,7 @@ def barplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -1206,7 +1246,7 @@ def barplot(
     barplot_kwargs.update(params)
 
     sb.barplot(**barplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1251,7 +1291,7 @@ def boxenplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     # palette은 hue가 있을 때만 사용
@@ -1270,7 +1310,7 @@ def boxenplot(
     boxenplot_kwargs.update(params)
 
     sb.boxenplot(**boxenplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1315,7 +1355,7 @@ def violinplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     # palette은 hue가 있을 때만 사용
@@ -1333,7 +1373,7 @@ def violinplot(
 
     violinplot_kwargs.update(params)
     sb.violinplot(**violinplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1378,7 +1418,7 @@ def pointplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -1398,7 +1438,7 @@ def pointplot(
 
     pointplot_kwargs.update(params)
     sb.pointplot(**pointplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1456,7 +1496,7 @@ def jointplot(
     g.fig.set_dpi(dpi)
 
     if title:
-        g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight='bold')
+        g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight="bold")
 
     # 중앙 및 주변 플롯에 grid 추가
     g.ax_joint.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
@@ -1466,7 +1506,7 @@ def jointplot(
     plt.tight_layout()
 
     if save_path is not None:
-        plt.savefig(save_path, dpi=dpi*2, bbox_inches='tight')
+        plt.savefig(save_path, dpi=dpi * 2, bbox_inches="tight")
 
     plt.show()
     plt.close()
@@ -1509,7 +1549,7 @@ def heatmap(
 
     if width == None or height == None:
         width = (config.font_size * config.dpi / 72) * 4.5 * len(data.columns)
-        height = width * 0.8    # type: ignore
+        height = width * 0.8  # type: ignore
 
     if ax is None:
         fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
@@ -1522,7 +1562,7 @@ def heatmap(
         "fmt": ".2f",
         "ax": ax,
         "linewidths": linewidth,
-        "annot_kws": {"size": 10}
+        "annot_kws": {"size": 10},
     }
 
     heatmatp_kwargs.update(params)
@@ -1531,7 +1571,6 @@ def heatmap(
     sb.heatmap(**heatmatp_kwargs)
 
     finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
-
 
 
 # ===================================================================
@@ -1619,19 +1658,30 @@ def kde_confidence_interval(
         cmin, cmax = t.interval(clevel, dof, loc=sample_mean, scale=sample_std_error)
 
         # 현재 컬럼에 대한 커널밀도추정
-        sb.kdeplot(data=column, linewidth=linewidth, ax=current_ax, fill=fill, alpha=config.fill_alpha) # type: ignore
+        sb.kdeplot(data=column, linewidth=linewidth, ax=current_ax, fill=fill, alpha=config.fill_alpha)  # type: ignore
 
         # 그래프 축의 범위
         xmin, xmax, ymin, ymax = current_ax.get_position().bounds
         ymin_val, ymax_val = 0, current_ax.get_ylim()[1]
 
         # 신뢰구간 그리기
-        current_ax.plot([cmin, cmin], [ymin_val, ymax_val], linestyle=":", linewidth=linewidth*0.5)
-        current_ax.plot([cmax, cmax], [ymin_val, ymax_val], linestyle=":", linewidth=linewidth*0.5)
-        current_ax.fill_between([cmin, cmax], y1=ymin_val, y2=ymax_val, alpha=config.fill_alpha)
+        current_ax.plot(
+            [cmin, cmin], [ymin_val, ymax_val], linestyle=":", linewidth=linewidth * 0.5
+        )
+        current_ax.plot(
+            [cmax, cmax], [ymin_val, ymax_val], linestyle=":", linewidth=linewidth * 0.5
+        )
+        current_ax.fill_between(
+            [cmin, cmax], y1=ymin_val, y2=ymax_val, alpha=config.fill_alpha
+        )
 
         # 평균 그리기
-        current_ax.plot([sample_mean, sample_mean], [0, ymax_val], linestyle="--", linewidth=linewidth)
+        current_ax.plot(
+            [sample_mean, sample_mean],
+            [0, ymax_val],
+            linestyle="--",
+            linewidth=linewidth,
+        )
 
         current_ax.text(
             x=(cmax - cmin) / 2 + cmin,
@@ -1644,8 +1694,7 @@ def kde_confidence_interval(
 
         current_ax.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
 
-    finalize_plot(axes[0] if isinstance(axes, list) and len(axes) > 0 else ax, callback, outparams, save_path, True, title) # type: ignore
-
+    finalize_plot(axes[0] if isinstance(axes, list) and len(axes) > 0 else ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1711,32 +1760,29 @@ def ols_residplot(
     sb.scatterplot(x=y_pred, y=resid, ax=ax, s=20, edgecolor="white", **params)
 
     # 기준선 (잔차 = 0)
-    ax.axhline(0, color="gray", linestyle="--", linewidth=linewidth*0.7)    # type: ignore
+    ax.axhline(0, color="gray", linestyle="--", linewidth=linewidth * 0.7)  # type: ignore
 
     # LOWESS 스무딩 (선택적)
     if lowess:
         lowess_result = sm_lowess(resid, y_pred, frac=0.6667)
-        ax.plot(lowess_result[:, 0], lowess_result[:, 1],           # type: ignore
-                color="red", linewidth=linewidth, label="LOWESS")   # type: ignore
+        ax.plot(
+            lowess_result[:, 0],
+            lowess_result[:, 1],  # type: ignore
+            color="red",
+            linewidth=linewidth,
+            label="LOWESS",
+        )  # type: ignore
 
     ax.set_xlabel("Fitted values")  # type: ignore
-    ax.set_ylabel("Residuals")      # type: ignore
+    ax.set_ylabel("Residuals")  # type: ignore
 
     if mse:
         mse_val = mean_squared_error(y, y_pred)
         mse_sq = np.sqrt(mse_val)
 
         r1 = resid[(resid > -mse_sq) & (resid < mse_sq)].size / resid.size * 100
-        r2 = (
-            resid[(resid > -2 * mse_sq) & (resid < 2 * mse_sq)].size
-            / resid.size
-            * 100
-        )
-        r3 = (
-            resid[(resid > -3 * mse_sq) & (resid < 3 * mse_sq)].size
-            / resid.size
-            * 100
-        )
+        r2 = resid[(resid > -2 * mse_sq) & (resid < 2 * mse_sq)].size / resid.size * 100
+        r3 = resid[(resid > -3 * mse_sq) & (resid < 3 * mse_sq)].size / resid.size * 100
 
         mse_r = [r1, r2, r3]
 
@@ -1747,26 +1793,26 @@ def ols_residplot(
         alphas = [0.15, 0.10, 0.05]  # 안쪽이 더 진하게
 
         # 3σ 영역 (가장 바깥쪽, 가장 연함)
-        ax.axhspan(-3 * mse_sq, 3 * mse_sq, facecolor=colors[2], alpha=alphas[2], zorder=0) # type: ignore
+        ax.axhspan(-3 * mse_sq, 3 * mse_sq, facecolor=colors[2], alpha=alphas[2], zorder=0)  # type: ignore
         # 2σ 영역 (중간)
-        ax.axhspan(-2 * mse_sq, 2 * mse_sq, facecolor=colors[1], alpha=alphas[1], zorder=1) # type: ignore
+        ax.axhspan(-2 * mse_sq, 2 * mse_sq, facecolor=colors[1], alpha=alphas[1], zorder=1)  # type: ignore
         # 1σ 영역 (가장 안쪽, 가장 진함)
-        ax.axhspan(-mse_sq, mse_sq, facecolor=colors[0], alpha=alphas[0], zorder=2) # type: ignore
+        ax.axhspan(-mse_sq, mse_sq, facecolor=colors[0], alpha=alphas[0], zorder=2)  # type: ignore
 
         # 경계선 그리기
         for i, c in enumerate(["red", "green", "blue"]):
-            ax.axhline(mse_sq * (i + 1), color=c, linestyle="--", linewidth=linewidth/2)    # type: ignore
-            ax.axhline(mse_sq * (-(i + 1)), color=c, linestyle="--", linewidth=linewidth/2)     # type: ignore
+            ax.axhline(mse_sq * (i + 1), color=c, linestyle="--", linewidth=linewidth / 2)  # type: ignore
+            ax.axhline(mse_sq * (-(i + 1)), color=c, linestyle="--", linewidth=linewidth / 2)  # type: ignore
 
         target = [68, 95, 99.7]
         for i, c in enumerate(["red", "green", "blue"]):
-            ax.text(    # type: ignore
+            ax.text(  # type: ignore
                 s=f"{i+1} sqrt(MSE) = {mse_r[i]:.2f}% ({mse_r[i] - target[i]:.2f}%)",
                 x=xmax + 0.05,
                 y=(i + 1) * mse_sq,
                 color=c,
             )
-            ax.text(    # type: ignore
+            ax.text(  # type: ignore
                 s=f"-{i+1} sqrt(MSE) = {mse_r[i]:.2f}% ({mse_r[i] - target[i]:.2f}%)",
                 x=xmax + 0.05,
                 y=-(i + 1) * mse_sq,
@@ -1782,7 +1828,7 @@ def ols_residplot(
 def ols_qqplot(
     fit,
     title: str | None = None,
-    line: str = 's',
+    line: str = "s",
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
@@ -1834,32 +1880,32 @@ def ols_qqplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     # fit 객체에서 잔차(residuals) 추출
     residuals = fit.resid
 
     # markersize 기본값 설정 (기존 크기의 2/3)
-    if 'markersize' not in params:
-        params['markersize'] = 2
+    if "markersize" not in params:
+        params["markersize"] = 2
 
     # statsmodels의 qqplot 사용 (더 전문적이고 최적화된 구현)
     # line 옵션으로 다양한 참조선 지원
     sm_qqplot(residuals, line=line, ax=ax, **params)
 
     # 점의 스타일 개선: 연한 내부, 진한 테두리
-    for collection in ax.collections:   # type: ignore
+    for collection in ax.collections:  # type: ignore
         # PathCollection (scatter plot의 점들)
-        collection.set_facecolor('#4A90E2')  # 연한 파란색 내부
-        collection.set_edgecolor('#1E3A8A')  # 진한 파란색 테두리
+        collection.set_facecolor("#4A90E2")  # 연한 파란색 내부
+        collection.set_edgecolor("#1E3A8A")  # 진한 파란색 테두리
         collection.set_linewidth(0.8)  # 테두리 굵기
         collection.set_alpha(0.7)  # 약간의 투명도
 
     # 선 굵기 조정
-    for line in ax.get_lines():     # type: ignore
-        if line.get_linestyle() == '--' or line.get_color() == 'r': # type: ignore
-            line.set_linewidth(linewidth)   # type: ignore
+    for line in ax.get_lines():  # type: ignore
+        if line.get_linestyle() == "--" or line.get_color() == "r":  # type: ignore
+            line.set_linewidth(linewidth)  # type: ignore
 
     finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
@@ -1904,7 +1950,7 @@ def distribution_by_class(
         None
     """
     if xnames is None:
-        xnames = data.columns   # type: ignore
+        xnames = data.columns  # type: ignore
 
     for i, v in enumerate(xnames):  # type: ignore
         # 종속변수이거나 숫자형이 아닌 경우는 제외
@@ -1930,14 +1976,14 @@ def distribution_by_class(
                 linewidth=linewidth,
                 dpi=dpi,
                 callback=callback,
-                save_path=save_path
+                save_path=save_path,
             )
         elif type == "hist":
             histplot(
                 df=data,
                 xname=v,
                 hue=hue,
-                bins=bins,          # type: ignore
+                bins=bins,  # type: ignore
                 kde=False,
                 palette=palette,
                 width=width,
@@ -1945,14 +1991,14 @@ def distribution_by_class(
                 linewidth=linewidth,
                 dpi=dpi,
                 callback=callback,
-                save_path=save_path
+                save_path=save_path,
             )
         elif type == "histkde":
             histplot(
                 df=data,
                 xname=v,
                 hue=hue,
-                bins=bins,          # type: ignore
+                bins=bins,  # type: ignore
                 kde=True,
                 palette=palette,
                 width=width,
@@ -1960,7 +2006,7 @@ def distribution_by_class(
                 linewidth=linewidth,
                 dpi=dpi,
                 callback=callback,
-                save_path=save_path
+                save_path=save_path,
             )
 
 
@@ -2027,7 +2073,7 @@ def scatter_by_class(
         group = processed
 
     for v in group:
-        scatterplot(data=data, xname=v[0], yname=v[1], outline=outline, hue=hue, palette=palette, width=width, height=height, linewidth=linewidth, dpi=dpi, callback=callback, save_path=save_path)    # type: ignore
+        scatterplot(data=data, xname=v[0], yname=v[1], outline=outline, hue=hue, palette=palette, width=width, height=height, linewidth=linewidth, dpi=dpi, callback=callback, save_path=save_path)  # type: ignore
 
 
 # ===================================================================
@@ -2072,7 +2118,9 @@ def categorical_target_distribution(
 
     # 명목형 컬럼 후보: object, category, bool
     if hue is None:
-        cat_cols = data.select_dtypes(include=["object", "category", "bool", "boolean"]).columns
+        cat_cols = data.select_dtypes(
+            include=["object", "category", "bool", "boolean"]
+        ).columns
         target_cols = [c for c in cat_cols if c != yname]
     elif isinstance(hue, str):
         target_cols = [hue]
@@ -2102,7 +2150,16 @@ def categorical_target_distribution(
             plot_kwargs.update({"x": col, "y": yname, "palette": palette})
             sb.violinplot(**plot_kwargs, linewidth=linewidth)
         elif kind == "kde":
-            plot_kwargs.update({"x": yname, "hue": col, "palette": palette, "fill": kde_fill, "common_norm": False, "linewidth": linewidth})
+            plot_kwargs.update(
+                {
+                    "x": yname,
+                    "hue": col,
+                    "palette": palette,
+                    "fill": kde_fill,
+                    "common_norm": False,
+                    "linewidth": linewidth,
+                }
+            )
             sb.kdeplot(**plot_kwargs)
         else:  # box
             plot_kwargs.update({"x": col, "y": yname, "hue": col, "palette": palette})
@@ -2156,7 +2213,7 @@ def roc_curve_plot(
     """
     outparams = False
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     # 실제값(y_true) 결정
@@ -2177,15 +2234,15 @@ def roc_curve_plot(
     roc_auc = auc(fpr, tpr)
 
     # ROC 곡선 그리기
-    ax.plot(fpr, tpr, color='darkorange', lw=linewidth, label=f'ROC curve (AUC = {roc_auc:.4f})')   # type: ignore
-    ax.plot([0, 1], [0, 1], color='navy', lw=linewidth, linestyle='--', label='Random Classifier')  # type: ignore
+    ax.plot(fpr, tpr, color="darkorange", lw=linewidth, label=f"ROC curve (AUC = {roc_auc:.4f})")  # type: ignore
+    ax.plot([0, 1], [0, 1], color="navy", lw=linewidth, linestyle="--", label="Random Classifier")  # type: ignore
 
-    ax.set_xlim([0.0, 1.0])     # type: ignore
-    ax.set_ylim([0.0, 1.05])    # type: ignore
-    ax.set_xlabel('위양성율 (False Positive Rate)', fontsize=8)     # type: ignore
-    ax.set_ylabel('재현율 (True Positive Rate)', fontsize=8)        # type: ignore
-    ax.set_title('ROC 곡선', fontsize=10, fontweight='bold')        # type: ignore
-    ax.legend(loc="lower right", fontsize=7)                        # type: ignore
+    ax.set_xlim([0.0, 1.0])  # type: ignore
+    ax.set_ylim([0.0, 1.05])  # type: ignore
+    ax.set_xlabel("위양성율 (False Positive Rate)", fontsize=8)  # type: ignore
+    ax.set_ylabel("재현율 (True Positive Rate)", fontsize=8)  # type: ignore
+    ax.set_title("ROC 곡선", fontsize=10, fontweight="bold")  # type: ignore
+    ax.legend(loc="lower right", fontsize=7)  # type: ignore
     finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
@@ -2232,13 +2289,18 @@ def confusion_matrix_plot(
     cm = confusion_matrix(y_true, y_pred)
 
     # 혼동행렬 시각화
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['음성', '양성'])
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["음성", "양성"])
     # 가독성을 위해 텍스트 크기/굵기 조정
-    disp.plot(ax=ax, cmap='Blues', values_format='d', text_kw={"fontsize": 16, "weight": "bold"})
+    disp.plot(
+        ax=ax,
+        cmap="Blues",
+        values_format="d",
+        text_kw={"fontsize": 16, "weight": "bold"},
+    )
 
-    ax.set_title(f'혼동행렬 (임계값: {threshold})', fontsize=8, fontweight='bold') # type: ignore
+    ax.set_title(f"혼동행렬 (임계값: {threshold})", fontsize=8, fontweight="bold")  # type: ignore
 
-    finalize_plot(ax, callback, outparams, save_path, False, title) # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, False, title)  # type: ignore
 
 
 # ===================================================================
@@ -2323,7 +2385,7 @@ def radarplot(
     # Axes 생성 (polar projection)
     if ax is None:
         fig = plt.figure(figsize=(width / 100, height / 100), dpi=dpi)
-        ax = fig.add_subplot(111, projection='polar')
+        ax = fig.add_subplot(111, projection="polar")
         outparams = True
 
     # 각도 계산
@@ -2345,8 +2407,15 @@ def radarplot(
         color = colors[idx]
 
         # 선 그리기
-        ax.plot(angles, values, 'o-', linewidth=linewidth,
-                label=str(label_name), color=color, **params)
+        ax.plot(
+            angles,
+            values,
+            "o-",
+            linewidth=linewidth,
+            label=str(label_name),
+            color=color,
+            **params,
+        )
 
         # 영역 채우기
         if fill:
@@ -2362,15 +2431,15 @@ def radarplot(
 
     # 범례
     if len(labels) <= 10:  # 너무 많으면 범례 생략
-        ax.legend(loc='upper right', bbox_to_anchor=(1.3, 1.1))
+        ax.legend(loc="upper right", bbox_to_anchor=(1.3, 1.1))
 
     # 제목
     if hue is not None:
-        ax.set_title(f'Radar Chart by {hue}', pad=20)
+        ax.set_title(f"Radar Chart by {hue}", pad=20)
     else:
-        ax.set_title('Radar Chart', pad=20)
+        ax.set_title("Radar Chart", pad=20)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -2421,7 +2490,9 @@ def distribution_plot(
 
         if hue is None:
             # 1행 2열 서브플롯 생성
-            fig, axes = get_default_ax(width, height, rows=1, cols=2, dpi=dpi, title=title)
+            fig, axes = get_default_ax(
+                width, height, rows=1, cols=2, dpi=dpi, title=title
+            )
 
             kde_confidence_interval(
                 data=data,
@@ -2432,17 +2503,10 @@ def distribution_plot(
             )
 
             if kind == "hist":
-                histplot(
-                    df=data,
-                    xname=c,
-                    linewidth=linewidth,
-                    ax=axes[1]
-                )
+                histplot(df=data, xname=c, linewidth=linewidth, ax=axes[1])
             else:
                 boxplot(
-                    df=data[column],        # type: ignore
-                    linewidth=linewidth,
-                    ax=axes[1]
+                    df=data[column], linewidth=linewidth, ax=axes[1]  # type: ignore
                 )
 
             fig.suptitle(title, fontsize=14, y=1.02)
@@ -2453,7 +2517,9 @@ def distribution_plot(
             categories = list(Series(data[hue].dropna().unique()).sort_values())
             n_cat = len(categories) if categories else 1
 
-            fig, axes = get_default_ax(width, height, rows=n_cat, cols=2, dpi=dpi, title=title)
+            fig, axes = get_default_ax(
+                width, height, rows=n_cat, cols=2, dpi=dpi, title=title
+            )
             axes_2d = np.atleast_2d(axes)
 
             for idx, cat in enumerate(categories):
@@ -2478,9 +2544,7 @@ def distribution_plot(
                     )
                 else:
                     boxplot(
-                        df=subset[c], # type: ignore
-                        linewidth=linewidth,
-                        ax=right_ax
+                        df=subset[c], linewidth=linewidth, ax=right_ax  # type: ignore
                     )
 
             fig.suptitle(f"{title} by {hue}", fontsize=14, y=1.02)
@@ -2488,24 +2552,24 @@ def distribution_plot(
             plt.tight_layout()
 
             if save_path:
-                plt.savefig(save_path, bbox_inches='tight', dpi=dpi)
+                plt.savefig(save_path, bbox_inches="tight", dpi=dpi)
                 plt.close()
             else:
                 plt.show()
 
 
 def silhouette_plot(
-        estimator: KMeans,
-        data: DataFrame,
-        title: str | None = None,
-        width: int = config.width,
-        height: int = config.height,
-        linewidth: float = config.line_width,
-        dpi: int = config.dpi,
-        save_path: str | None = None,
-        callback: Callable | None = None,
-        ax: Axes | None = None,
-    ) -> None:
+    estimator: KMeans,
+    data: DataFrame,
+    title: str | None = None,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
+) -> None:
     """
     군집분석 결과의 실루엣 플롯을 시각화함.
 
@@ -2532,7 +2596,7 @@ def silhouette_plot(
 
     outparams = False
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     sil_avg = silhouette_score(X=data, labels=estimator.labels_)
@@ -2541,14 +2605,14 @@ def silhouette_plot(
     y_lower = 10
 
     # 클러스터링 갯수별로 fill_betweenx( )형태의 막대 그래프 표현.
-    for i in range(estimator.n_clusters):   # type: ignore
-        ith_cluster_sil_values = sil_values[estimator.labels_ == i] # type: ignore
-        ith_cluster_sil_values.sort()   # type: ignore
+    for i in range(estimator.n_clusters):  # type: ignore
+        ith_cluster_sil_values = sil_values[estimator.labels_ == i]  # type: ignore
+        ith_cluster_sil_values.sort()  # type: ignore
 
-        size_cluster_i = ith_cluster_sil_values.shape[0]    # type: ignore
+        size_cluster_i = ith_cluster_sil_values.shape[0]  # type: ignore
         y_upper = y_lower + size_cluster_i
 
-        ax.fill_betweenx(   # type: ignore
+        ax.fill_betweenx(  # type: ignore
             np.arange(y_lower, y_upper),
             0,
             ith_cluster_sil_values,
@@ -2564,12 +2628,12 @@ def silhouette_plot(
     ax.set_xlim([-0.1, 1])  # type: ignore
     ax.set_ylim([0, len(data) + (estimator.n_clusters + 1) * 10])  # type: ignore
     ax.set_yticks([])  # type: ignore
-    ax.set_xticks([0, 0.2, 0.4, 0.6, 0.8, 1]) # type: ignore
+    ax.set_xticks([0, 0.2, 0.4, 0.6, 0.8, 1])  # type: ignore
 
     if title is None:
-        title = "Number of Cluster : " + str(estimator.n_clusters) + ", Silhouette Score :" + str(round(sil_avg, 3))    # type: ignore
+        title = "Number of Cluster : " + str(estimator.n_clusters) + ", Silhouette Score :" + str(round(sil_avg, 3))  # type: ignore
 
-    finalize_plot(ax, callback, outparams, save_path, True, title) # type: ignore
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 def cluster_plot(
@@ -2588,7 +2652,6 @@ def cluster_plot(
     save_path: str | None = None,
     ax: Axes | None = None,
 ) -> None:
-
     """
     2차원 공간에서 군집분석 결과를 산점도로 시각화함.
 
@@ -2622,28 +2685,28 @@ def cluster_plot(
     """
     outparams = False
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi) # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
     df = data.copy()
 
     if not hue:
-        df['cluster'] = estimator.labels_   # type: ignore
-        hue = 'cluster'
+        df["cluster"] = estimator.labels_  # type: ignore
+        hue = "cluster"
 
     if xname is None:
-        xname = df.columns[0]   # type: ignore
+        xname = df.columns[0]  # type: ignore
 
     if yname is None:
-        yname = df.columns[1]   # type: ignore
+        yname = df.columns[1]  # type: ignore
 
-    xindex = df.columns.get_loc(xname)   # type: ignore
-    yindex = df.columns.get_loc(yname)   # type: ignore
+    xindex = df.columns.get_loc(xname)  # type: ignore
+    yindex = df.columns.get_loc(yname)  # type: ignore
 
     def callback(ax: Axes) -> None:
         # 클러스터 중심점 표시
-        centers = estimator.cluster_centers_   # type: ignore
-        ax.scatter(    # type: ignore
+        centers = estimator.cluster_centers_  # type: ignore
+        ax.scatter(  # type: ignore
             centers[:, xindex],
             centers[:, yindex],
             marker="o",
@@ -2651,11 +2714,13 @@ def cluster_plot(
             alpha=1,
             s=200,
             edgecolor="r",
-            linewidth=linewidth
+            linewidth=linewidth,
         )
 
         for i, c in enumerate(centers):
-            ax.scatter(c[xindex], c[yindex], marker="$%d$" % i, alpha=1, s=50, edgecolor="k")
+            ax.scatter(
+                c[xindex], c[yindex], marker="$%d$" % i, alpha=1, s=50, edgecolor="k"
+            )
 
         ax.set_xlabel("Feature space for the " + xname)
         ax.set_ylabel("Feature space for the " + yname)
@@ -2674,16 +2739,40 @@ def cluster_plot(
         dpi=dpi,
         save_path=save_path,
         callback=callback,
-        ax=ax
+        ax=ax,
     )
 
-def visualize_silhouette(estimator: KMeans, data: DataFrame) -> None:
+
+def visualize_silhouette(
+    estimator: KMeans,
+    data: DataFrame,
+    xname: str | None = None,
+    yname: str | None = None,
+    title: str | None = None,
+    palette: str | None = None,
+    outline: bool = False,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
+    save_path: str | None = None,
+) -> None:
     """
     군집분석 결과의 실루엣 플롯과 군집 산점도를 한 화면에 함께 시각화함.
 
     Args:
         estimator (KMeans): 학습된 KMeans 군집 모델 객체.
         data (DataFrame): 군집분석에 사용된 입력 데이터 (n_samples, n_features).
+        xname (str, optional): 산점도 x축에 사용할 컬럼명. None이면 첫 번째 컬럼 사용.
+        yname (str, optional): 산점도 y축에 사용할 컬럼명. None이면 두 번째 컬럼 사용.
+        title (str, optional): 플롯 제목. None이면 기본값 사용.
+        palette (str, optional): 색상 팔레트.
+        outline (bool, optional): 산점도 외곽선 표시 여부.
+        width (int, optional): 플롯 가로 크기 (inch 단위).
+        height (int, optional): 플롯 세로 크기 (inch 단위).
+        linewidth (float, optional): 기준선 등 선 두께.
+        dpi (int, optional): 플롯 해상도(DPI).
+        save_path (str, optional): 저장 경로 지정 시 파일로 저장.
 
     Returns:
         None
@@ -2692,18 +2781,29 @@ def visualize_silhouette(estimator: KMeans, data: DataFrame) -> None:
         - 실루엣 플롯(왼쪽)과 2차원 군집 산점도(오른쪽)를 동시에 확인 가능
         - 군집 품질과 분포를 한눈에 비교·분석할 때 유용
     """
-    fig, ax = get_default_ax(rows=1, cols=2)
+    fig, ax = get_default_ax(rows=1, cols=2, width=width, height=height, dpi=dpi, title=title)
 
     silhouette_plot(
         estimator=estimator,
         data=data,
         ax=ax[0],
+        linewidth=linewidth,
+        width=width,
+        height=height,
+        dpi=dpi
     )
 
     cluster_plot(
         estimator=estimator,
         data=data,
+        xname=xname,
+        yname=yname,
         ax=ax[1],
+        outline=outline,
+        palette=palette,
+        width=width,
+        height=height,
+        dpi=dpi
     )
 
     finalize_plot(ax)
