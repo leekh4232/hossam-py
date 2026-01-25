@@ -2642,9 +2642,10 @@ def cluster_plot(
     xname: str | None = None,
     yname: str | None = None,
     hue: str | None = None,
+    vector: str | None = None,
     title: str | None = None,
     palette: str | None = None,
-    outline: bool = False,
+    outline: bool = True,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
@@ -2661,6 +2662,7 @@ def cluster_plot(
         xname (str, optional): x축에 사용할 컬럼명. None이면 첫 번째 컬럼 사용.
         yname (str, optional): y축에 사용할 컬럼명. None이면 두 번째 컬럼 사용.
         hue (str, optional): 군집 구분에 사용할 컬럼명. None이면 'cluster' 자동 생성.
+        vector (str, optional): 벡터 종류를 의미하는 컬럼명. None이면 사용 안함.
         title (str, optional): 플롯 제목. None이면 기본값 사용.
         palette (str, optional): 색상 팔레트.
         outline (bool, optional): 외곽선 표시 여부.
@@ -2704,32 +2706,34 @@ def cluster_plot(
     yindex = df.columns.get_loc(yname)  # type: ignore
 
     def callback(ax: Axes) -> None:
-        # 클러스터 중심점 표시
-        centers = estimator.cluster_centers_  # type: ignore
-        ax.scatter(  # type: ignore
-            centers[:, xindex],
-            centers[:, yindex],
-            marker="o",
-            color="white",
-            alpha=1,
-            s=200,
-            edgecolor="r",
-            linewidth=linewidth,
-        )
-
-        for i, c in enumerate(centers):
-            ax.scatter(
-                c[xindex], c[yindex], marker="$%d$" % i, alpha=1, s=50, edgecolor="k"
-            )
-
         ax.set_xlabel("Feature space for the " + xname)
         ax.set_ylabel("Feature space for the " + yname)
+
+        if hasattr(estimator, "cluster_centers_"):
+            # 클러스터 중심점 표시
+            centers = estimator.cluster_centers_  # type: ignore
+            ax.scatter(  # type: ignore
+                centers[:, xindex],
+                centers[:, yindex],
+                marker="o",
+                color="white",
+                alpha=1,
+                s=200,
+                edgecolor="r",
+                linewidth=linewidth,
+            )
+
+            for i, c in enumerate(centers):
+                ax.scatter(
+                    c[xindex], c[yindex], marker="$%d$" % i, alpha=1, s=50, edgecolor="k"
+                )
 
     scatterplot(
         df=df,          # type: ignore
         xname=xname,
         yname=yname,
         hue=hue,
+        vector=vector,
         title="The visualization of the clustered data." if title is None else title,
         outline=outline,
         palette=palette,

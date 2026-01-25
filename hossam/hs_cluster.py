@@ -12,16 +12,16 @@ from itertools import combinations
 
 from typing import Literal, Callable
 from kneed import KneeLocator
-from pandas import Series, DataFrame, MultiIndex
+from pandas import Series, DataFrame, MultiIndex, concat
 from matplotlib.pyplot import Axes  # type: ignore
 
 from sklearn.cluster import KMeans, DBSCAN
 from sklearn.neighbors import NearestNeighbors
-from sklearn.metrics import silhouette_score
+from sklearn.metrics import silhouette_score, adjusted_rand_score
 
 from scipy.stats import normaltest
 
-RANDOM_STATE = 4232
+RANDOM_STATE = 52
 
 
 # ===================================================================
@@ -358,7 +358,6 @@ def elbow_point(
     best_y = kn.elbow_y
 
     if plot:
-
         def hvline(ax):
             ax.axvline(best_x, color="red", linestyle="--", linewidth=0.7)
             ax.axhline(best_y, color="red", linestyle="--", linewidth=0.7)
@@ -402,10 +401,11 @@ def cluster_plot(
     estimator: KMeans,
     data: DataFrame,
     hue: str | None = None,
+    vector: str | None = None,
     fields: list[list] = None,
     title: str | None = None,
     palette: str | None = None,
-    outline: bool = False,
+    outline: bool = True,
     width: int = hs_plot.config.width,
     height: int = hs_plot.config.height,
     linewidth: float = hs_plot.config.line_width,
@@ -420,6 +420,7 @@ def cluster_plot(
         estimator (KMeans): KMeans 군집화 모델.
         data (DataFrame): 군집화할 데이터프레임.
         hue (str | None, optional): 군집 레이블 컬럼명. 지정되지 않으면 estimator의 레이블 사용.
+        vector (str | None, optional): 벡터 종류를 의미하는 컬럼명(for DBSCAN)
         fields (list[list], optional): 시각화할 필드 쌍 리스트. 기본값 None이면 수치형 컬럼의 모든 조합 사용.
         title (str | None, optional): 플롯 제목.
         palette (str | None, optional): 색상 팔레트 이름.
@@ -449,29 +450,26 @@ def cluster_plot(
         # fields의 모든 조합 생성
         fields = [list(pair) for pair in combinations(numeric_cols, 2)]
 
-    with tqdm(total=len(fields)) as pbar:
-        pbar.set_description("K-Means Cluster Plotting")
+    for field_pair in fields:
+        xname, yname = field_pair
 
-        for field_pair in fields:
-            xname, yname = field_pair
-
-            hs_plot.cluster_plot(
-                estimator=estimator,
-                data=data,
-                xname=xname,
-                yname=yname,
-                hue=hue,
-                title=title,
-                palette=palette,
-                outline=outline,
-                width=width,
-                height=height,
-                dpi=dpi,
-                save_path=save_path,
-                ax=ax,
-            )
-
-            pbar.update(1)
+        hs_plot.cluster_plot(
+            estimator=estimator,
+            data=data,
+            xname=xname,
+            yname=yname,
+            hue=hue,
+            title=title,
+            vector=vector,
+            palette=palette,
+            outline=outline,
+            width=width,
+            height=height,
+            linewidth=linewidth,
+            dpi=dpi,
+            save_path=save_path,
+            ax=ax,
+        )
 
 
 # ===================================================================
@@ -626,7 +624,7 @@ def kmeans_best_k(
 # ===================================================================
 # DBSCAN 군집화 모델을 적합하는 함수.
 # ===================================================================
-def dbscan_fit(
+def __dbscan_fit(
     data: DataFrame,
     eps: float = 0.5,
     min_samples: int = 5,
@@ -688,7 +686,6 @@ def dbscan_eps(
     plot: bool = True,
     title: str | None = None,
     palette: str | None = None,
-    outline: bool = False,
     width: int = hs_plot.config.width,
     height: int = hs_plot.config.height,
     linewidth: int = hs_plot.config.line_width,
@@ -708,7 +705,6 @@ def dbscan_eps(
         plot (bool, optional): True면 결과를 시각화함. 기본값 True.
         title (str | None, optional): 플롯 제목.
         palette (str | None, optional): 색상 팔레트 이름.
-        outline (bool, optional): True면 데이터 포인트 외곽선 표시. 기본값 False.
         width (int, optional): 플롯 가로 크기.
         height (int, optional): 플롯 세로 크기.
         linewidth (float, optional): 선 두께.
@@ -719,7 +715,7 @@ def dbscan_eps(
     Returns:
         tuple: (best_eps, eps_grid)
             - best_eps: 최적의 eps 값
-            - eps_grid: 탐색에 사용된 eps 값 그리드 배열
+            - eps_grid: 탐색할 eps 값의 그리드 배열
 
     Examples:
         ```python
@@ -750,6 +746,7 @@ def dbscan_eps(
         height=height,
         dpi=dpi,
         linewidth=linewidth,
+        palette=palette,
         save_path=save_path,
         ax=ax,
     )
@@ -761,3 +758,99 @@ def dbscan_eps(
     eps_grid = np.arange(eps_min, eps_max + step, step)
 
     return best_eps, eps_grid
+
+def dbscan_fit(
+    data: DataFrame,
+    eps: float | list | np.ndarray | None = None,
+    min_samples: int = 5,
+    ari_threshold: float = 0.9,
+    noise_diff_threshold: float = 0.05,
+    plot : bool = True,
+    **params
+) -> tuple[DBSCAN, DataFrame, DataFrame]:
+
+    # eps 값이 지정되지 않은 경우 최적의 eps 탐지
+    if eps is None:
+        _, eps_grid = dbscan_eps(data=data, min_samples=min_samples, plot=plot)
+        eps = eps_grid
+
+    # eps가 단일 값인 경우 리스트로 변환
+    if not isinstance(eps, (list, np.ndarray)):
+        eps = [eps]
+
+    estimators = []
+    cluster_dfs = []
+    result_dfs: DataFrame | None = None
+
+    with tqdm(total=len(eps)+2) as pbar:
+        with futures.ThreadPoolExecutor() as executor:
+            for i, e in enumerate(eps):
+                pbar.set_description(f"DBSCAN Fit: eps={e:.4f}")
+                executed = executor.submit(__dbscan_fit, data=data, eps=e, min_samples=min_samples, **params)
+                estimator, cluster_df, result_df = executed.result()
+                estimators.append(estimator)
+                cluster_dfs.append(cluster_df)
+
+                if result_dfs is None:
+                    result_df['ARI'] = np.nan
+                    result_dfs = result_df
+                else:
+                    result_df['ARI'] = adjusted_rand_score(cluster_dfs[i-1]['cluster'], cluster_df['cluster']) # type: ignore
+                    result_dfs = concat([result_dfs, result_df], ignore_index=True)
+
+                pbar.update(1)
+
+            pbar.set_description(f"DBSCAN Stability Analysis")
+            result_dfs['cluster_diff'] = result_dfs['n_clusters'].diff().abs()      # type: ignore
+            result_dfs['noise_ratio_diff'] = result_dfs['noise_ratio'].diff().abs()    # type: ignore
+            result_dfs['stable'] = ( # type: ignore
+                (result_dfs['ARI'] >= ari_threshold) & # type: ignore
+                (result_dfs['cluster_diff'] <= 0) & # type: ignore
+                (result_dfs['noise_ratio_diff'] <= noise_diff_threshold) # type: ignore
+            )
+
+            # 첫 행은 비교 불가
+            result_dfs.loc[0, 'stable'] = False # type: ignore
+            pbar.update(1)
+
+            if len(eps) == 1:
+                result_dfs['group_id'] = 1  # type: ignore
+                result_dfs['recommand'] = 'unknown' # type: ignore
+            else:
+                # 안정구간 도출하기
+                # stable 여부를 0/1로 변환
+                stable_flag = result_dfs['stable'].astype(int).values  # type: ignore
+
+                # 연속 구간 구분용 그룹 id 생성
+                group_id = (stable_flag != np.roll(stable_flag, 1)).cumsum()    # type: ignore
+                result_dfs['group_id'] = group_id  # type: ignore
+
+                # 안정구간 중 가장 긴 구간 선택
+                stable_groups = result_dfs[result_dfs['stable']].groupby('group_id')  # type: ignore
+
+                # 각 구간의 길이 계산
+                group_sizes = stable_groups.size()
+
+                # 가장 긴 안정 구간 선택
+                best_group_id = group_sizes.idxmax()
+
+                result_dfs['recommand'] = 'bad' # type: ignore
+
+                # 가장 긴 안정 구간에 해당하는 recommand 컬럼을 `best`로 변경
+                result_dfs.loc[result_dfs["group_id"] == best_group_id, 'recommand'] = 'best' # type: ignore
+
+                # result_dfs에서 recommand가 best에 해당하는 인덱스와 같은 위치의 추정기만 추출
+                best_indexes = list(result_dfs[result_dfs['recommand'] == 'best'].index) # type: ignore
+
+                for i in range(len(estimators)-1, -1, -1):
+                    if i not in best_indexes:
+                        del(estimators[i])
+                        del(cluster_dfs[i])
+
+            pbar.update(1)
+
+    return (
+        estimators[0] if len(estimators) == 1 else estimators,  # type: ignore
+        cluster_dfs[0] if len(cluster_dfs) == 1 else cluster_dfs,
+        result_dfs  # type: ignore
+    )
