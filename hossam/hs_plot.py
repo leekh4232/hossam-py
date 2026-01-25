@@ -22,7 +22,7 @@ from statsmodels.nonparametric.smoothers_lowess import lowess as sm_lowess
 from statannotations.Annotator import Annotator
 
 # ===================================================================
-from sklearn.cluster._kmeans import KMeans
+from sklearn.cluster import AgglomerativeClustering, KMeans
 
 from sklearn.metrics import (
     mean_squared_error,
@@ -2559,7 +2559,7 @@ def distribution_plot(
 
 
 def silhouette_plot(
-    estimator: KMeans,
+    estimator: KMeans | AgglomerativeClustering,
     data: DataFrame,
     title: str | None = None,
     width: int = config.width,
@@ -2574,7 +2574,7 @@ def silhouette_plot(
     군집분석 결과의 실루엣 플롯을 시각화함.
 
     Args:
-        estimator (KMeans): 학습된 KMeans 군집 모델 객체.
+        estimator (KMeans | AgglomerativeClustering): 학습된 KMeans 또는 AgglomerativeClustering 군집 모델 객체.
         data (DataFrame): 군집분석에 사용된 입력 데이터 (n_samples, n_features).
         title (str, optional): 플롯 제목. None이면 자동 생성.
         width (int, optional): 플롯 가로 크기 (inch 단위).
@@ -2605,7 +2605,15 @@ def silhouette_plot(
     y_lower = 10
 
     # 클러스터링 갯수별로 fill_betweenx( )형태의 막대 그래프 표현.
-    for i in range(estimator.n_clusters):  # type: ignore
+    n_clusters: int = 0
+    if hasattr(estimator, "n_clusters") and estimator.n_clusters is not None:   # type: ignore
+        n_clusters = estimator.n_clusters  # type: ignore
+    elif hasattr(estimator, "n_clusters_") and estimator.n_clusters_ is not None:    # type: ignore
+        n_clusters = estimator.n_clusters_  # type: ignore
+    else:
+        n_clusters = len(np.unique(estimator.labels_))  # type: ignore
+
+    for i in range(n_clusters):  # type: ignore
         ith_cluster_sil_values = sil_values[estimator.labels_ == i]  # type: ignore
         ith_cluster_sil_values.sort()  # type: ignore
 
@@ -2626,18 +2634,18 @@ def silhouette_plot(
     ax.set_xlabel("The silhouette coefficient values")  # type: ignore
     ax.set_ylabel("Cluster label")  # type: ignore
     ax.set_xlim([-0.1, 1])  # type: ignore
-    ax.set_ylim([0, len(data) + (estimator.n_clusters + 1) * 10])  # type: ignore
+    ax.set_ylim([0, len(data) + (n_clusters + 1) * 10])  # type: ignore
     ax.set_yticks([])  # type: ignore
     ax.set_xticks([0, 0.2, 0.4, 0.6, 0.8, 1])  # type: ignore
 
     if title is None:
-        title = "Number of Cluster : " + str(estimator.n_clusters) + ", Silhouette Score :" + str(round(sil_avg, 3))  # type: ignore
+        title = "Number of Cluster : " + str(n_clusters) + ", Silhouette Score :" + str(round(sil_avg, 3))  # type: ignore
 
     finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 def cluster_plot(
-    estimator: KMeans | None = None,
+    estimator: KMeans | AgglomerativeClustering | None = None,
     data: DataFrame | None = None,
     xname: str | None = None,
     yname: str | None = None,
@@ -2748,7 +2756,7 @@ def cluster_plot(
 
 
 def visualize_silhouette(
-    estimator: KMeans,
+    estimator: KMeans | AgglomerativeClustering,
     data: DataFrame,
     xname: str | None = None,
     yname: str | None = None,
@@ -2765,7 +2773,7 @@ def visualize_silhouette(
     군집분석 결과의 실루엣 플롯과 군집 산점도를 한 화면에 함께 시각화함.
 
     Args:
-        estimator (KMeans): 학습된 KMeans 군집 모델 객체.
+        estimator (KMeans | AgglomerativeClustering): 학습된 KMeans 또는 AgglomerativeClustering 군집 모델 객체.
         data (DataFrame): 군집분석에 사용된 입력 데이터 (n_samples, n_features).
         xname (str, optional): 산점도 x축에 사용할 컬럼명. None이면 첫 번째 컬럼 사용.
         yname (str, optional): 산점도 y축에 사용할 컬럼명. None이면 두 번째 컬럼 사용.
