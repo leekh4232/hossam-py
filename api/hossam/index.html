@@ -1321,11 +1321,11 @@
                 <code>estimator</code>
             </td>
             <td>
-                  <code><span title="sklearn.cluster._kmeans.KMeans">KMeans</span></code>
+                  <code><span title="sklearn.cluster.KMeans">KMeans</span> | <span title="sklearn.cluster.AgglomerativeClustering">AgglomerativeClustering</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>학습된 KMeans 군집 모델 객체.</p>
+                <p>학습된 KMeans 또는 AgglomerativeClustering 군집 모델 객체.</p>
               </div>
             </td>
             <td>
@@ -1545,15 +1545,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2750</span>
-<span class="normal">2751</span>
-<span class="normal">2752</span>
-<span class="normal">2753</span>
-<span class="normal">2754</span>
-<span class="normal">2755</span>
-<span class="normal">2756</span>
-<span class="normal">2757</span>
-<span class="normal">2758</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2758</span>
 <span class="normal">2759</span>
 <span class="normal">2760</span>
 <span class="normal">2761</span>
@@ -1608,8 +1600,16 @@
 <span class="normal">2810</span>
 <span class="normal">2811</span>
 <span class="normal">2812</span>
-<span class="normal">2813</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">visualize_silhouette</span><span class="p">(</span>
-    <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span><span class="p">,</span>
+<span class="normal">2813</span>
+<span class="normal">2814</span>
+<span class="normal">2815</span>
+<span class="normal">2816</span>
+<span class="normal">2817</span>
+<span class="normal">2818</span>
+<span class="normal">2819</span>
+<span class="normal">2820</span>
+<span class="normal">2821</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">visualize_silhouette</span><span class="p">(</span>
+    <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span> <span class="o">|</span> <span class="n">AgglomerativeClustering</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1626,7 +1626,7 @@
 <span class="sd">    군집분석 결과의 실루엣 플롯과 군집 산점도를 한 화면에 함께 시각화함.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        estimator (KMeans): 학습된 KMeans 군집 모델 객체.</span>
+<span class="sd">        estimator (KMeans | AgglomerativeClustering): 학습된 KMeans 또는 AgglomerativeClustering 군집 모델 객체.</span>
 <span class="sd">        data (DataFrame): 군집분석에 사용된 입력 데이터 (n_samples, n_features).</span>
 <span class="sd">        xname (str, optional): 산점도 x축에 사용할 컬럼명. None이면 첫 번째 컬럼 사용.</span>
 <span class="sd">        yname (str, optional): 산점도 y축에 사용할 컬럼명. None이면 두 번째 컬럼 사용.</span>

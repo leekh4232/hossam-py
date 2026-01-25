@@ -14297,11 +14297,11 @@ finalize_plot의 래퍼 함수.</p>
                 <code>estimator</code>
             </td>
             <td>
-                  <code><span title="sklearn.cluster._kmeans.KMeans">KMeans</span></code>
+                  <code><span title="sklearn.cluster.KMeans">KMeans</span> | <span title="sklearn.cluster.AgglomerativeClustering">AgglomerativeClustering</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>학습된 KMeans 군집 모델 객체.</p>
+                <p>학습된 KMeans 또는 AgglomerativeClustering 군집 모델 객체.</p>
               </div>
             </td>
             <td>
@@ -14565,8 +14565,16 @@ finalize_plot의 래퍼 함수.</p>
 <span class="normal">2633</span>
 <span class="normal">2634</span>
 <span class="normal">2635</span>
-<span class="normal">2636</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">silhouette_plot</span><span class="p">(</span>
-    <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span><span class="p">,</span>
+<span class="normal">2636</span>
+<span class="normal">2637</span>
+<span class="normal">2638</span>
+<span class="normal">2639</span>
+<span class="normal">2640</span>
+<span class="normal">2641</span>
+<span class="normal">2642</span>
+<span class="normal">2643</span>
+<span class="normal">2644</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">silhouette_plot</span><span class="p">(</span>
+    <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span> <span class="o">|</span> <span class="n">AgglomerativeClustering</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
@@ -14581,7 +14589,7 @@ finalize_plot의 래퍼 함수.</p>
 <span class="sd">    군집분석 결과의 실루엣 플롯을 시각화함.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        estimator (KMeans): 학습된 KMeans 군집 모델 객체.</span>
+<span class="sd">        estimator (KMeans | AgglomerativeClustering): 학습된 KMeans 또는 AgglomerativeClustering 군집 모델 객체.</span>
 <span class="sd">        data (DataFrame): 군집분석에 사용된 입력 데이터 (n_samples, n_features).</span>
 <span class="sd">        title (str, optional): 플롯 제목. None이면 자동 생성.</span>
 <span class="sd">        width (int, optional): 플롯 가로 크기 (inch 단위).</span>
@@ -14612,7 +14620,15 @@ finalize_plot의 래퍼 함수.</p>
     <span class="n">y_lower</span> <span class="o">=</span> <span class="mi">10</span>
 
     <span class="c1"># 클러스터링 갯수별로 fill_betweenx( )형태의 막대 그래프 표현.</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
+    <span class="n">n_clusters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="s2">&quot;n_clusters&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">estimator</span><span class="o">.</span><span class="n">n_clusters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>   <span class="c1"># type: ignore</span>
+        <span class="n">n_clusters</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">n_clusters</span>  <span class="c1"># type: ignore</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="s2">&quot;n_clusters_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">estimator</span><span class="o">.</span><span class="n">n_clusters_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>    <span class="c1"># type: ignore</span>
+        <span class="n">n_clusters</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">n_clusters_</span>  <span class="c1"># type: ignore</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n_clusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">labels_</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_clusters</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
         <span class="n">ith_cluster_sil_values</span> <span class="o">=</span> <span class="n">sil_values</span><span class="p">[</span><span class="n">estimator</span><span class="o">.</span><span class="n">labels_</span> <span class="o">==</span> <span class="n">i</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
         <span class="n">ith_cluster_sil_values</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
 
@@ -14633,12 +14649,12 @@ finalize_plot의 래퍼 함수.</p>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;The silhouette coefficient values&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Cluster label&quot;</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>  <span class="c1"># type: ignore</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_clusters</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">])</span>  <span class="c1"># type: ignore</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">n_clusters</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">])</span>  <span class="c1"># type: ignore</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>  <span class="c1"># type: ignore</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>  <span class="c1"># type: ignore</span>
 
     <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Number of Cluster : &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_clusters</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;, Silhouette Score :&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">sil_avg</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Number of Cluster : &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">n_clusters</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;, Silhouette Score :&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">sil_avg</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
 
     <span class="n">finalize_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">outparams</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 </code></pre></div></td></tr></table></div>
@@ -14695,7 +14711,7 @@ finalize_plot의 래퍼 함수.</p>
                 <code>estimator</code>
             </td>
             <td>
-                  <code><span title="sklearn.cluster._kmeans.KMeans">KMeans</span></code>
+                  <code><span title="sklearn.cluster.KMeans">KMeans</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -14973,15 +14989,7 @@ finalize_plot의 래퍼 함수.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2639</span>
-<span class="normal">2640</span>
-<span class="normal">2641</span>
-<span class="normal">2642</span>
-<span class="normal">2643</span>
-<span class="normal">2644</span>
-<span class="normal">2645</span>
-<span class="normal">2646</span>
-<span class="normal">2647</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2647</span>
 <span class="normal">2648</span>
 <span class="normal">2649</span>
 <span class="normal">2650</span>
@@ -15081,8 +15089,16 @@ finalize_plot의 래퍼 함수.</p>
 <span class="normal">2744</span>
 <span class="normal">2745</span>
 <span class="normal">2746</span>
-<span class="normal">2747</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cluster_plot</span><span class="p">(</span>
-    <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="normal">2747</span>
+<span class="normal">2748</span>
+<span class="normal">2749</span>
+<span class="normal">2750</span>
+<span class="normal">2751</span>
+<span class="normal">2752</span>
+<span class="normal">2753</span>
+<span class="normal">2754</span>
+<span class="normal">2755</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cluster_plot</span><span class="p">(</span>
+    <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span> <span class="o">|</span> <span class="n">AgglomerativeClustering</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -15241,11 +15257,11 @@ finalize_plot의 래퍼 함수.</p>
                 <code>estimator</code>
             </td>
             <td>
-                  <code><span title="sklearn.cluster._kmeans.KMeans">KMeans</span></code>
+                  <code><span title="sklearn.cluster.KMeans">KMeans</span> | <span title="sklearn.cluster.AgglomerativeClustering">AgglomerativeClustering</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>학습된 KMeans 군집 모델 객체.</p>
+                <p>학습된 KMeans 또는 AgglomerativeClustering 군집 모델 객체.</p>
               </div>
             </td>
             <td>
@@ -15465,15 +15481,7 @@ finalize_plot의 래퍼 함수.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2750</span>
-<span class="normal">2751</span>
-<span class="normal">2752</span>
-<span class="normal">2753</span>
-<span class="normal">2754</span>
-<span class="normal">2755</span>
-<span class="normal">2756</span>
-<span class="normal">2757</span>
-<span class="normal">2758</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2758</span>
 <span class="normal">2759</span>
 <span class="normal">2760</span>
 <span class="normal">2761</span>
@@ -15528,8 +15536,16 @@ finalize_plot의 래퍼 함수.</p>
 <span class="normal">2810</span>
 <span class="normal">2811</span>
 <span class="normal">2812</span>
-<span class="normal">2813</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">visualize_silhouette</span><span class="p">(</span>
-    <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span><span class="p">,</span>
+<span class="normal">2813</span>
+<span class="normal">2814</span>
+<span class="normal">2815</span>
+<span class="normal">2816</span>
+<span class="normal">2817</span>
+<span class="normal">2818</span>
+<span class="normal">2819</span>
+<span class="normal">2820</span>
+<span class="normal">2821</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">visualize_silhouette</span><span class="p">(</span>
+    <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span> <span class="o">|</span> <span class="n">AgglomerativeClustering</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -15546,7 +15562,7 @@ finalize_plot의 래퍼 함수.</p>
 <span class="sd">    군집분석 결과의 실루엣 플롯과 군집 산점도를 한 화면에 함께 시각화함.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        estimator (KMeans): 학습된 KMeans 군집 모델 객체.</span>
+<span class="sd">        estimator (KMeans | AgglomerativeClustering): 학습된 KMeans 또는 AgglomerativeClustering 군집 모델 객체.</span>
 <span class="sd">        data (DataFrame): 군집분석에 사용된 입력 데이터 (n_samples, n_features).</span>
 <span class="sd">        xname (str, optional): 산점도 x축에 사용할 컬럼명. None이면 첫 번째 컬럼 사용.</span>
 <span class="sd">        yname (str, optional): 산점도 y축에 사용할 컬럼명. None이면 두 번째 컬럼 사용.</span>
