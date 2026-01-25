@@ -2754,7 +2754,7 @@ def visualize_silhouette(
     yname: str | None = None,
     title: str | None = None,
     palette: str | None = None,
-    outline: bool = False,
+    outline: bool = True,
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
