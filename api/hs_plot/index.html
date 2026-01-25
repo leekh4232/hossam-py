@@ -14661,9 +14661,10 @@ finalize_plot의 래퍼 함수.</p>
     <span class="n">xname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">yname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">hue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">vector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">palette</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">outline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">outline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">width</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
     <span class="n">height</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
     <span class="n">linewidth</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">line_width</span><span class="p">,</span>
@@ -14771,6 +14772,22 @@ finalize_plot의 래퍼 함수.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
+                <code>vector</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>벡터 종류를 의미하는 컬럼명. None이면 사용 안함.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
                 <code>title</code>
             </td>
             <td>
@@ -14814,7 +14831,7 @@ finalize_plot의 래퍼 함수.</p>
               </div>
             </td>
             <td>
-                  <code>False</code>
+                  <code>True</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -15060,15 +15077,20 @@ finalize_plot의 래퍼 함수.</p>
 <span class="normal">2740</span>
 <span class="normal">2741</span>
 <span class="normal">2742</span>
-<span class="normal">2743</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cluster_plot</span><span class="p">(</span>
+<span class="normal">2743</span>
+<span class="normal">2744</span>
+<span class="normal">2745</span>
+<span class="normal">2746</span>
+<span class="normal">2747</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cluster_plot</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">hue</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">vector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">palette</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">outline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">outline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
     <span class="n">linewidth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">line_width</span><span class="p">,</span>
@@ -15085,6 +15107,7 @@ finalize_plot의 래퍼 함수.</p>
 <span class="sd">        xname (str, optional): x축에 사용할 컬럼명. None이면 첫 번째 컬럼 사용.</span>
 <span class="sd">        yname (str, optional): y축에 사용할 컬럼명. None이면 두 번째 컬럼 사용.</span>
 <span class="sd">        hue (str, optional): 군집 구분에 사용할 컬럼명. None이면 &#39;cluster&#39; 자동 생성.</span>
+<span class="sd">        vector (str, optional): 벡터 종류를 의미하는 컬럼명. None이면 사용 안함.</span>
 <span class="sd">        title (str, optional): 플롯 제목. None이면 기본값 사용.</span>
 <span class="sd">        palette (str, optional): 색상 팔레트.</span>
 <span class="sd">        outline (bool, optional): 외곽선 표시 여부.</span>
@@ -15128,32 +15151,34 @@ finalize_plot의 래퍼 함수.</p>
     <span class="n">yindex</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">yname</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span><span class="n">ax</span><span class="p">:</span> <span class="n">Axes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># 클러스터 중심점 표시</span>
-        <span class="n">centers</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">cluster_centers_</span>  <span class="c1"># type: ignore</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
-            <span class="n">centers</span><span class="p">[:,</span> <span class="n">xindex</span><span class="p">],</span>
-            <span class="n">centers</span><span class="p">[:,</span> <span class="n">yindex</span><span class="p">],</span>
-            <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
-            <span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
-            <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-            <span class="n">s</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
-            <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span>
-            <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">centers</span><span class="p">):</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
-                <span class="n">c</span><span class="p">[</span><span class="n">xindex</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="n">yindex</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">%d</span><span class="s2">$&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;k&quot;</span>
-            <span class="p">)</span>
-
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Feature space for the &quot;</span> <span class="o">+</span> <span class="n">xname</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Feature space for the &quot;</span> <span class="o">+</span> <span class="n">yname</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="s2">&quot;cluster_centers_&quot;</span><span class="p">):</span>
+            <span class="c1"># 클러스터 중심점 표시</span>
+            <span class="n">centers</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">cluster_centers_</span>  <span class="c1"># type: ignore</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+                <span class="n">centers</span><span class="p">[:,</span> <span class="n">xindex</span><span class="p">],</span>
+                <span class="n">centers</span><span class="p">[:,</span> <span class="n">yindex</span><span class="p">],</span>
+                <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+                <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">s</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+                <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span>
+                <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">centers</span><span class="p">):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+                    <span class="n">c</span><span class="p">[</span><span class="n">xindex</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="n">yindex</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;$</span><span class="si">%d</span><span class="s2">$&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;k&quot;</span>
+                <span class="p">)</span>
 
     <span class="n">scatterplot</span><span class="p">(</span>
         <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>          <span class="c1"># type: ignore</span>
         <span class="n">xname</span><span class="o">=</span><span class="n">xname</span><span class="p">,</span>
         <span class="n">yname</span><span class="o">=</span><span class="n">yname</span><span class="p">,</span>
         <span class="n">hue</span><span class="o">=</span><span class="n">hue</span><span class="p">,</span>
+        <span class="n">vector</span><span class="o">=</span><span class="n">vector</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="s2">&quot;The visualization of the clustered data.&quot;</span> <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">title</span><span class="p">,</span>
         <span class="n">outline</span><span class="o">=</span><span class="n">outline</span><span class="p">,</span>
         <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span>
@@ -15440,11 +15465,7 @@ finalize_plot의 래퍼 함수.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2746</span>
-<span class="normal">2747</span>
-<span class="normal">2748</span>
-<span class="normal">2749</span>
-<span class="normal">2750</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2750</span>
 <span class="normal">2751</span>
 <span class="normal">2752</span>
 <span class="normal">2753</span>
@@ -15503,7 +15524,11 @@ finalize_plot의 래퍼 함수.</p>
 <span class="normal">2806</span>
 <span class="normal">2807</span>
 <span class="normal">2808</span>
-<span class="normal">2809</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">visualize_silhouette</span><span class="p">(</span>
+<span class="normal">2809</span>
+<span class="normal">2810</span>
+<span class="normal">2811</span>
+<span class="normal">2812</span>
+<span class="normal">2813</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">visualize_silhouette</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
