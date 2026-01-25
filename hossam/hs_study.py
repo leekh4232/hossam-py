@@ -64,10 +64,10 @@ def function_list(module_name: str, keyword: str | None = None):
     df.sort_values(by='function', inplace=True)
     df.reset_index(drop=True, inplace=True)
 
-    df.style.format(
-        {"reference": lambda x: f"<a href='{x}' target='_blank'>view</a>"},
-        escape=False    # type: ignore
-    )
+    # df.style.format(
+    #     {"reference": lambda x: f"<a href='{x}' target='_blank'>view</a>"},
+    #     escape=False    # type: ignore
+    # )
 
     if keyword:
         mask = df['function'].str.contains(keyword, case=False) | df['description'].str.contains(keyword, case=False)

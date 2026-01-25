@@ -2,49 +2,65 @@
 # ===================================================================
 # 패키지 참조
 # ===================================================================
-from tqdm.auto import tqdm
+import numpy as np
 import concurrent.futures as futures
+
+from . import hs_plot
+
+from tqdm.auto import tqdm
 from itertools import combinations
 
 from typing import Literal, Callable
 from kneed import KneeLocator
 from pandas import Series, DataFrame, MultiIndex
 from matplotlib.pyplot import Axes  # type: ignore
-from sklearn.cluster import KMeans
 
+from sklearn.cluster import KMeans, DBSCAN
+from sklearn.neighbors import NearestNeighbors
 from sklearn.metrics import silhouette_score
 
 from scipy.stats import normaltest
 
-import numpy as np
-from . import hs_plot
-
-import numpy as np
-
 RANDOM_STATE = 4232
 
 
+# ===================================================================
+# K-평균 군집화 모델을 적합하는 함수.
+# ===================================================================
 def kmeans_fit(
-    data: DataFrame, n_clusters: int, random_state: int = RANDOM_STATE, **params
-) -> tuple[KMeans, np.ndarray]:
+    data: DataFrame, n_clusters: int, random_state: int = RANDOM_STATE, plot: bool = False,
+    fields: list[list[str]] | None = None,
+    **params
+) -> tuple[KMeans, DataFrame]:
     """
-    K-평균 군집화 모델을 적합하는 내부 함수.
+    K-평균 군집화 모델을 적합하는 함수.
 
     Args:
         data (DataFrame): 군집화할 데이터프레임.
         n_clusters (int): 군집 개수.
         random_state (int, optional): 랜덤 시드. 기본값은 RANDOM_STATE.
+        plot (bool, optional): True면 결과를 시각화함. 기본값 False.
+        fields (list[list[str]] | None, optional): 시각화할 필드 쌍 리스트. 기본값 None이면 수치형 컬럼의 모든 조합 사용.
         **params: KMeans에 전달할 추가 파라미터.
 
     Returns:
         KMeans: 적합된 KMeans 모델.
-        ndarray: 각 데이터 포인트의 클러스터 할당 배열.
+        DataFrame: 클러스터 결과가 포함된 데이터 프레임
     """
-
+    df = data.copy()
     kmeans = KMeans(n_clusters=n_clusters, random_state=random_state, **params)
     kmeans.fit(data)
-    cluster = kmeans.predict(data)
-    return kmeans, cluster
+    df["cluster"] = kmeans.predict(df)
+
+    if plot:
+        cluster_plot(
+            estimator=kmeans,
+            data=data,
+            fields=fields,
+            title=f"K-Means Clustering (k={n_clusters})"
+        )
+
+    return kmeans, df
 
 
 # ===================================================================
@@ -130,6 +146,9 @@ def kmeans_elbow(
     return best_k, inertia_list
 
 
+# ===================================================================
+# K-평균 군집화에서 실루엣 점수를 계산하는 함수.
+# ===================================================================
 def kmeans_silhouette(
     data: DataFrame,
     k_range: list | tuple = [2, 11],
@@ -187,10 +206,10 @@ def kmeans_silhouette(
         estimators = []
 
         def __process_k(k):
-            estimator, cluster = kmeans_fit(
+            estimator, cdf = kmeans_fit(
                 data=data, n_clusters=k, random_state=random_state
             )
-            s_score = silhouette_score(X=data, labels=cluster)
+            s_score = silhouette_score(X=data, labels=cdf["cluster"])
             return s_score, estimator
 
         with futures.ThreadPoolExecutor() as executor:
@@ -344,13 +363,14 @@ def elbow_point(
             ax.axvline(best_x, color="red", linestyle="--", linewidth=0.7)
             ax.axhline(best_y, color="red", linestyle="--", linewidth=0.7)
             ax.text(
-                best_x + 0.1,
-                best_y + 0.1,
-                "Best K=%d" % best_x,
-                fontsize=8,
-                ha="left",
+                best_x,
+                best_y + (best_y * 0.01),
+                "x=%.2f, y=%.2f" % (best_x, best_y),
+                fontsize=6,
+                ha="center",
                 va="bottom",
-                color="r",
+                color="black",
+                fontweight="bold"
             )
 
             if callback is not None:
@@ -375,6 +395,9 @@ def elbow_point(
     return best_x, best_y
 
 
+# ===================================================================
+# 데이터프레임의 여러 필드 쌍에 대해 군집 산점도를 그리는 함수.
+# ===================================================================
 def cluster_plot(
     estimator: KMeans,
     data: DataFrame,
@@ -413,8 +436,8 @@ def cluster_plot(
         from hossam import *
 
         data = hs_util.load_data('iris')
-        data['cluster'] = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)[1]
-        hs_cluster.cluster_plot(data, hue='cluster')
+        estimator, cdf = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)
+        hs_cluster.cluster_plot(cdf, hue='cluster')
         ```
     """
 
@@ -451,6 +474,9 @@ def cluster_plot(
             pbar.update(1)
 
 
+# ===================================================================
+# 군집화된 데이터프레임에서 각 군집의 페르소나(특성 요약)를 생성하는 함수.
+# ===================================================================
 def persona(
     data: DataFrame,
     cluster: str | Series | np.ndarray | list | dict,
@@ -539,3 +565,199 @@ def persona(
     persona_df.set_index((cluster, ""), inplace=True)
     persona_df.index.name = cluster
     return persona_df
+
+
+# ===================================================================
+# 엘보우 포인트와 실루엣 점수를 통해 최적의 K값을 결정하는 함수.
+# ===================================================================
+def kmeans_best_k(
+    data: DataFrame,
+    k_range: list | tuple = [2, 11],
+    S: float = 0.1,
+    random_state: int = RANDOM_STATE,
+    plot: bool = True
+) -> int:
+    """
+    엘보우 포인트와 실루엣 점수를 통해 최적의 K값을 결정하는 함수.
+    Args:
+        data (DataFrame): 군집화할 데이터프레임.
+        k_range (list | tuple, optional): K값의 범위 지정. 기본값은 [2, 11].
+        S (float, optional): KneeLocator의 민감도 파라미터. 기본값 0.1.
+        random_state (int, optional): 랜덤 시드. 기본값은 RANDOM_STATE.
+        plot (bool, optional): True면 결과를 시각화함. 기본값 True.
+
+    Returns:
+        int: 최적의 K값.
+
+    Examples:
+        ```python
+        from hossam import *
+        data = hs_util.load_data('iris')
+        best_k = hs_cluster.kmeans_best_k(data.iloc[:, :-1])
+        ```
+    """
+
+    elbow_k, _ = kmeans_elbow(
+        data=data,
+        k_range=k_range,
+        S=S,
+        random_state=random_state,
+        plot=True if plot else False
+    )
+
+    silhouette_df = kmeans_silhouette(
+        data=data,
+        k_range=k_range,
+        random_state=random_state,
+        plot="both" if plot else False
+    )
+
+    silhouette_k = silhouette_df.sort_values(by="silhouette_score", ascending=False).iloc[0]["k"]
+
+    if elbow_k == silhouette_k:
+        best_k = elbow_k
+    else:
+        best_k = min(elbow_k, silhouette_k)
+
+    print(f"Elbow K: {elbow_k}, Silhouette K: {silhouette_k} => Best K: {best_k}")
+    return best_k
+
+
+# ===================================================================
+# DBSCAN 군집화 모델을 적합하는 함수.
+# ===================================================================
+def dbscan_fit(
+    data: DataFrame,
+    eps: float = 0.5,
+    min_samples: int = 5,
+    **params
+) -> tuple[DBSCAN, DataFrame, DataFrame]:
+    """
+    DBSCAN 군집화 모델을 적합하는 함수.
+
+    Args:
+        data (DataFrame): 군집화할 데이터프레임.
+        eps (float, optional): 두 샘플이 같은 군집에 속하기 위한 최대 거리. 기본값 0.5.
+        min_samples (int, optional): 핵심점이 되기 위한 최소 샘플 수. 기본값 5.
+        **params: DBSCAN에 전달할 추가 파라미터.
+
+    Returns:
+        tuple: (estimator, df)
+            - estimator: 적합된 DBSCAN 모델.
+            - df: 클러스터 및 벡터 유형이 포함된 데이터 프레임.
+            - result_df: 군집화 요약 통계 데이터 프레임.
+
+    """
+    df = data.copy()
+    estimator = DBSCAN(eps=eps, min_samples=min_samples, n_jobs=-1, **params)
+    estimator.fit(df)
+    df["cluster"] = estimator.labels_
+
+    # 기본적으로 모두 외곽 벡터로 지정
+    df["vector"] = "border"
+
+    # 핵심 벡터인 경우 'core'로 지정
+    df.loc[estimator.core_sample_indices_, "vector"] = "core"
+
+    # 노이즈 분류
+    df.loc[df["cluster"] == -1, "vector"] = "noise"
+
+    labels = estimator.labels_
+    n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+    noise_ratio = np.mean(labels == -1)
+
+    result_df = DataFrame({
+        "eps": [eps],
+        "min_samples": [min_samples],
+        "n_clusters": [n_clusters],
+        "noise_ratio": [noise_ratio]
+    })
+
+    return estimator, df, result_df
+
+
+# ===================================================================
+# DBSCAN 군집화에서 최적의 eps 값을 탐지하는 함수.
+# ===================================================================
+def dbscan_eps(
+    data: DataFrame,
+    min_samples: int = 5,
+    delta_ratio: float = 0.3,
+    step_ratio: float = 0.05,
+    S: float = 0.1,
+    plot: bool = True,
+    title: str | None = None,
+    palette: str | None = None,
+    outline: bool = False,
+    width: int = hs_plot.config.width,
+    height: int = hs_plot.config.height,
+    linewidth: int = hs_plot.config.line_width,
+    dpi: int = hs_plot.config.dpi,
+    save_path: str | None = None,
+    ax: Axes | None = None
+) -> tuple[float, np.ndarray]:
+    """
+    DBSCAN 군집화에서 최적의 eps 값을 탐지하는 함수.
+
+    Args:
+        data (DataFrame): 군집화할 데이터프레임.
+        min_samples (int, optional): 핵심점이 되기 위한 최소 샘플 수. 기본값 5.
+        delta_ratio (float, optional): eps 탐색 범위 비율. 기본값 0.3.
+        step_ratio (float, optional): eps 탐색 스텝 비율. 기본값 0.05.
+        S (float, optional): KneeLocator의 민감도 파라미터. 기본값 0.1.
+        plot (bool, optional): True면 결과를 시각화함. 기본값 True.
+        title (str | None, optional): 플롯 제목.
+        palette (str | None, optional): 색상 팔레트 이름.
+        outline (bool, optional): True면 데이터 포인트 외곽선 표시. 기본값 False.
+        width (int, optional): 플롯 가로 크기.
+        height (int, optional): 플롯 세로 크기.
+        linewidth (float, optional): 선 두께.
+        dpi (int, optional): 플롯 해상도.
+        save_path (str | None, optional): 저장 경로 지정시 파일로 저장.
+        ax (Axes | None, optional): 기존 matplotlib Axes 객체. None이면 새로 생성.
+
+    Returns:
+        tuple: (best_eps, eps_grid)
+            - best_eps: 최적의 eps 값
+            - eps_grid: 탐색에 사용된 eps 값 그리드 배열
+
+    Examples:
+        ```python
+        from hossam import *
+        data = hs_util.load_data('iris')
+        best_eps, eps_grid = hs_cluster.dbscan_eps(data, plot=True)
+        ```
+    """
+
+    neigh = NearestNeighbors(n_neighbors=min_samples)
+    nbrs = neigh.fit(data)
+    distances, indices = nbrs.kneighbors(data)
+
+    # 각 포인트에 대해 k번째 최근접 이웃까지의 거리 추출
+    k_distances = distances[:, -1]
+    k_distances.sort()
+
+    # 엘보우 포인트 탐지
+    _, best_eps = elbow_point(
+        x=list(range(1, len(k_distances) + 1)),
+        y=k_distances,
+        dir="right,down",
+        S=S,
+        plot=plot,
+        title=title,
+        marker=None,
+        width=width,
+        height=height,
+        dpi=dpi,
+        linewidth=linewidth,
+        save_path=save_path,
+        ax=ax,
+    )
+
+    eps_min = best_eps * (1 - delta_ratio)
+    eps_max = best_eps * (1 + delta_ratio)
+    step = best_eps * step_ratio
+
+    eps_grid = np.arange(eps_min, eps_max + step, step)
+
+    return best_eps, eps_grid
