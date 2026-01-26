@@ -1,25 +1,28 @@
 # -*- coding: utf-8 -*-
 # ===================================================================
-# 패키지 참조
+# 파이썬 기본 패키지 참조
 # ===================================================================
 import numpy as np
 import concurrent.futures as futures
-
-from . import hs_plot
-
 from tqdm.auto import tqdm
 from itertools import combinations
-
 from typing import Literal, Callable
+
+# ===================================================================
+# 데이터 분석 패키지 참조
+# ===================================================================
 from kneed import KneeLocator
 from pandas import Series, DataFrame, MultiIndex, concat
 from matplotlib.pyplot import Axes  # type: ignore
-
-from sklearn.cluster import KMeans, DBSCAN
+from scipy.stats import normaltest
+from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
 from sklearn.neighbors import NearestNeighbors
 from sklearn.metrics import silhouette_score, adjusted_rand_score
 
-from scipy.stats import normaltest
+# ===================================================================
+# hossam 패키지 참조
+# ===================================================================
+from . import hs_plot
 
 RANDOM_STATE = 52
 
@@ -31,7 +34,7 @@ def kmeans_fit(
     data: DataFrame, n_clusters: int, random_state: int = RANDOM_STATE, plot: bool = False,
     fields: list[list[str]] | None = None,
     **params
-) -> tuple[KMeans, DataFrame]:
+) -> tuple[KMeans, DataFrame, float]:
     """
     K-평균 군집화 모델을 적합하는 함수.
 
@@ -46,11 +49,13 @@ def kmeans_fit(
     Returns:
         KMeans: 적합된 KMeans 모델.
         DataFrame: 클러스터 결과가 포함된 데이터 프레임
+        float: 실루엣 점수
     """
     df = data.copy()
     kmeans = KMeans(n_clusters=n_clusters, random_state=random_state, **params)
     kmeans.fit(data)
     df["cluster"] = kmeans.predict(df)
+    score = float(silhouette_score(X=data, labels=df["cluster"]))
 
     if plot:
         cluster_plot(
@@ -60,7 +65,7 @@ def kmeans_fit(
             title=f"K-Means Clustering (k={n_clusters})"
         )
 
-    return kmeans, df
+    return kmeans, df, score
 
 
 # ===================================================================
@@ -122,7 +127,7 @@ def kmeans_elbow(
     r = range(k_range[0], k_range[1])
 
     for k in r:
-        kmeans, _ = kmeans_fit(data=data, n_clusters=k, random_state=random_state)
+        kmeans, _, score = kmeans_fit(data=data, n_clusters=k, random_state=random_state)
         inertia_list.append(kmeans.inertia_)
 
     best_k, _ = elbow_point(
@@ -131,13 +136,13 @@ def kmeans_elbow(
         dir="left,down",
         S=S,
         plot=plot,
-        title=title,
         marker=marker,
         width=width,
         height=height,
         dpi=dpi,
         linewidth=linewidth,
         save_path=save_path,
+        title=f"K-Means Elbow Method (k={k_range[0]}-{k_range[1]-1}, silhouette={score:.3f})" if title is None else title,
         ax=ax,
         callback=callback,
         **params,
@@ -206,68 +211,70 @@ def kmeans_silhouette(
         estimators = []
 
         def __process_k(k):
-            estimator, cdf = kmeans_fit(
+            estimator, cdf, score = kmeans_fit(
                 data=data, n_clusters=k, random_state=random_state
             )
-            s_score = silhouette_score(X=data, labels=cdf["cluster"])
-            return s_score, estimator
+            return score, estimator
 
         with futures.ThreadPoolExecutor() as executor:
+            executed = []
             for k in klist:
                 pbar.set_description(f"K-Means Silhouette: k={k}")
-                executed = executor.submit(__process_k, k)
-                s_score, estimator = executed.result()
+                executed.append(executor.submit(__process_k, k))
+
+            for e in executed:
+                s_score, estimator = e.result()
                 silhouettes.append(s_score)
                 estimators.append(estimator)
                 pbar.update(1)
 
-            if plot is not False:
-                for estimator in estimators:
-                    pbar.set_description(f"K-Means Plotting: k={estimator.n_clusters}")
+        if plot is not False:
+            for estimator in estimators:
+                pbar.set_description(f"K-Means Plotting: k={estimator.n_clusters}")
 
-                    if plot == "silhouette":
-                        hs_plot.silhouette_plot(
-                            estimator=estimator,
-                            data=data,
-                            title=title,
-                            width=width,
-                            height=height,
-                            dpi=dpi,
-                            linewidth=linewidth,
-                            save_path=save_path,
-                            **params,
-                        )
-                    elif plot == "cluster":
-                        hs_plot.cluster_plot(
-                            estimator=estimator,
-                            data=data,
-                            xname=xname,
-                            yname=yname,
-                            outline=True,
-                            palette=None,
-                            width=width,
-                            height=height,
-                            dpi=dpi,
-                            title=title,
-                            save_path=save_path,
-                        )
-                    elif plot == "both":
-                        hs_plot.visualize_silhouette(
-                            estimator=estimator,
-                            data=data,
-                            xname=xname,
-                            yname=yname,
-                            outline=True,
-                            palette=None,
-                            width=width,
-                            height=height,
-                            dpi=dpi,
-                            title=title,
-                            linewidth=linewidth,
-                            save_path=save_path,
-                        )
+                if plot == "silhouette":
+                    hs_plot.silhouette_plot(
+                        estimator=estimator,
+                        data=data,
+                        title=title,
+                        width=width,
+                        height=height,
+                        dpi=dpi,
+                        linewidth=linewidth,
+                        save_path=save_path,
+                        **params,
+                    )
+                elif plot == "cluster":
+                    hs_plot.cluster_plot(
+                        estimator=estimator,
+                        data=data,
+                        xname=xname,
+                        yname=yname,
+                        outline=True,
+                        palette=None,
+                        width=width,
+                        height=height,
+                        dpi=dpi,
+                        title=title,
+                        save_path=save_path,
+                    )
+                elif plot == "both":
+                    hs_plot.visualize_silhouette(
+                        estimator=estimator,
+                        data=data,
+                        xname=xname,
+                        yname=yname,
+                        outline=True,
+                        palette=None,
+                        width=width,
+                        height=height,
+                        dpi=dpi,
+                        title=title,
+                        linewidth=linewidth,
+                        save_path=save_path,
+                    )
 
-                    pbar.update(1)
+                pbar.update(1)
 
     silhouette_df = DataFrame({"k": klist, "silhouette_score": silhouettes})
     silhouette_df.sort_values(by="silhouette_score", ascending=False, inplace=True)
@@ -398,7 +405,7 @@ def elbow_point(
 # 데이터프레임의 여러 필드 쌍에 대해 군집 산점도를 그리는 함수.
 # ===================================================================
 def cluster_plot(
-    estimator: KMeans,
+    estimator: KMeans | DBSCAN | AgglomerativeClustering,
     data: DataFrame,
     hue: str | None = None,
     vector: str | None = None,
@@ -437,7 +444,7 @@ def cluster_plot(
         from hossam import *
 
         data = hs_util.load_data('iris')
-        estimator, cdf = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)
+        estimator, cdf, score = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)
         hs_cluster.cluster_plot(cdf, hue='cluster')
         ```
     """
@@ -497,8 +504,8 @@ def persona(
         from hossam import *
 
         data = hs_util.load_data('iris')
-        data['cluster'] = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)[1]
-        persona_df = hs_cluster.persona(data, hue='cluster')
+        estimator, df, score = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)
+        persona_df = hs_cluster.persona(df, hue='cluster')
         print(persona_df)
         ```
     """
@@ -783,11 +790,15 @@ def dbscan_fit(
     result_dfs: DataFrame | None = None
 
     with tqdm(total=len(eps)+2) as pbar:
+        pbar.set_description(f"DBSCAN Clustering")
+
         with futures.ThreadPoolExecutor() as executor:
+            executers = []
             for i, e in enumerate(eps):
-                pbar.set_description(f"DBSCAN Fit: eps={e:.4f}")
-                executed = executor.submit(__dbscan_fit, data=data, eps=e, min_samples=min_samples, **params)
-                estimator, cluster_df, result_df = executed.result()
+                executers.append(executor.submit(__dbscan_fit, data=data, eps=e, min_samples=min_samples, **params))
+
+            for i, e in enumerate(executers):
+                estimator, cluster_df, result_df = e.result()
                 estimators.append(estimator)
                 cluster_dfs.append(cluster_df)
 
@@ -800,7 +811,6 @@ def dbscan_fit(
 
                 pbar.update(1)
 
-            pbar.set_description(f"DBSCAN Stability Analysis")
             result_dfs['cluster_diff'] = result_dfs['n_clusters'].diff().abs()      # type: ignore
             result_dfs['noise_ratio_diff'] = result_dfs['noise_ratio'].diff().abs()    # type: ignore
             result_dfs['stable'] = ( # type: ignore
@@ -854,3 +864,44 @@ def dbscan_fit(
         cluster_dfs[0] if len(cluster_dfs) == 1 else cluster_dfs,
         result_dfs  # type: ignore
     )
+
+
+# ===================================================================
+# 계층적 군집화 모델을 적합하는 함수.
+# ===================================================================
+def agg_fit(
+    data: DataFrame,
+    n_clusters: int = 3,
+    linkage: Literal['ward', 'complete', 'average', 'single'] = "ward",
+    compute_distances: bool = True,
+    plot: bool = False,
+    **params
+) -> tuple[AgglomerativeClustering, DataFrame, float]:
+    """
+    계층적 군집화 모델을 적합하는 함수.
+
+    Args:
+        data (DataFrame): 군집화할 데이터프레임.
+        n_clusters (int, optional): 군집 개수. 기본값 3.
+        linkage (str, optional): 병합 기준. 기본값 "ward".
+        compute_distances (bool, optional): 거리 행렬 계산 여부. 기본값 True.
+        plot (bool, optional): True면 결과를 시각화함. 기본값 False.
+        **params: AgglomerativeClustering에 전달할 추가 파라미터.
+
+    Returns:
+        tuple: (estimator, df, score)
+            - estimator: 적합된 AgglomerativeClustering 모델.
+            - df: 클러스터 결과가 포함된 데이터 프레임.
+            - score: 실루엣 점수.
+
+    """
+    df = data.copy()
+    estimator = AgglomerativeClustering(n_clusters=n_clusters, compute_distances=compute_distances, linkage=linkage, **params)
+    estimator.fit(data)
+    df["cluster"] = estimator.labels_
+    score = float(silhouette_score(X=data, labels=df["cluster"]))
+
+    if plot:
+        hs_plot.visualize_silhouette(estimator=estimator, data=data)
+
+    return estimator, df, score
