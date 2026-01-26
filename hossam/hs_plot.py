@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 from types import SimpleNamespace
-from typing import Callable
+from typing import Callable, Literal
 
 # ===================================================================
 import numpy as np
@@ -15,6 +15,7 @@ from pandas import DataFrame
 # ===================================================================
 from scipy.stats import t
 from scipy.spatial import ConvexHull
+from scipy.cluster.hierarchy import dendrogram as sch_dendrogram
 from statsmodels.graphics.gofplots import qqplot as sm_qqplot
 from statsmodels.nonparametric.smoothers_lowess import lowess as sm_lowess
 
@@ -2644,6 +2645,9 @@ def silhouette_plot(
     finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
+# ===================================================================
+# 군집분석 결과 시각화
+# ===================================================================
 def cluster_plot(
     estimator: KMeans | AgglomerativeClustering | None = None,
     data: DataFrame | None = None,
@@ -2755,6 +2759,9 @@ def cluster_plot(
     )
 
 
+# ===================================================================
+# 군집분석 결과의 실루엣 플롯과 군집 산점도를 한 화면에 함께 시각화
+# ===================================================================
 def visualize_silhouette(
     estimator: KMeans | AgglomerativeClustering,
     data: DataFrame,
@@ -2819,3 +2826,76 @@ def visualize_silhouette(
     )
 
     finalize_plot(ax)
+
+
+
+# ===================================================================
+# 덴드로그램 시각화
+# ===================================================================
+def dandrogram(
+    estimator: AgglomerativeClustering,
+    p: int = 30,
+    count_sort: Literal["ascending", "descending", False] = "ascending",
+    title: str | None = None,
+    width: int = config.width,
+    height: int = config.height,
+    dpi: int = config.dpi,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None
+) -> None:
+    """덴드로그램 시각화
+
+    Args:
+        estimator (AgglomerativeClustering): 학습된 AgglomerativeClustering 군집 모델 객체.
+        p (int): 덴드로그램에서 표시할 마지막 병합된 군집 수. 기본값 30.
+        count_sort (str): 'ascending' 또는 'descending'으로 병합 순서 정렬.
+        title (str|None): 그래프 제목.
+        palette (str|None): 팔레트 이름.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        dpi (int): 그림 크기 및 해상도.
+        save_path (str|None): 저장 경로.
+        callback (Callable|None): Axes 후처리 콜백.
+        ax (Axes|None): 외부에서 전달한 Axes. None이면 새로 생성.
+
+    Returns:
+        None
+    """
+    # 덴드로그램을 그리기 위해 linkage 행렬 생성
+    counts = np.zeros(estimator.children_.shape[0]) # type: ignore
+    n_samples = len(estimator.labels_)
+
+    for i, merge in enumerate(estimator.children_): # type: ignore
+        current_count = 0
+        for child_idx in merge:
+            if child_idx < n_samples:
+                current_count += 1  # leaf node
+            else:
+                current_count += counts[child_idx - n_samples]
+        counts[i] = current_count
+
+        linkage_matrix = np.column_stack(
+            [estimator.children_, estimator.distances_, counts]
+        ).astype(float)
+
+    outparams = False
+
+    if ax is None:
+        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        outparams = True
+
+
+    sch_dendrogram(
+        linkage_matrix,
+        ax=ax,
+        p=p,
+        truncate_mode="lastp" if p > 0 else None,
+        leaf_rotation=0,
+        leaf_font_size=8,
+        count_sort=count_sort,
+        color_threshold=None,
+        above_threshold_color="grey",
+    )
+
+    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore

@@ -31,9 +31,12 @@ RANDOM_STATE = 52
 # K-평균 군집화 모델을 적합하는 함수.
 # ===================================================================
 def kmeans_fit(
-    data: DataFrame, n_clusters: int, random_state: int = RANDOM_STATE, plot: bool = False,
+    data: DataFrame,
+    n_clusters: int,
+    random_state: int = RANDOM_STATE,
+    plot: bool = False,
     fields: list[list[str]] | None = None,
-    **params
+    **params,
 ) -> tuple[KMeans, DataFrame, float]:
     """
     K-평균 군집화 모델을 적합하는 함수.
@@ -62,7 +65,7 @@ def kmeans_fit(
             estimator=kmeans,
             data=data,
             fields=fields,
-            title=f"K-Means Clustering (k={n_clusters})"
+            title=f"K-Means Clustering (k={n_clusters})",
         )
 
     return kmeans, df, score
@@ -127,7 +130,9 @@ def kmeans_elbow(
     r = range(k_range[0], k_range[1])
 
     for k in r:
-        kmeans, _, score = kmeans_fit(data=data, n_clusters=k, random_state=random_state)
+        kmeans, _, score = kmeans_fit(
+            data=data, n_clusters=k, random_state=random_state
+        )
         inertia_list.append(kmeans.inertia_)
 
     best_k, _ = elbow_point(
@@ -142,7 +147,11 @@ def kmeans_elbow(
         dpi=dpi,
         linewidth=linewidth,
         save_path=save_path,
-        title=f"K-Means Elbow Method (k={k_range[0]}-{k_range[1]-1}, silhouette={score:.3f})" if title is None else title,
+        title=(
+            f"K-Means Elbow Method (k={k_range[0]}-{k_range[1]-1}, silhouette={score:.3f})"
+            if title is None
+            else title
+        ),
         ax=ax,
         callback=callback,
         **params,
@@ -365,6 +374,7 @@ def elbow_point(
     best_y = kn.elbow_y
 
     if plot:
+
         def hvline(ax):
             ax.axvline(best_x, color="red", linestyle="--", linewidth=0.7)
             ax.axhline(best_y, color="red", linestyle="--", linewidth=0.7)
@@ -376,7 +386,7 @@ def elbow_point(
                 ha="center",
                 va="bottom",
                 color="black",
-                fontweight="bold"
+                fontweight="bold",
             )
 
             if callback is not None:
@@ -461,7 +471,7 @@ def cluster_plot(
         xname, yname = field_pair
 
         hs_plot.cluster_plot(
-            estimator=estimator,
+            estimator=estimator,    # type: ignore
             data=data,
             xname=xname,
             yname=yname,
@@ -486,7 +496,7 @@ def persona(
     data: DataFrame,
     cluster: str | Series | np.ndarray | list | dict,
     fields: list[str] | None = None,
-    full: bool = False
+    full: bool = False,
 ) -> DataFrame:
     """
     군집화된 데이터프레임에서 각 군집의 페르소나(특성 요약)를 생성하는 함수.
@@ -516,7 +526,9 @@ def persona(
 
     if isinstance(cluster, str):
         if cluster not in df.columns:
-            raise ValueError(f"cluster로 지정된 컬럼 '{cluster}'이(가) 데이터프레임에 존재하지 않습니다.")
+            raise ValueError(
+                f"cluster로 지정된 컬럼 '{cluster}'이(가) 데이터프레임에 존재하지 않습니다."
+            )
     else:
         df["cluster"] = cluster
         cluster = "cluster"
@@ -580,7 +592,7 @@ def kmeans_best_k(
     k_range: list | tuple = [2, 11],
     S: float = 0.1,
     random_state: int = RANDOM_STATE,
-    plot: bool = True
+    plot: bool = True,
 ) -> int:
     """
     엘보우 포인트와 실루엣 점수를 통해 최적의 K값을 결정하는 함수.
@@ -607,17 +619,19 @@ def kmeans_best_k(
         k_range=k_range,
         S=S,
         random_state=random_state,
-        plot=True if plot else False
+        plot=True if plot else False,
     )
 
     silhouette_df = kmeans_silhouette(
         data=data,
         k_range=k_range,
         random_state=random_state,
-        plot="both" if plot else False
+        plot="both" if plot else False,
     )
 
-    silhouette_k = silhouette_df.sort_values(by="silhouette_score", ascending=False).iloc[0]["k"]
+    silhouette_k = silhouette_df.sort_values(
+        by="silhouette_score", ascending=False
+    ).iloc[0]["k"]
 
     if elbow_k == silhouette_k:
         best_k = elbow_k
@@ -632,10 +646,7 @@ def kmeans_best_k(
 # DBSCAN 군집화 모델을 적합하는 함수.
 # ===================================================================
 def __dbscan_fit(
-    data: DataFrame,
-    eps: float = 0.5,
-    min_samples: int = 5,
-    **params
+    data: DataFrame, eps: float = 0.5, min_samples: int = 5, **params
 ) -> tuple[DBSCAN, DataFrame, DataFrame]:
     """
     DBSCAN 군집화 모델을 적합하는 함수.
@@ -671,12 +682,14 @@ def __dbscan_fit(
     n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
     noise_ratio = np.mean(labels == -1)
 
-    result_df = DataFrame({
-        "eps": [eps],
-        "min_samples": [min_samples],
-        "n_clusters": [n_clusters],
-        "noise_ratio": [noise_ratio]
-    })
+    result_df = DataFrame(
+        {
+            "eps": [eps],
+            "min_samples": [min_samples],
+            "n_clusters": [n_clusters],
+            "noise_ratio": [noise_ratio],
+        }
+    )
 
     return estimator, df, result_df
 
@@ -698,7 +711,7 @@ def dbscan_eps(
     linewidth: int = hs_plot.config.line_width,
     dpi: int = hs_plot.config.dpi,
     save_path: str | None = None,
-    ax: Axes | None = None
+    ax: Axes | None = None,
 ) -> tuple[float, np.ndarray]:
     """
     DBSCAN 군집화에서 최적의 eps 값을 탐지하는 함수.
@@ -766,14 +779,15 @@ def dbscan_eps(
 
     return best_eps, eps_grid
 
+
 def dbscan_fit(
     data: DataFrame,
     eps: float | list | np.ndarray | None = None,
     min_samples: int = 5,
     ari_threshold: float = 0.9,
     noise_diff_threshold: float = 0.05,
-    plot : bool = True,
-    **params
+    plot: bool = True,
+    **params,
 ) -> tuple[DBSCAN, DataFrame, DataFrame]:
 
     # eps 값이 지정되지 않은 경우 최적의 eps 탐지
@@ -789,13 +803,21 @@ def dbscan_fit(
     cluster_dfs = []
     result_dfs: DataFrame | None = None
 
-    with tqdm(total=len(eps)+2) as pbar:
+    with tqdm(total=len(eps) + 2) as pbar:
         pbar.set_description(f"DBSCAN Clustering")
 
         with futures.ThreadPoolExecutor() as executor:
             executers = []
             for i, e in enumerate(eps):
-                executers.append(executor.submit(__dbscan_fit, data=data, eps=e, min_samples=min_samples, **params))
+                executers.append(
+                    executor.submit(
+                        __dbscan_fit,
+                        data=data,
+                        eps=e,
+                        min_samples=min_samples,
+                        **params,
+                    )
+                )
 
             for i, e in enumerate(executers):
                 estimator, cluster_df, result_df = e.result()
@@ -803,40 +825,40 @@ def dbscan_fit(
                 cluster_dfs.append(cluster_df)
 
                 if result_dfs is None:
-                    result_df['ARI'] = np.nan
+                    result_df["ARI"] = np.nan
                     result_dfs = result_df
                 else:
-                    result_df['ARI'] = adjusted_rand_score(cluster_dfs[i-1]['cluster'], cluster_df['cluster']) # type: ignore
+                    result_df["ARI"] = adjusted_rand_score(cluster_dfs[i - 1]["cluster"], cluster_df["cluster"])  # type: ignore
                     result_dfs = concat([result_dfs, result_df], ignore_index=True)
 
                 pbar.update(1)
 
-            result_dfs['cluster_diff'] = result_dfs['n_clusters'].diff().abs()      # type: ignore
-            result_dfs['noise_ratio_diff'] = result_dfs['noise_ratio'].diff().abs()    # type: ignore
-            result_dfs['stable'] = ( # type: ignore
-                (result_dfs['ARI'] >= ari_threshold) & # type: ignore
-                (result_dfs['cluster_diff'] <= 0) & # type: ignore
-                (result_dfs['noise_ratio_diff'] <= noise_diff_threshold) # type: ignore
+            result_dfs["cluster_diff"] = result_dfs["n_clusters"].diff().abs()  # type: ignore
+            result_dfs["noise_ratio_diff"] = result_dfs["noise_ratio"].diff().abs()  # type: ignore
+            result_dfs["stable"] = (  # type: ignore
+                (result_dfs["ARI"] >= ari_threshold)  # type: ignore
+                & (result_dfs["cluster_diff"] <= 0)  # type: ignore
+                & (result_dfs["noise_ratio_diff"] <= noise_diff_threshold)  # type: ignore
             )
 
             # 첫 행은 비교 불가
-            result_dfs.loc[0, 'stable'] = False # type: ignore
+            result_dfs.loc[0, "stable"] = False  # type: ignore
             pbar.update(1)
 
             if len(eps) == 1:
-                result_dfs['group_id'] = 1  # type: ignore
-                result_dfs['recommand'] = 'unknown' # type: ignore
+                result_dfs["group_id"] = 1  # type: ignore
+                result_dfs["recommand"] = "unknown"  # type: ignore
             else:
                 # 안정구간 도출하기
                 # stable 여부를 0/1로 변환
-                stable_flag = result_dfs['stable'].astype(int).values  # type: ignore
+                stable_flag = result_dfs["stable"].astype(int).values  # type: ignore
 
                 # 연속 구간 구분용 그룹 id 생성
-                group_id = (stable_flag != np.roll(stable_flag, 1)).cumsum()    # type: ignore
-                result_dfs['group_id'] = group_id  # type: ignore
+                group_id = (stable_flag != np.roll(stable_flag, 1)).cumsum()  # type: ignore
+                result_dfs["group_id"] = group_id  # type: ignore
 
                 # 안정구간 중 가장 긴 구간 선택
-                stable_groups = result_dfs[result_dfs['stable']].groupby('group_id')  # type: ignore
+                stable_groups = result_dfs[result_dfs["stable"]].groupby("group_id")  # type: ignore
 
                 # 각 구간의 길이 계산
                 group_sizes = stable_groups.size()
@@ -844,41 +866,41 @@ def dbscan_fit(
                 # 가장 긴 안정 구간 선택
                 best_group_id = group_sizes.idxmax()
 
-                result_dfs['recommand'] = 'bad' # type: ignore
+                result_dfs["recommand"] = "bad"  # type: ignore
 
                 # 가장 긴 안정 구간에 해당하는 recommand 컬럼을 `best`로 변경
-                result_dfs.loc[result_dfs["group_id"] == best_group_id, 'recommand'] = 'best' # type: ignore
+                result_dfs.loc[result_dfs["group_id"] == best_group_id, "recommand"] = "best"  # type: ignore
 
                 # result_dfs에서 recommand가 best에 해당하는 인덱스와 같은 위치의 추정기만 추출
-                best_indexes = list(result_dfs[result_dfs['recommand'] == 'best'].index) # type: ignore
+                best_indexes = list(result_dfs[result_dfs["recommand"] == "best"].index)  # type: ignore
 
-                for i in range(len(estimators)-1, -1, -1):
+                for i in range(len(estimators) - 1, -1, -1):
                     if i not in best_indexes:
-                        del(estimators[i])
-                        del(cluster_dfs[i])
+                        del estimators[i]
+                        del cluster_dfs[i]
 
             pbar.update(1)
 
     return (
         estimators[0] if len(estimators) == 1 else estimators,  # type: ignore
         cluster_dfs[0] if len(cluster_dfs) == 1 else cluster_dfs,
-        result_dfs  # type: ignore
+        result_dfs,  # type: ignore
     )
 
 
 # ===================================================================
-# 계층적 군집화 모델을 적합하는 함수.
+# 단일 계층적 군집화 모델을 적합하는 함수.
 # ===================================================================
-def agg_fit(
+def __agg_fit(
     data: DataFrame,
     n_clusters: int = 3,
-    linkage: Literal['ward', 'complete', 'average', 'single'] = "ward",
-    compute_distances: bool = True,
+    linkage: Literal["ward", "complete", "average", "single"] = "ward",
     plot: bool = False,
-    **params
+    compute_distances: bool = True,
+    **params,
 ) -> tuple[AgglomerativeClustering, DataFrame, float]:
     """
-    계층적 군집화 모델을 적합하는 함수.
+    단일 계층적 군집화 모델을 적합하는 함수.
 
     Args:
         data (DataFrame): 군집화할 데이터프레임.
@@ -896,7 +918,9 @@ def agg_fit(
 
     """
     df = data.copy()
-    estimator = AgglomerativeClustering(n_clusters=n_clusters, compute_distances=compute_distances, linkage=linkage, **params)
+    estimator = AgglomerativeClustering(
+        n_clusters=n_clusters, compute_distances=compute_distances, linkage=linkage, **params
+    )
     estimator.fit(data)
     df["cluster"] = estimator.labels_
     score = float(silhouette_score(X=data, labels=df["cluster"]))
@@ -905,3 +929,91 @@ def agg_fit(
         hs_plot.visualize_silhouette(estimator=estimator, data=data)
 
     return estimator, df, score
+
+
+def agg_fit(
+    data: DataFrame,
+    n_clusters: int | list[int] | np.ndarray = 3,
+    linkage: Literal["ward", "complete", "average", "single"] = "ward",
+    plot: bool = False,
+    **params,
+) -> tuple[AgglomerativeClustering | list[AgglomerativeClustering], DataFrame | list[DataFrame], DataFrame]:
+    """
+    계층적 군집화 모델을 적합하는 함수.
+
+    Args:
+        data (DataFrame): 군집화할 데이터프레임.
+        n_clusters (int | list[int] | np.ndarray, optional): 군집 개수 또는 개수 리스트. 기본값 3.
+        linkage (str, optional): 병합 기준. 기본값 "ward".
+        plot (bool, optional): True면 결과를 시각화함. 기본값 False.
+        **params: AgglomerativeClustering에 전달할 추가 파라미터.
+
+    Returns:
+        tuple: (estimator(s), df(s), score_df)
+            - estimator(s): 적합된 AgglomerativeClustering 모델 또는 모델 리스트.
+            - df(s): 클러스터 결과가 포함된 데이터 프레임 또는 데이터 프레임 리스트.
+            - score_df: 각 군집 개수에 대한 실루엣 점수 데이터프레임.
+
+    Examples:
+        ```python
+        from hossam import *
+
+        data = hs_util.load_data('iris')
+        estimators, cluster_dfs, score_df = hs_cluster.agg_fit(data.iloc[:, :-1], n_clusters=[2,3,4])
+        ```
+    """
+    compute_distances = False
+
+    if isinstance(n_clusters, int):
+        n_clusters = [n_clusters]
+        compute_distances = True
+    else:
+        n_clusters = list(range(n_clusters[0], n_clusters[-1]))
+
+    estimators = []
+    cluster_dfs = []
+    scores = []
+
+    with tqdm(total=len(n_clusters)*2) as pbar:
+        pbar.set_description(f"Agglomerative Clustering")
+
+        with futures.ThreadPoolExecutor() as executor:
+            executers = []
+            for k in n_clusters:
+                executers.append(
+                    executor.submit(
+                        __agg_fit,
+                        data=data,
+                        n_clusters=k,
+                        linkage=linkage,
+                        plot=False,
+                        compute_distances=compute_distances,
+                        **params,
+                    )
+                )
+                pbar.update(1)
+
+            for e in executers:
+                estimator, cluster_df, score = e.result()
+                estimators.append(estimator)
+                cluster_dfs.append(cluster_df)
+                scores.append({"k": estimator.n_clusters, "silhouette_score": score})
+
+                if plot:
+                    hs_plot.visualize_silhouette(
+                        estimator=estimator,
+                        data=data,
+                        outline=True,
+                        title=f"Agglomerative Clustering Silhouette (k={estimator.n_clusters})",
+                    )
+
+                pbar.update(1)
+
+    score_df = DataFrame(scores)
+    score_df.sort_values(by="silhouette_score", ascending=False, inplace=True)
+
+    return (
+        estimators[0] if len(estimators) == 1 else estimators,  # type: ignore
+        cluster_dfs[0] if len(cluster_dfs) == 1 else cluster_dfs,
+        score_df,  # type: ignore
+    )
