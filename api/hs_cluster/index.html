@@ -771,6 +771,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.agg_fit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        agg_fit
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -912,6 +923,17 @@
     <span class="md-ellipsis">
       
         dbscan_eps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_cluster.agg_fit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        agg_fit
       
     </span>
   </a>
@@ -1137,16 +1159,23 @@
               </div>
             </td>
           </tr>
+          <tr class="doc-section-item">
+<td><code>float</code></td>            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>실루엣 점수</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_cluster.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
 <span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
@@ -1176,11 +1205,16 @@
 <span class="normal">60</span>
 <span class="normal">61</span>
 <span class="normal">62</span>
-<span class="normal">63</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kmeans_fit</span><span class="p">(</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kmeans_fit</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">n_clusters</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">RANDOM_STATE</span><span class="p">,</span> <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">params</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">KMeans</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">KMeans</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    K-평균 군집화 모델을 적합하는 함수.</span>
 
@@ -1195,11 +1229,13 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        KMeans: 적합된 KMeans 모델.</span>
 <span class="sd">        DataFrame: 클러스터 결과가 포함된 데이터 프레임</span>
+<span class="sd">        float: 실루엣 점수</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
     <span class="n">kmeans</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
     <span class="n">df</span><span class="p">[</span><span class="s2">&quot;cluster&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kmeans</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">silhouette_score</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;cluster&quot;</span><span class="p">]))</span>
 
     <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
         <span class="n">cluster_plot</span><span class="p">(</span>
@@ -1209,7 +1245,7 @@
             <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;K-Means Clustering (k=</span><span class="si">{</span><span class="n">n_clusters</span><span class="si">}</span><span class="s2">)&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">kmeans</span><span class="p">,</span> <span class="n">df</span>
+    <span class="k">return</span> <span class="n">kmeans</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">score</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1537,12 +1573,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_cluster.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 69</span>
-<span class="normal"> 70</span>
-<span class="normal"> 71</span>
-<span class="normal"> 72</span>
-<span class="normal"> 73</span>
-<span class="normal"> 74</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 74</span>
 <span class="normal"> 75</span>
 <span class="normal"> 76</span>
 <span class="normal"> 77</span>
@@ -1614,7 +1645,12 @@
 <span class="normal">143</span>
 <span class="normal">144</span>
 <span class="normal">145</span>
-<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kmeans_elbow</span><span class="p">(</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kmeans_elbow</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">k_range</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
     <span class="n">S</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
@@ -1670,7 +1706,7 @@
     <span class="n">r</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">k_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">k_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
-        <span class="n">kmeans</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">kmeans_fit</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+        <span class="n">kmeans</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="n">kmeans_fit</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
         <span class="n">inertia_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kmeans</span><span class="o">.</span><span class="n">inertia_</span><span class="p">)</span>
 
     <span class="n">best_k</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">elbow_point</span><span class="p">(</span>
@@ -1679,13 +1715,13 @@
         <span class="nb">dir</span><span class="o">=</span><span class="s2">&quot;left,down&quot;</span><span class="p">,</span>
         <span class="n">S</span><span class="o">=</span><span class="n">S</span><span class="p">,</span>
         <span class="n">plot</span><span class="o">=</span><span class="n">plot</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
         <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
         <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
         <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span>
         <span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;K-Means Elbow Method (k=</span><span class="si">{</span><span class="n">k_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">k_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="si">}</span><span class="s2">, silhouette=</span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">title</span><span class="p">,</span>
         <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
         <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span>
         <span class="o">**</span><span class="n">params</span><span class="p">,</span>
@@ -1983,12 +2019,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_cluster.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">157</span>
 <span class="normal">158</span>
 <span class="normal">159</span>
 <span class="normal">160</span>
@@ -2105,7 +2136,14 @@
 <span class="normal">271</span>
 <span class="normal">272</span>
 <span class="normal">273</span>
-<span class="normal">274</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kmeans_silhouette</span><span class="p">(</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kmeans_silhouette</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">k_range</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
     <span class="n">random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">RANDOM_STATE</span><span class="p">,</span>
@@ -2162,68 +2200,70 @@
         <span class="n">estimators</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">__process_k</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
-            <span class="n">estimator</span><span class="p">,</span> <span class="n">cdf</span> <span class="o">=</span> <span class="n">kmeans_fit</span><span class="p">(</span>
+            <span class="n">estimator</span><span class="p">,</span> <span class="n">cdf</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="n">kmeans_fit</span><span class="p">(</span>
                 <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span>
             <span class="p">)</span>
-            <span class="n">s_score</span> <span class="o">=</span> <span class="n">silhouette_score</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">cdf</span><span class="p">[</span><span class="s2">&quot;cluster&quot;</span><span class="p">])</span>
-            <span class="k">return</span> <span class="n">s_score</span><span class="p">,</span> <span class="n">estimator</span>
+            <span class="k">return</span> <span class="n">score</span><span class="p">,</span> <span class="n">estimator</span>
 
         <span class="k">with</span> <span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">()</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+            <span class="n">executed</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">klist</span><span class="p">:</span>
                 <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;K-Means Silhouette: k=</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">executed</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">__process_k</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
-                <span class="n">s_score</span><span class="p">,</span> <span class="n">estimator</span> <span class="o">=</span> <span class="n">executed</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+                <span class="n">executed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">__process_k</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">executed</span><span class="p">:</span>
+                <span class="n">s_score</span><span class="p">,</span> <span class="n">estimator</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
                 <span class="n">silhouettes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s_score</span><span class="p">)</span>
                 <span class="n">estimators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span>
                 <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">plot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">estimator</span> <span class="ow">in</span> <span class="n">estimators</span><span class="p">:</span>
-                    <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;K-Means Plotting: k=</span><span class="si">{</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_clusters</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">plot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">estimator</span> <span class="ow">in</span> <span class="n">estimators</span><span class="p">:</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;K-Means Plotting: k=</span><span class="si">{</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_clusters</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-                    <span class="k">if</span> <span class="n">plot</span> <span class="o">==</span> <span class="s2">&quot;silhouette&quot;</span><span class="p">:</span>
-                        <span class="n">hs_plot</span><span class="o">.</span><span class="n">silhouette_plot</span><span class="p">(</span>
-                            <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
-                            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-                            <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-                            <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
-                            <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
-                            <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
-                            <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span>
-                            <span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">,</span>
-                            <span class="o">**</span><span class="n">params</span><span class="p">,</span>
-                        <span class="p">)</span>
-                    <span class="k">elif</span> <span class="n">plot</span> <span class="o">==</span> <span class="s2">&quot;cluster&quot;</span><span class="p">:</span>
-                        <span class="n">hs_plot</span><span class="o">.</span><span class="n">cluster_plot</span><span class="p">(</span>
-                            <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
-                            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-                            <span class="n">xname</span><span class="o">=</span><span class="n">xname</span><span class="p">,</span>
-                            <span class="n">yname</span><span class="o">=</span><span class="n">yname</span><span class="p">,</span>
-                            <span class="n">outline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                            <span class="n">palette</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                            <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
-                            <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
-                            <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
-                            <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-                            <span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">,</span>
-                        <span class="p">)</span>
-                    <span class="k">elif</span> <span class="n">plot</span> <span class="o">==</span> <span class="s2">&quot;both&quot;</span><span class="p">:</span>
-                        <span class="n">hs_plot</span><span class="o">.</span><span class="n">visualize_silhouette</span><span class="p">(</span>
-                            <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
-                            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-                            <span class="n">xname</span><span class="o">=</span><span class="n">xname</span><span class="p">,</span>
-                            <span class="n">yname</span><span class="o">=</span><span class="n">yname</span><span class="p">,</span>
-                            <span class="n">outline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                            <span class="n">palette</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                            <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
-                            <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
-                            <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
-                            <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
-                            <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span>
-                            <span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">,</span>
-                        <span class="p">)</span>
+                <span class="k">if</span> <span class="n">plot</span> <span class="o">==</span> <span class="s2">&quot;silhouette&quot;</span><span class="p">:</span>
+                    <span class="n">hs_plot</span><span class="o">.</span><span class="n">silhouette_plot</span><span class="p">(</span>
+                        <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+                        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+                        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+                        <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
+                        <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span>
+                        <span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">params</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">plot</span> <span class="o">==</span> <span class="s2">&quot;cluster&quot;</span><span class="p">:</span>
+                    <span class="n">hs_plot</span><span class="o">.</span><span class="n">cluster_plot</span><span class="p">(</span>
+                        <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                        <span class="n">xname</span><span class="o">=</span><span class="n">xname</span><span class="p">,</span>
+                        <span class="n">yname</span><span class="o">=</span><span class="n">yname</span><span class="p">,</span>
+                        <span class="n">outline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">palette</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+                        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+                        <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
+                        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+                        <span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">plot</span> <span class="o">==</span> <span class="s2">&quot;both&quot;</span><span class="p">:</span>
+                    <span class="n">hs_plot</span><span class="o">.</span><span class="n">visualize_silhouette</span><span class="p">(</span>
+                        <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                        <span class="n">xname</span><span class="o">=</span><span class="n">xname</span><span class="p">,</span>
+                        <span class="n">yname</span><span class="o">=</span><span class="n">yname</span><span class="p">,</span>
+                        <span class="n">outline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">palette</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+                        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+                        <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
+                        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+                        <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span>
+                        <span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">,</span>
+                    <span class="p">)</span>
 
-                    <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="n">silhouette_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;k&quot;</span><span class="p">:</span> <span class="n">klist</span><span class="p">,</span> <span class="s2">&quot;silhouette_score&quot;</span><span class="p">:</span> <span class="n">silhouettes</span><span class="p">})</span>
     <span class="n">silhouette_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;silhouette_score&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -2568,14 +2608,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_cluster.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">280</span>
-<span class="normal">281</span>
-<span class="normal">282</span>
-<span class="normal">283</span>
-<span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
-<span class="normal">287</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">287</span>
 <span class="normal">288</span>
 <span class="normal">289</span>
 <span class="normal">290</span>
@@ -2682,7 +2715,14 @@
 <span class="normal">391</span>
 <span class="normal">392</span>
 <span class="normal">393</span>
-<span class="normal">394</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">elbow_point</span><span class="p">(</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">elbow_point</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">Series</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span><span class="p">,</span>
     <span class="n">y</span><span class="p">:</span> <span class="n">Series</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span><span class="p">,</span>
     <span class="nb">dir</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;left,down&quot;</span><span class="p">,</span> <span class="s2">&quot;left,up&quot;</span><span class="p">,</span> <span class="s2">&quot;right,down&quot;</span><span class="p">,</span> <span class="s2">&quot;right,up&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;left,down&quot;</span><span class="p">,</span>
@@ -3077,21 +3117,14 @@
     <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">hs_util</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
-<span class="n">estimator</span><span class="p">,</span> <span class="n">cdf</span> <span class="o">=</span> <span class="n">hs_cluster</span><span class="o">.</span><span class="n">kmeans_fit</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">estimator</span><span class="p">,</span> <span class="n">cdf</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="n">hs_cluster</span><span class="o">.</span><span class="n">kmeans_fit</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <span class="n">hs_cluster</span><span class="o">.</span><span class="n">cluster_plot</span><span class="p">(</span><span class="n">cdf</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;cluster&#39;</span><span class="p">)</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_cluster.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">400</span>
-<span class="normal">401</span>
-<span class="normal">402</span>
-<span class="normal">403</span>
-<span class="normal">404</span>
-<span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">407</span>
 <span class="normal">408</span>
 <span class="normal">409</span>
 <span class="normal">410</span>
@@ -3156,8 +3189,15 @@
 <span class="normal">469</span>
 <span class="normal">470</span>
 <span class="normal">471</span>
-<span class="normal">472</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cluster_plot</span><span class="p">(</span>
-    <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span><span class="p">,</span>
+<span class="normal">472</span>
+<span class="normal">473</span>
+<span class="normal">474</span>
+<span class="normal">475</span>
+<span class="normal">476</span>
+<span class="normal">477</span>
+<span class="normal">478</span>
+<span class="normal">479</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cluster_plot</span><span class="p">(</span>
+    <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span> <span class="o">|</span> <span class="n">DBSCAN</span> <span class="o">|</span> <span class="n">AgglomerativeClustering</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">hue</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">vector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3196,7 +3236,7 @@
 <span class="sd">        from hossam import *</span>
 
 <span class="sd">        data = hs_util.load_data(&#39;iris&#39;)</span>
-<span class="sd">        estimator, cdf = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)</span>
+<span class="sd">        estimator, cdf, score = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)</span>
 <span class="sd">        hs_cluster.cluster_plot(cdf, hue=&#39;cluster&#39;)</span>
 <span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -3336,22 +3376,15 @@
     <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">hs_util</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
-<span class="n">data</span><span class="p">[</span><span class="s1">&#39;cluster&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hs_cluster</span><span class="o">.</span><span class="n">kmeans_fit</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">3</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">persona_df</span> <span class="o">=</span> <span class="n">hs_cluster</span><span class="o">.</span><span class="n">persona</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;cluster&#39;</span><span class="p">)</span>
+<span class="n">estimator</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="n">hs_cluster</span><span class="o">.</span><span class="n">kmeans_fit</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">persona_df</span> <span class="o">=</span> <span class="n">hs_cluster</span><span class="o">.</span><span class="n">persona</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;cluster&#39;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">persona_df</span><span class="p">)</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_cluster.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">478</span>
-<span class="normal">479</span>
-<span class="normal">480</span>
-<span class="normal">481</span>
-<span class="normal">482</span>
-<span class="normal">483</span>
-<span class="normal">484</span>
-<span class="normal">485</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">485</span>
 <span class="normal">486</span>
 <span class="normal">487</span>
 <span class="normal">488</span>
@@ -3431,7 +3464,14 @@
 <span class="normal">562</span>
 <span class="normal">563</span>
 <span class="normal">564</span>
-<span class="normal">565</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">persona</span><span class="p">(</span>
+<span class="normal">565</span>
+<span class="normal">566</span>
+<span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">persona</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">cluster</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Series</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">,</span>
     <span class="n">fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3453,8 +3493,8 @@
 <span class="sd">        from hossam import *</span>
 
 <span class="sd">        data = hs_util.load_data(&#39;iris&#39;)</span>
-<span class="sd">        data[&#39;cluster&#39;] = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)[1]</span>
-<span class="sd">        persona_df = hs_cluster.persona(data, hue=&#39;cluster&#39;)</span>
+<span class="sd">        estimator, df, score = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)</span>
+<span class="sd">        persona_df = hs_cluster.persona(df, hue=&#39;cluster&#39;)</span>
 <span class="sd">        print(persona_df)</span>
 <span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -3585,14 +3625,7 @@ Args:
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_cluster.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">571</span>
-<span class="normal">572</span>
-<span class="normal">573</span>
-<span class="normal">574</span>
-<span class="normal">575</span>
-<span class="normal">576</span>
-<span class="normal">577</span>
-<span class="normal">578</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">578</span>
 <span class="normal">579</span>
 <span class="normal">580</span>
 <span class="normal">581</span>
@@ -3635,7 +3668,14 @@ Args:
 <span class="normal">618</span>
 <span class="normal">619</span>
 <span class="normal">620</span>
-<span class="normal">621</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kmeans_best_k</span><span class="p">(</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kmeans_best_k</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">k_range</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
     <span class="n">S</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
@@ -3996,14 +4036,7 @@ Args:
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_cluster.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">680</span>
-<span class="normal">681</span>
-<span class="normal">682</span>
-<span class="normal">683</span>
-<span class="normal">684</span>
-<span class="normal">685</span>
-<span class="normal">686</span>
-<span class="normal">687</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">687</span>
 <span class="normal">688</span>
 <span class="normal">689</span>
 <span class="normal">690</span>
@@ -4076,7 +4109,14 @@ Args:
 <span class="normal">757</span>
 <span class="normal">758</span>
 <span class="normal">759</span>
-<span class="normal">760</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dbscan_eps</span><span class="p">(</span>
+<span class="normal">760</span>
+<span class="normal">761</span>
+<span class="normal">762</span>
+<span class="normal">763</span>
+<span class="normal">764</span>
+<span class="normal">765</span>
+<span class="normal">766</span>
+<span class="normal">767</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dbscan_eps</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">min_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
     <span class="n">delta_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
@@ -4157,6 +4197,244 @@ Args:
     <span class="n">eps_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">eps_min</span><span class="p">,</span> <span class="n">eps_max</span> <span class="o">+</span> <span class="n">step</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">best_eps</span><span class="p">,</span> <span class="n">eps_grid</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.hs_cluster.agg_fit" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">agg_fit</span>
+
+
+<a href="#hossam.hs_cluster.agg_fit" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">agg_fit</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">n_clusters</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">linkage</span><span class="o">=</span><span class="s2">&quot;ward&quot;</span><span class="p">,</span>
+    <span class="n">compute_distances</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">params</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>계층적 군집화 모델을 적합하는 함수.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>군집화할 데이터프레임.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>n_clusters</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>군집 개수. 기본값 3.</p>
+              </div>
+            </td>
+            <td>
+                  <code>3</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>linkage</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>병합 기준. 기본값 "ward".</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;ward&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>compute_distances</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>거리 행렬 계산 여부. 기본값 True.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>plot</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True면 결과를 시각화함. 기본값 False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>**params</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>AgglomerativeClustering에 전달할 추가 파라미터.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>tuple</code></td>            <td>
+                  <code><span title="tuple">tuple</span>[<span title="sklearn.cluster.AgglomerativeClustering">AgglomerativeClustering</span>, <span title="pandas.DataFrame">DataFrame</span>, <span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>(estimator, df, score)
+- estimator: 적합된 AgglomerativeClustering 모델.
+- df: 클러스터 결과가 포함된 데이터 프레임.
+- score: 실루엣 점수.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/hs_cluster.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">872</span>
+<span class="normal">873</span>
+<span class="normal">874</span>
+<span class="normal">875</span>
+<span class="normal">876</span>
+<span class="normal">877</span>
+<span class="normal">878</span>
+<span class="normal">879</span>
+<span class="normal">880</span>
+<span class="normal">881</span>
+<span class="normal">882</span>
+<span class="normal">883</span>
+<span class="normal">884</span>
+<span class="normal">885</span>
+<span class="normal">886</span>
+<span class="normal">887</span>
+<span class="normal">888</span>
+<span class="normal">889</span>
+<span class="normal">890</span>
+<span class="normal">891</span>
+<span class="normal">892</span>
+<span class="normal">893</span>
+<span class="normal">894</span>
+<span class="normal">895</span>
+<span class="normal">896</span>
+<span class="normal">897</span>
+<span class="normal">898</span>
+<span class="normal">899</span>
+<span class="normal">900</span>
+<span class="normal">901</span>
+<span class="normal">902</span>
+<span class="normal">903</span>
+<span class="normal">904</span>
+<span class="normal">905</span>
+<span class="normal">906</span>
+<span class="normal">907</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">agg_fit</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">n_clusters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">linkage</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;ward&#39;</span><span class="p">,</span> <span class="s1">&#39;complete&#39;</span><span class="p">,</span> <span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="s1">&#39;single&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ward&quot;</span><span class="p">,</span>
+    <span class="n">compute_distances</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">params</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">AgglomerativeClustering</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    계층적 군집화 모델을 적합하는 함수.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (DataFrame): 군집화할 데이터프레임.</span>
+<span class="sd">        n_clusters (int, optional): 군집 개수. 기본값 3.</span>
+<span class="sd">        linkage (str, optional): 병합 기준. 기본값 &quot;ward&quot;.</span>
+<span class="sd">        compute_distances (bool, optional): 거리 행렬 계산 여부. 기본값 True.</span>
+<span class="sd">        plot (bool, optional): True면 결과를 시각화함. 기본값 False.</span>
+<span class="sd">        **params: AgglomerativeClustering에 전달할 추가 파라미터.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: (estimator, df, score)</span>
+<span class="sd">            - estimator: 적합된 AgglomerativeClustering 모델.</span>
+<span class="sd">            - df: 클러스터 결과가 포함된 데이터 프레임.</span>
+<span class="sd">            - score: 실루엣 점수.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">estimator</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span> <span class="n">compute_distances</span><span class="o">=</span><span class="n">compute_distances</span><span class="p">,</span> <span class="n">linkage</span><span class="o">=</span><span class="n">linkage</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;cluster&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">labels_</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">silhouette_score</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;cluster&quot;</span><span class="p">]))</span>
+
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">hs_plot</span><span class="o">.</span><span class="n">visualize_silhouette</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">estimator</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">score</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
