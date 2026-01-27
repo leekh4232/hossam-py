@@ -474,3 +474,23 @@ def load_data(key: str,
         raise RuntimeError("Data loading failed: origin is None")
 
     return __data_info(origin, index_col, timeindex, info, categories)
+
+
+# ===================================================================
+# 2차원 리스트 여부 확인
+# ===================================================================
+def is_2d(x) -> bool:
+    """
+    주어진 객체가 2차원 리스트인지 확인합니다.
+
+    Args:
+        x: 확인할 객체
+
+    Returns:
+        bool: 객체가 2차원 리스트인 경우 True, 그렇지 않은 경우 False
+    """
+    return (
+        isinstance(x, (list, tuple)) and
+        len(x) > 0 and
+        all(isinstance(i, (list, tuple)) for i in x)
+    )

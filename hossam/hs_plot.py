@@ -2,6 +2,7 @@
 from __future__ import annotations
 from types import SimpleNamespace
 from typing import Callable, Literal
+from itertools import combinations
 
 # ===================================================================
 import numpy as np
@@ -24,6 +25,7 @@ from statannotations.Annotator import Annotator
 
 # ===================================================================
 from sklearn.cluster import AgglomerativeClustering, KMeans
+from sklearn.decomposition import PCA
 
 from sklearn.metrics import (
     mean_squared_error,
@@ -34,6 +36,8 @@ from sklearn.metrics import (
     silhouette_score,
     silhouette_samples,
 )
+
+from .hs_util import is_2d
 
 # ===================================================================
 config = SimpleNamespace(
@@ -750,7 +754,7 @@ def stackplot(
 # 산점도를 그린다
 # ===================================================================
 def scatterplot(
-    df: DataFrame,
+    df: DataFrame | None,
     xname: str,
     yname: str,
     hue=None,
@@ -770,7 +774,7 @@ def scatterplot(
     """산점도를 그린다.
 
     Args:
-        df (DataFrame): 시각화할 데이터.
+        df (DataFrame | None): 시각화할 데이터.
         xname (str): x축 컬럼.
         yname (str): y축 컬럼.
         hue (str|None): 범주 컬럼.
@@ -797,12 +801,12 @@ def scatterplot(
 
     if outline and hue is not None:
         # 군집별 값의 종류별로 반복 수행
-        for c in df[hue].unique():
+        for c in df[hue].unique():  # type: ignore
             if c == -1:
                 continue
 
             # 한 종류만 필터링한 결과에서 두 변수만 선택
-            df_c = df.loc[df[hue] == c, [xname, yname]]
+            df_c = df.loc[df[hue] == c, [xname, yname]] # type: ignore
 
             try:
                 # 외각선 좌표 계산
@@ -2899,3 +2903,138 @@ def dandrogram(
     )
 
     finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+
+
+# ===================================================================
+# PCA 분석 결과에 대한 biplot 시각화
+# ===================================================================
+def pca_plot(
+    estimator: PCA,
+    data: DataFrame,
+    yname: str | None = None,
+    fields: list | tuple | list[list] | tuple[list] | list[tuple] | tuple[tuple] | None = None,
+    hue: str | None = None,
+    palette: str | None = None,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    dpi: int = config.dpi,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+) -> None:
+    """
+    PCA 분석 결과에 대한 biplot 시각화
+
+    Args:
+        estimator (PCA): 학습된 PCA 객체.
+        data (DataFrame): PCA에 사용된 원본 데이터.
+        yname (str | None): 종속변수 컬럼명.
+        fields (list | tuple | list[list] | tuple[list] | list[tuple] | tuple[tuple] | None): 시각화할 독립변수 목록. None이면 자동 탐지.
+        hue (str|None): 집단 구분 컬럼명.
+        palette (str|None): 팔레트 이름.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        linewidth (float): 선 굵기.
+        dpi (int): 그림 크기 및 해상도.
+        save_path (str|None): 저장 경로.
+        callback (Callable|None): Axes 후처리 콜백.
+
+    Returns:
+        None
+    """
+    df = data.copy()
+    df_columns = df.columns.tolist()
+
+    # 종속변수가 지정되었다면 해당 컬럼 추출
+    yfield = None
+    if yname is not None and yname in data.columns:
+        yfield = df[[yname]].copy()
+        df = df.drop(columns=[yname])
+
+    # PCA 변환 수행
+    #display(df)
+    score = estimator.transform(df)
+    #print(score)
+
+    # 추정기로부터 PCA 결과 데이터 프레임 생성
+    pca_df = DataFrame(
+        data=score,
+        columns=[f"PC{i+1}" for i in range(estimator.n_components_)],
+    )
+    #display(pca_df)
+
+    # 종속변수 컬럼 추가
+    if yfield is not None:
+        pca_df[yname] = yfield
+
+    # 모든 컬럼명에 대한 조합 생성
+    if fields is None:
+        feature_cols = pca_df.columns.tolist()
+        if yname is not None and yname in feature_cols:
+            feature_cols.remove(yname)
+        fields = list(combinations(feature_cols, 2))
+
+    if not is_2d(fields):
+        fields = [fields]   # type: ignore
+
+    components = estimator.components_
+
+    x_index: int = 0
+    y_index: int = 0
+
+    def __callable(ax) -> None:
+        for i in range(n):
+            ax.arrow(
+                0,
+                0,
+                components[x_index, i],
+                components[y_index, i],
+                color="r",
+                head_width=0.007,
+                head_length=0.007,
+                linewidth=linewidth * 0.75,
+                alpha=0.75,
+            )
+            ax.text(
+                components[x_index, i] * 1.15,
+                components[y_index, i] * 1.15,
+                f"{df_columns[i]} ({components[x_index, i]:.2f})",
+                color="b",
+                ha="center",
+                va="center",
+            )
+
+        if callback is not None:
+            callback(ax)
+
+    for field_group in fields:  # type: ignore
+        x_index = int(pca_df.columns.get_loc(field_group[0]))   # type: ignore
+        y_index = int(pca_df.columns.get_loc(field_group[1]))   # type: ignore
+
+        xs = score[:, x_index]
+        ys = score[:, y_index]
+        n = score.shape[1]
+
+        scalex = 1.0 / (xs.max() - xs.min())
+        scaley = 1.0 / (ys.max() - ys.min())
+
+        title = "PCA Biplot"
+        if field_group is not None:
+            title += " - " + ", ".join(field_group)
+
+        scatterplot(
+            df=None,
+            xname=xs * scalex,
+            yname=ys * scaley,
+            hue=pca_df[hue] if hue is not None else None,
+            outline=False,
+            palette=palette,
+            width=width,
+            height=height,
+            linewidth=linewidth,
+            dpi=dpi,
+            save_path=save_path,
+            title=title,
+            callback=__callable,
+        )
+    

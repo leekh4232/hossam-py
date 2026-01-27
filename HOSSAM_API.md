@@ -14,7 +14,7 @@ def kmeans_fit(data: DataFrame,
                random_state: int = RANDOM_STATE,
                plot: bool = False,
                fields: list[list[str]] | None = None,
-               **params) -> tuple[KMeans, DataFrame]
+               **params) -> tuple[KMeans, DataFrame, float]
 ```
 
 K-평균 군집화 모델을 적합하는 함수.
@@ -33,6 +33,7 @@ K-평균 군집화 모델을 적합하는 함수.
 
 - `KMeans` - 적합된 KMeans 모델.
 - `DataFrame` - 클러스터 결과가 포함된 데이터 프레임
+- `float` - 실루엣 점수
 
 <a id="hs_cluster.kmeans_elbow"></a>
 
@@ -226,7 +227,7 @@ elbow_point(x, y)
 ### cluster\_plot
 
 ```python
-def cluster_plot(estimator: KMeans,
+def cluster_plot(estimator: KMeans | DBSCAN | AgglomerativeClustering,
                  data: DataFrame,
                  hue: str | None = None,
                  vector: str | None = None,
@@ -268,7 +269,7 @@ def cluster_plot(estimator: KMeans,
 from hossam import *
 
 data = hs_util.load_data('iris')
-estimator, cdf = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)
+estimator, cdf, score = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)
 hs_cluster.cluster_plot(cdf, hue='cluster')
 ```
 
@@ -303,8 +304,8 @@ def persona(data: DataFrame,
 from hossam import *
 
 data = hs_util.load_data('iris')
-data['cluster'] = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)[1]
-persona_df = hs_cluster.persona(data, hue='cluster')
+estimator, df, score = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)
+persona_df = hs_cluster.persona(df, hue='cluster')
 print(persona_df)
 ```
 
@@ -398,6 +399,49 @@ DBSCAN 군집화에서 최적의 eps 값을 탐지하는 함수.
 from hossam import *
 data = hs_util.load_data('iris')
 best_eps, eps_grid = hs_cluster.dbscan_eps(data, plot=True)
+```
+
+<a id="hs_cluster.agg_fit"></a>
+
+### agg\_fit
+
+```python
+def agg_fit(
+    data: DataFrame,
+    n_clusters: int | list[int] | np.ndarray = 3,
+    linkage: Literal["ward", "complete", "average", "single"] = "ward",
+    plot: bool = False,
+    **params
+) -> tuple[AgglomerativeClustering | list[AgglomerativeClustering], DataFrame
+           | list[DataFrame], DataFrame]
+```
+
+계층적 군집화 모델을 적합하는 함수.
+
+**Arguments**:
+
+- `data` _DataFrame_ - 군집화할 데이터프레임.
+- `n_clusters` _int | list[int] | np.ndarray, optional_ - 군집 개수 또는 개수 리스트. 기본값 3.
+- `linkage` _str, optional_ - 병합 기준. 기본값 "ward".
+- `plot` _bool, optional_ - True면 결과를 시각화함. 기본값 False.
+- `**params` - AgglomerativeClustering에 전달할 추가 파라미터.
+  
+
+**Returns**:
+
+- `tuple` - (estimator(s), df(s), score_df)
+  - estimator(s): 적합된 AgglomerativeClustering 모델 또는 모델 리스트.
+  - df(s): 클러스터 결과가 포함된 데이터 프레임 또는 데이터 프레임 리스트.
+  - score_df: 각 군집 개수에 대한 실루엣 점수 데이터프레임.
+  
+
+**Examples**:
+
+```python
+from hossam import *
+
+data = hs_util.load_data('iris')
+estimators, cluster_dfs, score_df = hs_cluster.agg_fit(data.iloc[:, :-1], n_clusters=[2,3,4])
 ```
 
 <a id="hs_study"></a>
@@ -911,6 +955,50 @@ df = DataFrame({'color': ['R', 'G', 'B'], 'cut': ['A', 'B', 'A']})
 result = hs_prep.add_interaction(df, pairs=[('color', 'cut')])
 print(result.columns)  # color, cut, color_cut
 ```
+
+<a id="hs_prep.pca"></a>
+
+### pca
+
+```python
+def pca(data: DataFrame,
+        n_components: int | float | str = 0.8,
+        yname: str | None = None,
+        random_state: int = RANDOM_STATE,
+        plot: bool = False,
+        fields: list | tuple | list[list] | tuple[list] | list[tuple]
+        | tuple[tuple] | None = None,
+        palette: str | None = None,
+        width: int = config.width,
+        height: int = config.height,
+        linewidth: float = config.line_width,
+        dpi: int = config.dpi,
+        save_path: str | None = None,
+        callback: Callable | None = None) -> tuple[PCA, DataFrame, DataFrame]
+```
+
+주성분 분석(PCA)을 수행하고, 주성분 데이터프레임과 설명된 분산 비율 데이터프레임을 반환합니다.
+
+**Arguments**:
+
+- `data` _DataFrame_ - 입력 데이터프레임.
+- `n_components` _int|float|str_ - 주성분의 수 또는 설명할 분산 비율. (기본값 0.8)
+- `yname` _str|None_ - 종속 변수 이름. 종속변수 이름이 주어진 경우 해당 컬럼은 제외하고 처리합니다. (기본값 None)
+- `random_state` _int_ - 랜덤 시드. (기본값 RANDOM_STATE)
+- `plot` _bool_ - 주성분 설명력 그래프를 출력할지 여부. (기본값 False)
+- `fields` _list|tuple|list[list]|tuple[list]|list[tuple]|tuple[tuple]|None_ - 산점도에 표시할 변수 목록.
+- `palette` _str|None_ - 팔레트 이름.
+- `width` _int_ - 캔버스 가로 픽셀.
+- `height` _int_ - 캔버스 세로 픽셀.
+- `linewidth` _float_ - 선 굵기.
+- `dpi` _int_ - 그림 크기 및 해상도.
+- `save_path` _str|None_ - 저장 경로.
+- `callback` _Callable|None_ - Axes 후처리 콜백.
+  
+
+**Returns**:
+
+  tuple[DataFrame, DataFrame]: 주성분 데이터프레임과 설명된 분산 비율 데이터프레임.
 
 <a id="hs_gis"></a>
 
@@ -2825,7 +2913,7 @@ def stackplot(df: DataFrame,
 ### scatterplot
 
 ```python
-def scatterplot(df: DataFrame,
+def scatterplot(df: DataFrame | None,
                 xname: str,
                 yname: str,
                 hue=None,
@@ -2847,7 +2935,7 @@ def scatterplot(df: DataFrame,
 
 **Arguments**:
 
-- `df` _DataFrame_ - 시각화할 데이터.
+- `df` _DataFrame | None_ - 시각화할 데이터.
 - `xname` _str_ - x축 컬럼.
 - `yname` _str_ - y축 컬럼.
 - `hue` _str|None_ - 범주 컬럼.
@@ -3759,7 +3847,7 @@ def distribution_plot(data: DataFrame,
 ### silhouette\_plot
 
 ```python
-def silhouette_plot(estimator: KMeans,
+def silhouette_plot(estimator: KMeans | AgglomerativeClustering,
                     data: DataFrame,
                     title: str | None = None,
                     width: int = config.width,
@@ -3775,7 +3863,7 @@ def silhouette_plot(estimator: KMeans,
 
 **Arguments**:
 
-- `estimator` _KMeans_ - 학습된 KMeans 군집 모델 객체.
+- `estimator` _KMeans | AgglomerativeClustering_ - 학습된 KMeans 또는 AgglomerativeClustering 군집 모델 객체.
 - `data` _DataFrame_ - 군집분석에 사용된 입력 데이터 (n_samples, n_features).
 - `title` _str, optional_ - 플롯 제목. None이면 자동 생성.
 - `width` _int, optional_ - 플롯 가로 크기 (inch 단위).
@@ -3803,7 +3891,7 @@ def silhouette_plot(estimator: KMeans,
 ### cluster\_plot
 
 ```python
-def cluster_plot(estimator: KMeans | None = None,
+def cluster_plot(estimator: KMeans | AgglomerativeClustering | None = None,
                  data: DataFrame | None = None,
                  xname: str | None = None,
                  yname: str | None = None,
@@ -3863,13 +3951,13 @@ cluster_plot(estimator, data, xname='Sepal.Length', yname='Sepal.Width')
 ### visualize\_silhouette
 
 ```python
-def visualize_silhouette(estimator: KMeans,
+def visualize_silhouette(estimator: KMeans | AgglomerativeClustering,
                          data: DataFrame,
                          xname: str | None = None,
                          yname: str | None = None,
                          title: str | None = None,
                          palette: str | None = None,
-                         outline: bool = False,
+                         outline: bool = True,
                          width: int = config.width,
                          height: int = config.height,
                          linewidth: float = config.line_width,
@@ -3881,7 +3969,7 @@ def visualize_silhouette(estimator: KMeans,
 
 **Arguments**:
 
-- `estimator` _KMeans_ - 학습된 KMeans 군집 모델 객체.
+- `estimator` _KMeans | AgglomerativeClustering_ - 학습된 KMeans 또는 AgglomerativeClustering 군집 모델 객체.
 - `data` _DataFrame_ - 군집분석에 사용된 입력 데이터 (n_samples, n_features).
 - `xname` _str, optional_ - 산점도 x축에 사용할 컬럼명. None이면 첫 번째 컬럼 사용.
 - `yname` _str, optional_ - 산점도 y축에 사용할 컬럼명. None이면 두 번째 컬럼 사용.
@@ -3904,6 +3992,87 @@ def visualize_silhouette(estimator: KMeans,
 
   - 실루엣 플롯(왼쪽)과 2차원 군집 산점도(오른쪽)를 동시에 확인 가능
   - 군집 품질과 분포를 한눈에 비교·분석할 때 유용
+
+<a id="hs_plot.dandrogram"></a>
+
+### dandrogram
+
+```python
+def dandrogram(estimator: AgglomerativeClustering,
+               p: int = 30,
+               count_sort: Literal["ascending", "descending",
+                                   False] = "ascending",
+               title: str | None = None,
+               width: int = config.width,
+               height: int = config.height,
+               dpi: int = config.dpi,
+               save_path: str | None = None,
+               callback: Callable | None = None,
+               ax: Axes | None = None) -> None
+```
+
+덴드로그램 시각화
+
+**Arguments**:
+
+- `estimator` _AgglomerativeClustering_ - 학습된 AgglomerativeClustering 군집 모델 객체.
+- `p` _int_ - 덴드로그램에서 표시할 마지막 병합된 군집 수. 기본값 30.
+- `count_sort` _str_ - 'ascending' 또는 'descending'으로 병합 순서 정렬.
+- `title` _str|None_ - 그래프 제목.
+- `palette` _str|None_ - 팔레트 이름.
+- `width` _int_ - 캔버스 가로 픽셀.
+- `height` _int_ - 캔버스 세로 픽셀.
+- `dpi` _int_ - 그림 크기 및 해상도.
+- `save_path` _str|None_ - 저장 경로.
+- `callback` _Callable|None_ - Axes 후처리 콜백.
+- `ax` _Axes|None_ - 외부에서 전달한 Axes. None이면 새로 생성.
+  
+
+**Returns**:
+
+  None
+
+<a id="hs_plot.pca_plot"></a>
+
+### pca\_plot
+
+```python
+def pca_plot(estimator: PCA,
+             data: DataFrame,
+             yname: str | None = None,
+             fields: list | tuple | list[list] | tuple[list] | list[tuple]
+             | tuple[tuple] | None = None,
+             hue: str | None = None,
+             palette: str | None = None,
+             width: int = config.width,
+             height: int = config.height,
+             linewidth: float = config.line_width,
+             dpi: int = config.dpi,
+             save_path: str | None = None,
+             callback: Callable | None = None) -> None
+```
+
+PCA 분석 결과에 대한 biplot 시각화
+
+**Arguments**:
+
+- `estimator` _PCA_ - 학습된 PCA 객체.
+- `data` _DataFrame_ - PCA에 사용된 원본 데이터.
+- `yname` _str | None_ - 종속변수 컬럼명.
+- `fields` _list | tuple | list[list] | tuple[list] | list[tuple] | tuple[tuple] | None_ - 시각화할 독립변수 목록. None이면 자동 탐지.
+- `hue` _str|None_ - 집단 구분 컬럼명.
+- `palette` _str|None_ - 팔레트 이름.
+- `width` _int_ - 캔버스 가로 픽셀.
+- `height` _int_ - 캔버스 세로 픽셀.
+- `linewidth` _float_ - 선 굵기.
+- `dpi` _int_ - 그림 크기 및 해상도.
+- `save_path` _str|None_ - 저장 경로.
+- `callback` _Callable|None_ - Axes 후처리 콜백.
+  
+
+**Returns**:
+
+  None
 
 <a id="hs_classroom"></a>
 
@@ -5049,3 +5218,22 @@ def load_data(key: str,
 from hossam import *
 df = hs_util.load_data("AD_SALES", index_col=None, timeindex=False, info=False)
 ```
+
+<a id="hs_util.is_2d"></a>
+
+### is\_2d
+
+```python
+def is_2d(x) -> bool
+```
+
+주어진 객체가 2차원 리스트인지 확인합니다.
+
+**Arguments**:
+
+- `x` - 확인할 객체
+  
+
+**Returns**:
+
+- `bool` - 객체가 2차원 리스트인 경우 True, 그렇지 않은 경우 False
