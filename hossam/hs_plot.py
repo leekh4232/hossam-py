@@ -1103,14 +1103,9 @@ def pairplot(
         g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight="bold")
 
     g.map_lower(
-        func=sb.kdeplot, fill=True, alpha=config.fill_alpha, linewidth=linewidth
+        func=sb.kdeplot, fill=True, alpha=config.fill_alpha
     )
-    g.map_upper(func=sb.scatterplot, linewidth=linewidth)
-
-    # KDE 대각선에도 linewidth 적용
-    for ax in g.axes.diag:  # type: ignore
-        for line in ax.get_lines():
-            line.set_linewidth(linewidth)
+    g.map_upper(func=sb.scatterplot)
 
     plt.tight_layout()
 
