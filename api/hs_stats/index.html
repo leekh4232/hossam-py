@@ -1745,7 +1745,44 @@
 <span class="normal">261</span>
 <span class="normal">262</span>
 <span class="normal">263</span>
-<span class="normal">264</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">outlier_table</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">outlier_table</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;데이터프레임의 사분위수와 이상치 경계값, 왜도를 구한다.</span>
 
 <span class="sd">    Tukey의 방법을 사용하여 각 숫자형 컬럼에 대한 사분위수(Q1, Q2, Q3)와</span>
@@ -1828,6 +1865,41 @@
         <span class="n">outlier_count</span> <span class="o">=</span> <span class="p">((</span><span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">down</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">up</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="n">outlier_rate</span> <span class="o">=</span> <span class="p">(</span><span class="n">outlier_count</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span>
 
+        <span class="c1"># 왜도</span>
+        <span class="n">skew</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span><span class="o">.</span><span class="n">skew</span><span class="p">()</span>
+
+        <span class="c1"># 이상치 개수 및 비율</span>
+        <span class="n">outlier_count</span> <span class="o">=</span> <span class="p">((</span><span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">down</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">up</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">outlier_rate</span> <span class="o">=</span> <span class="p">(</span><span class="n">outlier_count</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span>
+
+        <span class="c1"># 분포 특성 판정 (왜도 기준)</span>
+        <span class="n">abs_skew</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">skew</span><span class="p">)</span>    <span class="c1"># type: ignore</span>
+        <span class="k">if</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>      <span class="c1"># type: ignore</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;거의 대칭&quot;</span>
+        <span class="k">elif</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>    <span class="c1"># type: ignore</span>
+            <span class="k">if</span> <span class="n">skew</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>        <span class="c1"># type: ignore</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;약한 우측 꼬리&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;약한 좌측 꼬리&quot;</span>
+        <span class="k">elif</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">2.0</span><span class="p">:</span>    <span class="c1"># type: ignore</span>
+            <span class="k">if</span> <span class="n">skew</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>        <span class="c1"># type: ignore</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;중간 우측 꼬리&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;중간 좌측 꼬리&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">skew</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>        <span class="c1"># type: ignore</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;극단 우측 꼬리&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="s2">&quot;극단 좌측 꼬리&quot;</span>
+
+        <span class="c1"># 로그변환 필요성 판정</span>
+        <span class="k">if</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>      <span class="c1"># type: ignore</span>
+            <span class="n">log_need</span> <span class="o">=</span> <span class="s2">&quot;낮음&quot;</span>
+        <span class="k">elif</span> <span class="n">abs_skew</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>    <span class="c1"># type: ignore</span>
+            <span class="n">log_need</span> <span class="o">=</span> <span class="s2">&quot;중간&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log_need</span> <span class="o">=</span> <span class="s2">&quot;높음&quot;</span>
+
         <span class="n">iq</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;field&quot;</span><span class="p">:</span> <span class="n">f</span><span class="p">,</span>
             <span class="s2">&quot;q1&quot;</span><span class="p">:</span> <span class="n">q1</span><span class="p">,</span>
@@ -1838,9 +1910,11 @@
             <span class="s2">&quot;down&quot;</span><span class="p">:</span> <span class="n">down</span><span class="p">,</span>
             <span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="n">min_value</span><span class="p">,</span>
             <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="n">max_value</span><span class="p">,</span>
-            <span class="s2">&quot;skew&quot;</span><span class="p">:</span> <span class="n">skew</span><span class="p">,</span>
             <span class="s2">&quot;outlier_count&quot;</span><span class="p">:</span> <span class="n">outlier_count</span><span class="p">,</span>
-            <span class="s2">&quot;outlier_rate&quot;</span><span class="p">:</span> <span class="n">outlier_rate</span>
+            <span class="s2">&quot;outlier_rate&quot;</span><span class="p">:</span> <span class="n">outlier_rate</span><span class="p">,</span>
+            <span class="s2">&quot;skew&quot;</span><span class="p">:</span> <span class="n">skew</span><span class="p">,</span>
+            <span class="s2">&quot;dist&quot;</span><span class="p">:</span> <span class="n">dist</span><span class="p">,</span>
+            <span class="s2">&quot;log_need&quot;</span><span class="p">:</span> <span class="n">log_need</span>
         <span class="p">}</span>
 
         <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iq</span><span class="p">)</span>
@@ -2010,44 +2084,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">270</span>
-<span class="normal">271</span>
-<span class="normal">272</span>
-<span class="normal">273</span>
-<span class="normal">274</span>
-<span class="normal">275</span>
-<span class="normal">276</span>
-<span class="normal">277</span>
-<span class="normal">278</span>
-<span class="normal">279</span>
-<span class="normal">280</span>
-<span class="normal">281</span>
-<span class="normal">282</span>
-<span class="normal">283</span>
-<span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
-<span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span>
-<span class="normal">293</span>
-<span class="normal">294</span>
-<span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span>
-<span class="normal">298</span>
-<span class="normal">299</span>
-<span class="normal">300</span>
-<span class="normal">301</span>
-<span class="normal">302</span>
-<span class="normal">303</span>
-<span class="normal">304</span>
-<span class="normal">305</span>
-<span class="normal">306</span>
-<span class="normal">307</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">307</span>
 <span class="normal">308</span>
 <span class="normal">309</span>
 <span class="normal">310</span>
@@ -2167,7 +2204,44 @@
 <span class="normal">424</span>
 <span class="normal">425</span>
 <span class="normal">426</span>
-<span class="normal">427</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">describe</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">describe</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;데이터프레임의 연속형 변수의 단위 및 현실성을 평가하기 위해 확장된 기술통계량을 반환한다.</span>
 
 <span class="sd">    각 연속형(숫자형) 컬럼의 기술통계량(describe)을 구하고, 이에 사분위수 범위(IQR),</span>
@@ -2454,44 +2528,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">433</span>
-<span class="normal">434</span>
-<span class="normal">435</span>
-<span class="normal">436</span>
-<span class="normal">437</span>
-<span class="normal">438</span>
-<span class="normal">439</span>
-<span class="normal">440</span>
-<span class="normal">441</span>
-<span class="normal">442</span>
-<span class="normal">443</span>
-<span class="normal">444</span>
-<span class="normal">445</span>
-<span class="normal">446</span>
-<span class="normal">447</span>
-<span class="normal">448</span>
-<span class="normal">449</span>
-<span class="normal">450</span>
-<span class="normal">451</span>
-<span class="normal">452</span>
-<span class="normal">453</span>
-<span class="normal">454</span>
-<span class="normal">455</span>
-<span class="normal">456</span>
-<span class="normal">457</span>
-<span class="normal">458</span>
-<span class="normal">459</span>
-<span class="normal">460</span>
-<span class="normal">461</span>
-<span class="normal">462</span>
-<span class="normal">463</span>
-<span class="normal">464</span>
-<span class="normal">465</span>
-<span class="normal">466</span>
-<span class="normal">467</span>
-<span class="normal">468</span>
-<span class="normal">469</span>
-<span class="normal">470</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">470</span>
 <span class="normal">471</span>
 <span class="normal">472</span>
 <span class="normal">473</span>
@@ -2545,7 +2582,44 @@
 <span class="normal">521</span>
 <span class="normal">522</span>
 <span class="normal">523</span>
-<span class="normal">524</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">category_describe</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="normal">524</span>
+<span class="normal">525</span>
+<span class="normal">526</span>
+<span class="normal">527</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span>
+<span class="normal">531</span>
+<span class="normal">532</span>
+<span class="normal">533</span>
+<span class="normal">534</span>
+<span class="normal">535</span>
+<span class="normal">536</span>
+<span class="normal">537</span>
+<span class="normal">538</span>
+<span class="normal">539</span>
+<span class="normal">540</span>
+<span class="normal">541</span>
+<span class="normal">542</span>
+<span class="normal">543</span>
+<span class="normal">544</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">category_describe</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;데이터프레임의 명목형(범주형) 변수에 대한 분포 편향을 요약한다.</span>
 
 <span class="sd">    각 명목형 컬럼의 최다 범주와 최소 범주의 정보를 요약하여 데이터프레임으로 반환한다.</span>
@@ -2805,44 +2879,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">529</span>
-<span class="normal">530</span>
-<span class="normal">531</span>
-<span class="normal">532</span>
-<span class="normal">533</span>
-<span class="normal">534</span>
-<span class="normal">535</span>
-<span class="normal">536</span>
-<span class="normal">537</span>
-<span class="normal">538</span>
-<span class="normal">539</span>
-<span class="normal">540</span>
-<span class="normal">541</span>
-<span class="normal">542</span>
-<span class="normal">543</span>
-<span class="normal">544</span>
-<span class="normal">545</span>
-<span class="normal">546</span>
-<span class="normal">547</span>
-<span class="normal">548</span>
-<span class="normal">549</span>
-<span class="normal">550</span>
-<span class="normal">551</span>
-<span class="normal">552</span>
-<span class="normal">553</span>
-<span class="normal">554</span>
-<span class="normal">555</span>
-<span class="normal">556</span>
-<span class="normal">557</span>
-<span class="normal">558</span>
-<span class="normal">559</span>
-<span class="normal">560</span>
-<span class="normal">561</span>
-<span class="normal">562</span>
-<span class="normal">563</span>
-<span class="normal">564</span>
-<span class="normal">565</span>
-<span class="normal">566</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">566</span>
 <span class="normal">567</span>
 <span class="normal">568</span>
 <span class="normal">569</span>
@@ -2913,7 +2950,44 @@
 <span class="normal">634</span>
 <span class="normal">635</span>
 <span class="normal">636</span>
-<span class="normal">637</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">normal_test</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;n&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">637</span>
+<span class="normal">638</span>
+<span class="normal">639</span>
+<span class="normal">640</span>
+<span class="normal">641</span>
+<span class="normal">642</span>
+<span class="normal">643</span>
+<span class="normal">644</span>
+<span class="normal">645</span>
+<span class="normal">646</span>
+<span class="normal">647</span>
+<span class="normal">648</span>
+<span class="normal">649</span>
+<span class="normal">650</span>
+<span class="normal">651</span>
+<span class="normal">652</span>
+<span class="normal">653</span>
+<span class="normal">654</span>
+<span class="normal">655</span>
+<span class="normal">656</span>
+<span class="normal">657</span>
+<span class="normal">658</span>
+<span class="normal">659</span>
+<span class="normal">660</span>
+<span class="normal">661</span>
+<span class="normal">662</span>
+<span class="normal">663</span>
+<span class="normal">664</span>
+<span class="normal">665</span>
+<span class="normal">666</span>
+<span class="normal">667</span>
+<span class="normal">668</span>
+<span class="normal">669</span>
+<span class="normal">670</span>
+<span class="normal">671</span>
+<span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">normal_test</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;n&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;지정된 컬럼(또는 모든 수치형 컬럼)에 대해 정규성 검정을 수행하고 결과를 DataFrame으로 반환한다.</span>
 
 <span class="sd">    정규성 검정의 귀무가설은 &quot;데이터가 정규분포를 따른다&quot;이므로, p-value &gt; 0.05일 때</span>
@@ -3198,44 +3272,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">643</span>
-<span class="normal">644</span>
-<span class="normal">645</span>
-<span class="normal">646</span>
-<span class="normal">647</span>
-<span class="normal">648</span>
-<span class="normal">649</span>
-<span class="normal">650</span>
-<span class="normal">651</span>
-<span class="normal">652</span>
-<span class="normal">653</span>
-<span class="normal">654</span>
-<span class="normal">655</span>
-<span class="normal">656</span>
-<span class="normal">657</span>
-<span class="normal">658</span>
-<span class="normal">659</span>
-<span class="normal">660</span>
-<span class="normal">661</span>
-<span class="normal">662</span>
-<span class="normal">663</span>
-<span class="normal">664</span>
-<span class="normal">665</span>
-<span class="normal">666</span>
-<span class="normal">667</span>
-<span class="normal">668</span>
-<span class="normal">669</span>
-<span class="normal">670</span>
-<span class="normal">671</span>
-<span class="normal">672</span>
-<span class="normal">673</span>
-<span class="normal">674</span>
-<span class="normal">675</span>
-<span class="normal">676</span>
-<span class="normal">677</span>
-<span class="normal">678</span>
-<span class="normal">679</span>
-<span class="normal">680</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">680</span>
 <span class="normal">681</span>
 <span class="normal">682</span>
 <span class="normal">683</span>
@@ -3323,7 +3360,44 @@
 <span class="normal">765</span>
 <span class="normal">766</span>
 <span class="normal">767</span>
-<span class="normal">768</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">equal_var_test</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">normal_dist</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">768</span>
+<span class="normal">769</span>
+<span class="normal">770</span>
+<span class="normal">771</span>
+<span class="normal">772</span>
+<span class="normal">773</span>
+<span class="normal">774</span>
+<span class="normal">775</span>
+<span class="normal">776</span>
+<span class="normal">777</span>
+<span class="normal">778</span>
+<span class="normal">779</span>
+<span class="normal">780</span>
+<span class="normal">781</span>
+<span class="normal">782</span>
+<span class="normal">783</span>
+<span class="normal">784</span>
+<span class="normal">785</span>
+<span class="normal">786</span>
+<span class="normal">787</span>
+<span class="normal">788</span>
+<span class="normal">789</span>
+<span class="normal">790</span>
+<span class="normal">791</span>
+<span class="normal">792</span>
+<span class="normal">793</span>
+<span class="normal">794</span>
+<span class="normal">795</span>
+<span class="normal">796</span>
+<span class="normal">797</span>
+<span class="normal">798</span>
+<span class="normal">799</span>
+<span class="normal">800</span>
+<span class="normal">801</span>
+<span class="normal">802</span>
+<span class="normal">803</span>
+<span class="normal">804</span>
+<span class="normal">805</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">equal_var_test</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">normal_dist</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;수치형 컬럼들의 분산이 같은지 검정하고 결과를 DataFrame으로 반환한다.</span>
 
 <span class="sd">    등분산성 검정의 귀무가설은 &quot;모든 그룹의 분산이 같다&quot;이므로, p-value &gt; 0.05일 때</span>
@@ -3608,131 +3682,131 @@ data가 주어진 경우 명목형 변수의 컬럼명. 기본값은 None.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">871</span>
-<span class="normal">872</span>
-<span class="normal">873</span>
-<span class="normal">874</span>
-<span class="normal">875</span>
-<span class="normal">876</span>
-<span class="normal">877</span>
-<span class="normal">878</span>
-<span class="normal">879</span>
-<span class="normal">880</span>
-<span class="normal">881</span>
-<span class="normal">882</span>
-<span class="normal">883</span>
-<span class="normal">884</span>
-<span class="normal">885</span>
-<span class="normal">886</span>
-<span class="normal">887</span>
-<span class="normal">888</span>
-<span class="normal">889</span>
-<span class="normal">890</span>
-<span class="normal">891</span>
-<span class="normal">892</span>
-<span class="normal">893</span>
-<span class="normal">894</span>
-<span class="normal">895</span>
-<span class="normal">896</span>
-<span class="normal">897</span>
-<span class="normal">898</span>
-<span class="normal">899</span>
-<span class="normal">900</span>
-<span class="normal">901</span>
-<span class="normal">902</span>
-<span class="normal">903</span>
-<span class="normal">904</span>
-<span class="normal">905</span>
-<span class="normal">906</span>
-<span class="normal">907</span>
-<span class="normal">908</span>
-<span class="normal">909</span>
-<span class="normal">910</span>
-<span class="normal">911</span>
-<span class="normal">912</span>
-<span class="normal">913</span>
-<span class="normal">914</span>
-<span class="normal">915</span>
-<span class="normal">916</span>
-<span class="normal">917</span>
-<span class="normal">918</span>
-<span class="normal">919</span>
-<span class="normal">920</span>
-<span class="normal">921</span>
-<span class="normal">922</span>
-<span class="normal">923</span>
-<span class="normal">924</span>
-<span class="normal">925</span>
-<span class="normal">926</span>
-<span class="normal">927</span>
-<span class="normal">928</span>
-<span class="normal">929</span>
-<span class="normal">930</span>
-<span class="normal">931</span>
-<span class="normal">932</span>
-<span class="normal">933</span>
-<span class="normal">934</span>
-<span class="normal">935</span>
-<span class="normal">936</span>
-<span class="normal">937</span>
-<span class="normal">938</span>
-<span class="normal">939</span>
-<span class="normal">940</span>
-<span class="normal">941</span>
-<span class="normal">942</span>
-<span class="normal">943</span>
-<span class="normal">944</span>
-<span class="normal">945</span>
-<span class="normal">946</span>
-<span class="normal">947</span>
-<span class="normal">948</span>
-<span class="normal">949</span>
-<span class="normal">950</span>
-<span class="normal">951</span>
-<span class="normal">952</span>
-<span class="normal">953</span>
-<span class="normal">954</span>
-<span class="normal">955</span>
-<span class="normal">956</span>
-<span class="normal">957</span>
-<span class="normal">958</span>
-<span class="normal">959</span>
-<span class="normal">960</span>
-<span class="normal">961</span>
-<span class="normal">962</span>
-<span class="normal">963</span>
-<span class="normal">964</span>
-<span class="normal">965</span>
-<span class="normal">966</span>
-<span class="normal">967</span>
-<span class="normal">968</span>
-<span class="normal">969</span>
-<span class="normal">970</span>
-<span class="normal">971</span>
-<span class="normal">972</span>
-<span class="normal">973</span>
-<span class="normal">974</span>
-<span class="normal">975</span>
-<span class="normal">976</span>
-<span class="normal">977</span>
-<span class="normal">978</span>
-<span class="normal">979</span>
-<span class="normal">980</span>
-<span class="normal">981</span>
-<span class="normal">982</span>
-<span class="normal">983</span>
-<span class="normal">984</span>
-<span class="normal">985</span>
-<span class="normal">986</span>
-<span class="normal">987</span>
-<span class="normal">988</span>
-<span class="normal">989</span>
-<span class="normal">990</span>
-<span class="normal">991</span>
-<span class="normal">992</span>
-<span class="normal">993</span>
-<span class="normal">994</span>
-<span class="normal">995</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ttest_ind</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 908</span>
+<span class="normal"> 909</span>
+<span class="normal"> 910</span>
+<span class="normal"> 911</span>
+<span class="normal"> 912</span>
+<span class="normal"> 913</span>
+<span class="normal"> 914</span>
+<span class="normal"> 915</span>
+<span class="normal"> 916</span>
+<span class="normal"> 917</span>
+<span class="normal"> 918</span>
+<span class="normal"> 919</span>
+<span class="normal"> 920</span>
+<span class="normal"> 921</span>
+<span class="normal"> 922</span>
+<span class="normal"> 923</span>
+<span class="normal"> 924</span>
+<span class="normal"> 925</span>
+<span class="normal"> 926</span>
+<span class="normal"> 927</span>
+<span class="normal"> 928</span>
+<span class="normal"> 929</span>
+<span class="normal"> 930</span>
+<span class="normal"> 931</span>
+<span class="normal"> 932</span>
+<span class="normal"> 933</span>
+<span class="normal"> 934</span>
+<span class="normal"> 935</span>
+<span class="normal"> 936</span>
+<span class="normal"> 937</span>
+<span class="normal"> 938</span>
+<span class="normal"> 939</span>
+<span class="normal"> 940</span>
+<span class="normal"> 941</span>
+<span class="normal"> 942</span>
+<span class="normal"> 943</span>
+<span class="normal"> 944</span>
+<span class="normal"> 945</span>
+<span class="normal"> 946</span>
+<span class="normal"> 947</span>
+<span class="normal"> 948</span>
+<span class="normal"> 949</span>
+<span class="normal"> 950</span>
+<span class="normal"> 951</span>
+<span class="normal"> 952</span>
+<span class="normal"> 953</span>
+<span class="normal"> 954</span>
+<span class="normal"> 955</span>
+<span class="normal"> 956</span>
+<span class="normal"> 957</span>
+<span class="normal"> 958</span>
+<span class="normal"> 959</span>
+<span class="normal"> 960</span>
+<span class="normal"> 961</span>
+<span class="normal"> 962</span>
+<span class="normal"> 963</span>
+<span class="normal"> 964</span>
+<span class="normal"> 965</span>
+<span class="normal"> 966</span>
+<span class="normal"> 967</span>
+<span class="normal"> 968</span>
+<span class="normal"> 969</span>
+<span class="normal"> 970</span>
+<span class="normal"> 971</span>
+<span class="normal"> 972</span>
+<span class="normal"> 973</span>
+<span class="normal"> 974</span>
+<span class="normal"> 975</span>
+<span class="normal"> 976</span>
+<span class="normal"> 977</span>
+<span class="normal"> 978</span>
+<span class="normal"> 979</span>
+<span class="normal"> 980</span>
+<span class="normal"> 981</span>
+<span class="normal"> 982</span>
+<span class="normal"> 983</span>
+<span class="normal"> 984</span>
+<span class="normal"> 985</span>
+<span class="normal"> 986</span>
+<span class="normal"> 987</span>
+<span class="normal"> 988</span>
+<span class="normal"> 989</span>
+<span class="normal"> 990</span>
+<span class="normal"> 991</span>
+<span class="normal"> 992</span>
+<span class="normal"> 993</span>
+<span class="normal"> 994</span>
+<span class="normal"> 995</span>
+<span class="normal"> 996</span>
+<span class="normal"> 997</span>
+<span class="normal"> 998</span>
+<span class="normal"> 999</span>
+<span class="normal">1000</span>
+<span class="normal">1001</span>
+<span class="normal">1002</span>
+<span class="normal">1003</span>
+<span class="normal">1004</span>
+<span class="normal">1005</span>
+<span class="normal">1006</span>
+<span class="normal">1007</span>
+<span class="normal">1008</span>
+<span class="normal">1009</span>
+<span class="normal">1010</span>
+<span class="normal">1011</span>
+<span class="normal">1012</span>
+<span class="normal">1013</span>
+<span class="normal">1014</span>
+<span class="normal">1015</span>
+<span class="normal">1016</span>
+<span class="normal">1017</span>
+<span class="normal">1018</span>
+<span class="normal">1019</span>
+<span class="normal">1020</span>
+<span class="normal">1021</span>
+<span class="normal">1022</span>
+<span class="normal">1023</span>
+<span class="normal">1024</span>
+<span class="normal">1025</span>
+<span class="normal">1026</span>
+<span class="normal">1027</span>
+<span class="normal">1028</span>
+<span class="normal">1029</span>
+<span class="normal">1030</span>
+<span class="normal">1031</span>
+<span class="normal">1032</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ttest_ind</span><span class="p">(</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">x</span> <span class="p">:</span> <span class="n">Series</span> <span class="o">|</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">y</span> <span class="p">:</span> <span class="n">Series</span> <span class="o">|</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4037,44 +4111,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1136</span>
-<span class="normal">1137</span>
-<span class="normal">1138</span>
-<span class="normal">1139</span>
-<span class="normal">1140</span>
-<span class="normal">1141</span>
-<span class="normal">1142</span>
-<span class="normal">1143</span>
-<span class="normal">1144</span>
-<span class="normal">1145</span>
-<span class="normal">1146</span>
-<span class="normal">1147</span>
-<span class="normal">1148</span>
-<span class="normal">1149</span>
-<span class="normal">1150</span>
-<span class="normal">1151</span>
-<span class="normal">1152</span>
-<span class="normal">1153</span>
-<span class="normal">1154</span>
-<span class="normal">1155</span>
-<span class="normal">1156</span>
-<span class="normal">1157</span>
-<span class="normal">1158</span>
-<span class="normal">1159</span>
-<span class="normal">1160</span>
-<span class="normal">1161</span>
-<span class="normal">1162</span>
-<span class="normal">1163</span>
-<span class="normal">1164</span>
-<span class="normal">1165</span>
-<span class="normal">1166</span>
-<span class="normal">1167</span>
-<span class="normal">1168</span>
-<span class="normal">1169</span>
-<span class="normal">1170</span>
-<span class="normal">1171</span>
-<span class="normal">1172</span>
-<span class="normal">1173</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1173</span>
 <span class="normal">1174</span>
 <span class="normal">1175</span>
 <span class="normal">1176</span>
@@ -4226,7 +4263,44 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="normal">1322</span>
 <span class="normal">1323</span>
 <span class="normal">1324</span>
-<span class="normal">1325</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">oneway_anova</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">dv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">between</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="normal">1325</span>
+<span class="normal">1326</span>
+<span class="normal">1327</span>
+<span class="normal">1328</span>
+<span class="normal">1329</span>
+<span class="normal">1330</span>
+<span class="normal">1331</span>
+<span class="normal">1332</span>
+<span class="normal">1333</span>
+<span class="normal">1334</span>
+<span class="normal">1335</span>
+<span class="normal">1336</span>
+<span class="normal">1337</span>
+<span class="normal">1338</span>
+<span class="normal">1339</span>
+<span class="normal">1340</span>
+<span class="normal">1341</span>
+<span class="normal">1342</span>
+<span class="normal">1343</span>
+<span class="normal">1344</span>
+<span class="normal">1345</span>
+<span class="normal">1346</span>
+<span class="normal">1347</span>
+<span class="normal">1348</span>
+<span class="normal">1349</span>
+<span class="normal">1350</span>
+<span class="normal">1351</span>
+<span class="normal">1352</span>
+<span class="normal">1353</span>
+<span class="normal">1354</span>
+<span class="normal">1355</span>
+<span class="normal">1356</span>
+<span class="normal">1357</span>
+<span class="normal">1358</span>
+<span class="normal">1359</span>
+<span class="normal">1360</span>
+<span class="normal">1361</span>
+<span class="normal">1362</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">oneway_anova</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">dv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">between</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;일원분산분석(One-way ANOVA)을 일괄 처리한다.</span>
 
 <span class="sd">    정규성 및 등분산성 검정을 자동으로 수행한 후,</span>
@@ -4591,44 +4665,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1331</span>
-<span class="normal">1332</span>
-<span class="normal">1333</span>
-<span class="normal">1334</span>
-<span class="normal">1335</span>
-<span class="normal">1336</span>
-<span class="normal">1337</span>
-<span class="normal">1338</span>
-<span class="normal">1339</span>
-<span class="normal">1340</span>
-<span class="normal">1341</span>
-<span class="normal">1342</span>
-<span class="normal">1343</span>
-<span class="normal">1344</span>
-<span class="normal">1345</span>
-<span class="normal">1346</span>
-<span class="normal">1347</span>
-<span class="normal">1348</span>
-<span class="normal">1349</span>
-<span class="normal">1350</span>
-<span class="normal">1351</span>
-<span class="normal">1352</span>
-<span class="normal">1353</span>
-<span class="normal">1354</span>
-<span class="normal">1355</span>
-<span class="normal">1356</span>
-<span class="normal">1357</span>
-<span class="normal">1358</span>
-<span class="normal">1359</span>
-<span class="normal">1360</span>
-<span class="normal">1361</span>
-<span class="normal">1362</span>
-<span class="normal">1363</span>
-<span class="normal">1364</span>
-<span class="normal">1365</span>
-<span class="normal">1366</span>
-<span class="normal">1367</span>
-<span class="normal">1368</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1368</span>
 <span class="normal">1369</span>
 <span class="normal">1370</span>
 <span class="normal">1371</span>
@@ -4735,7 +4772,44 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="normal">1472</span>
 <span class="normal">1473</span>
 <span class="normal">1474</span>
-<span class="normal">1475</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">twoway_anova</span><span class="p">(</span>
+<span class="normal">1475</span>
+<span class="normal">1476</span>
+<span class="normal">1477</span>
+<span class="normal">1478</span>
+<span class="normal">1479</span>
+<span class="normal">1480</span>
+<span class="normal">1481</span>
+<span class="normal">1482</span>
+<span class="normal">1483</span>
+<span class="normal">1484</span>
+<span class="normal">1485</span>
+<span class="normal">1486</span>
+<span class="normal">1487</span>
+<span class="normal">1488</span>
+<span class="normal">1489</span>
+<span class="normal">1490</span>
+<span class="normal">1491</span>
+<span class="normal">1492</span>
+<span class="normal">1493</span>
+<span class="normal">1494</span>
+<span class="normal">1495</span>
+<span class="normal">1496</span>
+<span class="normal">1497</span>
+<span class="normal">1498</span>
+<span class="normal">1499</span>
+<span class="normal">1500</span>
+<span class="normal">1501</span>
+<span class="normal">1502</span>
+<span class="normal">1503</span>
+<span class="normal">1504</span>
+<span class="normal">1505</span>
+<span class="normal">1506</span>
+<span class="normal">1507</span>
+<span class="normal">1508</span>
+<span class="normal">1509</span>
+<span class="normal">1510</span>
+<span class="normal">1511</span>
+<span class="normal">1512</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">twoway_anova</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">dv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">factor_a</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -5027,44 +5101,7 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1482</span>
-<span class="normal">1483</span>
-<span class="normal">1484</span>
-<span class="normal">1485</span>
-<span class="normal">1486</span>
-<span class="normal">1487</span>
-<span class="normal">1488</span>
-<span class="normal">1489</span>
-<span class="normal">1490</span>
-<span class="normal">1491</span>
-<span class="normal">1492</span>
-<span class="normal">1493</span>
-<span class="normal">1494</span>
-<span class="normal">1495</span>
-<span class="normal">1496</span>
-<span class="normal">1497</span>
-<span class="normal">1498</span>
-<span class="normal">1499</span>
-<span class="normal">1500</span>
-<span class="normal">1501</span>
-<span class="normal">1502</span>
-<span class="normal">1503</span>
-<span class="normal">1504</span>
-<span class="normal">1505</span>
-<span class="normal">1506</span>
-<span class="normal">1507</span>
-<span class="normal">1508</span>
-<span class="normal">1509</span>
-<span class="normal">1510</span>
-<span class="normal">1511</span>
-<span class="normal">1512</span>
-<span class="normal">1513</span>
-<span class="normal">1514</span>
-<span class="normal">1515</span>
-<span class="normal">1516</span>
-<span class="normal">1517</span>
-<span class="normal">1518</span>
-<span class="normal">1519</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1519</span>
 <span class="normal">1520</span>
 <span class="normal">1521</span>
 <span class="normal">1522</span>
@@ -5139,7 +5176,44 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 <span class="normal">1591</span>
 <span class="normal">1592</span>
 <span class="normal">1593</span>
-<span class="normal">1594</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">corr_effect_size</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">dv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">1594</span>
+<span class="normal">1595</span>
+<span class="normal">1596</span>
+<span class="normal">1597</span>
+<span class="normal">1598</span>
+<span class="normal">1599</span>
+<span class="normal">1600</span>
+<span class="normal">1601</span>
+<span class="normal">1602</span>
+<span class="normal">1603</span>
+<span class="normal">1604</span>
+<span class="normal">1605</span>
+<span class="normal">1606</span>
+<span class="normal">1607</span>
+<span class="normal">1608</span>
+<span class="normal">1609</span>
+<span class="normal">1610</span>
+<span class="normal">1611</span>
+<span class="normal">1612</span>
+<span class="normal">1613</span>
+<span class="normal">1614</span>
+<span class="normal">1615</span>
+<span class="normal">1616</span>
+<span class="normal">1617</span>
+<span class="normal">1618</span>
+<span class="normal">1619</span>
+<span class="normal">1620</span>
+<span class="normal">1621</span>
+<span class="normal">1622</span>
+<span class="normal">1623</span>
+<span class="normal">1624</span>
+<span class="normal">1625</span>
+<span class="normal">1626</span>
+<span class="normal">1627</span>
+<span class="normal">1628</span>
+<span class="normal">1629</span>
+<span class="normal">1630</span>
+<span class="normal">1631</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">corr_effect_size</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">dv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;종속변수와의 편상관계수 및 효과크기를 계산한다.</span>
 
 <span class="sd">    각 독립변수와 종속변수 간의 상관계수를 계산하되, 정규성과 선형성을 검사하여</span>
@@ -5456,44 +5530,7 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1600</span>
-<span class="normal">1601</span>
-<span class="normal">1602</span>
-<span class="normal">1603</span>
-<span class="normal">1604</span>
-<span class="normal">1605</span>
-<span class="normal">1606</span>
-<span class="normal">1607</span>
-<span class="normal">1608</span>
-<span class="normal">1609</span>
-<span class="normal">1610</span>
-<span class="normal">1611</span>
-<span class="normal">1612</span>
-<span class="normal">1613</span>
-<span class="normal">1614</span>
-<span class="normal">1615</span>
-<span class="normal">1616</span>
-<span class="normal">1617</span>
-<span class="normal">1618</span>
-<span class="normal">1619</span>
-<span class="normal">1620</span>
-<span class="normal">1621</span>
-<span class="normal">1622</span>
-<span class="normal">1623</span>
-<span class="normal">1624</span>
-<span class="normal">1625</span>
-<span class="normal">1626</span>
-<span class="normal">1627</span>
-<span class="normal">1628</span>
-<span class="normal">1629</span>
-<span class="normal">1630</span>
-<span class="normal">1631</span>
-<span class="normal">1632</span>
-<span class="normal">1633</span>
-<span class="normal">1634</span>
-<span class="normal">1635</span>
-<span class="normal">1636</span>
-<span class="normal">1637</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1637</span>
 <span class="normal">1638</span>
 <span class="normal">1639</span>
 <span class="normal">1640</span>
@@ -5651,7 +5688,44 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 <span class="normal">1792</span>
 <span class="normal">1793</span>
 <span class="normal">1794</span>
-<span class="normal">1795</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">corr_pairwise</span><span class="p">(</span>
+<span class="normal">1795</span>
+<span class="normal">1796</span>
+<span class="normal">1797</span>
+<span class="normal">1798</span>
+<span class="normal">1799</span>
+<span class="normal">1800</span>
+<span class="normal">1801</span>
+<span class="normal">1802</span>
+<span class="normal">1803</span>
+<span class="normal">1804</span>
+<span class="normal">1805</span>
+<span class="normal">1806</span>
+<span class="normal">1807</span>
+<span class="normal">1808</span>
+<span class="normal">1809</span>
+<span class="normal">1810</span>
+<span class="normal">1811</span>
+<span class="normal">1812</span>
+<span class="normal">1813</span>
+<span class="normal">1814</span>
+<span class="normal">1815</span>
+<span class="normal">1816</span>
+<span class="normal">1817</span>
+<span class="normal">1818</span>
+<span class="normal">1819</span>
+<span class="normal">1820</span>
+<span class="normal">1821</span>
+<span class="normal">1822</span>
+<span class="normal">1823</span>
+<span class="normal">1824</span>
+<span class="normal">1825</span>
+<span class="normal">1826</span>
+<span class="normal">1827</span>
+<span class="normal">1828</span>
+<span class="normal">1829</span>
+<span class="normal">1830</span>
+<span class="normal">1831</span>
+<span class="normal">1832</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">corr_pairwise</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
@@ -6002,44 +6076,7 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1802</span>
-<span class="normal">1803</span>
-<span class="normal">1804</span>
-<span class="normal">1805</span>
-<span class="normal">1806</span>
-<span class="normal">1807</span>
-<span class="normal">1808</span>
-<span class="normal">1809</span>
-<span class="normal">1810</span>
-<span class="normal">1811</span>
-<span class="normal">1812</span>
-<span class="normal">1813</span>
-<span class="normal">1814</span>
-<span class="normal">1815</span>
-<span class="normal">1816</span>
-<span class="normal">1817</span>
-<span class="normal">1818</span>
-<span class="normal">1819</span>
-<span class="normal">1820</span>
-<span class="normal">1821</span>
-<span class="normal">1822</span>
-<span class="normal">1823</span>
-<span class="normal">1824</span>
-<span class="normal">1825</span>
-<span class="normal">1826</span>
-<span class="normal">1827</span>
-<span class="normal">1828</span>
-<span class="normal">1829</span>
-<span class="normal">1830</span>
-<span class="normal">1831</span>
-<span class="normal">1832</span>
-<span class="normal">1833</span>
-<span class="normal">1834</span>
-<span class="normal">1835</span>
-<span class="normal">1836</span>
-<span class="normal">1837</span>
-<span class="normal">1838</span>
-<span class="normal">1839</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1839</span>
 <span class="normal">1840</span>
 <span class="normal">1841</span>
 <span class="normal">1842</span>
@@ -6100,7 +6137,44 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 <span class="normal">1897</span>
 <span class="normal">1898</span>
 <span class="normal">1899</span>
-<span class="normal">1900</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">vif_filter</span><span class="p">(</span>
+<span class="normal">1900</span>
+<span class="normal">1901</span>
+<span class="normal">1902</span>
+<span class="normal">1903</span>
+<span class="normal">1904</span>
+<span class="normal">1905</span>
+<span class="normal">1906</span>
+<span class="normal">1907</span>
+<span class="normal">1908</span>
+<span class="normal">1909</span>
+<span class="normal">1910</span>
+<span class="normal">1911</span>
+<span class="normal">1912</span>
+<span class="normal">1913</span>
+<span class="normal">1914</span>
+<span class="normal">1915</span>
+<span class="normal">1916</span>
+<span class="normal">1917</span>
+<span class="normal">1918</span>
+<span class="normal">1919</span>
+<span class="normal">1920</span>
+<span class="normal">1921</span>
+<span class="normal">1922</span>
+<span class="normal">1923</span>
+<span class="normal">1924</span>
+<span class="normal">1925</span>
+<span class="normal">1926</span>
+<span class="normal">1927</span>
+<span class="normal">1928</span>
+<span class="normal">1929</span>
+<span class="normal">1930</span>
+<span class="normal">1931</span>
+<span class="normal">1932</span>
+<span class="normal">1933</span>
+<span class="normal">1934</span>
+<span class="normal">1935</span>
+<span class="normal">1936</span>
+<span class="normal">1937</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">vif_filter</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">ignore</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -6333,43 +6407,43 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1907</span>
-<span class="normal">1908</span>
-<span class="normal">1909</span>
-<span class="normal">1910</span>
-<span class="normal">1911</span>
-<span class="normal">1912</span>
-<span class="normal">1913</span>
-<span class="normal">1914</span>
-<span class="normal">1915</span>
-<span class="normal">1916</span>
-<span class="normal">1917</span>
-<span class="normal">1918</span>
-<span class="normal">1919</span>
-<span class="normal">1920</span>
-<span class="normal">1921</span>
-<span class="normal">1922</span>
-<span class="normal">1923</span>
-<span class="normal">1924</span>
-<span class="normal">1925</span>
-<span class="normal">1926</span>
-<span class="normal">1927</span>
-<span class="normal">1928</span>
-<span class="normal">1929</span>
-<span class="normal">1930</span>
-<span class="normal">1931</span>
-<span class="normal">1932</span>
-<span class="normal">1933</span>
-<span class="normal">1934</span>
-<span class="normal">1935</span>
-<span class="normal">1936</span>
-<span class="normal">1937</span>
-<span class="normal">1938</span>
-<span class="normal">1939</span>
-<span class="normal">1940</span>
-<span class="normal">1941</span>
-<span class="normal">1942</span>
-<span class="normal">1943</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">trend</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">degree</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">value_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1944</span>
+<span class="normal">1945</span>
+<span class="normal">1946</span>
+<span class="normal">1947</span>
+<span class="normal">1948</span>
+<span class="normal">1949</span>
+<span class="normal">1950</span>
+<span class="normal">1951</span>
+<span class="normal">1952</span>
+<span class="normal">1953</span>
+<span class="normal">1954</span>
+<span class="normal">1955</span>
+<span class="normal">1956</span>
+<span class="normal">1957</span>
+<span class="normal">1958</span>
+<span class="normal">1959</span>
+<span class="normal">1960</span>
+<span class="normal">1961</span>
+<span class="normal">1962</span>
+<span class="normal">1963</span>
+<span class="normal">1964</span>
+<span class="normal">1965</span>
+<span class="normal">1966</span>
+<span class="normal">1967</span>
+<span class="normal">1968</span>
+<span class="normal">1969</span>
+<span class="normal">1970</span>
+<span class="normal">1971</span>
+<span class="normal">1972</span>
+<span class="normal">1973</span>
+<span class="normal">1974</span>
+<span class="normal">1975</span>
+<span class="normal">1976</span>
+<span class="normal">1977</span>
+<span class="normal">1978</span>
+<span class="normal">1979</span>
+<span class="normal">1980</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">trend</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">degree</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">value_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;x, y 데이터에 대한 추세선을 구한다.</span>
 
 <span class="sd">    Args:</span>
@@ -6594,44 +6668,7 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1972</span>
-<span class="normal">1973</span>
-<span class="normal">1974</span>
-<span class="normal">1975</span>
-<span class="normal">1976</span>
-<span class="normal">1977</span>
-<span class="normal">1978</span>
-<span class="normal">1979</span>
-<span class="normal">1980</span>
-<span class="normal">1981</span>
-<span class="normal">1982</span>
-<span class="normal">1983</span>
-<span class="normal">1984</span>
-<span class="normal">1985</span>
-<span class="normal">1986</span>
-<span class="normal">1987</span>
-<span class="normal">1988</span>
-<span class="normal">1989</span>
-<span class="normal">1990</span>
-<span class="normal">1991</span>
-<span class="normal">1992</span>
-<span class="normal">1993</span>
-<span class="normal">1994</span>
-<span class="normal">1995</span>
-<span class="normal">1996</span>
-<span class="normal">1997</span>
-<span class="normal">1998</span>
-<span class="normal">1999</span>
-<span class="normal">2000</span>
-<span class="normal">2001</span>
-<span class="normal">2002</span>
-<span class="normal">2003</span>
-<span class="normal">2004</span>
-<span class="normal">2005</span>
-<span class="normal">2006</span>
-<span class="normal">2007</span>
-<span class="normal">2008</span>
-<span class="normal">2009</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2009</span>
 <span class="normal">2010</span>
 <span class="normal">2011</span>
 <span class="normal">2012</span>
@@ -6800,7 +6837,44 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 <span class="normal">2175</span>
 <span class="normal">2176</span>
 <span class="normal">2177</span>
-<span class="normal">2178</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_report</span><span class="p">(</span>
+<span class="normal">2178</span>
+<span class="normal">2179</span>
+<span class="normal">2180</span>
+<span class="normal">2181</span>
+<span class="normal">2182</span>
+<span class="normal">2183</span>
+<span class="normal">2184</span>
+<span class="normal">2185</span>
+<span class="normal">2186</span>
+<span class="normal">2187</span>
+<span class="normal">2188</span>
+<span class="normal">2189</span>
+<span class="normal">2190</span>
+<span class="normal">2191</span>
+<span class="normal">2192</span>
+<span class="normal">2193</span>
+<span class="normal">2194</span>
+<span class="normal">2195</span>
+<span class="normal">2196</span>
+<span class="normal">2197</span>
+<span class="normal">2198</span>
+<span class="normal">2199</span>
+<span class="normal">2200</span>
+<span class="normal">2201</span>
+<span class="normal">2202</span>
+<span class="normal">2203</span>
+<span class="normal">2204</span>
+<span class="normal">2205</span>
+<span class="normal">2206</span>
+<span class="normal">2207</span>
+<span class="normal">2208</span>
+<span class="normal">2209</span>
+<span class="normal">2210</span>
+<span class="normal">2211</span>
+<span class="normal">2212</span>
+<span class="normal">2213</span>
+<span class="normal">2214</span>
+<span class="normal">2215</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_report</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">:</span> <span class="n">RegressionResultsWrapper</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">full</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -7194,44 +7268,7 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2213</span>
-<span class="normal">2214</span>
-<span class="normal">2215</span>
-<span class="normal">2216</span>
-<span class="normal">2217</span>
-<span class="normal">2218</span>
-<span class="normal">2219</span>
-<span class="normal">2220</span>
-<span class="normal">2221</span>
-<span class="normal">2222</span>
-<span class="normal">2223</span>
-<span class="normal">2224</span>
-<span class="normal">2225</span>
-<span class="normal">2226</span>
-<span class="normal">2227</span>
-<span class="normal">2228</span>
-<span class="normal">2229</span>
-<span class="normal">2230</span>
-<span class="normal">2231</span>
-<span class="normal">2232</span>
-<span class="normal">2233</span>
-<span class="normal">2234</span>
-<span class="normal">2235</span>
-<span class="normal">2236</span>
-<span class="normal">2237</span>
-<span class="normal">2238</span>
-<span class="normal">2239</span>
-<span class="normal">2240</span>
-<span class="normal">2241</span>
-<span class="normal">2242</span>
-<span class="normal">2243</span>
-<span class="normal">2244</span>
-<span class="normal">2245</span>
-<span class="normal">2246</span>
-<span class="normal">2247</span>
-<span class="normal">2248</span>
-<span class="normal">2249</span>
-<span class="normal">2250</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2250</span>
 <span class="normal">2251</span>
 <span class="normal">2252</span>
 <span class="normal">2253</span>
@@ -7278,7 +7315,44 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 <span class="normal">2294</span>
 <span class="normal">2295</span>
 <span class="normal">2296</span>
-<span class="normal">2297</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="s2">&quot;full&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;summary&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
+<span class="normal">2297</span>
+<span class="normal">2298</span>
+<span class="normal">2299</span>
+<span class="normal">2300</span>
+<span class="normal">2301</span>
+<span class="normal">2302</span>
+<span class="normal">2303</span>
+<span class="normal">2304</span>
+<span class="normal">2305</span>
+<span class="normal">2306</span>
+<span class="normal">2307</span>
+<span class="normal">2308</span>
+<span class="normal">2309</span>
+<span class="normal">2310</span>
+<span class="normal">2311</span>
+<span class="normal">2312</span>
+<span class="normal">2313</span>
+<span class="normal">2314</span>
+<span class="normal">2315</span>
+<span class="normal">2316</span>
+<span class="normal">2317</span>
+<span class="normal">2318</span>
+<span class="normal">2319</span>
+<span class="normal">2320</span>
+<span class="normal">2321</span>
+<span class="normal">2322</span>
+<span class="normal">2323</span>
+<span class="normal">2324</span>
+<span class="normal">2325</span>
+<span class="normal">2326</span>
+<span class="normal">2327</span>
+<span class="normal">2328</span>
+<span class="normal">2329</span>
+<span class="normal">2330</span>
+<span class="normal">2331</span>
+<span class="normal">2332</span>
+<span class="normal">2333</span>
+<span class="normal">2334</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="s2">&quot;full&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;summary&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
     <span class="n">Tuple</span><span class="p">[</span><span class="n">RegressionResultsWrapper</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">],</span>
     <span class="n">Tuple</span><span class="p">[</span>
         <span class="n">RegressionResultsWrapper</span><span class="p">,</span>
@@ -7497,44 +7571,7 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2303</span>
-<span class="normal">2304</span>
-<span class="normal">2305</span>
-<span class="normal">2306</span>
-<span class="normal">2307</span>
-<span class="normal">2308</span>
-<span class="normal">2309</span>
-<span class="normal">2310</span>
-<span class="normal">2311</span>
-<span class="normal">2312</span>
-<span class="normal">2313</span>
-<span class="normal">2314</span>
-<span class="normal">2315</span>
-<span class="normal">2316</span>
-<span class="normal">2317</span>
-<span class="normal">2318</span>
-<span class="normal">2319</span>
-<span class="normal">2320</span>
-<span class="normal">2321</span>
-<span class="normal">2322</span>
-<span class="normal">2323</span>
-<span class="normal">2324</span>
-<span class="normal">2325</span>
-<span class="normal">2326</span>
-<span class="normal">2327</span>
-<span class="normal">2328</span>
-<span class="normal">2329</span>
-<span class="normal">2330</span>
-<span class="normal">2331</span>
-<span class="normal">2332</span>
-<span class="normal">2333</span>
-<span class="normal">2334</span>
-<span class="normal">2335</span>
-<span class="normal">2336</span>
-<span class="normal">2337</span>
-<span class="normal">2338</span>
-<span class="normal">2339</span>
-<span class="normal">2340</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2340</span>
 <span class="normal">2341</span>
 <span class="normal">2342</span>
 <span class="normal">2343</span>
@@ -7592,7 +7629,44 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 <span class="normal">2395</span>
 <span class="normal">2396</span>
 <span class="normal">2397</span>
-<span class="normal">2398</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_linearity_test</span><span class="p">(</span><span class="n">fit</span><span class="p">:</span> <span class="n">RegressionResultsWrapper</span><span class="p">,</span> <span class="n">power</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">2398</span>
+<span class="normal">2399</span>
+<span class="normal">2400</span>
+<span class="normal">2401</span>
+<span class="normal">2402</span>
+<span class="normal">2403</span>
+<span class="normal">2404</span>
+<span class="normal">2405</span>
+<span class="normal">2406</span>
+<span class="normal">2407</span>
+<span class="normal">2408</span>
+<span class="normal">2409</span>
+<span class="normal">2410</span>
+<span class="normal">2411</span>
+<span class="normal">2412</span>
+<span class="normal">2413</span>
+<span class="normal">2414</span>
+<span class="normal">2415</span>
+<span class="normal">2416</span>
+<span class="normal">2417</span>
+<span class="normal">2418</span>
+<span class="normal">2419</span>
+<span class="normal">2420</span>
+<span class="normal">2421</span>
+<span class="normal">2422</span>
+<span class="normal">2423</span>
+<span class="normal">2424</span>
+<span class="normal">2425</span>
+<span class="normal">2426</span>
+<span class="normal">2427</span>
+<span class="normal">2428</span>
+<span class="normal">2429</span>
+<span class="normal">2430</span>
+<span class="normal">2431</span>
+<span class="normal">2432</span>
+<span class="normal">2433</span>
+<span class="normal">2434</span>
+<span class="normal">2435</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_linearity_test</span><span class="p">(</span><span class="n">fit</span><span class="p">:</span> <span class="n">RegressionResultsWrapper</span><span class="p">,</span> <span class="n">power</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;회귀모형의 선형성을 Ramsey RESET 검정으로 평가한다.</span>
 
 <span class="sd">    적합된 회귀모형에 대해 Ramsey RESET(Regression Specification Error Test) 검정을 수행하여</span>
@@ -7857,44 +7931,7 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2404</span>
-<span class="normal">2405</span>
-<span class="normal">2406</span>
-<span class="normal">2407</span>
-<span class="normal">2408</span>
-<span class="normal">2409</span>
-<span class="normal">2410</span>
-<span class="normal">2411</span>
-<span class="normal">2412</span>
-<span class="normal">2413</span>
-<span class="normal">2414</span>
-<span class="normal">2415</span>
-<span class="normal">2416</span>
-<span class="normal">2417</span>
-<span class="normal">2418</span>
-<span class="normal">2419</span>
-<span class="normal">2420</span>
-<span class="normal">2421</span>
-<span class="normal">2422</span>
-<span class="normal">2423</span>
-<span class="normal">2424</span>
-<span class="normal">2425</span>
-<span class="normal">2426</span>
-<span class="normal">2427</span>
-<span class="normal">2428</span>
-<span class="normal">2429</span>
-<span class="normal">2430</span>
-<span class="normal">2431</span>
-<span class="normal">2432</span>
-<span class="normal">2433</span>
-<span class="normal">2434</span>
-<span class="normal">2435</span>
-<span class="normal">2436</span>
-<span class="normal">2437</span>
-<span class="normal">2438</span>
-<span class="normal">2439</span>
-<span class="normal">2440</span>
-<span class="normal">2441</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2441</span>
 <span class="normal">2442</span>
 <span class="normal">2443</span>
 <span class="normal">2444</span>
@@ -7952,7 +7989,44 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 <span class="normal">2496</span>
 <span class="normal">2497</span>
 <span class="normal">2498</span>
-<span class="normal">2499</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_normality_test</span><span class="p">(</span><span class="n">fit</span><span class="p">:</span> <span class="n">RegressionResultsWrapper</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">2499</span>
+<span class="normal">2500</span>
+<span class="normal">2501</span>
+<span class="normal">2502</span>
+<span class="normal">2503</span>
+<span class="normal">2504</span>
+<span class="normal">2505</span>
+<span class="normal">2506</span>
+<span class="normal">2507</span>
+<span class="normal">2508</span>
+<span class="normal">2509</span>
+<span class="normal">2510</span>
+<span class="normal">2511</span>
+<span class="normal">2512</span>
+<span class="normal">2513</span>
+<span class="normal">2514</span>
+<span class="normal">2515</span>
+<span class="normal">2516</span>
+<span class="normal">2517</span>
+<span class="normal">2518</span>
+<span class="normal">2519</span>
+<span class="normal">2520</span>
+<span class="normal">2521</span>
+<span class="normal">2522</span>
+<span class="normal">2523</span>
+<span class="normal">2524</span>
+<span class="normal">2525</span>
+<span class="normal">2526</span>
+<span class="normal">2527</span>
+<span class="normal">2528</span>
+<span class="normal">2529</span>
+<span class="normal">2530</span>
+<span class="normal">2531</span>
+<span class="normal">2532</span>
+<span class="normal">2533</span>
+<span class="normal">2534</span>
+<span class="normal">2535</span>
+<span class="normal">2536</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_normality_test</span><span class="p">(</span><span class="n">fit</span><span class="p">:</span> <span class="n">RegressionResultsWrapper</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;회귀모형 잔차의 정규성을 검정한다.</span>
 
 <span class="sd">    회귀모형의 잔차가 정규분포를 따르는지 Shapiro-Wilk 검정과 Jarque-Bera 검정으로 평가한다.</span>
@@ -8217,44 +8291,7 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2505</span>
-<span class="normal">2506</span>
-<span class="normal">2507</span>
-<span class="normal">2508</span>
-<span class="normal">2509</span>
-<span class="normal">2510</span>
-<span class="normal">2511</span>
-<span class="normal">2512</span>
-<span class="normal">2513</span>
-<span class="normal">2514</span>
-<span class="normal">2515</span>
-<span class="normal">2516</span>
-<span class="normal">2517</span>
-<span class="normal">2518</span>
-<span class="normal">2519</span>
-<span class="normal">2520</span>
-<span class="normal">2521</span>
-<span class="normal">2522</span>
-<span class="normal">2523</span>
-<span class="normal">2524</span>
-<span class="normal">2525</span>
-<span class="normal">2526</span>
-<span class="normal">2527</span>
-<span class="normal">2528</span>
-<span class="normal">2529</span>
-<span class="normal">2530</span>
-<span class="normal">2531</span>
-<span class="normal">2532</span>
-<span class="normal">2533</span>
-<span class="normal">2534</span>
-<span class="normal">2535</span>
-<span class="normal">2536</span>
-<span class="normal">2537</span>
-<span class="normal">2538</span>
-<span class="normal">2539</span>
-<span class="normal">2540</span>
-<span class="normal">2541</span>
-<span class="normal">2542</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2542</span>
 <span class="normal">2543</span>
 <span class="normal">2544</span>
 <span class="normal">2545</span>
@@ -8309,7 +8346,44 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 <span class="normal">2594</span>
 <span class="normal">2595</span>
 <span class="normal">2596</span>
-<span class="normal">2597</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_variance_test</span><span class="p">(</span><span class="n">fit</span><span class="p">:</span> <span class="n">RegressionResultsWrapper</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">2597</span>
+<span class="normal">2598</span>
+<span class="normal">2599</span>
+<span class="normal">2600</span>
+<span class="normal">2601</span>
+<span class="normal">2602</span>
+<span class="normal">2603</span>
+<span class="normal">2604</span>
+<span class="normal">2605</span>
+<span class="normal">2606</span>
+<span class="normal">2607</span>
+<span class="normal">2608</span>
+<span class="normal">2609</span>
+<span class="normal">2610</span>
+<span class="normal">2611</span>
+<span class="normal">2612</span>
+<span class="normal">2613</span>
+<span class="normal">2614</span>
+<span class="normal">2615</span>
+<span class="normal">2616</span>
+<span class="normal">2617</span>
+<span class="normal">2618</span>
+<span class="normal">2619</span>
+<span class="normal">2620</span>
+<span class="normal">2621</span>
+<span class="normal">2622</span>
+<span class="normal">2623</span>
+<span class="normal">2624</span>
+<span class="normal">2625</span>
+<span class="normal">2626</span>
+<span class="normal">2627</span>
+<span class="normal">2628</span>
+<span class="normal">2629</span>
+<span class="normal">2630</span>
+<span class="normal">2631</span>
+<span class="normal">2632</span>
+<span class="normal">2633</span>
+<span class="normal">2634</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_variance_test</span><span class="p">(</span><span class="n">fit</span><span class="p">:</span> <span class="n">RegressionResultsWrapper</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;회귀모형의 등분산성 가정을 검정한다.</span>
 
 <span class="sd">    잔차의 분산이 예측값의 수준에 관계없이 일정한지 Breusch-Pagan 검정과 White 검정으로 평가한다.</span>
@@ -8521,44 +8595,7 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2603</span>
-<span class="normal">2604</span>
-<span class="normal">2605</span>
-<span class="normal">2606</span>
-<span class="normal">2607</span>
-<span class="normal">2608</span>
-<span class="normal">2609</span>
-<span class="normal">2610</span>
-<span class="normal">2611</span>
-<span class="normal">2612</span>
-<span class="normal">2613</span>
-<span class="normal">2614</span>
-<span class="normal">2615</span>
-<span class="normal">2616</span>
-<span class="normal">2617</span>
-<span class="normal">2618</span>
-<span class="normal">2619</span>
-<span class="normal">2620</span>
-<span class="normal">2621</span>
-<span class="normal">2622</span>
-<span class="normal">2623</span>
-<span class="normal">2624</span>
-<span class="normal">2625</span>
-<span class="normal">2626</span>
-<span class="normal">2627</span>
-<span class="normal">2628</span>
-<span class="normal">2629</span>
-<span class="normal">2630</span>
-<span class="normal">2631</span>
-<span class="normal">2632</span>
-<span class="normal">2633</span>
-<span class="normal">2634</span>
-<span class="normal">2635</span>
-<span class="normal">2636</span>
-<span class="normal">2637</span>
-<span class="normal">2638</span>
-<span class="normal">2639</span>
-<span class="normal">2640</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2640</span>
 <span class="normal">2641</span>
 <span class="normal">2642</span>
 <span class="normal">2643</span>
@@ -8579,7 +8616,44 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 <span class="normal">2658</span>
 <span class="normal">2659</span>
 <span class="normal">2660</span>
-<span class="normal">2661</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_independence_test</span><span class="p">(</span><span class="n">fit</span><span class="p">:</span> <span class="n">RegressionResultsWrapper</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">2661</span>
+<span class="normal">2662</span>
+<span class="normal">2663</span>
+<span class="normal">2664</span>
+<span class="normal">2665</span>
+<span class="normal">2666</span>
+<span class="normal">2667</span>
+<span class="normal">2668</span>
+<span class="normal">2669</span>
+<span class="normal">2670</span>
+<span class="normal">2671</span>
+<span class="normal">2672</span>
+<span class="normal">2673</span>
+<span class="normal">2674</span>
+<span class="normal">2675</span>
+<span class="normal">2676</span>
+<span class="normal">2677</span>
+<span class="normal">2678</span>
+<span class="normal">2679</span>
+<span class="normal">2680</span>
+<span class="normal">2681</span>
+<span class="normal">2682</span>
+<span class="normal">2683</span>
+<span class="normal">2684</span>
+<span class="normal">2685</span>
+<span class="normal">2686</span>
+<span class="normal">2687</span>
+<span class="normal">2688</span>
+<span class="normal">2689</span>
+<span class="normal">2690</span>
+<span class="normal">2691</span>
+<span class="normal">2692</span>
+<span class="normal">2693</span>
+<span class="normal">2694</span>
+<span class="normal">2695</span>
+<span class="normal">2696</span>
+<span class="normal">2697</span>
+<span class="normal">2698</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_independence_test</span><span class="p">(</span><span class="n">fit</span><span class="p">:</span> <span class="n">RegressionResultsWrapper</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;회귀모형의 독립성 가정(자기상관 없음)을 검정한다.</span>
 
 <span class="sd">    Durbin-Watson 검정을 사용하여 잔차의 1차 자기상관 여부를 검정한다.</span>
@@ -8790,45 +8864,45 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2665</span>
-<span class="normal">2666</span>
-<span class="normal">2667</span>
-<span class="normal">2668</span>
-<span class="normal">2669</span>
-<span class="normal">2670</span>
-<span class="normal">2671</span>
-<span class="normal">2672</span>
-<span class="normal">2673</span>
-<span class="normal">2674</span>
-<span class="normal">2675</span>
-<span class="normal">2676</span>
-<span class="normal">2677</span>
-<span class="normal">2678</span>
-<span class="normal">2679</span>
-<span class="normal">2680</span>
-<span class="normal">2681</span>
-<span class="normal">2682</span>
-<span class="normal">2683</span>
-<span class="normal">2684</span>
-<span class="normal">2685</span>
-<span class="normal">2686</span>
-<span class="normal">2687</span>
-<span class="normal">2688</span>
-<span class="normal">2689</span>
-<span class="normal">2690</span>
-<span class="normal">2691</span>
-<span class="normal">2692</span>
-<span class="normal">2693</span>
-<span class="normal">2694</span>
-<span class="normal">2695</span>
-<span class="normal">2696</span>
-<span class="normal">2697</span>
-<span class="normal">2698</span>
-<span class="normal">2699</span>
-<span class="normal">2700</span>
-<span class="normal">2701</span>
-<span class="normal">2702</span>
-<span class="normal">2703</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_tests</span><span class="p">(</span><span class="n">fit</span><span class="p">:</span> <span class="n">RegressionResultsWrapper</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2702</span>
+<span class="normal">2703</span>
+<span class="normal">2704</span>
+<span class="normal">2705</span>
+<span class="normal">2706</span>
+<span class="normal">2707</span>
+<span class="normal">2708</span>
+<span class="normal">2709</span>
+<span class="normal">2710</span>
+<span class="normal">2711</span>
+<span class="normal">2712</span>
+<span class="normal">2713</span>
+<span class="normal">2714</span>
+<span class="normal">2715</span>
+<span class="normal">2716</span>
+<span class="normal">2717</span>
+<span class="normal">2718</span>
+<span class="normal">2719</span>
+<span class="normal">2720</span>
+<span class="normal">2721</span>
+<span class="normal">2722</span>
+<span class="normal">2723</span>
+<span class="normal">2724</span>
+<span class="normal">2725</span>
+<span class="normal">2726</span>
+<span class="normal">2727</span>
+<span class="normal">2728</span>
+<span class="normal">2729</span>
+<span class="normal">2730</span>
+<span class="normal">2731</span>
+<span class="normal">2732</span>
+<span class="normal">2733</span>
+<span class="normal">2734</span>
+<span class="normal">2735</span>
+<span class="normal">2736</span>
+<span class="normal">2737</span>
+<span class="normal">2738</span>
+<span class="normal">2739</span>
+<span class="normal">2740</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_tests</span><span class="p">(</span><span class="n">fit</span><span class="p">:</span> <span class="n">RegressionResultsWrapper</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span> <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;회귀모형의 가정 검정을 종합적으로 수행한다.</span>
 
 <span class="sd">    선형성, 정규성, 등분산성, 독립성 검정을 순차적으로 실시하고 결과를 하나의 데이터프레임으로 반환한다.</span>
@@ -9051,44 +9125,7 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2709</span>
-<span class="normal">2710</span>
-<span class="normal">2711</span>
-<span class="normal">2712</span>
-<span class="normal">2713</span>
-<span class="normal">2714</span>
-<span class="normal">2715</span>
-<span class="normal">2716</span>
-<span class="normal">2717</span>
-<span class="normal">2718</span>
-<span class="normal">2719</span>
-<span class="normal">2720</span>
-<span class="normal">2721</span>
-<span class="normal">2722</span>
-<span class="normal">2723</span>
-<span class="normal">2724</span>
-<span class="normal">2725</span>
-<span class="normal">2726</span>
-<span class="normal">2727</span>
-<span class="normal">2728</span>
-<span class="normal">2729</span>
-<span class="normal">2730</span>
-<span class="normal">2731</span>
-<span class="normal">2732</span>
-<span class="normal">2733</span>
-<span class="normal">2734</span>
-<span class="normal">2735</span>
-<span class="normal">2736</span>
-<span class="normal">2737</span>
-<span class="normal">2738</span>
-<span class="normal">2739</span>
-<span class="normal">2740</span>
-<span class="normal">2741</span>
-<span class="normal">2742</span>
-<span class="normal">2743</span>
-<span class="normal">2744</span>
-<span class="normal">2745</span>
-<span class="normal">2746</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2746</span>
 <span class="normal">2747</span>
 <span class="normal">2748</span>
 <span class="normal">2749</span>
@@ -9254,7 +9291,44 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 <span class="normal">2909</span>
 <span class="normal">2910</span>
 <span class="normal">2911</span>
-<span class="normal">2912</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">logit_report</span><span class="p">(</span>
+<span class="normal">2912</span>
+<span class="normal">2913</span>
+<span class="normal">2914</span>
+<span class="normal">2915</span>
+<span class="normal">2916</span>
+<span class="normal">2917</span>
+<span class="normal">2918</span>
+<span class="normal">2919</span>
+<span class="normal">2920</span>
+<span class="normal">2921</span>
+<span class="normal">2922</span>
+<span class="normal">2923</span>
+<span class="normal">2924</span>
+<span class="normal">2925</span>
+<span class="normal">2926</span>
+<span class="normal">2927</span>
+<span class="normal">2928</span>
+<span class="normal">2929</span>
+<span class="normal">2930</span>
+<span class="normal">2931</span>
+<span class="normal">2932</span>
+<span class="normal">2933</span>
+<span class="normal">2934</span>
+<span class="normal">2935</span>
+<span class="normal">2936</span>
+<span class="normal">2937</span>
+<span class="normal">2938</span>
+<span class="normal">2939</span>
+<span class="normal">2940</span>
+<span class="normal">2941</span>
+<span class="normal">2942</span>
+<span class="normal">2943</span>
+<span class="normal">2944</span>
+<span class="normal">2945</span>
+<span class="normal">2946</span>
+<span class="normal">2947</span>
+<span class="normal">2948</span>
+<span class="normal">2949</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">logit_report</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">:</span> <span class="n">BinaryResultsWrapper</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
@@ -9625,44 +9699,7 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2918</span>
-<span class="normal">2919</span>
-<span class="normal">2920</span>
-<span class="normal">2921</span>
-<span class="normal">2922</span>
-<span class="normal">2923</span>
-<span class="normal">2924</span>
-<span class="normal">2925</span>
-<span class="normal">2926</span>
-<span class="normal">2927</span>
-<span class="normal">2928</span>
-<span class="normal">2929</span>
-<span class="normal">2930</span>
-<span class="normal">2931</span>
-<span class="normal">2932</span>
-<span class="normal">2933</span>
-<span class="normal">2934</span>
-<span class="normal">2935</span>
-<span class="normal">2936</span>
-<span class="normal">2937</span>
-<span class="normal">2938</span>
-<span class="normal">2939</span>
-<span class="normal">2940</span>
-<span class="normal">2941</span>
-<span class="normal">2942</span>
-<span class="normal">2943</span>
-<span class="normal">2944</span>
-<span class="normal">2945</span>
-<span class="normal">2946</span>
-<span class="normal">2947</span>
-<span class="normal">2948</span>
-<span class="normal">2949</span>
-<span class="normal">2950</span>
-<span class="normal">2951</span>
-<span class="normal">2952</span>
-<span class="normal">2953</span>
-<span class="normal">2954</span>
-<span class="normal">2955</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2955</span>
 <span class="normal">2956</span>
 <span class="normal">2957</span>
 <span class="normal">2958</span>
@@ -9717,7 +9754,44 @@ Cohen's d (효과크기)를 계산하여 상관 강도를 정량화한다.</p>
 <span class="normal">3007</span>
 <span class="normal">3008</span>
 <span class="normal">3009</span>
-<span class="normal">3010</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">logit</span><span class="p">(</span>
+<span class="normal">3010</span>
+<span class="normal">3011</span>
+<span class="normal">3012</span>
+<span class="normal">3013</span>
+<span class="normal">3014</span>
+<span class="normal">3015</span>
+<span class="normal">3016</span>
+<span class="normal">3017</span>
+<span class="normal">3018</span>
+<span class="normal">3019</span>
+<span class="normal">3020</span>
+<span class="normal">3021</span>
+<span class="normal">3022</span>
+<span class="normal">3023</span>
+<span class="normal">3024</span>
+<span class="normal">3025</span>
+<span class="normal">3026</span>
+<span class="normal">3027</span>
+<span class="normal">3028</span>
+<span class="normal">3029</span>
+<span class="normal">3030</span>
+<span class="normal">3031</span>
+<span class="normal">3032</span>
+<span class="normal">3033</span>
+<span class="normal">3034</span>
+<span class="normal">3035</span>
+<span class="normal">3036</span>
+<span class="normal">3037</span>
+<span class="normal">3038</span>
+<span class="normal">3039</span>
+<span class="normal">3040</span>
+<span class="normal">3041</span>
+<span class="normal">3042</span>
+<span class="normal">3043</span>
+<span class="normal">3044</span>
+<span class="normal">3045</span>
+<span class="normal">3046</span>
+<span class="normal">3047</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">logit</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;summary&#39;</span>
@@ -9966,44 +10040,7 @@ BinaryResultsWrapper(로지스틱 회귀) 객체를 받아 데이터에 대한
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_stats.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3016</span>
-<span class="normal">3017</span>
-<span class="normal">3018</span>
-<span class="normal">3019</span>
-<span class="normal">3020</span>
-<span class="normal">3021</span>
-<span class="normal">3022</span>
-<span class="normal">3023</span>
-<span class="normal">3024</span>
-<span class="normal">3025</span>
-<span class="normal">3026</span>
-<span class="normal">3027</span>
-<span class="normal">3028</span>
-<span class="normal">3029</span>
-<span class="normal">3030</span>
-<span class="normal">3031</span>
-<span class="normal">3032</span>
-<span class="normal">3033</span>
-<span class="normal">3034</span>
-<span class="normal">3035</span>
-<span class="normal">3036</span>
-<span class="normal">3037</span>
-<span class="normal">3038</span>
-<span class="normal">3039</span>
-<span class="normal">3040</span>
-<span class="normal">3041</span>
-<span class="normal">3042</span>
-<span class="normal">3043</span>
-<span class="normal">3044</span>
-<span class="normal">3045</span>
-<span class="normal">3046</span>
-<span class="normal">3047</span>
-<span class="normal">3048</span>
-<span class="normal">3049</span>
-<span class="normal">3050</span>
-<span class="normal">3051</span>
-<span class="normal">3052</span>
-<span class="normal">3053</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3053</span>
 <span class="normal">3054</span>
 <span class="normal">3055</span>
 <span class="normal">3056</span>
@@ -10084,7 +10121,44 @@ BinaryResultsWrapper(로지스틱 회귀) 객체를 받아 데이터에 대한
 <span class="normal">3131</span>
 <span class="normal">3132</span>
 <span class="normal">3133</span>
-<span class="normal">3134</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">Series</span> <span class="o">|</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">3134</span>
+<span class="normal">3135</span>
+<span class="normal">3136</span>
+<span class="normal">3137</span>
+<span class="normal">3138</span>
+<span class="normal">3139</span>
+<span class="normal">3140</span>
+<span class="normal">3141</span>
+<span class="normal">3142</span>
+<span class="normal">3143</span>
+<span class="normal">3144</span>
+<span class="normal">3145</span>
+<span class="normal">3146</span>
+<span class="normal">3147</span>
+<span class="normal">3148</span>
+<span class="normal">3149</span>
+<span class="normal">3150</span>
+<span class="normal">3151</span>
+<span class="normal">3152</span>
+<span class="normal">3153</span>
+<span class="normal">3154</span>
+<span class="normal">3155</span>
+<span class="normal">3156</span>
+<span class="normal">3157</span>
+<span class="normal">3158</span>
+<span class="normal">3159</span>
+<span class="normal">3160</span>
+<span class="normal">3161</span>
+<span class="normal">3162</span>
+<span class="normal">3163</span>
+<span class="normal">3164</span>
+<span class="normal">3165</span>
+<span class="normal">3166</span>
+<span class="normal">3167</span>
+<span class="normal">3168</span>
+<span class="normal">3169</span>
+<span class="normal">3170</span>
+<span class="normal">3171</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">Series</span> <span class="o">|</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;회귀 또는 로지스틱 모형을 이용하여 예측값을 생성한다.</span>
 
 <span class="sd">    statsmodels의 RegressionResultsWrapper(선형회귀) 또는</span>
