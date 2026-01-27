@@ -309,7 +309,7 @@ def lineplot(
 # 상자그림(boxplot)을 그린다
 # ===================================================================
 def boxplot(
-    df: DataFrame,
+    df: DataFrame | None = None,
     xname: str | None = None,
     yname: str | None = None,
     title: str | None = None,
@@ -331,7 +331,7 @@ def boxplot(
     """상자그림(boxplot)을 그린다.
 
     Args:
-        df (DataFrame): 시각화할 데이터.
+        df (DataFrame|None): 시각화할 데이터.
         xname (str|None): x축 범주 컬럼명.
         yname (str|None): y축 값 컬럼명.
         title (str|None): 그래프 제목.
@@ -359,13 +359,20 @@ def boxplot(
         fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
-    if xname is not None and yname is not None:
+    if xname is not None or yname is not None:
+        if xname is not None and yname is None:
+            orient = "h"
+        elif xname is None and yname is not None:
+            orient = "v"
+
+
         boxplot_kwargs = {
             "data": df,
             "x": xname,
             "y": yname,
             "orient": orient,
             "ax": ax,
+            "linewidth": linewidth,
         }
 
         # hue 파라미터 확인 (params에 있을 수 있음)
@@ -377,12 +384,12 @@ def boxplot(
             boxplot_kwargs["color"] = sb.color_palette(palette)[0]
 
         boxplot_kwargs.update(params)
-        sb.boxplot(**boxplot_kwargs, linewidth=linewidth)
+        sb.boxplot(**boxplot_kwargs)
 
         # 통계 검정 추가
         if stat_test is not None:
             if stat_pairs is None:
-                stat_pairs = [df[xname].dropna().unique().tolist()]
+                stat_pairs = [df[xname].dropna().unique().tolist()] # type: ignore
 
             annotator = Annotator(
                 ax, data=df, x=xname, y=yname, pairs=stat_pairs, orient=orient
@@ -847,15 +854,15 @@ def scatterplot(
     else:
         # 핵심벡터
         scatterplot_kwargs["edgecolor"] = "#ffffff"
-        sb.scatterplot(data=df[df[vector] == "core"], **scatterplot_kwargs)
+        sb.scatterplot(data=df[df[vector] == "core"], **scatterplot_kwargs) # type: ignore
 
         # 외곽백터
         scatterplot_kwargs["edgecolor"] = "#000000"
         scatterplot_kwargs["s"] = 25
         scatterplot_kwargs["marker"] = "^"
         scatterplot_kwargs["linewidth"] = 0.8
-        sb.scatterplot(data=df[df[vector] == "border"], **scatterplot_kwargs)
-
+        sb.scatterplot(data=df[df[vector] == "border"], **scatterplot_kwargs) # type: ignore
+ 
         # 노이즈벡터
         scatterplot_kwargs["edgecolor"] = None
         scatterplot_kwargs["s"] = 25
@@ -3022,10 +3029,15 @@ def pca_plot(
         if field_group is not None:
             title += " - " + ", ".join(field_group)
 
+        tdf = DataFrame({
+            field_group[0]: xs * scalex,
+            field_group[1]: ys * scaley,
+        })
+
         scatterplot(
-            df=None,
-            xname=xs * scalex,
-            yname=ys * scaley,
+            df=tdf,
+            xname=field_group[0],
+            yname=field_group[1],
             hue=pca_df[hue] if hue is not None else None,
             outline=False,
             palette=palette,

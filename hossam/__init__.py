@@ -119,10 +119,29 @@ def _init():
 
     _init_korean_font()
 
+    pd.set_option("display.max_colwidth", None)
+    pd.set_option("display.width", None)
     # 컬럼 생략 금지
     pd.set_option("display.max_columns", None)
     # 행 최대 출력 수 100개로 수정
     pd.set_option("display.max_rows", 100)
+
+    from IPython.display import display, HTML
+
+    display(HTML("""
+    <style>
+    .dataframe td, .dataframe th {
+        white-space: nowrap;
+        font-size: 0.85em;
+        padding: 2px 3px;
+    }
+                 
+    .dataframe tr:hover {
+        background-color: #ffff99 !important;
+        border: 1px solid #ffcc00;
+    }
+    </style>
+    """))
 
 
 _init()

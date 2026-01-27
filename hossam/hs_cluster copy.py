@@ -564,9 +564,6 @@ def persona(
         persona_dict[("", f"count")] = len(group)
 
         for field in fields:
-            if field == cluster:
-                continue
-            
             # 명목형일 경우 최빈값 사용
             if df[field].dtype == "object" or df[field].dtype.name == "category":
                 persona_dict[(field, "mode")] = group[field].mode()[0]
@@ -918,52 +915,18 @@ def dbscan_fit(
                 # result_dfs에서 recommand가 best에 해당하는 인덱스와 같은 위치의 추정기만 추출
                 best_indexes = list(result_dfs[result_dfs["recommand"] == "best"].index)  # type: ignore
 
-                # for i in range(len(estimators) - 1, -1, -1):
-                #     if i not in best_indexes:
-                #         del estimators[i]
-                #         del cluster_dfs[i]
+                for i in range(len(estimators) - 1, -1, -1):
+                    if i not in best_indexes:
+                        del estimators[i]
+                        del cluster_dfs[i]
 
             pbar.update(1)
 
-    # best 모델 선정: recommand=='best'인 인덱스의 estimator/cluster_df만 반환
-    if len(estimators) == 1:
-
-        if plot:
-            hs_plot.scatterplot(
-                df=cluster_dfs[0],
-                xname=cluster_dfs[0].columns[0],
-                yname=cluster_dfs[0].columns[1],
-                hue="cluster",
-                vector="vector",
-                title=f"DBSCAN Clustering (eps={estimators[0].eps}, min_samples={estimators[0].min_samples})",
-                outline=True
-            )
-
-        return estimators[0], cluster_dfs[0], result_dfs # type: ignore
-    
-    # recommand=='best'인 인덱스 추출 (여러 개면 첫 번째)
-    best_indexes = list(result_dfs[result_dfs["recommand"] == "best"].index) # type: ignore
-    if not best_indexes:
-        # fallback: 첫 번째
-        best_index = 0
-    else:
-        best_index = best_indexes[0]
-
-    best_estimator = estimators[best_index]
-    best_cluster_df = cluster_dfs[best_index]
-
-    if plot:
-        hs_plot.scatterplot(
-            df=best_cluster_df,
-            xname=best_cluster_df.columns[0],
-            yname=best_cluster_df.columns[1],
-            hue="cluster",
-            vector="vector",
-            title=f"DBSCAN Clustering (eps={best_estimator.eps}, min_samples={best_estimator.min_samples})",
-            outline=True
-        )
-
-    return best_estimator, best_cluster_df, result_dfs # type: ignore
+    return (
+        estimators[0] if len(estimators) == 1 else estimators,  # type: ignore
+        cluster_dfs[0] if len(cluster_dfs) == 1 else cluster_dfs,
+        result_dfs,  # type: ignore
+    )
 
 
 # ===================================================================
@@ -1028,8 +991,8 @@ def agg_fit(
 
     Returns:
         tuple: (estimator(s), df(s), score_df)
-            - estimator(s): 적합된 AgglomerativeClustering 모델 또는 모델 리스트 (n_clusters가 리스트일 때 리턴도 리스트로 처리됨).
-            - df(s): 클러스터 결과가 포함된 데이터 프레임 또는 데이터 프레임 리스트(n_cluseters가 리스트일 때 리턴되 리스트로 처리됨).
+            - estimator(s): 적합된 AgglomerativeClustering 모델 또는 모델 리스트.
+            - df(s): 클러스터 결과가 포함된 데이터 프레임 또는 데이터 프레임 리스트.
             - score_df: 각 군집 개수에 대한 실루엣 점수 데이터프레임.
 
     Examples:

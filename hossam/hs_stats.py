@@ -244,6 +244,41 @@ def outlier_table(data: DataFrame, *fields: str):
         outlier_count = ((data[f] < down) | (data[f] > up)).sum()
         outlier_rate = (outlier_count / len(data)) * 100
 
+        # 왜도
+        skew = data[f].skew()
+
+        # 이상치 개수 및 비율
+        outlier_count = ((data[f] < down) | (data[f] > up)).sum()
+        outlier_rate = (outlier_count / len(data)) * 100
+
+        # 분포 특성 판정 (왜도 기준)
+        abs_skew = abs(skew)    # type: ignore
+        if abs_skew < 0.5:      # type: ignore
+            dist = "거의 대칭"
+        elif abs_skew < 1.0:    # type: ignore
+            if skew > 0:        # type: ignore
+                dist = "약한 우측 꼬리"
+            else:
+                dist = "약한 좌측 꼬리"
+        elif abs_skew < 2.0:    # type: ignore
+            if skew > 0:        # type: ignore
+                dist = "중간 우측 꼬리"
+            else:
+                dist = "중간 좌측 꼬리"
+        else:
+            if skew > 0:        # type: ignore
+                dist = "극단 우측 꼬리"
+            else:
+                dist = "극단 좌측 꼬리"
+
+        # 로그변환 필요성 판정
+        if abs_skew < 0.5:      # type: ignore
+            log_need = "낮음"
+        elif abs_skew < 1.0:    # type: ignore
+            log_need = "중간"
+        else:
+            log_need = "높음"
+
         iq = {
             "field": f,
             "q1": q1,
@@ -254,9 +289,11 @@ def outlier_table(data: DataFrame, *fields: str):
             "down": down,
             "min": min_value,
             "max": max_value,
-            "skew": skew,
             "outlier_count": outlier_count,
-            "outlier_rate": outlier_rate
+            "outlier_rate": outlier_rate,
+            "skew": skew,
+            "dist": dist,
+            "log_need": log_need
         }
 
         result.append(iq)
