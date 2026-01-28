@@ -119,12 +119,16 @@ def _init():
 
     _init_korean_font()
 
+    # 각 열의 넓이 제한 없음
     pd.set_option("display.max_colwidth", None)
+    # 출력 너비 제한 없음 (가로 스크롤될 수 있음)
     pd.set_option("display.width", None)
     # 컬럼 생략 금지
     pd.set_option("display.max_columns", None)
     # 행 최대 출력 수 100개로 수정
     pd.set_option("display.max_rows", 100)
+    # 소수점 자리수 3자리로 설정
+    pd.options.display.float_format = '{:.3f}'.format
 
     from IPython.display import display, HTML
 
@@ -132,11 +136,11 @@ def _init():
     <style>
     .dataframe td, .dataframe th {
         white-space: nowrap;
-        font-size: 0.85em;
+        font-size: 0.9em;
         padding: 2px 3px;
     }
                  
-    .dataframe tr:hover {
+    .dataframe tr:not(:first-child):hover {
         background-color: #ffff99 !important;
         border: 1px solid #ffcc00;
     }
