@@ -30,7 +30,8 @@ from scipy.stats import (
     wilcoxon,
     pearsonr,
     spearmanr,
-    chi2
+    chi2,
+    jarque_bera
 )
 
 import statsmodels.api as sm
@@ -2337,7 +2338,7 @@ def ols(df: DataFrame, yname: str, report: Literal[False, "summary", "full"] = "
 # ===================================================================
 # 선형성 검정 (Linearity Test)
 # ===================================================================
-def ols_linearity_test(fit: RegressionResultsWrapper, power: int = 2, alpha: float = 0.05) -> DataFrame:
+def ols_linearity_test(fit: RegressionResultsWrapper, power: int = 2, alpha: float = 0.05,  plot: bool = False, title: str | None = None, save_path: str | None = None) -> DataFrame:
     """회귀모형의 선형성을 Ramsey RESET 검정으로 평가한다.
 
     적합된 회귀모형에 대해 Ramsey RESET(Regression Specification Error Test) 검정을 수행하여
@@ -2432,6 +2433,9 @@ def ols_linearity_test(fit: RegressionResultsWrapper, power: int = 2, alpha: flo
         "해석": [interpretation]
     })
 
+    if plot:
+        ols_residplot(fit, lowess=True, mse=True, title=title, save_path=save_path)
+
     return result_df
 
 
@@ -2473,8 +2477,6 @@ def ols_normality_test(fit: RegressionResultsWrapper, alpha: float = 0.05, plot:
         - p-value > alpha: 정규성 가정 만족 (귀무가설 채택)
         - p-value <= alpha: 정규성 가정 위반 (귀무가설 기각)
     """
-    from scipy.stats import jarque_bera
-
     # fit 객체에서 잔차 추출
     residuals = fit.resid
     n = len(residuals)
@@ -2669,8 +2671,6 @@ def ols_independence_test(fit: RegressionResultsWrapper, alpha: float = 0.05) ->
         - 일반적으로 1.5~2.5 범위를 자기상관 없음으로 판단
         - 시계열 데이터나 관측치에 순서가 있는 경우 중요한 검정
     """
-    from pandas import DataFrame
-
     # Durbin-Watson 통계량 계산
     dw_stat = durbin_watson(fit.resid)
 

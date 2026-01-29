@@ -1763,25 +1763,14 @@ def ols_residplot(
         fig, ax = get_default_ax(width + 150 if mse else width, height, 1, 1, dpi)  # type: ignore
         outparams = True
 
-    # 산점도 seaborn으로 그리기
-    sb.scatterplot(x=y_pred, y=resid, ax=ax, s=20, edgecolor="white", **params)
-
-    # 기준선 (잔차 = 0)
-    ax.axhline(0, color="gray", linestyle="--", linewidth=linewidth * 0.7)  # type: ignore
-
-    # LOWESS 스무딩 (선택적)
-    if lowess:
-        lowess_result = sm_lowess(resid, y_pred, frac=0.6667)
-        ax.plot(    # type: ignore
-            lowess_result[:, 0],
-            lowess_result[:, 1],  # type: ignore
-            color="red",
-            linewidth=linewidth,
-            label="LOWESS",
-        )  # type: ignore
-
-    ax.set_xlabel("Fitted values")  # type: ignore
-    ax.set_ylabel("Residuals")  # type: ignore
+    sb.residplot(
+        x=y_pred,
+        y=resid,
+        lowess=True,  # 잔차의 추세선 표시
+        line_kws={"color": "red", "linewidth": linewidth * 0.7},  # 추세선 스타일
+        scatter_kws={"edgecolor": "white", "alpha": config.alpha},
+        **params
+    )
 
     if mse:
         mse_val = mean_squared_error(y, y_pred)
@@ -1911,8 +1900,7 @@ def ols_qqplot(
 
     # 선 굵기 조정
     for line in ax.get_lines():  # type: ignore
-        if line.get_linestyle() == "--" or line.get_color() == "r":  # type: ignore
-            line.set_linewidth(linewidth)  # type: ignore
+        line.set_linewidth(linewidth)  # type: ignore
 
     finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
