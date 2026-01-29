@@ -2105,19 +2105,20 @@ def ols_report(
         var_row = {
             "종속변수": yname,  # 종속변수 이름
             "독립변수": name,  # 독립변수 이름
-            "B": f"{b:.6f}",  # 비표준화 회귀계수(B)
+            "B(비표준화 계수)": np.round(b, 4),  # 비표준화 회귀계수(B)
         }
         # logvar가 True면 exp(B) 컬럼 추가
         if 'logvar' in locals() and logvar:
-            var_row["exp(B)"] = f"{np.exp(b):.6f}"
+            var_row["exp(B)"] = np.round(np.exp(b), 4)
+
         var_row.update({
-            "표준오차": f"{se:.6f}",  # 계수 표준오차
-            "Beta": beta,  # 표준화 회귀계수(β)
-            "t": f"{t:.3f}{stars}",  # t-통계량(+별표)
-            "p-value": p,  # 계수 유의확률
-            "significant": p <= alpha,  # 유의성 여부 (boolean)
-            "공차": 1 / vif,  # 공차(Tolerance = 1/VIF)
-            "vif": vif,  # 분산팽창계수
+            "표준오차": np.round(se, 4),  # 계수 표준오차
+            "β(표준화 계수)": np.round(beta, 4),  # 표준화 회귀계수(β)
+            "t": f"{np.round(t, 4)}{stars}",  # t-통계량(+별표)
+            "유의확률": np.round(p, 4),  # 계수 유의확률
+            #"significant": p <= alpha,  # 유의성 여부 (boolean)
+            #"공차": 1 / vif,  # 공차(Tolerance = 1/VIF)
+            "vif": np.round(vif, 4),  # 분산팽창계수
         })
         variables.append(var_row)
 
@@ -2136,11 +2137,15 @@ def ols_report(
                     continue
                 result_dict[key] = value
 
+    r2 = float(result_dict.get('R-squared', np.nan))
+    adj_r2 = float(result_dict.get('Adj. R-squared', np.nan))
+    r = np.sqrt(r2) if r2 >= 0 else np.nan
+
     # 적합도 보고 문자열 구성
-    result_report = f"𝑅({result_dict['R-squared']}), 𝑅^2({result_dict['Adj. R-squared']}), 𝐹({result_dict['F-statistic']}), 유의확률({result_dict['Prob (F-statistic)']}), Durbin-Watson({result_dict['Durbin-Watson']})"
+    result_report = f"𝑅({r:.3f}), 𝑅^2({r2:.3f}), Adj 𝑅^2({adj_r2:.3f}), 𝐹({float(result_dict['F-statistic']):.3f}), 유의확률({float(result_dict['Prob (F-statistic)']):.3f}), Durbin-Watson({float(result_dict['Durbin-Watson']):.3f})"
 
     # 모형 보고 문장 구성
-    tpl = "%s에 대하여 %s로 예측하는 회귀분석을 실시한 결과, 이 회귀모형은 통계적으로 %s(F(%s,%s) = %s, p %s 0.05)."
+    tpl = "%s에 대하여 %s로 예측하는 회귀분석을 실시한 결과, 이 회귀모형은 통계적으로 %s(F(%s,%s) = %0.3f, p %s 0.05)."
     model_report = tpl % (
         rdf["종속변수"][0],
         ",".join(list(rdf["독립변수"])),
@@ -2151,27 +2156,27 @@ def ols_report(
         ),
         result_dict["Df Model"],
         result_dict["Df Residuals"],
-        result_dict["F-statistic"],
+        float(result_dict["F-statistic"]),
         "<=" if float(result_dict["Prob (F-statistic)"]) <= 0.05 else ">",
     )
 
     # 변수별 보고 문장 리스트 구성
     variable_reports = []
-    s_normal = "%s가 1 증가하면 %s가 %.2f만큼 변하는 것으로 나타남. (p %s 0.05, %s)"
-    s_log = "%s가 1 증가하면 %s가 약 %.2f배 변하는 것으로 나타남. (p %s 0.05, %s)"
+    s_normal = "%s가 1 증가하면 %s(이)가 %.3f만큼 변하는 것으로 나타남. (p %s 0.05, %s)"
+    s_log = "%s가 1 증가하면 %s(이)가 약 %.3f배 변하는 것으로 나타남. (p %s 0.05, %s)"
 
     for i in rdf.index:
         row = rdf.iloc[i]
         if logvar:
-            effect = np.exp(float(row["B"]))
+            effect = np.exp(float(row["B(비표준화 계수)"]))
             variable_reports.append(
                 s_log
                 % (
                     row["독립변수"],
                     row["종속변수"],
                     effect,
-                    "<=" if float(row["p-value"]) < 0.05 else ">",
-                    "유의함" if float(row["p-value"]) < 0.05 else "유의하지 않음",
+                    "<=" if float(row["유의확률"]) < 0.05 else ">",
+                    "유의함" if float(row["유의확률"]) < 0.05 else "유의하지 않음",
                 )
             )
         else:
@@ -2180,9 +2185,9 @@ def ols_report(
                 % (
                     row["독립변수"],
                     row["종속변수"],
-                    float(row["B"]),
-                    "<=" if float(row["p-value"]) < 0.05 else ">",
-                    "유의함" if float(row["p-value"]) < 0.05 else "유의하지 않음",
+                    float(row["B(비표준화 계수)"]),
+                    "<=" if float(row["유의확률"]) < 0.05 else ">",
+                    "유의함" if float(row["유의확률"]) < 0.05 else "유의하지 않음",
                 )
             )
 
@@ -2202,8 +2207,9 @@ def ols_report(
     # 성능 지표 표 생성 (pdf)
     pdf = DataFrame(
         {
-            "R": [float(result_dict.get('R-squared', np.nan))],
-            "R²": [float(result_dict.get('Adj. R-squared', np.nan))],
+            "R": [r],
+            "R²": [r2],
+            "Adj. R²": [adj_r2],
             "F": [float(result_dict.get('F-statistic', np.nan))],
             "p-value": [float(result_dict.get('Prob (F-statistic)', np.nan))],
             "Durbin-Watson": [float(result_dict.get('Durbin-Watson', np.nan))],
