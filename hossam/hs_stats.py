@@ -751,6 +751,7 @@ def equal_var_test(data: DataFrame, columns: list | str | None = None, normal_di
         normality_result = normal_test(data[numeric_cols], method="n")
         # 모든 컬럼이 정규분포를 따르는지 확인
         all_normal = normality_result["is_normal"].all()
+        normality_method = normality_result["method"].iloc[0]
         normal_dist = all_normal    # type: ignore
 
     try:
@@ -762,13 +763,14 @@ def equal_var_test(data: DataFrame, columns: list | str | None = None, normal_di
             s, p = levene(*fields)
 
         result_df = DataFrame([{
+            "normality_method": normality_method,
+            "normality_checked": normal_dist,
             "method": method_name,
             "statistic": s,
             "p-value": p,
             "is_equal_var": p > 0.05,
             "n_columns": len(fields),
-            "columns": ", ".join(numeric_cols[:len(fields)]),
-            "normality_checked": normality_checked
+            "columns": ", ".join(numeric_cols[:len(fields)])
         }])
 
         return result_df
@@ -836,52 +838,40 @@ def ttest_1samp(data, mean_value: float = 0.0) -> DataFrame:
     alternative: list = ["two-sided", "less", "greater"]
     result: list = []
 
-    # 데이터가 없거나 분산이 0인 경우
-    if len(col_data) == 0 or col_data.std(ddof=1) == 0:
-        for a in alternative:
+    # 각 대립가설 방향에 대해 t-검정 수행
+    for a in alternative:
+        try:
+            s, p = ttest_1samp(col_data, mean_value, alternative=a) # type: ignore
+
+            itp = None
+
+            if a == "two-sided":
+                itp = "μ {0} {1}".format("==" if p > 0.05 else "!=", mean_value)
+            elif a == "less":
+                itp = "μ {0} {1}".format(">=" if p > 0.05 else "<", mean_value)
+            else:
+                itp = "μ {0} {1}".format("<=" if p > 0.05 else ">", mean_value)
+
+            result.append({
+                "alternative": a,
+                "statistic": round(s, 3),
+                "p-value": round(p, 4),
+                "H0": p > 0.05,
+                "H1": p <= 0.05,
+                "interpretation": itp,
+            })
+        except Exception as e:
             result.append({
                 "alternative": a,
                 "statistic": np.nan,
                 "p-value": np.nan,
                 "H0": False,
                 "H1": False,
-                "interpretation": f"검정 불가 (데이터 부족 또는 분산=0)"
+                "interpretation": f"검정 실패: {str(e)}"
             })
-    else:
-        for a in alternative:
-            try:
-                s, p = ttest_1samp(col_data, mean_value, alternative=a) # type: ignore
-
-                itp = None
-
-                if a == "two-sided":
-                    itp = "μ {0} {1}".format("==" if p > 0.05 else "!=", mean_value)
-                elif a == "less":
-                    itp = "μ {0} {1}".format(">=" if p > 0.05 else "<", mean_value)
-                else:
-                    itp = "μ {0} {1}".format("<=" if p > 0.05 else ">", mean_value)
-
-                result.append({
-                    "alternative": a,
-                    "statistic": round(s, 3),
-                    "p-value": round(p, 4),
-                    "H0": p > 0.05,
-                    "H1": p <= 0.05,
-                    "interpretation": itp,
-                })
-            except Exception as e:
-                result.append({
-                    "alternative": a,
-                    "statistic": np.nan,
-                    "p-value": np.nan,
-                    "H0": False,
-                    "H1": False,
-                    "interpretation": f"검정 실패: {str(e)}"
-                })
 
     rdf = DataFrame(result)
     rdf.set_index(["field", "alternative"], inplace=True)
-
     return rdf
 
 
@@ -967,6 +957,9 @@ def ttest_ind(
         # 두 데이터를 DataFrame으로 구성하여 등분산성 검정
         temp_df = DataFrame({'x': x_data, 'y': y_data})
         var_result = equal_var_test(temp_df)
+        normality_method = var_result["normality_method"].iloc[0]
+        normality_checked = var_result["normality_checked"].iloc[0]
+        equal_var_method = var_result["method"].iloc[0]
         equal_var = var_result["is_equal_var"].iloc[0]
 
     alternative: list = ["two-sided", "less", "greater"]
@@ -992,8 +985,9 @@ def ttest_ind(
                 "test": n,
                 "alternative": a,
                 "interpretation": itp,
-                "equal_var_checked": var_checked,
-                "statistic": round(s, 3),   # type: ignore
+                normality_method: normality_checked,
+                equal_var_method: equal_var,
+                n: round(s, 3),   # type: ignore
                 "p-value": round(p, 4),     # type: ignore
                 "H0": p > 0.05,             # type: ignore
                 "H1": p <= 0.05,            # type: ignore
@@ -1002,12 +996,13 @@ def ttest_ind(
             result.append({
                 "test": "t-test_ind" if equal_var else "Welch's t-test",
                 "alternative": a,
-                "statistic": np.nan,
+                "interpretation": f"검정 실패: {str(e)}",
+                normality_method: normality_checked,
+                equal_var_method: equal_var,
+                n: np.nan,
                 "p-value": np.nan,
                 "H0": False,
-                "H1": False,
-                "interpretation": f"검정 실패: {str(e)}",
-                "equal_var_checked": var_checked
+                "H1": False
             })
 
     rdf = DataFrame(result)
@@ -1018,7 +1013,7 @@ def ttest_ind(
 # ===================================================================
 # 대응표본 t-검정 또는 Wilcoxon test
 # ===================================================================
-def ttest_rel(x, y, parametric: bool | None = None) -> DataFrame:
+def ttest_rel(x, y, normality: bool | None = None) -> DataFrame:
     """대응표본 t-검정 또는 Wilcoxon signed-rank test를 수행한다.
 
     대응표본 t-검정은 동일 개체에서 측정된 두 시점의 평균 차이를 검정한다.
@@ -1027,7 +1022,7 @@ def ttest_rel(x, y, parametric: bool | None = None) -> DataFrame:
     Args:
         x (array-like): 첫 번째 측정값의 연속형 데이터 (리스트, Series, ndarray 등).
         y (array-like): 두 번째 측정값의 연속형 데이터 (리스트, Series, ndarray 등).
-        parametric (bool | None, optional): 정규성 가정 여부.
+        normality (bool | None, optional): 정규성 가정 여부.
             - True: 대응표본 t-검정 (차이의 정규분포 가정)
             - False: Wilcoxon signed-rank test (비모수 검정, 더 강건함)
             - None: 차이의 정규성을 자동으로 검정하여 판별
@@ -1080,36 +1075,31 @@ def ttest_rel(x, y, parametric: bool | None = None) -> DataFrame:
         raise ValueError(f"최소 2개 이상의 대응 데이터가 필요합니다. 현재: {len(x_data)}")
 
     # parametric이 None이면 차이의 정규성을 자동으로 검정
-    var_checked = False
-    if parametric is None:
-        var_checked = True
-        # 대응표본의 차이 계산 및 정규성 검정
-        diff = x_data - y_data
-        try:
-            _, p_normal = shapiro(diff)  # 표본 크기 5000 이하일 때 권장
-            parametric = p_normal > 0.05  # p > 0.05면 정규분포 따름
-        except Exception:
-            # shapiro 실패 시 normaltest 사용
-            try:
-                _, p_normal = normaltest(diff)
-                parametric = p_normal > 0.05
-            except Exception:
-                # 둘 다 실패하면 기본값으로 비모수 검정 사용
-                parametric = False
+    if normality is None:
+        tmp_df = DataFrame({'x': x_data, 'y': y_data})
+        normality_result = normal_test(tmp_df, method="n")
+        # 모든 컬럼이 정규분포를 따르는지 확인
+        all_normal = normality_result["is_normal"].all()
+        normality_method = normality_result["method"].iloc[0]
+        normality = all_normal    # type: ignore
 
     alternative: list = ["two-sided", "less", "greater"]
     result: list = []
     fmt: str = "μ(x) {0} μ(y)"
 
+    if normality:
+        s, p = ttest_rel(x_data, y_data, alternative=a) # type: ignore
+    else:
+        # Wilcoxon signed-rank test (대응표본용 비모수 검정)
+        n = "Wilcoxon signed-rank"
+
     for a in alternative:
         try:
-            if parametric:
+            if normality:
                 s, p = ttest_rel(x_data, y_data, alternative=a) # type: ignore
-                n = "t-test_paired"
             else:
                 # Wilcoxon signed-rank test (대응표본용 비모수 검정)
                 s, p = wilcoxon(x_data, y_data, alternative=a)
-                n = "Wilcoxon signed-rank"
 
             itp = None
 
@@ -1123,28 +1113,27 @@ def ttest_rel(x, y, parametric: bool | None = None) -> DataFrame:
             result.append({
                 "test": n,
                 "alternative": a,
+                normality_method: normality,
+                "interpretation": itp,
                 "statistic": round(s, 3) if not np.isnan(s) else s, # type: ignore
                 "p-value": round(p, 4) if not np.isnan(p) else p,   # type: ignore
                 "H0": p > 0.05,     # type: ignore
                 "H1": p <= 0.05,    # type: ignore
-                "interpretation": itp,
-                "normality_checked": var_checked
             })
         except Exception as e:
             result.append({
-                "test": "t-test_paired" if parametric else "Wilcoxon signed-rank",
+                "test": n,
                 "alternative": a,
+                normality_method: normality,
+                "interpretation": f"검정 실패: {str(e)}",
                 "statistic": np.nan,
                 "p-value": np.nan,
                 "H0": False,
-                "H1": False,
-                "interpretation": f"검정 실패: {str(e)}",
-                "normality_checked": var_checked
+                "H1": False
             })
 
     rdf = DataFrame(result)
     rdf.set_index(["test", "alternative"], inplace=True)
-
     return rdf
 
 
@@ -1153,7 +1142,8 @@ def ttest_rel(x, y, parametric: bool | None = None) -> DataFrame:
 # ===================================================================
 # 일원 분산분석 (One-way ANOVA)
 # ===================================================================
-def oneway_anova(data: DataFrame, dv: str, between: str, alpha: float = 0.05) -> tuple[DataFrame, str, DataFrame | None, str]:
+#def oneway_anova(data: DataFrame, dv: str, between: str, alpha: float = 0.05) -> tuple[DataFrame, str, DataFrame | None, str]:
+def oneway_anova(data: DataFrame, dv: str, between: str, alpha: float = 0.05, posthoc: bool = False) -> DataFrame | tuple[DataFrame, DataFrame] :
     """일원분산분석(One-way ANOVA)을 일괄 처리한다.
 
     정규성 및 등분산성 검정을 자동으로 수행한 후,
@@ -1171,13 +1161,12 @@ def oneway_anova(data: DataFrame, dv: str, between: str, alpha: float = 0.05) ->
         dv (str): 종속변수(Dependent Variable) 컬럼명.
         between (str): 그룹 구분 변수 컬럼명.
         alpha (float, optional): 유의수준. 기본값 0.05.
+        posthoc (bool, optional): 사후검정 수행 여부. 기본값 False.
 
     Returns:
         tuple:
             - anova_df (DataFrame): ANOVA 또는 Welch 결과 테이블(Source, ddof1, ddof2, F, p-unc, np2 등 포함).
-            - anova_report (str): 정규성/등분산 여부와 F, p값, 효과크기를 요약한 보고 문장.
             - posthoc_df (DataFrame|None): 사후검정 결과(Tukey HSD 또는 Games-Howell). ANOVA가 유의할 때만 생성.
-            - posthoc_report (str): 사후검정 유무와 유의한 쌍 정보를 요약한 보고 문장.
 
     Examples:
         ```python
@@ -1189,7 +1178,7 @@ def oneway_anova(data: DataFrame, dv: str, between: str, alpha: float = 0.05) ->
             'group': ['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B']
         })
 
-        anova_df, anova_report, posthoc_df, posthoc_report = hs_stats.oneway_anova(df, dv='score', between='group')
+        anova_df, posthoc_df = hs_stats.oneway_anova(df, dv='score', between='group')
 
         # 사후검정결과는 ANOVA가 유의할 때만 생성됨
         if posthoc_df is not None:
@@ -1246,57 +1235,61 @@ def oneway_anova(data: DataFrame, dv: str, between: str, alpha: float = 0.05) ->
     # ============================================
     # 3. ANOVA 수행
     # ============================================
+    anova_df: DataFrame
+    anova_method: str
+
     if equal_var_satisfied:
         # 등분산을 만족할 때 일반적인 ANOVA 사용
         anova_method = "ANOVA"
         anova_df = anova(data=df_filtered, dv=dv, between=between)
+        en = "Bartlett"
     else:
         # 등분산을 만족하지 않을 때 Welch's ANOVA 사용
         anova_method = "Welch"
         anova_df = welch_anova(data=df_filtered, dv=dv, between=between)
+        en = "Levene"
 
     # ANOVA 결과에 메타정보 추가
     anova_df.insert(1, 'normality', normality_satisfied)
-    anova_df.insert(2, 'equal_var', equal_var_satisfied)
-    anova_df.insert(3, 'method', anova_method)
+    anova_df.insert(2, en, equal_var_satisfied)
+    anova_df[anova_method] = anova_df['p-unc'] <= alpha if 'p-unc' in anova_df.columns else False  # type: ignore
 
-    # 유의성 여부 컬럼 추가
-    if 'p-unc' in anova_df.columns:
-        anova_df['significant'] = anova_df['p-unc'] <= alpha
+    if posthoc == False:
+        return anova_df
 
     # ANOVA 결과가 유의한지 확인
     p_unc = float(anova_df.loc[0, 'p-unc']) # type: ignore
     anova_significant = p_unc <= alpha
 
     # ANOVA 보고 문장 생성
-    def _safe_get(col: str, default: float = np.nan) -> float:
-        try:
-            return float(anova_df.loc[0, col]) if col in anova_df.columns else default  # type: ignore
-        except Exception:
-            return default
+    # def _safe_get(col: str, default: float = np.nan) -> float:
+    #     try:
+    #         return float(anova_df.loc[0, col]) if col in anova_df.columns else default  # type: ignore
+    #     except Exception:
+    #         return default
 
-    df1 = _safe_get('ddof1')
-    df2 = _safe_get('ddof2')
-    fval = _safe_get('F')
-    eta2 = _safe_get('np2')
+    # df1 = _safe_get('ddof1')
+    # df2 = _safe_get('ddof2')
+    # fval = _safe_get('F')
+    # eta2 = _safe_get('np2')
 
-    anova_sig_text = "그룹별 평균이 다를 가능성이 높습니다." if anova_significant else "그룹별 평균 차이에 대한 근거가 부족합니다."
-    assumption_text = f"정규성은 {'대체로 만족' if normality_satisfied else '충족되지 않았고'}, 등분산성은 {'충족' if equal_var_satisfied else '충족되지 않았다'}고 판단됩니다."
+    # anova_sig_text = "그룹별 평균이 다를 가능성이 높습니다." if anova_significant else "그룹별 평균 차이에 대한 근거가 부족합니다."
+    # assumption_text = f"정규성은 {'대체로 만족' if normality_satisfied else '충족되지 않았고'}, 등분산성은 {'충족되었다' if equal_var_satisfied else '충족되지 않았다'}고 판단됩니다."
 
-    anova_report = (
-        f"{between}별로 {dv} 평균을 비교한 {anova_method} 결과: F({df1:.3f}, {df2:.3f}) = {fval:.3f}, p = {p_unc:.4f}. "
-        f"해석: {anova_sig_text} {assumption_text}"
-    )
+    # anova_report = (
+    #     f"{between}별로 {dv} 평균을 비교한 {anova_method} 결과: F({df1:.3f}, {df2:.3f}) = {fval:.3f}, p = {p_unc:.4f}. "
+    #     f"해석: {anova_sig_text} {assumption_text}"
+    # )
 
-    if not np.isnan(eta2):
-        anova_report += f" 효과 크기(η²p) ≈ {eta2:.3f}, 값이 클수록 그룹 차이가 뚜렷함을 의미합니다."
+    # if not np.isnan(eta2):
+    #     anova_report += f" 효과 크기(η²p) ≈ {eta2:.3f}, 값이 클수록 그룹 차이가 뚜렷함을 의미합니다."
 
     # ============================================
     # 4. 사후검정 (ANOVA 유의할 때만)
     # ============================================
-    posthoc_df = None
-    posthoc_method = 'None'
-    posthoc_report = "ANOVA 결과가 유의하지 않아 사후검정을 진행하지 않았습니다."
+    posthoc_df: DataFrame
+    posthoc_method: str
+    #posthoc_report = "ANOVA 결과가 유의하지 않아 사후검정을 진행하지 않았습니다."
 
     if anova_significant:
         if equal_var_satisfied:
@@ -1311,38 +1304,39 @@ def oneway_anova(data: DataFrame, dv: str, between: str, alpha: float = 0.05) ->
         # 사후검정 결과에 메타정보 추가
         # posthoc_df.insert(0, 'normality', normality_satisfied)
         # posthoc_df.insert(1, 'equal_var', equal_var_satisfied)
-        posthoc_df.insert(0, 'method', posthoc_method)
+        posthoc_df.insert(0, 'method', posthoc_method)  # type: ignore
 
         # p-value 컬럼 탐색
-        p_cols = [c for c in ["p-tukey", "pval", "p-adjust", "p_adj", "p-corr", "p", "p-unc", "pvalue", "p_value"] if c in posthoc_df.columns]
+        p_cols = [c for c in ["p-tukey", "pval", "p-adjust", "p_adj", "p-corr", "p", "p-unc", "pvalue", "p_value"] if c in posthoc_df.columns]  # type: ignore
         p_col = p_cols[0] if p_cols else None
+        
+        # 유의성 여부 컬럼 추가
+        posthoc_df['significant'] = posthoc_df[p_col] <= alpha  if p_col else False # type: ignore
 
-        if p_col:
-            # 유의성 여부 컬럼 추가
-            posthoc_df['significant'] = posthoc_df[p_col] <= alpha
+        # if p_col:
+        #     sig_pairs_df = posthoc_df[posthoc_df[p_col] <= alpha]
+        #     sig_count = len(sig_pairs_df)
+        #     total_count = len(posthoc_df)
+        #     pair_samples = []
+        #     if not sig_pairs_df.empty and {'A', 'B'}.issubset(sig_pairs_df.columns):
+        #         pair_samples = [f"{row['A']} vs {row['B']}" for _, row in sig_pairs_df.head(3).iterrows()]
 
-            sig_pairs_df = posthoc_df[posthoc_df[p_col] <= alpha]
-            sig_count = len(sig_pairs_df)
-            total_count = len(posthoc_df)
-            pair_samples = []
-            if not sig_pairs_df.empty and {'A', 'B'}.issubset(sig_pairs_df.columns):
-                pair_samples = [f"{row['A']} vs {row['B']}" for _, row in sig_pairs_df.head(3).iterrows()]
-
-            if sig_count > 0:
-                posthoc_report = (
-                    f"{posthoc_method} 사후검정에서 {sig_count}/{total_count}쌍이 의미 있는 차이를 보였습니다 (alpha={alpha})."
-                )
-                if pair_samples:
-                    posthoc_report += " 예: " + ", ".join(pair_samples) + " 등."
-            else:
-                posthoc_report = f"{posthoc_method} 사후검정에서 추가로 유의한 쌍은 발견되지 않았습니다."
-        else:
-            posthoc_report = f"{posthoc_method} 결과는 생성했지만 p-value 정보를 찾지 못해 유의성을 확인할 수 없습니다."
+        #     if sig_count > 0:
+        #         posthoc_report = (
+        #             f"{posthoc_method} 사후검정에서 {sig_count}/{total_count}쌍이 의미 있는 차이를 보였습니다 (alpha={alpha})."
+        #         )
+        #         if pair_samples:
+        #             posthoc_report += " 예: " + ", ".join(pair_samples) + " 등."
+        #     else:
+        #         posthoc_report = f"{posthoc_method} 사후검정에서 추가로 유의한 쌍은 발견되지 않았습니다."
+        # else:
+        #     posthoc_report = f"{posthoc_method} 결과는 생성했지만 p-value 정보를 찾지 못해 유의성을 확인할 수 없습니다."
 
     # ============================================
     # 5. 결과 반환
     # ============================================
-    return anova_df, anova_report, posthoc_df, posthoc_report
+    #return anova_df, anova_report, posthoc_df, posthoc_report
+    return anova_df, posthoc_df
 
 
 # ===================================================================
@@ -1623,8 +1617,7 @@ def corr_pairwise(
     alpha: float = 0.05,
     z_thresh: float = 3.0,
     min_n: int = 8,
-    linearity_power: tuple[int, ...] = (2,),
-    p_adjust: str = "none",
+    #linearity_power: tuple[int, ...] = (2,)
 ) -> tuple[DataFrame, DataFrame]:
     """각 변수 쌍에 대해 선형성·이상치 여부를 점검한 뒤 Pearson/Spearman을 자동 선택해 상관을 요약한다.
 
@@ -1633,7 +1626,6 @@ def corr_pairwise(
     2) 단순회귀 y~x에 대해 Ramsey RESET(linearity_power)로 선형성 검정 (모든 p>alpha → 선형성 충족)
     3) 선형성 충족이고 양쪽 변수에서 |z|>z_thresh 이상치가 없으면 Pearson, 그 외엔 Spearman 선택
     4) 상관계수/유의확률, 유의성 여부, 강도(strong/medium/weak/no correlation) 기록
-    5) 선택적으로 다중비교 보정(p_adjust="fdr_bh" 등) 적용하여 pval_adj와 significant_adj 추가
 
     Args:
         data (DataFrame): 분석 대상 데이터프레임.
@@ -1641,14 +1633,13 @@ def corr_pairwise(
         alpha (float, optional): 유의수준. 기본 0.05.
         z_thresh (float, optional): 이상치 판단 임계값(|z| 기준). 기본 3.0.
         min_n (int, optional): 쌍별 최소 표본 크기. 미만이면 계산 생략. 기본 8.
-        linearity_power (tuple[int,...], optional): RESET 검정에서 포함할 차수 집합. 기본 (2,).
-        p_adjust (str, optional): 다중비교 보정 방법. "none" 또는 statsmodels.multipletests 지원값 중 하나(e.g., "fdr_bh"). 기본 "none".
+        #linearity_power (tuple[int,...], optional): RESET 검정에서 포함할 차수 집합. 기본 (2,).
 
     Returns:
         tuple[DataFrame, DataFrame]: 두 개의 데이터프레임을 반환.
             [0] result_df: 각 변수쌍별 결과 테이블. 컬럼:
                 var_a, var_b, n, linearity(bool), outlier_flag(bool), chosen('pearson'|'spearman'),
-                corr, pval, significant(bool), strength(str), (보정 사용 시) pval_adj, significant_adj
+                corr, pval, significant(bool), strength(str)
             [1] corr_matrix: 상관계수 행렬 (행과 열에 변수명, 값에 상관계수)
 
     Examples:
@@ -1692,7 +1683,7 @@ def corr_pairwise(
     for a, b in combinations(cols, 2):
         # 공통 관측치 사용
         pair_df = data[[a, b]].dropna()
-        if len(pair_df) < max(3, min_n):
+        if len(pair_df) < min_n:
             # 표본이 너무 적으면 계산하지 않음
             rows.append(
                 {
@@ -1736,13 +1727,16 @@ def corr_pairwise(
         try:
             X_const = sm.add_constant(x)
             model = sm.OLS(y, X_const).fit()
-            pvals = []
-            for pwr in linearity_power:
-                reset = linear_reset(model, power=pwr, use_f=True)
-                pvals.append(reset.pvalue)
-            # 모든 차수에서 유의하지 않을 때 선형성 충족으로 간주
-            if len(pvals) > 0:
-                linearity_ok = all([pv > alpha for pv in pvals])
+            # pvals = []
+            # for pwr in linearity_power:
+            #     reset = linear_reset(model, power=pwr, use_f=True)
+            #     pvals.append(reset.pvalue)
+            # # 모든 차수에서 유의하지 않을 때 선형성 충족으로 간주
+            # if len(pvals) > 0:
+            #     linearity_ok = all([pv > alpha for pv in pvals])
+
+            reset = linear_reset(model)
+            linearity_ok = reset.pvalue > alpha
         except Exception:
             linearity_ok = False
 
@@ -1790,16 +1784,8 @@ def corr_pairwise(
 
     result_df = DataFrame(rows)
 
-    # 5) 다중비교 보정 (선택)
-    if p_adjust.lower() != "none" and not result_df.empty:
-        # 유효한 p만 보정
-        mask = result_df["pval"].notna()
-        if mask.any():
-            _, p_adj, _, _ = multipletests(result_df.loc[mask, "pval"], alpha=alpha, method=p_adjust)
-            result_df.loc[mask, "pval_adj"] = p_adj
-            result_df["significant_adj"] = result_df["pval_adj"] <= alpha
 
-    # 6) 상관행렬 생성 (result_df 기반)
+    # 5) 상관행렬 생성 (result_df 기반)
     # 모든 변수를 행과 열로 하는 대칭 행렬 생성
     corr_matrix = DataFrame(np.nan, index=cols, columns=cols)
     # 대각선: 1 (자기상관)
@@ -1910,7 +1896,8 @@ def vif_filter(
     # 출력 옵션이 False일 경우 최종 값만 출력
     if not verbose:
         final_vifs = _compute_vifs(X) if X.shape[1] > 0 else {}
-        print(final_vifs)
+        vdf = DataFrame(list(final_vifs.items()), columns=["Variable", "VIF"])
+        display(vdf) # type: ignore
 
     # 원본 컬럼 순서 유지하며 제거된 수치형 컬럼만 제외
     kept_numeric_cols = list(X.columns)

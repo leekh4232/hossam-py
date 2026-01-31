@@ -133,14 +133,8 @@ def _init():
     from IPython.display import display, HTML
 
     display(HTML("""
-    <style>
-    .dataframe td, .dataframe th {
-        white-space: nowrap;
-        font-size: 0.9em;
-        padding: 2px 3px;
-    }
-                 
-    .dataframe tr:not(:first-child):hover {
+    <style>      
+    .dataframe tr:hover {
         background-color: #ffff99 !important;
         border: 1px solid #ffcc00;
     }
