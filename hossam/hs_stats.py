@@ -213,17 +213,12 @@ def outlier_table(data: DataFrame, *fields: str):
     if not fields:
         fields = tuple(data.columns)
 
+    num_columns = data.select_dtypes(include=np.number).columns
+
     result = []
     for f in fields:
         # 숫자 타입이 아니라면 건너뜀
-        if data[f].dtypes not in [
-            "int",
-            "int32",
-            "int64",
-            "float",
-            "float32",
-            "float64",
-        ]:
+        if f not in num_columns:
             continue
 
         # 사분위수
@@ -367,8 +362,10 @@ def describe(data: DataFrame, *fields: str, columns: list | None = None):
         - 분포 특성은 왜도 값으로 판정합니다.
         - 로그변환 필요성은 왜도의 절댓값 크기로 판정합니다.
     """
+    num_columns = data.select_dtypes(include=np.number).columns
+
     if not fields:
-        fields = tuple(data.select_dtypes(include=['int', 'int32', 'int64', 'float', 'float32', 'float64']).columns)
+        fields = tuple(num_columns)
 
     # 기술통계량 구하기
     desc = data[list(fields)].describe().T
@@ -384,17 +381,7 @@ def describe(data: DataFrame, *fields: str, columns: list | None = None):
     additional_stats = []
     for f in fields:
         # 숫자 타입이 아니라면 건너뜀
-        if data[f].dtype not in [
-            'int',
-            'int32',
-            'int64',
-            'float',
-            'float32',
-            'float64',
-            'int64',
-            'float64',
-            'float32'
-        ]:
+        if f not in num_columns:
             continue
 
         # 사분위수
@@ -510,6 +497,8 @@ def category_describe(data: DataFrame, *fields: str):
         - 숫자형 컬럼은 자동으로 제외됩니다.
         - NaN 값도 하나의 범주로 포함됩니다.
     """
+    num_columns = data.select_dtypes(include=np.number).columns
+
     if not fields:
         # 명목형(범주형) 컬럼 선택: object, category, bool 타입
         fields = data.select_dtypes(include=['object', 'category', 'bool']).columns # type: ignore
@@ -518,14 +507,7 @@ def category_describe(data: DataFrame, *fields: str):
     summary = []
     for f in fields:
         # 숫자형 컬럼은 건너뜀
-        if data[f].dtypes in [
-            "int",
-            "int32",
-            "int64",
-            "float",
-            "float32",
-            "float64",
-        ]:
+        if f in num_columns:
             continue
 
         # 각 범주값의 빈도수 계산 (NaN 포함)
