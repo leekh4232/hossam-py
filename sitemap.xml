@@ -2,42 +2,42 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://py.hossam.kr/</loc>
-         <lastmod>2026-01-31</lastmod>
+         <lastmod>2026-02-01</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hossam/</loc>
-         <lastmod>2026-01-31</lastmod>
+         <lastmod>2026-02-01</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hs_classroom/</loc>
-         <lastmod>2026-01-31</lastmod>
+         <lastmod>2026-02-01</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hs_cluster/</loc>
-         <lastmod>2026-01-31</lastmod>
+         <lastmod>2026-02-01</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hs_gis/</loc>
-         <lastmod>2026-01-31</lastmod>
+         <lastmod>2026-02-01</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hs_plot/</loc>
-         <lastmod>2026-01-31</lastmod>
+         <lastmod>2026-02-01</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hs_prep/</loc>
-         <lastmod>2026-01-31</lastmod>
+         <lastmod>2026-02-01</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hs_stats/</loc>
-         <lastmod>2026-01-31</lastmod>
+         <lastmod>2026-02-01</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hs_timeserise/</loc>
-         <lastmod>2026-01-31</lastmod>
+         <lastmod>2026-02-01</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hs_util/</loc>
-         <lastmod>2026-01-31</lastmod>
+         <lastmod>2026-02-01</lastmod>
     </url>
 </urlset>
