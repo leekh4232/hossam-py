@@ -47,6 +47,7 @@ from pingouin import anova, pairwise_tukey, welch_anova, pairwise_gameshowell
 
 from .hs_plot import ols_residplot, ols_qqplot, get_default_ax, finalize_plot
 from .hs_prep import unmelt
+from .hs_util import pretty_table
 
 # ===================================================================
 # MCAR(결측치 무작위성) 검정
@@ -1858,17 +1859,21 @@ def vif_filter(
         result = data.copy()
         return result
 
-    def _compute_vifs(X_: DataFrame) -> dict:
+    def _compute_vifs(X_: DataFrame, verbose: bool = False) -> DataFrame:
         # NA 제거 후 상수항 추가
         X_clean = X_.dropna()
+        
         if X_clean.shape[0] == 0:
             # 데이터가 모두 NA인 경우 VIF 계산 불가: NaN 반환
-            return {col: np.nan for col in X_.columns}
+            return DataFrame({col: [np.nan] for col in X_.columns})
+        
         if X_clean.shape[1] == 1:
             # 단일 예측변수의 경우 다른 설명변수가 없으므로 VIF는 1로 간주
-            return {col: 1.0 for col in X_clean.columns}
+            return DataFrame({col: [1.0] for col in X_clean.columns})
+        
         exog = sm.add_constant(X_clean, prepend=True)
         vifs = {}
+        
         for i, col in enumerate(X_clean.columns, start=0):
             # exog의 첫 열은 상수항이므로 변수 인덱스는 +1
             try:
@@ -1876,28 +1881,40 @@ def vif_filter(
             except Exception:
                 # 계산 실패 시 무한대로 처리하여 우선 제거 대상으로
                 vifs[col] = float("inf")
-        return vifs
+        
+        vdf = DataFrame(list(vifs.items()), columns=["Variable", "VIF"])
+        vdf.sort_values("VIF", ascending=False, inplace=True)
+
+        if verbose:
+            pretty_table(vdf)  # type: ignore
+            print()
+
+        return vdf
 
     # 반복 제거 루프
+    i = 0
     while True:
         if X.shape[1] == 0:
             break
-        vifs = _compute_vifs(X)
-        if verbose:
-            print(vifs)
+
+        print(f"📇 VIF 제거 반복 {i+1}회차\n")
+        vifs = _compute_vifs(X, verbose=verbose)
+        
         # 모든 변수가 임계값 이하이면 종료
-        max_key = max(vifs, key=lambda k: (vifs[k] if not np.isnan(vifs[k]) else -np.inf))
-        max_vif = vifs[max_key]
+        max_vif = vifs.iloc[0]["VIF"]
+        max_key = vifs.iloc[0]["Variable"]
+
         if np.isnan(max_vif) or max_vif <= threshold:
+            if i == 0:
+                print("▶ 모든 변수의 VIF가 임계값 이하입니다. 제거할 변수가 없습니다.\n")
+            else:
+                print("▶ 모든 변수의 VIF가 임계값 이하가 되어 종료합니다. 제거된 변수 {0}개\n".format(i))
             break
+
         # 가장 큰 VIF 변수 제거
         X = X.drop(columns=[max_key])
-
-    # 출력 옵션이 False일 경우 최종 값만 출력
-    if not verbose:
-        final_vifs = _compute_vifs(X) if X.shape[1] > 0 else {}
-        vdf = DataFrame(list(final_vifs.items()), columns=["Variable", "VIF"])
-        display(vdf) # type: ignore
+        print(f"제거된 변수: {max_key} (VIF={max_vif:.2f})")
+        i += 1
 
     # 원본 컬럼 순서 유지하며 제거된 수치형 컬럼만 제외
     kept_numeric_cols = list(X.columns)
