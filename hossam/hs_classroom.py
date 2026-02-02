@@ -6,6 +6,7 @@ import math
 from pandas import DataFrame, qcut, concat, to_numeric
 from kmodes.kmodes import KModes
 from matplotlib import pyplot as plt
+from prompt_toolkit.formatted_text.ansi import i
 import seaborn as sns
 from .hs_util import load_data, pretty_table
 from .hs_plot import config
@@ -19,6 +20,7 @@ def cluster_students(
     n_groups: int,
     score_cols: list | None = None,
     interest_col: str | None = None,
+    interest_ignore: str | None = None,
     max_iter: int = 200,
     score_metric: str = 'total'
 ) -> DataFrame:
@@ -39,6 +41,8 @@ def cluster_students(
             None일 경우 점수 기반 균형 조정을 하지 않습니다. 기본값: None
         interest_col: 관심사 정보가 있는 컬럼명.
             None일 경우 관심사 기반 군집화를 하지 않습니다. 기본값: None
+        interest_ignore: 관심사 군집화에서 제외할 값.
+            지정된 값은 별도 군집에서 제외됩니다. 기본값: None
         max_iter: 균형 조정 최대 반복 횟수. 기본값: 200
         score_metric: 점수 기준 선택 ('total' 또는 'average').
             'total'이면 총점, 'average'이면 평균점수 기준. 기본값: 'total'
@@ -151,8 +155,18 @@ def cluster_students(
     if actual_n_groups < 2:
         actual_n_groups = 2
 
+    df_ignore = None
+
     # ===== 3단계: 관심사 기반 1차 군집 =====
     if interest_col is not None:
+        df_main[interest_col] = df_main[interest_col].fillna('미정')
+
+        if interest_ignore is not None:
+            df_ignore = df_main[df_main[interest_col] == interest_ignore].copy()
+            df_main = df_main[df_main[interest_col] != interest_ignore].copy()
+
+            print(df_ignore)
+
         X_interest = df_main[[interest_col]].to_numpy()
 
         kmodes_interest = KModes(
@@ -184,12 +198,18 @@ def cluster_students(
         df_main = _balance_group_sizes_only(df_main, actual_n_groups, min_size, max_size)
 
     # ===== 5단계: 극단값 포함 병합 =====
-    if df_outlier is not None and len(df_outlier) > 0:
+    result = df_main
+
+    if (df_outlier is not None and len(df_outlier) > 0):
         # '조'는 숫자형 유지: 극단값은 0으로 표시
         df_outlier['조'] = 0
-        result = concat([df_main, df_outlier], ignore_index=True)
-    else:
-        result = df_main
+        result = concat([result, df_outlier], ignore_index=True)
+
+    if (df_ignore is not None and len(df_ignore) > 0):
+        # '조'는 숫자형 유지: 제외된 학생은 -1로 표시
+        df_ignore['조'] = -1
+        result = concat([result, df_ignore], ignore_index=True)
+        
 
     # 평균점수는 이미 계산됨 (score_cols 있을 때)
 
@@ -694,6 +714,7 @@ def analyze_classroom(
     n_groups: int,
     score_cols: list | None = None,
     interest_col: str | None = None,
+    interest_ignore: str | None = None,
     max_iter: int = 200,
     score_metric: str = 'average',
     name_col: str = '학생이름',
@@ -713,6 +734,7 @@ def analyze_classroom(
         n_groups: 목표 조의 개수.
         score_cols: 성적 계산에 사용할 점수 컬럼명 리스트. 기본값: None
         interest_col: 관심사 정보가 있는 컬럼명. 기본값: None
+        interest_ignore: 관심사 군집화에서 제외할 값. 기본값: None
         max_iter: 균형 조정 최대 반복 횟수. 기본값: 200
         score_metric: 점수 기준 선택 ('total' 또는 'average'). 기본값: 'average'
         name_col: 학생 이름 컬럼명. 기본값: '학생이름'
@@ -740,6 +762,7 @@ def analyze_classroom(
         n_groups=n_groups,
         score_cols=score_cols,
         interest_col=interest_col,
+        interest_ignore=interest_ignore,
         max_iter=max_iter,
         score_metric=score_metric
     )
