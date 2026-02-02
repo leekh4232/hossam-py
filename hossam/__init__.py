@@ -9,11 +9,17 @@ from . import hs_prep
 from . import hs_stats
 from . import hs_timeserise
 from . import hs_util
+from . import hs_reg
 from . import hs_cluster
 from . import hs_study
 from .hs_util import load_info
 from .hs_util import _load_data_remote as load_data
 from .hs_plot import visualize_silhouette
+from .hs_stats import ttest_ind as hs_ttest_ind
+from .hs_stats import outlier_table as hs_outlier_table
+from .hs_stats import oneway_anova as hs_oneway_anova
+from .hs_reg import hs_leanring_cv as hs_leanring_cv
+from .hs_reg import VIFSelector
 
 # py-modules
 import sys
@@ -31,7 +37,27 @@ except Exception:
 
 my_dpi = hs_plot.config.dpi
 
-__all__ = ["my_dpi", "load_data", "load_info", "hs_classroom", "hs_gis", "hs_plot", "hs_prep", "hs_stats", "hs_timeserise", "hs_util", "hs_cluster", "hs_study", "visualize_silhouette"]
+__all__ = [
+    "my_dpi",
+    "load_data",
+    "load_info",
+    "hs_classroom",
+    "hs_gis",
+    "hs_plot",
+    "hs_prep",
+    "hs_stats",
+    "hs_timeserise",
+    "hs_util",
+    "hs_cluster",
+    "hs_reg",
+    "hs_study",
+    "visualize_silhouette",
+    "hs_ttest_ind",
+    "hs_outlier_table",
+    "hs_oneway_anova",
+    "hs_leanring_cv",
+    "VIFSelector",
+]
 
 
 def check_pypi_latest(package_name: str):
@@ -51,7 +77,7 @@ def check_pypi_latest(package_name: str):
         "package": package_name,
         "installed": installed,
         "latest": latest,
-        "outdated": installed != latest
+        "outdated": installed != latest,
     }
 
 
@@ -67,21 +93,23 @@ def _init_korean_font():
             fprop = fm.FontProperties(fname=str(font_path))
             fname = fprop.get_name()
 
-            plt.rcParams.update({
-                "font.family": fname,
-                "font.size": hs_plot.config.font_size,
-                "font.weight": hs_plot.config.font_weight,
-                "axes.unicode_minus": False,
-                "text.antialiased": True,
-                "lines.antialiased": True,
-                "patch.antialiased": True,
-                "figure.dpi": hs_plot.config.dpi,
-                "savefig.dpi": hs_plot.config.dpi * 2,
-                "text.hinting": "auto",
-                "text.hinting_factor": 8,
-                "pdf.fonttype": 42,
-                "ps.fonttype": 42,
-            })
+            plt.rcParams.update(
+                {
+                    "font.family": fname,
+                    "font.size": hs_plot.config.font_size,
+                    "font.weight": hs_plot.config.font_weight,
+                    "axes.unicode_minus": False,
+                    "text.antialiased": True,
+                    "lines.antialiased": True,
+                    "patch.antialiased": True,
+                    "figure.dpi": hs_plot.config.dpi,
+                    "savefig.dpi": hs_plot.config.dpi * 2,
+                    "text.hinting": "auto",
+                    "text.hinting_factor": 8,
+                    "pdf.fonttype": 42,
+                    "ps.fonttype": 42,
+                }
+            )
 
             print(
                 "\n✅ 시각화를 위한 한글 글꼴(NotoSansKR-Regular)이 자동 적용되었습니다."
@@ -128,18 +156,22 @@ def _init():
     # 행 최대 출력 수 100개로 수정
     pd.set_option("display.max_rows", 100)
     # 소수점 자리수 3자리로 설정
-    pd.options.display.float_format = '{:.3f}'.format
+    pd.options.display.float_format = "{:.3f}".format
 
     from IPython.display import display, HTML
 
-    display(HTML("""
+    display(
+        HTML(
+            """
     <style>      
     .dataframe tr:hover {
         background-color: #ffff99 !important;
         border: 1px solid #ffcc00;
     }
     </style>
-    """))
+    """
+        )
+    )
 
 
 _init()
