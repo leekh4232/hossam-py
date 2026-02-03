@@ -1,15 +1,28 @@
 from IPython.display import display
 
 from pandas import DataFrame
+import seaborn as sb
 import numpy as np
+
 import statsmodels.api as sm
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import learning_curve
 
-from .hs_plot import create_figure, finalize_plot
-import seaborn as sb
+# 성능 평가 지표 모듈
+from sklearn.metrics import (
+    r2_score,
+    mean_absolute_error,
+    mean_squared_error,
+    mean_absolute_percentage_error,
+)
 
+from .hs_plot import create_figure, finalize_plot
+
+# --------------------------------------------------------
+# VIF 기반 다중공선성 제거기
+# --------------------------------------------------------
 class VIFSelector(BaseEstimator, TransformerMixin):
     """
     VIF(Variance Inflation Factor) 기반 다중공선성 제거기
@@ -76,10 +89,51 @@ class VIFSelector(BaseEstimator, TransformerMixin):
     def transform(self, X):
         return X.drop(columns=self.drop_cols_, errors="ignore")
 
-# ---------------------------------
+
+
+# --------------------------------------------------------
+# 회귀 성능 평가 지표 함수
+# --------------------------------------------------------
+def get_scores(
+    estimator, x_test: DataFrame, y_true: DataFrame | np.ndarray
+) -> DataFrame:
+    """
+    회귀 성능 평가 지표 함수
+    
+    Args:
+        estimator: 학습된 사이킷런 회귀 모델
+        x_test: 테스트용 설명변수 데이터 (DataFrame)
+        y_true: 실제 목표변수 값 (DataFrame 또는 ndarray)
+
+    Returns:
+        DataFrame: 회귀 성능 평가 지표 (R2, MAE, MSE, RMSE, MAPE, MPE)
+    """
+    if hasattr(estimator, 'named_steps'):
+        classname = estimator.named_steps['model'].__class__.__name__
+    else:
+        classname = estimator.__class__.__name__
+
+    y_pred = estimator.predict(x_test)
+
+    return DataFrame(
+        {
+            "결정계수(R2)": r2_score(y_true, y_pred),
+            "평균절대오차(MAE)": mean_absolute_error(y_true, y_pred),
+            "평균제곱오차(MSE)": mean_squared_error(y_true, y_pred),
+            "평균오차(RMSE)": np.sqrt(mean_squared_error(y_true, y_pred)),
+            "평균 절대 백분오차 비율(MAPE)": mean_absolute_percentage_error(
+                y_true, y_pred
+            ),
+            "평균 비율 오차(MPE)": np.mean((y_true - y_pred) / y_true * 100),
+        },
+        index=[classname],
+    )
+
+
+# --------------------------------------------------------
 # 학습곡선기반 과적합 판별 함수
-# ---------------------------------
-def hs_leanring_cv(
+# --------------------------------------------------------
+def learning_cv(
     estimator,
     x,
     y,
@@ -112,8 +166,12 @@ def hs_leanring_cv(
         random_state=52,
     )
 
-    model_name = estimator.named_steps["model"].__class__.__name__
-    print(f"=== Learning Curve: {model_name} ===")
+    if hasattr(estimator, 'named_steps'):
+        classname = estimator.named_steps['model'].__class__.__name__
+    else:
+        classname = estimator.__class__.__name__
+
+    print(f"=== Learning Curve: {classname} ===")
 
     # neg RMSE → RMSE
     train_rmse = -train_scores

@@ -18,7 +18,8 @@ from .hs_plot import visualize_silhouette
 from .hs_stats import ttest_ind as hs_ttest_ind
 from .hs_stats import outlier_table as hs_outlier_table
 from .hs_stats import oneway_anova as hs_oneway_anova
-from .hs_reg import hs_leanring_cv as hs_leanring_cv
+from .hs_reg import learning_cv as hs_learning_cv
+from .hs_reg import get_scores as hs_get_scores
 from .hs_reg import VIFSelector
 
 # py-modules
@@ -55,7 +56,8 @@ __all__ = [
     "hs_ttest_ind",
     "hs_outlier_table",
     "hs_oneway_anova",
-    "hs_leanring_cv",
+    "hs_learning_cv",
+    "hs_get_scores",
     "VIFSelector",
 ]
 

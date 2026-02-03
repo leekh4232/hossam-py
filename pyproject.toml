@@ -43,7 +43,8 @@ dependencies = [
     "xgboost",
     "lightgbm",
     "catboost",
-    "kneed"
+    "kneed",
+    "shap"
 ]
 
 [project.urls]
