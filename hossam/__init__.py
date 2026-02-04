@@ -21,7 +21,7 @@ from .hs_stats import oneway_anova as hs_oneway_anova
 from .hs_reg import learning_cv as hs_learning_cv
 from .hs_reg import get_scores as hs_get_scores
 from .hs_reg import get_score_cv as hs_get_score_cv
-from .hs_reg import feature_importance as feature_importance
+from .hs_reg import feature_importance as hs_feature_importance
 from .VIFSelector import VIFSelector
 
 # py-modules
@@ -61,7 +61,7 @@ __all__ = [
     "hs_learning_cv",
     "hs_get_scores",
     "hs_get_score_cv",
-    "feature_importance",
+    "hs_feature_importance",
     "VIFSelector",
 ]
 
