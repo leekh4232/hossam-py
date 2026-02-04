@@ -1,4 +1,4 @@
-from pandas import DataFrame, merge
+from pandas import DataFrame, merge, concat
 import seaborn as sb
 import numpy as np
 
@@ -189,11 +189,11 @@ def learning_cv(
         label="CV RMSE",
     )
 
-    ax.set_xlabel("RMSE", fontsize=8, labelpad=5)   # type : ignore
-    ax.set_ylabel("학습곡선 (Learning Curve)", fontsize=8, labelpad=5)  # type : ignore
+    ax.set_xlabel("학습 데이터 비율", fontsize=8, labelpad=5)   # type : ignore
+    ax.set_ylabel("RMSE", fontsize=8, labelpad=5)  # type : ignore
     ax.grid(True, alpha=0.3) # type : ignore
 
-    finalize_plot(ax)
+    finalize_plot(ax, title=f"{classname} 학습곡선 (Learning Curve)")
 
     return result_df
 
@@ -227,15 +227,23 @@ def get_score_cv(
         DataFrame: 회귀 성능 평가 지표 + 과적합 판정 여부
     """
 
-    score_df = get_scores(estimator, x_test, y_test)
-    cv_df = learning_cv(
-        estimator,
-        x_origin,
-        y_origin,
-        scoring=scoring,
-        cv=cv,
-        train_sizes=train_sizes,
-        n_jobs=n_jobs,
-    )
+    if type(estimator) != list:
+        estimator = [estimator]
 
-    return merge(score_df, cv_df, left_index=True, right_index=True)
+    result_df = DataFrame()
+
+    for est in estimator:
+        score_df = get_scores(est, x_test, y_test)
+        cv_df = learning_cv(
+            est,
+            x_origin,
+            y_origin,
+            scoring=scoring,
+            cv=cv,
+            train_sizes=train_sizes,
+            n_jobs=n_jobs,
+        )
+
+        result_df = concat([result_df, merge(score_df, cv_df, left_index=True, right_index=True)])
+                              
+    return result_df
