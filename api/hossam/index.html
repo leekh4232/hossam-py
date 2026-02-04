@@ -3634,11 +3634,11 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
         <span class="n">label</span><span class="o">=</span><span class="s2">&quot;CV RMSE&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;RMSE&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>   <span class="c1"># type : ignore</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;학습곡선 (Learning Curve)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># type : ignore</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;학습 데이터 비율&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>   <span class="c1"># type : ignore</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;RMSE&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># type : ignore</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span> <span class="c1"># type : ignore</span>
 
-    <span class="n">finalize_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">finalize_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">classname</span><span class="si">}</span><span class="s2"> 학습곡선 (Learning Curve)&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">result_df</span>
 </code></pre></div></td></tr></table></div>
@@ -4076,7 +4076,15 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="normal">238</span>
 <span class="normal">239</span>
 <span class="normal">240</span>
-<span class="normal">241</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_score_cv</span><span class="p">(</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_score_cv</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">,</span>
     <span class="n">x_test</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">y_test</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -4105,18 +4113,26 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="sd">        DataFrame: 회귀 성능 평가 지표 + 과적합 판정 여부</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">score_df</span> <span class="o">=</span> <span class="n">get_scores</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
-    <span class="n">cv_df</span> <span class="o">=</span> <span class="n">learning_cv</span><span class="p">(</span>
-        <span class="n">estimator</span><span class="p">,</span>
-        <span class="n">x_origin</span><span class="p">,</span>
-        <span class="n">y_origin</span><span class="p">,</span>
-        <span class="n">scoring</span><span class="o">=</span><span class="n">scoring</span><span class="p">,</span>
-        <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span>
-        <span class="n">train_sizes</span><span class="o">=</span><span class="n">train_sizes</span><span class="p">,</span>
-        <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">estimator</span> <span class="o">=</span> <span class="p">[</span><span class="n">estimator</span><span class="p">]</span>
 
-    <span class="k">return</span> <span class="n">merge</span><span class="p">(</span><span class="n">score_df</span><span class="p">,</span> <span class="n">cv_df</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">result_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">est</span> <span class="ow">in</span> <span class="n">estimator</span><span class="p">:</span>
+        <span class="n">score_df</span> <span class="o">=</span> <span class="n">get_scores</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+        <span class="n">cv_df</span> <span class="o">=</span> <span class="n">learning_cv</span><span class="p">(</span>
+            <span class="n">est</span><span class="p">,</span>
+            <span class="n">x_origin</span><span class="p">,</span>
+            <span class="n">y_origin</span><span class="p">,</span>
+            <span class="n">scoring</span><span class="o">=</span><span class="n">scoring</span><span class="p">,</span>
+            <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span>
+            <span class="n">train_sizes</span><span class="o">=</span><span class="n">train_sizes</span><span class="p">,</span>
+            <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">result_df</span> <span class="o">=</span> <span class="n">concat</span><span class="p">([</span><span class="n">result_df</span><span class="p">,</span> <span class="n">merge</span><span class="p">(</span><span class="n">score_df</span><span class="p">,</span> <span class="n">cv_df</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)])</span>
+
+    <span class="k">return</span> <span class="n">result_df</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
