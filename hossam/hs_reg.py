@@ -1,8 +1,8 @@
-from pandas import DataFrame, merge, concat
+from pandas import DataFrame, Series, merge, concat
 import seaborn as sb
 import numpy as np
 
-
+from sklearn.inspection import permutation_importance
 from sklearn.model_selection import learning_curve
 
 # 성능 평가 지표 모듈
@@ -13,7 +13,7 @@ from sklearn.metrics import (
     mean_absolute_percentage_error,
 )
 
-from .hs_plot import create_figure, finalize_plot
+from .hs_plot import create_figure, finalize_plot, barplot
 
 
 
@@ -247,3 +247,31 @@ def get_score_cv(
         result_df = concat([result_df, merge(score_df, cv_df, left_index=True, right_index=True)])
                               
     return result_df
+
+def feature_importance(model, x_train: DataFrame, y_train: DataFrame | np.ndarray | Series, plot: bool = True) -> DataFrame:
+    perm = permutation_importance(
+        estimator=model,
+        X=x_train,
+        y=y_train,
+        scoring="r2",
+        n_repeats=30,
+        random_state=42,
+        n_jobs=-1,
+    )
+
+    # 결과 정리
+    perm_df = DataFrame(
+        {
+            "importance_mean": perm.importances_mean,   # type: ignore
+            "importance_std": perm.importances_std,     # type: ignore
+        },
+        index=x_train.columns,
+    ).sort_values("importance_mean", ascending=False)
+
+    perm_df["importance_cumsum"] = perm_df["importance_mean"].cumsum()
+
+    # 시각화
+    if plot:
+        barplot(df=perm_df, xname="importance_mean", yname=perm_df.index, title="Permutation Importance", callback=lambda ax: ax.set_xlabel("Permutation Importance (mean)"))
+
+    return perm_df

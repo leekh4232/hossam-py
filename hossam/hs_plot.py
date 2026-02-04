@@ -10,7 +10,7 @@ import seaborn as sb
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure  # type: ignore
 from matplotlib.pyplot import Axes  # type: ignore
-from pandas import Series, DataFrame
+from pandas import Index, Series, DataFrame
 from math import sqrt
 from pandas import DataFrame
 
@@ -151,7 +151,7 @@ def create_figure(
         tuple[Figure, Axes]: 생성된 matplotlib Figure와 Axes 객체.
     """
     fig, ax = get_default_ax(width, height, rows, cols, dpi, flatten, ws, hs, title)
-    return fig, ax
+    return fig, ax  # type: ignore
 
 
 # ===================================================================
@@ -763,8 +763,8 @@ def stackplot(
 # ===================================================================
 def scatterplot(
     df: DataFrame | None,
-    xname: str,
-    yname: str,
+    xname: str | Index,
+    yname: str | Index,
     hue=None,
     vector: str | None = None,
     outline: bool = False,
@@ -783,8 +783,8 @@ def scatterplot(
 
     Args:
         df (DataFrame | None): 시각화할 데이터.
-        xname (str): x축 컬럼.
-        yname (str): y축 컬럼.
+        xname (str | Index): x축 컬럼.
+        yname (str | Index): y축 컬럼.
         hue (str|None): 범주 컬럼.
         vector (str|None): 벡터 종류 컬럼.
         outline (bool): 점 외곽선 표시 여부.
@@ -871,7 +871,7 @@ def scatterplot(
         scatterplot_kwargs["linewidth"] = 2
         scatterplot_kwargs["color"] = "#ff0000"
         scatterplot_kwargs["hue"] = None
-        sb.scatterplot(data=df[df[vector] == "noise"], **scatterplot_kwargs)
+        sb.scatterplot(data=df[df[vector] == "noise"], **scatterplot_kwargs)    # type: ignore
 
     finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
@@ -1196,8 +1196,8 @@ def countplot(
 # ===================================================================
 def barplot(
     df: DataFrame,
-    xname: str,
-    yname: str,
+    xname: str | Index,
+    yname: str | Index,
     hue=None,
     title: str | None = None,
     palette: str | None = None,
@@ -1214,8 +1214,8 @@ def barplot(
 
     Args:
         df (DataFrame): 시각화할 데이터.
-        xname (str): 범주 컬럼.
-        yname (str): 값 컬럼.
+        xname (str | Index): 범주 컬럼.
+        yname (str | Index): 값 컬럼.
         hue (str|None): 보조 범주 컬럼.
         title (str|None): 그래프 제목.
         palette (str|None): 팔레트 이름.
