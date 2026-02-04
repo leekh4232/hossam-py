@@ -8,6 +8,7 @@ from itertools import combinations
 import numpy as np
 import seaborn as sb
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure  # type: ignore
 from matplotlib.pyplot import Axes  # type: ignore
 from pandas import Series, DataFrame
 from math import sqrt
@@ -132,7 +133,7 @@ def create_figure(
     ws: int | None = None,
     hs: int | None = None,
     title: str | None = None,
-):
+) -> tuple[Figure, Axes]:
     """기본 크기의 Figure와 Axes를 생성한다. get_default_ax의 래퍼 함수.
 
     Args:

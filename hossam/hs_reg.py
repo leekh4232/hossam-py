@@ -1,6 +1,6 @@
 from IPython.display import display
 
-from pandas import DataFrame
+from pandas import DataFrame, merge
 import seaborn as sb
 import numpy as np
 
@@ -20,22 +20,24 @@ from sklearn.metrics import (
 
 from .hs_plot import create_figure, finalize_plot
 
+
 # --------------------------------------------------------
 # VIF 기반 다중공선성 제거기
 # --------------------------------------------------------
 class VIFSelector(BaseEstimator, TransformerMixin):
     """
     VIF(Variance Inflation Factor) 기반 다중공선성 제거기
-    
+
     Args:
         threshold (float): VIF 임계값 (기본값: 10.0
         check_cols (list or None): VIF 계산에 사용할 열 목록 (기본값: None, 모든 열 사용)
-    
+
     Attributes:
         drop_cols_ (list): 제거된 열 목록
         vif_cols_ (list): VIF 계산에 사용된 열 목록
-    
+
     """
+
     def __init__(self, threshold=10.0, check_cols=None):
         self.threshold = threshold
         self.check_cols = check_cols
@@ -66,22 +68,21 @@ class VIFSelector(BaseEstimator, TransformerMixin):
             if X_vif.shape[1] == 0:
                 break
 
-            print(f"\nVIF 제거 반복 {i+1}회차 ====================")
             vdf = self._compute_vifs(X_vif)
             max_vif = vdf.iloc[0]["VIF"]
             max_col = vdf.iloc[0]["Variable"]
 
             if max_vif <= self.threshold:
-                print(
-                    "모든 변수의 VIF가 임계값 이하가 되어 종료합니다. 제거된 변수 {0}개.".format(
-                        i
-                    )
-                )
+                # print(
+                #     "모든 변수의 VIF가 임계값 이하가 되어 종료합니다. 제거된 변수 {0}개.".format(
+                #         i
+                #     )
+                # )
                 break
 
             X_vif = X_vif.drop(columns=[max_col])
             self.drop_cols_.append(max_col)
-            print(f"제거된 변수: {max_col} (VIF={X_vif:.2f})")
+            #print(f"제거된 변수: {max_col} (VIF={X_vif:.2f})")
             i += 1
 
         return self
@@ -90,44 +91,47 @@ class VIFSelector(BaseEstimator, TransformerMixin):
         return X.drop(columns=self.drop_cols_, errors="ignore")
 
 
-
 # --------------------------------------------------------
 # 회귀 성능 평가 지표 함수
 # --------------------------------------------------------
 def get_scores(
-    estimator, x_test: DataFrame, y_true: DataFrame | np.ndarray
+    estimator,
+    x_test: DataFrame,
+    y_test: DataFrame | np.ndarray
 ) -> DataFrame:
     """
     회귀 성능 평가 지표 함수
-    
+
     Args:
         estimator: 학습된 사이킷런 회귀 모델
         x_test: 테스트용 설명변수 데이터 (DataFrame)
-        y_true: 실제 목표변수 값 (DataFrame 또는 ndarray)
+        y_test: 실제 목표변수 값 (DataFrame 또는 ndarray)
 
     Returns:
         DataFrame: 회귀 성능 평가 지표 (R2, MAE, MSE, RMSE, MAPE, MPE)
     """
-    if hasattr(estimator, 'named_steps'):
-        classname = estimator.named_steps['model'].__class__.__name__
+    if hasattr(estimator, "named_steps"):
+        classname = estimator.named_steps["model"].__class__.__name__
     else:
         classname = estimator.__class__.__name__
 
     y_pred = estimator.predict(x_test)
 
-    return DataFrame(
+    score_df = DataFrame(
         {
-            "결정계수(R2)": r2_score(y_true, y_pred),
-            "평균절대오차(MAE)": mean_absolute_error(y_true, y_pred),
-            "평균제곱오차(MSE)": mean_squared_error(y_true, y_pred),
-            "평균오차(RMSE)": np.sqrt(mean_squared_error(y_true, y_pred)),
+            "결정계수(R2)": r2_score(y_test, y_pred),
+            "평균절대오차(MAE)": mean_absolute_error(y_test, y_pred),
+            "평균제곱오차(MSE)": mean_squared_error(y_test, y_pred),
+            "평균오차(RMSE)": np.sqrt(mean_squared_error(y_test, y_pred)),
             "평균 절대 백분오차 비율(MAPE)": mean_absolute_percentage_error(
-                y_true, y_pred
+                y_test, y_pred
             ),
-            "평균 비율 오차(MPE)": np.mean((y_true - y_pred) / y_true * 100),
+            "평균 비율 오차(MPE)": np.mean((y_test - y_pred) / y_test * 100),
         },
         index=[classname],
     )
+
+    return score_df
 
 
 # --------------------------------------------------------
@@ -141,9 +145,9 @@ def learning_cv(
     cv=5,
     train_sizes=np.linspace(0.1, 1.0, 10),
     n_jobs=-1,
-):
+) -> DataFrame:
     """학습곡선 기반 과적합 판별 함수
-    
+
     Args:
         estimator: 사이킷런 Estimator (파이프라인 권장)
         x: 설명변수 (DataFrame 또는 ndarray)
@@ -152,9 +156,12 @@ def learning_cv(
         cv: 교차검증 폴드 수 (기본값: 5)
         train_sizes: 학습곡선 학습 데이터 비율 (기본값: np.linspace(0.1, 1.0, 10))
         n_jobs: 병렬 처리 개수 (기본값: -1, 모든 CPU 사용)
+
+    Returns:
+        DataFrame: 과적합 판별 결과 표
     """
 
-    train_sizes, train_scores, cv_scores = learning_curve(
+    train_sizes, train_scores, cv_scores = learning_curve(  # type: ignore
         estimator=estimator,
         X=x,
         y=y,
@@ -166,12 +173,10 @@ def learning_cv(
         random_state=52,
     )
 
-    if hasattr(estimator, 'named_steps'):
-        classname = estimator.named_steps['model'].__class__.__name__
+    if hasattr(estimator, "named_steps"):
+        classname = estimator.named_steps["model"].__class__.__name__
     else:
         classname = estimator.__class__.__name__
-
-    print(f"=== Learning Curve: {classname} ===")
 
     # neg RMSE → RMSE
     train_rmse = -train_scores
@@ -226,26 +231,15 @@ def learning_cv(
     # -----------------
     result_df = DataFrame(
         {
-            "지표": [
-                "Train RMSE",
-                "CV RMSE 평균",
-                "CV RMSE 표준편차",
-                "Train/CV 비율",
-                "CV 변동성 비율",
-                "판정 결과",
-            ],
-            "값": [
-                final_train,
-                final_cv,
-                final_std,
-                gap_ratio,
-                var_ratio,
-                status,
-            ],
-        }
+            "Train RMSE": [final_train],
+            "CV RMSE 평균": [final_cv],
+            "CV RMSE 표준편차": [final_std],
+            "Train/CV 비율": [gap_ratio],
+            "CV 변동성 비율": [var_ratio],
+            "판정 결과": [status],
+        },
+        index=[classname],
     )
-
-    display(result_df)
 
     # -----------------
     # 학습곡선 시각화
@@ -264,11 +258,56 @@ def learning_cv(
         y=cv_mean,
         marker="o",
         markeredgecolor="#ffffff",
-        label="Train RMSE",
+        label="CV RMSE",
     )
 
-    ax.set_xlabel("RMSE", fontsize=8, labelpad=5)
-    ax.set_ylabel("학습곡선 (Learning Curve)", fontsize=8, labelpad=5)
-    ax.grid(True, alpha=0.3)
+    ax.set_xlabel("RMSE", fontsize=8, labelpad=5)   # type : ignore
+    ax.set_ylabel("학습곡선 (Learning Curve)", fontsize=8, labelpad=5)  # type : ignore
+    ax.grid(True, alpha=0.3) # type : ignore
 
     finalize_plot(ax)
+
+    return result_df
+
+
+def get_score_cv(
+    estimator,
+    x_test: DataFrame,
+    y_test: DataFrame | np.ndarray,
+    x_origin: DataFrame,
+    y_origin: DataFrame | np.ndarray,
+    scoring="neg_root_mean_squared_error",
+    cv=5,
+    train_sizes=np.linspace(0.1, 1.0, 10),
+    n_jobs=-1,
+) -> DataFrame:
+    """
+    회귀 성능 평가 지표 함수
+
+    Args:
+        estimator: 학습된 사이킷런 회귀 모델
+        x_test: 테스트용 설명변수 데이터 (DataFrame)
+        y_test: 실제 목표변수 값 (DataFrame 또는 ndarray)
+        x_origin: 학습곡선용 전체 설명변수 데이터 (DataFrame, learning_curve=True일 때 필요)
+        y_origin: 학습곡선용 전체 목표변수 값 (DataFrame 또는 ndarray, learning_curve=True일 때 필요)
+        scoring: 학습곡선 평가 지표 (기본값: neg_root_mean_squared_error)
+        cv: 학습곡선 교차검증 폴드 수 (기본값: 5)
+        train_sizes: 학습곡선 학습 데이터 비율 (기본값: np.linspace(0.1, 1.0, 10))
+        n_jobs: 학습곡선 병렬 처리 개수 (기본값: -1, 모든 CPU 사용)
+
+    Returns:
+        DataFrame: 회귀 성능 평가 지표 + 과적합 판정 여부
+    """
+
+    score_df = get_scores(estimator, x_test, y_test)
+    cv_df = learning_cv(
+        estimator,
+        x_origin,
+        y_origin,
+        scoring=scoring,
+        cv=cv,
+        train_sizes=train_sizes,
+        n_jobs=n_jobs,
+    )
+
+    return merge(score_df, cv_df, left_index=True, right_index=True)

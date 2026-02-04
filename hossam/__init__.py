@@ -20,6 +20,7 @@ from .hs_stats import outlier_table as hs_outlier_table
 from .hs_stats import oneway_anova as hs_oneway_anova
 from .hs_reg import learning_cv as hs_learning_cv
 from .hs_reg import get_scores as hs_get_scores
+from .hs_reg import get_score_cv as hs_get_score_cv
 from .hs_reg import VIFSelector
 
 # py-modules
@@ -58,6 +59,7 @@ __all__ = [
     "hs_oneway_anova",
     "hs_learning_cv",
     "hs_get_scores",
+    "hs_get_score_cv",
     "VIFSelector",
 ]
 
@@ -133,6 +135,8 @@ def _init():
         f"🔖 Version: {__version__}",
     ]
 
+    
+
     for msg in messages:
         print(f"{msg}")
 
@@ -175,5 +179,10 @@ def _init():
         )
     )
 
+import multiprocessing as mp
 
-_init()
+def is_parallel_worker():
+    return mp.current_process().name != "MainProcess"
+
+if not is_parallel_worker():
+    _init()
