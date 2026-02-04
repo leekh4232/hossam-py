@@ -560,6 +560,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hossam.hs_get_score_cv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hs_get_score_cv
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -942,6 +953,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hossam.hs_get_score_cv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hs_get_score_cv
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1109,8 +1131,7 @@
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>hossam/hs_reg.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">26</span>
-<span class="normal">27</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">27</span>
 <span class="normal">28</span>
 <span class="normal">29</span>
 <span class="normal">30</span>
@@ -1173,7 +1194,8 @@
 <span class="normal">87</span>
 <span class="normal">88</span>
 <span class="normal">89</span>
-<span class="normal">90</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VIFSelector</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+<span class="normal">90</span>
+<span class="normal">91</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VIFSelector</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    VIF(Variance Inflation Factor) 기반 다중공선성 제거기</span>
 
@@ -1186,6 +1208,7 @@
 <span class="sd">        vif_cols_ (list): VIF 계산에 사용된 열 목록</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">check_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="n">threshold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_cols</span> <span class="o">=</span> <span class="n">check_cols</span>
@@ -1216,22 +1239,21 @@
             <span class="k">if</span> <span class="n">X_vif</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">break</span>
 
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">VIF 제거 반복 </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">회차 ====================&quot;</span><span class="p">)</span>
             <span class="n">vdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_vifs</span><span class="p">(</span><span class="n">X_vif</span><span class="p">)</span>
             <span class="n">max_vif</span> <span class="o">=</span> <span class="n">vdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;VIF&quot;</span><span class="p">]</span>
             <span class="n">max_col</span> <span class="o">=</span> <span class="n">vdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;Variable&quot;</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="n">max_vif</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span>
-                    <span class="s2">&quot;모든 변수의 VIF가 임계값 이하가 되어 종료합니다. 제거된 변수 </span><span class="si">{0}</span><span class="s2">개.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">i</span>
-                    <span class="p">)</span>
-                <span class="p">)</span>
+                <span class="c1"># print(</span>
+                <span class="c1">#     &quot;모든 변수의 VIF가 임계값 이하가 되어 종료합니다. 제거된 변수 {0}개.&quot;.format(</span>
+                <span class="c1">#         i</span>
+                <span class="c1">#     )</span>
+                <span class="c1"># )</span>
                 <span class="k">break</span>
 
             <span class="n">X_vif</span> <span class="o">=</span> <span class="n">X_vif</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">max_col</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">drop_cols_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_col</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;제거된 변수: </span><span class="si">{</span><span class="n">max_col</span><span class="si">}</span><span class="s2"> (VIF=</span><span class="si">{</span><span class="n">X_vif</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="c1">#print(f&quot;제거된 변수: {max_col} (VIF={X_vif:.2f})&quot;)</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">return</span> <span class="bp">self</span>
@@ -1941,8 +1963,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2759</span>
-<span class="normal">2760</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2760</span>
 <span class="normal">2761</span>
 <span class="normal">2762</span>
 <span class="normal">2763</span>
@@ -2004,7 +2025,8 @@
 <span class="normal">2819</span>
 <span class="normal">2820</span>
 <span class="normal">2821</span>
-<span class="normal">2822</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">visualize_silhouette</span><span class="p">(</span>
+<span class="normal">2822</span>
+<span class="normal">2823</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">visualize_silhouette</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span> <span class="o">|</span> <span class="n">AgglomerativeClustering</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3619,13 +3641,32 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
     </table>
 
 
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>DataFrame</code></td>            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>과적합 판별 결과 표</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_reg.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">136</span>
-<span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">140</span>
 <span class="normal">141</span>
 <span class="normal">142</span>
 <span class="normal">143</span>
@@ -3755,11 +3796,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="normal">267</span>
 <span class="normal">268</span>
 <span class="normal">269</span>
-<span class="normal">270</span>
-<span class="normal">271</span>
-<span class="normal">272</span>
-<span class="normal">273</span>
-<span class="normal">274</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">learning_cv</span><span class="p">(</span>
+<span class="normal">270</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">learning_cv</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">,</span>
     <span class="n">x</span><span class="p">,</span>
     <span class="n">y</span><span class="p">,</span>
@@ -3767,7 +3804,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
     <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
     <span class="n">train_sizes</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
     <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;학습곡선 기반 과적합 판별 함수</span>
 
 <span class="sd">    Args:</span>
@@ -3778,9 +3815,12 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="sd">        cv: 교차검증 폴드 수 (기본값: 5)</span>
 <span class="sd">        train_sizes: 학습곡선 학습 데이터 비율 (기본값: np.linspace(0.1, 1.0, 10))</span>
 <span class="sd">        n_jobs: 병렬 처리 개수 (기본값: -1, 모든 CPU 사용)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame: 과적합 판별 결과 표</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">train_sizes</span><span class="p">,</span> <span class="n">train_scores</span><span class="p">,</span> <span class="n">cv_scores</span> <span class="o">=</span> <span class="n">learning_curve</span><span class="p">(</span>
+    <span class="n">train_sizes</span><span class="p">,</span> <span class="n">train_scores</span><span class="p">,</span> <span class="n">cv_scores</span> <span class="o">=</span> <span class="n">learning_curve</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
         <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
         <span class="n">X</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
         <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
@@ -3792,12 +3832,10 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
         <span class="n">random_state</span><span class="o">=</span><span class="mi">52</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="s1">&#39;named_steps&#39;</span><span class="p">):</span>
-        <span class="n">classname</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="s2">&quot;named_steps&quot;</span><span class="p">):</span>
+        <span class="n">classname</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">classname</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;=== Learning Curve: </span><span class="si">{</span><span class="n">classname</span><span class="si">}</span><span class="s2"> ===&quot;</span><span class="p">)</span>
 
     <span class="c1"># neg RMSE → RMSE</span>
     <span class="n">train_rmse</span> <span class="o">=</span> <span class="o">-</span><span class="n">train_scores</span>
@@ -3852,26 +3890,15 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
     <span class="c1"># -----------------</span>
     <span class="n">result_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
         <span class="p">{</span>
-            <span class="s2">&quot;지표&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="s2">&quot;Train RMSE&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;CV RMSE 평균&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;CV RMSE 표준편차&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;Train/CV 비율&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;CV 변동성 비율&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;판정 결과&quot;</span><span class="p">,</span>
-            <span class="p">],</span>
-            <span class="s2">&quot;값&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="n">final_train</span><span class="p">,</span>
-                <span class="n">final_cv</span><span class="p">,</span>
-                <span class="n">final_std</span><span class="p">,</span>
-                <span class="n">gap_ratio</span><span class="p">,</span>
-                <span class="n">var_ratio</span><span class="p">,</span>
-                <span class="n">status</span><span class="p">,</span>
-            <span class="p">],</span>
-        <span class="p">}</span>
+            <span class="s2">&quot;Train RMSE&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">final_train</span><span class="p">],</span>
+            <span class="s2">&quot;CV RMSE 평균&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">final_cv</span><span class="p">],</span>
+            <span class="s2">&quot;CV RMSE 표준편차&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">final_std</span><span class="p">],</span>
+            <span class="s2">&quot;Train/CV 비율&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">gap_ratio</span><span class="p">],</span>
+            <span class="s2">&quot;CV 변동성 비율&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">var_ratio</span><span class="p">],</span>
+            <span class="s2">&quot;판정 결과&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">status</span><span class="p">],</span>
+        <span class="p">},</span>
+        <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">classname</span><span class="p">],</span>
     <span class="p">)</span>
-
-    <span class="n">display</span><span class="p">(</span><span class="n">result_df</span><span class="p">)</span>
 
     <span class="c1"># -----------------</span>
     <span class="c1"># 학습곡선 시각화</span>
@@ -3890,14 +3917,16 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
         <span class="n">y</span><span class="o">=</span><span class="n">cv_mean</span><span class="p">,</span>
         <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
         <span class="n">markeredgecolor</span><span class="o">=</span><span class="s2">&quot;#ffffff&quot;</span><span class="p">,</span>
-        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Train RMSE&quot;</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;CV RMSE&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;RMSE&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;학습곡선 (Learning Curve)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;RMSE&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>   <span class="c1"># type : ignore</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;학습곡선 (Learning Curve)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># type : ignore</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span> <span class="c1"># type : ignore</span>
 
     <span class="n">finalize_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result_df</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -3912,7 +3941,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 
 
 <a href="#hossam.hs_get_scores" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">hs_get_scores</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_true</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">hs_get_scores</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3964,7 +3993,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>y_true</code>
+                <code>y_test</code>
             </td>
             <td>
                   <code><span title="pandas.DataFrame">DataFrame</span> | <span title="numpy.ndarray">ndarray</span></code>
@@ -4040,8 +4069,14 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="normal">127</span>
 <span class="normal">128</span>
 <span class="normal">129</span>
-<span class="normal">130</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_scores</span><span class="p">(</span>
-    <span class="n">estimator</span><span class="p">,</span> <span class="n">x_test</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">y_true</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_scores</span><span class="p">(</span>
+    <span class="n">estimator</span><span class="p">,</span>
+    <span class="n">x_test</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">y_test</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    회귀 성능 평가 지표 함수</span>
@@ -4049,31 +4084,325 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="sd">    Args:</span>
 <span class="sd">        estimator: 학습된 사이킷런 회귀 모델</span>
 <span class="sd">        x_test: 테스트용 설명변수 데이터 (DataFrame)</span>
-<span class="sd">        y_true: 실제 목표변수 값 (DataFrame 또는 ndarray)</span>
+<span class="sd">        y_test: 실제 목표변수 값 (DataFrame 또는 ndarray)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        DataFrame: 회귀 성능 평가 지표 (R2, MAE, MSE, RMSE, MAPE, MPE)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="s1">&#39;named_steps&#39;</span><span class="p">):</span>
-        <span class="n">classname</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="s2">&quot;named_steps&quot;</span><span class="p">):</span>
+        <span class="n">classname</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">classname</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
 
     <span class="n">y_pred</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">score_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span>
         <span class="p">{</span>
-            <span class="s2">&quot;결정계수(R2)&quot;</span><span class="p">:</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">),</span>
-            <span class="s2">&quot;평균절대오차(MAE)&quot;</span><span class="p">:</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">),</span>
-            <span class="s2">&quot;평균제곱오차(MSE)&quot;</span><span class="p">:</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">),</span>
-            <span class="s2">&quot;평균오차(RMSE)&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)),</span>
+            <span class="s2">&quot;결정계수(R2)&quot;</span><span class="p">:</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">),</span>
+            <span class="s2">&quot;평균절대오차(MAE)&quot;</span><span class="p">:</span> <span class="n">mean_absolute_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">),</span>
+            <span class="s2">&quot;평균제곱오차(MSE)&quot;</span><span class="p">:</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">),</span>
+            <span class="s2">&quot;평균오차(RMSE)&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)),</span>
             <span class="s2">&quot;평균 절대 백분오차 비율(MAPE)&quot;</span><span class="p">:</span> <span class="n">mean_absolute_percentage_error</span><span class="p">(</span>
-                <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span>
+                <span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span>
             <span class="p">),</span>
-            <span class="s2">&quot;평균 비율 오차(MPE)&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_true</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">)</span> <span class="o">/</span> <span class="n">y_true</span> <span class="o">*</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="s2">&quot;평균 비율 오차(MPE)&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_test</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">)</span> <span class="o">/</span> <span class="n">y_test</span> <span class="o">*</span> <span class="mi">100</span><span class="p">),</span>
         <span class="p">},</span>
         <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">classname</span><span class="p">],</span>
     <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">score_df</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.hs_get_score_cv" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">hs_get_score_cv</span>
+
+
+<a href="#hossam.hs_get_score_cv" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">hs_get_score_cv</span><span class="p">(</span>
+    <span class="n">estimator</span><span class="p">,</span>
+    <span class="n">x_test</span><span class="p">,</span>
+    <span class="n">y_test</span><span class="p">,</span>
+    <span class="n">x_origin</span><span class="p">,</span>
+    <span class="n">y_origin</span><span class="p">,</span>
+    <span class="n">scoring</span><span class="o">=</span><span class="s2">&quot;neg_root_mean_squared_error&quot;</span><span class="p">,</span>
+    <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">train_sizes</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+    <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>회귀 성능 평가 지표 함수</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>estimator</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>학습된 사이킷런 회귀 모델</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>x_test</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>테스트용 설명변수 데이터 (DataFrame)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>y_test</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span> | <span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>실제 목표변수 값 (DataFrame 또는 ndarray)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>x_origin</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>학습곡선용 전체 설명변수 데이터 (DataFrame, learning_curve=True일 때 필요)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>y_origin</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span> | <span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>학습곡선용 전체 목표변수 값 (DataFrame 또는 ndarray, learning_curve=True일 때 필요)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scoring</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>학습곡선 평가 지표 (기본값: neg_root_mean_squared_error)</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;neg_root_mean_squared_error&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>cv</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>학습곡선 교차검증 폴드 수 (기본값: 5)</p>
+              </div>
+            </td>
+            <td>
+                  <code>5</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>train_sizes</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>학습곡선 학습 데이터 비율 (기본값: np.linspace(0.1, 1.0, 10))</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="numpy.linspace">linspace</span>(0.1, 1.0, 10)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>n_jobs</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>학습곡선 병렬 처리 개수 (기본값: -1, 모든 CPU 사용)</p>
+              </div>
+            </td>
+            <td>
+                  <code>-1</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>DataFrame</code></td>            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>회귀 성능 평가 지표 + 과적합 판정 여부</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/hs_reg.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_score_cv</span><span class="p">(</span>
+    <span class="n">estimator</span><span class="p">,</span>
+    <span class="n">x_test</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">y_test</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">x_origin</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">y_origin</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">scoring</span><span class="o">=</span><span class="s2">&quot;neg_root_mean_squared_error&quot;</span><span class="p">,</span>
+    <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">train_sizes</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+    <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    회귀 성능 평가 지표 함수</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        estimator: 학습된 사이킷런 회귀 모델</span>
+<span class="sd">        x_test: 테스트용 설명변수 데이터 (DataFrame)</span>
+<span class="sd">        y_test: 실제 목표변수 값 (DataFrame 또는 ndarray)</span>
+<span class="sd">        x_origin: 학습곡선용 전체 설명변수 데이터 (DataFrame, learning_curve=True일 때 필요)</span>
+<span class="sd">        y_origin: 학습곡선용 전체 목표변수 값 (DataFrame 또는 ndarray, learning_curve=True일 때 필요)</span>
+<span class="sd">        scoring: 학습곡선 평가 지표 (기본값: neg_root_mean_squared_error)</span>
+<span class="sd">        cv: 학습곡선 교차검증 폴드 수 (기본값: 5)</span>
+<span class="sd">        train_sizes: 학습곡선 학습 데이터 비율 (기본값: np.linspace(0.1, 1.0, 10))</span>
+<span class="sd">        n_jobs: 학습곡선 병렬 처리 개수 (기본값: -1, 모든 CPU 사용)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame: 회귀 성능 평가 지표 + 과적합 판정 여부</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">score_df</span> <span class="o">=</span> <span class="n">get_scores</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+    <span class="n">cv_df</span> <span class="o">=</span> <span class="n">learning_cv</span><span class="p">(</span>
+        <span class="n">estimator</span><span class="p">,</span>
+        <span class="n">x_origin</span><span class="p">,</span>
+        <span class="n">y_origin</span><span class="p">,</span>
+        <span class="n">scoring</span><span class="o">=</span><span class="n">scoring</span><span class="p">,</span>
+        <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span>
+        <span class="n">train_sizes</span><span class="o">=</span><span class="n">train_sizes</span><span class="p">,</span>
+        <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">merge</span><span class="p">(</span><span class="n">score_df</span><span class="p">,</span> <span class="n">cv_df</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
