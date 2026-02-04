@@ -21,7 +21,7 @@ from .hs_stats import oneway_anova as hs_oneway_anova
 from .hs_reg import learning_cv as hs_learning_cv
 from .hs_reg import get_scores as hs_get_scores
 from .hs_reg import get_score_cv as hs_get_score_cv
-from .hs_reg import VIFSelector
+from .VIFSelector import VIFSelector
 
 # py-modules
 import sys
