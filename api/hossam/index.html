@@ -3576,7 +3576,13 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="normal">194</span>
 <span class="normal">195</span>
 <span class="normal">196</span>
-<span class="normal">197</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">learning_cv</span><span class="p">(</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">learning_cv</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">,</span>
     <span class="n">x</span><span class="p">,</span>
     <span class="n">y</span><span class="p">,</span>
@@ -3609,7 +3615,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
         <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span>
         <span class="n">scoring</span><span class="o">=</span><span class="n">scoring</span><span class="p">,</span>
         <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">,</span>
-        <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">random_state</span><span class="o">=</span><span class="mi">52</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -3655,8 +3661,14 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
     <span class="c1"># -----------------</span>
     <span class="c1"># 판정 로직</span>
     <span class="c1"># -----------------</span>
+    <span class="c1"># 마지막 두 지점 기울기</span>
+    <span class="n">train_slope</span> <span class="o">=</span> <span class="n">train_mean</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">train_mean</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">cv_slope</span> <span class="o">=</span> <span class="n">cv_mean</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">cv_mean</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+
     <span class="k">if</span> <span class="n">gap_ratio</span> <span class="o">&gt;=</span> <span class="mf">0.95</span> <span class="ow">and</span> <span class="n">final_cv</span> <span class="o">&gt;</span> <span class="n">some_threshold</span><span class="p">:</span>
         <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;⚠️ 과소적합 (bias 큼)&quot;</span>
+    <span class="k">elif</span> <span class="n">gap_ratio</span> <span class="o">&lt;=</span> <span class="mf">0.8</span> <span class="ow">and</span> <span class="n">train_slope</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">cv_slope</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;⚠️ 과대적합이나 데이터 추가 시 일반화 가능&quot;</span>
     <span class="k">elif</span> <span class="n">gap_ratio</span> <span class="o">&lt;=</span> <span class="mf">0.8</span><span class="p">:</span>
         <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;⚠️ 과대적합 (variance 큼)&quot;</span>
     <span class="k">elif</span> <span class="n">gap_ratio</span> <span class="o">&lt;=</span> <span class="mf">0.95</span> <span class="ow">and</span> <span class="n">var_ratio</span> <span class="o">&lt;=</span> <span class="mf">0.10</span><span class="p">:</span>
@@ -4103,13 +4115,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_reg.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">208</span>
 <span class="normal">209</span>
 <span class="normal">210</span>
 <span class="normal">211</span>
@@ -4154,7 +4160,13 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="normal">250</span>
 <span class="normal">251</span>
 <span class="normal">252</span>
-<span class="normal">253</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_score_cv</span><span class="p">(</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_score_cv</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">,</span>
     <span class="n">x_test</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">y_test</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -4354,13 +4366,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_reg.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span>
-<span class="normal">319</span>
-<span class="normal">320</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">320</span>
 <span class="normal">321</span>
 <span class="normal">322</span>
 <span class="normal">323</span>
@@ -4444,7 +4450,13 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="normal">401</span>
 <span class="normal">402</span>
 <span class="normal">403</span>
-<span class="normal">404</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_analysis</span><span class="p">(</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_analysis</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -4700,13 +4712,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_reg.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">411</span>
-<span class="normal">412</span>
-<span class="normal">413</span>
-<span class="normal">414</span>
-<span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">417</span>
 <span class="normal">418</span>
 <span class="normal">419</span>
 <span class="normal">420</span>
@@ -4793,7 +4799,13 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="normal">501</span>
 <span class="normal">502</span>
 <span class="normal">503</span>
-<span class="normal">504</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_dependence_analysis</span><span class="p">(</span>
+<span class="normal">504</span>
+<span class="normal">505</span>
+<span class="normal">506</span>
+<span class="normal">507</span>
+<span class="normal">508</span>
+<span class="normal">509</span>
+<span class="normal">510</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_dependence_analysis</span><span class="p">(</span>
     <span class="n">summary_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">shap_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
