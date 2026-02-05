@@ -166,6 +166,8 @@ def missing_values(data: DataFrame, *fields: str):
 def outlier_table(data: DataFrame, *fields: str):
     """데이터프레임의 사분위수와 이상치 경계값, 왜도를 구한다.
 
+    수업에서 사용된 hs_outlier_table() 함수를 개선한 버전    
+
     Tukey의 방법을 사용하여 각 숫자형 컬럼에 대한 사분위수(Q1, Q2, Q3)와
     이상치 판단을 위한 하한(DOWN)과 상한(UP) 경계값을 계산한다.
     함수 호출 전 상자그림을 통해 이상치가 확인된 필드에 대해서만 처리하는 것이 좋다.
@@ -887,6 +889,8 @@ def ttest_ind(
 ) -> DataFrame:
     """두 독립 집단의 평균 차이를 검정한다 (독립표본 t-검정 또는 Welch's t-test).
 
+    수업에서 사용한 hs_ttest_ind() 함수를 확장한 버전이다.
+
     독립표본 t-검정은 두 독립된 집단의 평균이 같은지를 검정한다.
     귀무가설(H0): μ1 = μ2 (두 집단의 평균이 같다)
 
@@ -1146,6 +1150,8 @@ def ttest_rel(x, y, normality: bool | None = None) -> DataFrame:
 #def oneway_anova(data: DataFrame, dv: str, between: str, alpha: float = 0.05) -> tuple[DataFrame, str, DataFrame | None, str]:
 def oneway_anova(data: DataFrame, dv: str, between: str, alpha: float = 0.05, posthoc: bool = False) -> DataFrame | tuple[DataFrame, DataFrame] :
     """일원분산분석(One-way ANOVA)을 일괄 처리한다.
+
+    수업에서 사용된 hs_oneway_anova() 함수를 개선한 버전    
 
     정규성 및 등분산성 검정을 자동으로 수행한 후,
     그 결과에 따라 적절한 ANOVA 방식을 선택하여 분산분석을 수행한다.

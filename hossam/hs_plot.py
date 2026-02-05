@@ -2774,6 +2774,8 @@ def visualize_silhouette(
     """
     군집분석 결과의 실루엣 플롯과 군집 산점도를 한 화면에 함께 시각화함.
 
+    수업에서 사용한 visualize_silhouette 함수와 동일한 기능을 수행함.
+
     Args:
         estimator (KMeans | AgglomerativeClustering): 학습된 KMeans 또는 AgglomerativeClustering 군집 모델 객체.
         data (DataFrame): 군집분석에 사용된 입력 데이터 (n_samples, n_features).

@@ -22,6 +22,8 @@ from .hs_reg import learning_cv as hs_learning_cv
 from .hs_reg import get_scores as hs_get_scores
 from .hs_reg import get_score_cv as hs_get_score_cv
 from .hs_reg import feature_importance as hs_feature_importance
+from .hs_reg import shap_analysis as hs_shap_analysis
+from .hs_reg import shap_dependence_analysis as hs_shap_dependence_analysis
 from .VIFSelector import VIFSelector
 
 # py-modules
@@ -62,6 +64,8 @@ __all__ = [
     "hs_get_scores",
     "hs_get_score_cv",
     "hs_feature_importance",
+    "hs_shap_analysis",
+    "hs_shap_dependence_analysis",
     "VIFSelector",
 ]
 
