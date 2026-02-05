@@ -392,7 +392,7 @@ def shap_analysis(
         shap.summary_plot(shap_values, x, show=False)
 
         fig = plt.gcf()
-        fig.set_size_inches(width / config.my_dpi, height / config.my_dpi)
+        fig.set_size_inches(width / config.dpi, height / config.dpi)
         ax = fig.get_axes()[0]
 
         plt.xlabel("SHAP value", fontsize=8)
@@ -491,7 +491,7 @@ def shap_dependence_analysis(
 
         # SHAP figure 직접 제어
         fig = plt.gcf()
-        fig.set_size_inches(width / config.my_dpi, height / config.my_dpi)
+        fig.set_size_inches(width / config.dpi, height / config.dpi)
         ax = fig.get_axes()[0]
 
         plt.xlabel(feature_name, fontsize=10)
