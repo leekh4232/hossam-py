@@ -4525,7 +4525,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
         <span class="n">shap</span><span class="o">.</span><span class="n">summary_plot</span><span class="p">(</span><span class="n">shap_values</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">my_dpi</span><span class="p">,</span> <span class="n">height</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">my_dpi</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">,</span> <span class="n">height</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">)</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_axes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;SHAP value&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
@@ -4876,7 +4876,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 
         <span class="c1"># SHAP figure 직접 제어</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">my_dpi</span><span class="p">,</span> <span class="n">height</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">my_dpi</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">,</span> <span class="n">height</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">)</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_axes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">feature_name</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
