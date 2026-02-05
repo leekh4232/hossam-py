@@ -96,7 +96,7 @@ def learning_cv(
         cv=cv,
         scoring=scoring,
         n_jobs=n_jobs,
-        shuffle=True,
+        shuffle=False,
         random_state=52,
     )
 
@@ -142,8 +142,14 @@ def learning_cv(
     # -----------------
     # 판정 로직
     # -----------------
+    # 마지막 두 지점 기울기
+    train_slope = train_mean[-1] - train_mean[-2]
+    cv_slope = cv_mean[-1] - cv_mean[-2]
+
     if gap_ratio >= 0.95 and final_cv > some_threshold:
         status = "⚠️ 과소적합 (bias 큼)"
+    elif gap_ratio <= 0.8 and train_slope > 0 and cv_slope < 0:
+        status = "⚠️ 과대적합이나 데이터 추가 시 일반화 가능"
     elif gap_ratio <= 0.8:
         status = "⚠️ 과대적합 (variance 큼)"
     elif gap_ratio <= 0.95 and var_ratio <= 0.10:
