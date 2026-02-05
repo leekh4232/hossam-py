@@ -21,15 +21,18 @@ keywords = ["data", "analysis", "helper", "hossam", "tensorflow"]
 dependencies = [
 	"tqdm",
 	"tabulate",
-	"pandas",
+    "numpy<1.28",
+	"pandas<2.2.0",
 	"matplotlib",
 	"seaborn",
 	"requests",
+    "bs4",
+    "lxml",
 	"openpyxl",
 	"xlrd",
 	"statsmodels",
 	"scipy",
-	"scikit-learn>=1.3,<1.4",
+	"scikit-learn",
 	"pingouin",
 	"statannotations",
 	"joblib",
@@ -42,9 +45,9 @@ dependencies = [
     "flask",
     "xgboost",
     "lightgbm",
-    "catboost",
     "kneed",
-    "shap"
+    "shap",
+    "anywidget"
 ]
 
 [project.urls]
