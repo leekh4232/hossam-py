@@ -147,17 +147,17 @@ def learning_cv(
     cv_slope = cv_mean[-1] - cv_mean[-2]
 
     if gap_ratio >= 0.95 and final_cv > some_threshold:
-        status = "⚠️ 과소적합 (bias 큼)"
+        status = "⚠️ 과소적합"
     elif gap_ratio <= 0.8 and train_slope > 0 and cv_slope < 0:
-        status = "⚠️ 과대적합이나 데이터 추가 시 일반화 가능"
+        status = "⚠️ 데이터 추가시 일반화 기대"
     elif gap_ratio <= 0.8:
-        status = "⚠️ 과대적합 (variance 큼)"
+        status = "⚠️ 과대적합"
     elif gap_ratio <= 0.95 and var_ratio <= 0.10:
         status = "✅ 일반화 양호"
     elif var_ratio > 0.15:
-        status = "⚠️ 데이터 부족 / 분산 큼"
+        status = "⚠️ 데이터 부족"
     else:
-        status = "⚠️ 판단 유보"
+        status = "⚠️ 판단유보"
 
     # -----------------
     # 정량 결과 표

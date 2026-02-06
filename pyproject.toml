@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hossam"
-version = "0.5.1"
+version = "0.5.2"
 description = "Hossam Data Helper"
 readme = "README.md"
-requires-python = ">=3.11.0,<=3.11.14"
+requires-python = ">=3.11.0"
 authors = [{ name = "Lee Kwang-Ho", email = "leekh4232@gmail.com" }]
 license = "MIT"
 classifiers = [
@@ -23,7 +23,7 @@ dependencies = [
     "tqdm",
     "tabulate",
     "numpy>=1.21,<1.27",
-    "pandas<2.2",
+    "pandas",
     "scipy>=1.6.1,<=1.11.4",
     "joblib",
     "scikit-learn<1.5",
