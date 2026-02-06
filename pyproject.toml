@@ -4,50 +4,71 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hossam"
-version = "0.4.24"
+version = "0.5"
 description = "Hossam Data Helper"
 readme = "README.md"
-requires-python = ">=3.11.0"
+requires-python = ">=3.11.0,<=3.11.14"
 authors = [{ name = "Lee Kwang-Ho", email = "leekh4232@gmail.com" }]
 license = "MIT"
 classifiers = [
-	"Development Status :: 3 - Alpha",
-	"Intended Audience :: Developers",
-	"Topic :: Software Development :: Libraries",
-	"Programming Language :: Python :: 3",
-	"Programming Language :: Python :: 3 :: Only",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
 ]
 keywords = ["data", "analysis", "helper", "hossam", "tensorflow"]
 dependencies = [
-	"tqdm",
-	"tabulate",
-    "numpy<1.28",
-	"pandas<2.2.0",
-	"matplotlib",
-	"seaborn",
-	"requests",
-    "bs4",
+    # Core
+    "tqdm",
+    "tabulate",
+    "numpy>=1.21,<1.27",
+    "pandas<2.2",
+    "scipy>=1.6.1,<=1.11.4",
+    "joblib>=1.4.2,<1.5",
+    "scikit-learn<1.5",
+    "statsmodels>=0.12.1",
+    "requests>=2.27.1",
+    "cloudpickle",
+    "psutil>=5.9.0",
+    "importlib_metadata>=4.12.0",
+    "deprecation>=2.1.0",
+    "xxhash",
+
+    # Visualization
+    "matplotlib<3.8.0",
+    "seaborn",
+    "plotly>=5.14.0",
+    "kaleido>=0.2.1",
+
+    # Data I/O
+    "openpyxl",
+    "xlrd",
     "lxml",
-	"openpyxl",
-	"xlrd",
-	"statsmodels",
-	"scipy",
-	"scikit-learn",
-	"pingouin",
-	"statannotations",
-	"joblib",
-	"geopandas",
-	"kmodes",
-    "pmdarima",
+    "bs4",
+
+    # ML / Statistics
+    "pingouin",
+    "statannotations",
+    "xgboost",
+    "lightgbm>=3.0.0",
+    "shap>=0.40",
+
+    # Time series (hossam 성격상 유지)
+    "pmdarima>=2.0.4",
     "prophet",
-    "plotly",
+
+    # Optional but PyCaret 친화
+    "imbalanced-learn>=0.12.0,<0.14.0",
+    "category-encoders>=2.4.0",
+    "yellowbrick>=1.4",
+
+    # 확장
+    "geopandas",
+    "kmodes",
     "jenkspy",
     "flask",
-    "xgboost",
-    "lightgbm",
-    "kneed",
-    "shap",
-    "anywidget"
+    "kneed"
 ]
 
 [project.urls]
