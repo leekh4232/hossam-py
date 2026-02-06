@@ -15,7 +15,7 @@ from sklearn.metrics import (
     mean_absolute_percentage_error,
 )
 
-from .hs_plot import create_figure, finalize_plot, barplot, config
+from .hs_plot import create_figure, finalize_plot, barplot, lineplot, config
 
 
 # --------------------------------------------------------
@@ -177,28 +177,26 @@ def learning_cv(
     # -----------------
     # 학습곡선 시각화
     # -----------------
-    fig, ax = create_figure()
+    def __callback(ax):
+        sb.lineplot(
+            x=train_sizes,
+            y=cv_mean,
+            marker="o",
+            linewidth=config.line_width,
+            markeredgecolor="#ffffff",
+            label="CV RMSE",
+        )
 
-    sb.lineplot(
-        x=train_sizes,
-        y=train_mean,
+        ax.set_xlabel("학습 데이터 비율", fontsize=config.font_size*0.9, labelpad=5)  # type : ignore
+        ax.set_ylabel("RMSE", fontsize=config.font_size*0.9, labelpad=5)  # type : ignore
+
+    lineplot(df=None, xname=train_sizes, yname=train_mean, 
         marker="o",
         markeredgecolor="#ffffff",
         label="Train RMSE",
+        title=f"{classname} 학습곡선 (Learning Curve)",
+        callback=__callback
     )
-    sb.lineplot(
-        x=train_sizes,
-        y=cv_mean,
-        marker="o",
-        markeredgecolor="#ffffff",
-        label="CV RMSE",
-    )
-
-    ax.set_xlabel("학습 데이터 비율", fontsize=8, labelpad=5)  # type : ignore
-    ax.set_ylabel("RMSE", fontsize=8, labelpad=5)  # type : ignore
-    ax.grid(True, alpha=0.3)  # type : ignore
-
-    finalize_plot(ax, title=f"{classname} 학습곡선 (Learning Curve)")
 
     return result_df
 
@@ -253,7 +251,8 @@ def get_score_cv(
         )
 
         result_df = concat(
-            [result_df, merge(score_df, cv_df, left_index=True, right_index=True)]
+            [result_df, merge(
+                score_df, cv_df, left_index=True, right_index=True)]
         )
 
     return result_df
@@ -265,7 +264,11 @@ def feature_importance(
     model,
     x_train: DataFrame,
     y_train: DataFrame | np.ndarray | Series,
+    threshold: float = 0.9,
     plot: bool = True,
+    width: int = config.width,
+    height: int = config.height,
+    dpi: int = config.dpi,
 ) -> DataFrame:
     perm = permutation_importance(
         estimator=model,
@@ -284,34 +287,93 @@ def feature_importance(
         model: 학습된 사이킷런 회귀 모델
         x_train: 학습용 설명변수 데이터 (DataFrame)
         y_train: 학습용 목표변수 값 (DataFrame, Series 또는 ndarray)
+        threshold: 누적 중요도 기준 (기본값: 0.9)
         plot: 중요도 시각화 여부 (기본값: True)
+        width: 플롯 너비 (기본값: config.width)
+        height: 플롯 높이 (기본값: config.height)
+        dpi: 플롯 해상도 (기본값: config.dpi)
 
     Returns:
         DataFrame: 특징 중요도 결과 표
     """
 
+    imp_df = permutation_importance(
+        estimator=model,
+        X=x_train,
+        y=y_train,
+        scoring="r2",
+        n_repeats=30,
+        random_state=42,
+        n_jobs=-1,
+    )
+
     # 결과 정리
-    perm_df = DataFrame(
+    imp_df = DataFrame(
         {
-            "importance_mean": perm.importances_mean,  # type: ignore
-            "importance_std": perm.importances_std,  # type: ignore
+            "importance_mean": imp_df.importances_mean,
+            "importance_std": imp_df.importances_std,
         },
         index=x_train.columns,
-    ).sort_values("importance_mean", ascending=False)
+    )
 
-    perm_df["importance_cumsum"] = perm_df["importance_mean"].cumsum()
+    # 중요도 비율
+    imp_df["importance_ratio"] = (
+        imp_df["importance_mean"] / imp_df["importance_mean"].sum()
+    )
 
+    imp_df.sort_values("importance_ratio", ascending=False, inplace=True)
+
+    # 누적 중요도 계산
+    imp_df["importance_cumsum"] = imp_df["importance_ratio"].cumsum()
+
+    # ----------------------------------
     # 시각화
+    # ----------------------------------
     if plot:
+        df = imp_df.sort_values(by="importance_ratio", ascending=False)
+
+        def __callback(ax):
+            # 값 라벨 추가
+            for i, v in enumerate(imp_df["importance_mean"]):
+                ax.text(
+                    v + 0.005,          # 막대 끝에서 약간 오른쪽
+                    i,                  # y 위치
+                    # 표시 형식
+                    f"{v*100:.1f}% ({imp_df.iloc[i]['importance_cumsum']*100:.1f}%)",
+                    va="center",
+                    fontsize=6
+                )
+
+            ax.set_xlabel("Permutation Importance (mean)")
+            ax.set_xlim(0, imp_df["importance_mean"].max() * 1.2)
+
+            # 90% 처음 도달하는 인덱스 (0-based)
+            cut_idx = np.argmax(imp_df["importance_cumsum"].values >= threshold)    # type: ignore
+
+            # x축은 rank 기준이므로 +1
+            cut_rank = (int(cut_idx) + 1) - 0.5
+
+            # 90% 도달 지점 수직선 (핵심)
+            plt.axhline(
+                y=cut_rank,
+                linestyle=":",
+                color="red",
+                alpha=0.9,
+                linewidth=0.7
+            )
+
         barplot(
-            df=perm_df,
-            xname="importance_mean",
-            yname=perm_df.index,
-            title="Permutation Importance",
-            callback=lambda ax: ax.set_xlabel("Permutation Importance (mean)"),
+            df, 
+            xname="importance_mean", 
+            yname=df.index, 
+            width=width, 
+            height=height, 
+            dpi=dpi, 
+            title=f"Feature Importance (Cumulative {threshold*100:.0f}% at rank {cut_idx + 1})", 
+            callback=__callback
         )
 
-    return perm_df
+    return imp_df
 
 
 # --------------------------------------------------------
@@ -369,7 +431,8 @@ def shap_analysis(
     )
 
     # 6. 변동성 지표
-    summary_df["cv"] = summary_df["std_shap"] / (summary_df["mean_abs_shap"] + 1e-9)
+    summary_df["cv"] = summary_df["std_shap"] / \
+        (summary_df["mean_abs_shap"] + 1e-9)
 
     summary_df["variability"] = np.where(
         summary_df["cv"] < 1,
@@ -384,7 +447,8 @@ def shap_analysis(
 
     # 8. 중요 변수 표시 (누적 80%)
     total_importance = summary_df["mean_abs_shap"].sum()
-    summary_df["importance_ratio"] = summary_df["mean_abs_shap"] / total_importance
+    summary_df["importance_ratio"] = summary_df["mean_abs_shap"] / \
+        total_importance
     summary_df["importance_cumsum"] = summary_df["importance_ratio"].cumsum()
 
     summary_df["is_important"] = np.where(
@@ -405,7 +469,7 @@ def shap_analysis(
         plt.xticks(fontsize=6)
         plt.yticks(fontsize=8)
 
-        finalize_plot(ax, title="SHAP Summary Plot")
+        finalize_plot(ax, outparams=True,title="SHAP Summary Plot")
 
     return summary_df, shap_values
 
@@ -505,6 +569,8 @@ def shap_dependence_analysis(
         plt.xticks(fontsize=6)
         plt.yticks(fontsize=8)
 
-        finalize_plot(ax, title=f"SHAP Dependence Plot: {feature_name} vs {interaction_name}")
+        finalize_plot(
+            ax, outparams=True, 
+            title=f"SHAP Dependence Plot: {feature_name} vs {interaction_name}")
 
     return pairs

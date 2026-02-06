@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hossam"
-version = "0.5"
+version = "0.5.1"
 description = "Hossam Data Helper"
 readme = "README.md"
 requires-python = ">=3.11.0,<=3.11.14"
@@ -25,7 +25,7 @@ dependencies = [
     "numpy>=1.21,<1.27",
     "pandas<2.2",
     "scipy>=1.6.1,<=1.11.4",
-    "joblib>=1.4.2,<1.5",
+    "joblib",
     "scikit-learn<1.5",
     "statsmodels>=0.12.1",
     "requests>=2.27.1",
@@ -52,9 +52,10 @@ dependencies = [
     "statannotations",
     "xgboost",
     "lightgbm>=3.0.0",
+    "catboost",
     "shap>=0.40",
 
-    # Time series (hossam 성격상 유지)
+    # Time series
     "pmdarima>=2.0.4",
     "prophet",
 

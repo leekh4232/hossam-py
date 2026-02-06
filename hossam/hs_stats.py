@@ -2735,7 +2735,7 @@ def ols_tests(fit: RegressionResultsWrapper, alpha: float = 0.05, plot: bool = F
         fig, ax = get_default_ax(rows=1, cols=2, title=title)
         ols_qqplot(fit, ax=ax[0])
         ols_residplot(fit, lowess=True, mse=True, ax=ax[1])
-        finalize_plot(ax)
+        finalize_plot(ax, outparams=True)
 
 
 # ===================================================================

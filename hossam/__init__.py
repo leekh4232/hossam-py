@@ -30,6 +30,7 @@ from .VIFSelector import VIFSelector
 import sys
 import warnings
 import pandas as pd
+import seaborn as sb
 from matplotlib import pyplot as plt
 from matplotlib import font_manager as fm
 from importlib.resources import files, as_file
@@ -67,6 +68,7 @@ __all__ = [
     "hs_shap_analysis",
     "hs_shap_dependence_analysis",
     "VIFSelector",
+    "init_pyplot"
 ]
 
 
@@ -91,16 +93,34 @@ def check_pypi_latest(package_name: str):
     }
 
 
-def _init_korean_font():
-    """
-    패키지에 포함된 한글 폰트를 기본 폰트로 설정합니다.
-    """
+def init_pyplot():
+    # 각 열의 넓이 제한 없음
+    pd.set_option("display.max_colwidth", None)
+    # 출력 너비 제한 없음 (가로 스크롤될 수 있음)
+    pd.set_option("display.width", None)
+    # 컬럼 생략 금지
+    pd.set_option("display.max_columns", None)
+    # 행 최대 출력 수 100개로 수정
+    pd.set_option("display.max_rows", 100)
+    # 소수점 자리수 3자리로 설정
+    pd.options.display.float_format = "{:.3f}".format
+
+    # matplotlib 기본값으로 복원
+    plt.rcParams.update(plt.rcParamsDefault)    # type: ignore
+
+    # seaborn 스타일 제거
+    sb.reset_defaults()
+    sb.reset_orig()
+
+    # 현재 figure에도 반영
+    plt.rcdefaults()
+
     font_file = "NotoSansKR-Regular.ttf"
     try:
         # 패키지 리소스에서 폰트 파일 경로 확보
         with as_file(files("hossam") / font_file) as font_path:
             fm.fontManager.addfont(str(font_path))
-            fprop = fm.FontProperties(fname=str(font_path))
+            fprop = fm.FontProperties(fname=str(font_path)) # type: ignore
             fname = fprop.get_name()
 
             plt.rcParams.update(
@@ -115,9 +135,7 @@ def _init_korean_font():
                     "figure.dpi": hs_plot.config.dpi,
                     "savefig.dpi": hs_plot.config.dpi * 2,
                     "text.hinting": "auto",
-                    "text.hinting_factor": 8,
-                    "pdf.fonttype": 42,
-                    "ps.fonttype": 42,
+                    "text.hinting_factor": 8
                 }
             )
 
@@ -127,6 +145,21 @@ def _init_korean_font():
             return
     except Exception as e:
         warnings.warn(f"\n한글 폰트 초기화: 패키지 폰트 사용 실패 ({e}).")
+
+    from IPython.display import display, HTML
+
+    display(
+        HTML(
+            """
+            <style>      
+            .dataframe tr:hover {
+                background-color: #ffff99 !important;
+                border: 1px solid #ffcc00;
+            }
+            </style>
+            """
+            )
+        )
 
 
 def _init():
@@ -157,33 +190,7 @@ def _init():
 
         raise Warning("hossam 패키지가 최신 버전이 아닙니다.")
 
-    _init_korean_font()
-
-    # 각 열의 넓이 제한 없음
-    pd.set_option("display.max_colwidth", None)
-    # 출력 너비 제한 없음 (가로 스크롤될 수 있음)
-    pd.set_option("display.width", None)
-    # 컬럼 생략 금지
-    pd.set_option("display.max_columns", None)
-    # 행 최대 출력 수 100개로 수정
-    pd.set_option("display.max_rows", 100)
-    # 소수점 자리수 3자리로 설정
-    pd.options.display.float_format = "{:.3f}".format
-
-    from IPython.display import display, HTML
-
-    display(
-        HTML(
-            """
-    <style>      
-    .dataframe tr:hover {
-        background-color: #ffff99 !important;
-        border: 1px solid #ffcc00;
-    }
-    </style>
-    """
-        )
-    )
+    init_pyplot()
 
 import multiprocessing as mp
 

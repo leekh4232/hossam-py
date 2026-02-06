@@ -43,14 +43,14 @@ from .hs_util import is_2d
 # ===================================================================
 config = SimpleNamespace(
     dpi=200,
-    width=600,
-    height=350,
-    font_size=7,
+    width=1280,
+    height=640,
+    font_size=14,
     font_weight="normal",
-    frame_width=0.5,
-    line_width=1,
+    frame_width=0.7,
+    line_width=2.5,
     grid_alpha=0.3,
-    grid_width=0.5,
+    grid_width=0.7,
     fill_alpha=0.3,
 )
 
@@ -86,6 +86,7 @@ def get_default_ax(
         tuple[Figure, Axes]: 생성된 matplotlib Figure와 Axes 객체.
     """
     figsize = (width * cols / 100, height * rows / 100)
+    #print(f"📐 Figure 크기: {figsize[0]:.2f} x {figsize[1]:.2f} 인치 (DPI: {dpi})")
     fig, ax = plt.subplots(rows, cols, figsize=figsize, dpi=dpi)
 
     # ax가 배열 (subplots)인지 단일 Axes인지 확인
@@ -95,7 +96,7 @@ def get_default_ax(
         fig.subplots_adjust(wspace=ws, hspace=hs)
 
     if title and is_array:
-        fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight="bold")
+        fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight="bold", pad=15)
 
     if flatten == True:
         # 단일 Axes인 경우 리스트로 변환
@@ -107,11 +108,11 @@ def get_default_ax(
     # 테두리 굵기 설정
     if flatten and isinstance(ax, list):
         for a in ax:
-            for spine in a.spines.values():
+            for spine in a.spines.values(): # type: ignore
                 spine.set_linewidth(config.frame_width)
     elif isinstance(ax, np.ndarray):
         for a in ax.flat:
-            for spine in a.spines.values():
+            for spine in a.spines.values(): # type: ignore
                 spine.set_linewidth(config.frame_width)
     else:
         for spine in ax.spines.values():  # type: ignore
@@ -199,7 +200,7 @@ def finalize_plot(
     plt.tight_layout()
 
     if title and not is_array:
-        ax.set_title(title, fontsize=config.font_size * 1.3, pad=7, fontweight="bold")
+        ax.set_title(title, fontsize=config.font_size * 1.5, pad=15, fontweight="bold")
 
     if save_path is not None:
         plt.savefig(save_path, dpi=config.dpi * 2, bbox_inches="tight")
@@ -2431,9 +2432,9 @@ def radarplot(
 
     # 제목
     if hue is not None:
-        ax.set_title(f"Radar Chart by {hue}", pad=20)
+        title = title if title else f"Radar Chart by {hue}"
     else:
-        ax.set_title("Radar Chart", pad=20)
+        title = title if title else "Radar Chart"
 
     finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 

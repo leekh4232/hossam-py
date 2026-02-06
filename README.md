@@ -26,10 +26,10 @@ title: 🎓 Hossam Data Helper
 ## 📦 설치
 
 ```bash
-pip install --upgrade hossam
+pip install hossam --upgrade-strategy eager
 ```
 
-**요구사항**: Python 3.13.9 이상
+**요구사항**: Python 3.11.9
 
 ## 📚 전체 문서
 
