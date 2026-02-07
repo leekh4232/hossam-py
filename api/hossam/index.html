@@ -1471,7 +1471,6 @@
     <span class="n">width</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
     <span class="n">height</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
     <span class="n">linewidth</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">line_width</span><span class="p">,</span>
-    <span class="n">dpi</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">,</span>
     <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -1655,22 +1654,6 @@
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>dpi</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>플롯 해상도(DPI).</p>
-              </div>
-            </td>
-            <td>
-                  <code><span title="hossam.hs_plot.config.dpi">dpi</span></code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
                 <code>save_path</code>
             </td>
             <td>
@@ -1722,72 +1705,68 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2761</span>
-<span class="normal">2762</span>
-<span class="normal">2763</span>
-<span class="normal">2764</span>
-<span class="normal">2765</span>
-<span class="normal">2766</span>
-<span class="normal">2767</span>
-<span class="normal">2768</span>
-<span class="normal">2769</span>
-<span class="normal">2770</span>
-<span class="normal">2771</span>
-<span class="normal">2772</span>
-<span class="normal">2773</span>
-<span class="normal">2774</span>
-<span class="normal">2775</span>
-<span class="normal">2776</span>
-<span class="normal">2777</span>
-<span class="normal">2778</span>
-<span class="normal">2779</span>
-<span class="normal">2780</span>
-<span class="normal">2781</span>
-<span class="normal">2782</span>
-<span class="normal">2783</span>
-<span class="normal">2784</span>
-<span class="normal">2785</span>
-<span class="normal">2786</span>
-<span class="normal">2787</span>
-<span class="normal">2788</span>
-<span class="normal">2789</span>
-<span class="normal">2790</span>
-<span class="normal">2791</span>
-<span class="normal">2792</span>
-<span class="normal">2793</span>
-<span class="normal">2794</span>
-<span class="normal">2795</span>
-<span class="normal">2796</span>
-<span class="normal">2797</span>
-<span class="normal">2798</span>
-<span class="normal">2799</span>
-<span class="normal">2800</span>
-<span class="normal">2801</span>
-<span class="normal">2802</span>
-<span class="normal">2803</span>
-<span class="normal">2804</span>
-<span class="normal">2805</span>
-<span class="normal">2806</span>
-<span class="normal">2807</span>
-<span class="normal">2808</span>
-<span class="normal">2809</span>
-<span class="normal">2810</span>
-<span class="normal">2811</span>
-<span class="normal">2812</span>
-<span class="normal">2813</span>
-<span class="normal">2814</span>
-<span class="normal">2815</span>
-<span class="normal">2816</span>
-<span class="normal">2817</span>
-<span class="normal">2818</span>
-<span class="normal">2819</span>
-<span class="normal">2820</span>
-<span class="normal">2821</span>
-<span class="normal">2822</span>
-<span class="normal">2823</span>
-<span class="normal">2824</span>
-<span class="normal">2825</span>
-<span class="normal">2826</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">visualize_silhouette</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2700</span>
+<span class="normal">2701</span>
+<span class="normal">2702</span>
+<span class="normal">2703</span>
+<span class="normal">2704</span>
+<span class="normal">2705</span>
+<span class="normal">2706</span>
+<span class="normal">2707</span>
+<span class="normal">2708</span>
+<span class="normal">2709</span>
+<span class="normal">2710</span>
+<span class="normal">2711</span>
+<span class="normal">2712</span>
+<span class="normal">2713</span>
+<span class="normal">2714</span>
+<span class="normal">2715</span>
+<span class="normal">2716</span>
+<span class="normal">2717</span>
+<span class="normal">2718</span>
+<span class="normal">2719</span>
+<span class="normal">2720</span>
+<span class="normal">2721</span>
+<span class="normal">2722</span>
+<span class="normal">2723</span>
+<span class="normal">2724</span>
+<span class="normal">2725</span>
+<span class="normal">2726</span>
+<span class="normal">2727</span>
+<span class="normal">2728</span>
+<span class="normal">2729</span>
+<span class="normal">2730</span>
+<span class="normal">2731</span>
+<span class="normal">2732</span>
+<span class="normal">2733</span>
+<span class="normal">2734</span>
+<span class="normal">2735</span>
+<span class="normal">2736</span>
+<span class="normal">2737</span>
+<span class="normal">2738</span>
+<span class="normal">2739</span>
+<span class="normal">2740</span>
+<span class="normal">2741</span>
+<span class="normal">2742</span>
+<span class="normal">2743</span>
+<span class="normal">2744</span>
+<span class="normal">2745</span>
+<span class="normal">2746</span>
+<span class="normal">2747</span>
+<span class="normal">2748</span>
+<span class="normal">2749</span>
+<span class="normal">2750</span>
+<span class="normal">2751</span>
+<span class="normal">2752</span>
+<span class="normal">2753</span>
+<span class="normal">2754</span>
+<span class="normal">2755</span>
+<span class="normal">2756</span>
+<span class="normal">2757</span>
+<span class="normal">2758</span>
+<span class="normal">2759</span>
+<span class="normal">2760</span>
+<span class="normal">2761</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">visualize_silhouette</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span> <span class="o">|</span> <span class="n">AgglomerativeClustering</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1798,7 +1777,6 @@
     <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
     <span class="n">linewidth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">line_width</span><span class="p">,</span>
-    <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">,</span>
     <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1817,7 +1795,6 @@
 <span class="sd">        width (int, optional): 플롯 가로 크기 (inch 단위).</span>
 <span class="sd">        height (int, optional): 플롯 세로 크기 (inch 단위).</span>
 <span class="sd">        linewidth (float, optional): 기준선 등 선 두께.</span>
-<span class="sd">        dpi (int, optional): 플롯 해상도(DPI).</span>
 <span class="sd">        save_path (str, optional): 저장 경로 지정 시 파일로 저장.</span>
 
 <span class="sd">    Returns:</span>
@@ -1827,16 +1804,15 @@
 <span class="sd">        - 실루엣 플롯(왼쪽)과 2차원 군집 산점도(오른쪽)를 동시에 확인 가능</span>
 <span class="sd">        - 군집 품질과 분포를 한눈에 비교·분석할 때 유용</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">get_default_ax</span><span class="p">(</span><span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">get_default_ax</span><span class="p">(</span><span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
 
     <span class="n">silhouette_plot</span><span class="p">(</span>
         <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span>
         <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>  <span class="c1"># type: ignore</span>
         <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
-        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
-        <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">height</span>
     <span class="p">)</span>
 
     <span class="n">cluster_plot</span><span class="p">(</span>
@@ -1844,12 +1820,11 @@
         <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
         <span class="n">xname</span><span class="o">=</span><span class="n">xname</span><span class="p">,</span>
         <span class="n">yname</span><span class="o">=</span><span class="n">yname</span><span class="p">,</span>
-        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>  <span class="c1"># type: ignore</span>
         <span class="n">outline</span><span class="o">=</span><span class="n">outline</span><span class="p">,</span>
         <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
-        <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
-        <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">height</span>
     <span class="p">)</span>
 
     <span class="n">finalize_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
@@ -3862,7 +3837,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="normal">57</span>
 <span class="normal">58</span>
 <span class="normal">59</span>
-<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_scores</span><span class="p">(</span>
+<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">scores</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">,</span> <span class="n">x_test</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">y_test</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -4163,7 +4138,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="normal">255</span>
 <span class="normal">256</span>
 <span class="normal">257</span>
-<span class="normal">258</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_score_cv</span><span class="p">(</span>
+<span class="normal">258</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">score_cv</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">,</span>
     <span class="n">x_test</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">y_test</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -4199,7 +4174,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
     <span class="n">result_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
 
     <span class="k">for</span> <span class="n">est</span> <span class="ow">in</span> <span class="n">estimator</span><span class="p">:</span>
-        <span class="n">score_df</span> <span class="o">=</span> <span class="n">get_scores</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+        <span class="n">score_df</span> <span class="o">=</span> <span class="n">scores</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
         <span class="n">cv_df</span> <span class="o">=</span> <span class="n">learning_cv</span><span class="p">(</span>
             <span class="n">est</span><span class="p">,</span>
             <span class="n">x_origin</span><span class="p">,</span>
@@ -4364,7 +4339,10 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_reg.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">382</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
 <span class="normal">383</span>
 <span class="normal">384</span>
 <span class="normal">385</span>
@@ -4453,10 +4431,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="normal">468</span>
 <span class="normal">469</span>
 <span class="normal">470</span>
-<span class="normal">471</span>
-<span class="normal">472</span>
-<span class="normal">473</span>
-<span class="normal">474</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_analysis</span><span class="p">(</span>
+<span class="normal">471</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_analysis</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -4542,11 +4517,11 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
         <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">,</span> <span class="n">height</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">)</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_axes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;SHAP value&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;SHAP value&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">label_font_size</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">font_size</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">font_size</span><span class="p">)</span>
 
-        <span class="n">finalize_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">outparams</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;SHAP Summary Plot&quot;</span><span class="p">)</span>
+        <span class="n">finalize_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">outparams</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;SHAP Summary Plot&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">summary_df</span><span class="p">,</span> <span class="n">shap_values</span>
 </code></pre></div></td></tr></table></div>
@@ -4714,7 +4689,10 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_reg.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">481</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">478</span>
+<span class="normal">479</span>
+<span class="normal">480</span>
+<span class="normal">481</span>
 <span class="normal">482</span>
 <span class="normal">483</span>
 <span class="normal">484</span>
@@ -4806,10 +4784,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="normal">570</span>
 <span class="normal">571</span>
 <span class="normal">572</span>
-<span class="normal">573</span>
-<span class="normal">574</span>
-<span class="normal">575</span>
-<span class="normal">576</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_dependence_analysis</span><span class="p">(</span>
+<span class="normal">573</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_dependence_analysis</span><span class="p">(</span>
     <span class="n">summary_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">shap_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
@@ -4895,10 +4870,10 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
         <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">,</span> <span class="n">height</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">)</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_axes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">feature_name</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SHAP value for </span><span class="si">{</span><span class="n">feature_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">feature_name</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">label_font_size</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SHAP value for </span><span class="si">{</span><span class="n">feature_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">label_font_size</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">font_size</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">font_size</span><span class="p">)</span>
 
         <span class="n">finalize_plot</span><span class="p">(</span>
             <span class="n">ax</span><span class="p">,</span> <span class="n">outparams</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
