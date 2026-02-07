@@ -489,8 +489,8 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
     )
 
     axes[plot_idx].set_title("조별 인원 분포", fontsize=config.title_font_size, fontweight='bold', pad=config.title_pad)  # type: ignore
-    axes[plot_idx].set_xlabel("조")  # type: ignore
-    axes[plot_idx].set_ylabel("인원")  # type: ignore
+    axes[plot_idx].set_xlabel("조", fontsize=config.label_font_size)  # type: ignore
+    axes[plot_idx].set_ylabel("인원", fontsize=config.label_font_size)  # type: ignore
     for i, v in enumerate(group_sizes.values):
         axes[plot_idx].text(i, v + 0.1, str(int(v)), ha='center', fontsize=config.font_size)  # type: ignore
     plot_idx += 1

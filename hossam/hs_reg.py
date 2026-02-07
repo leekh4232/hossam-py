@@ -6,6 +6,9 @@ from pandas import DataFrame, Series, merge, concat
 from matplotlib import pyplot as plt
 from sklearn.inspection import permutation_importance
 from sklearn.model_selection import learning_curve
+from xgboost import XGBRegressor
+from lightgbm import LGBMRegressor
+from catboost import CatBoostRegressor
 
 # 성능 평가 지표 모듈
 from sklearn.metrics import (
@@ -187,8 +190,8 @@ def learning_cv(
             label="CV RMSE",
         )
 
-        ax.set_xlabel("학습 데이터 비율", fontsize=config.font_size*0.9, labelpad=5)  # type : ignore
-        ax.set_ylabel("RMSE", fontsize=config.font_size*0.9, labelpad=5)  # type : ignore
+        ax.set_xlabel("학습 데이터 비율", fontsize=config.label_font_size)  # type : ignore
+        ax.set_ylabel("RMSE", fontsize=config.label_font_size)  # type : ignore
 
     lineplot(df=None, xname=train_sizes, yname=train_mean, 
         marker="o",
@@ -267,17 +270,7 @@ def feature_importance(
     threshold: float = 0.9,
     plot: bool = True,
     width: int = config.width,
-    height: int = config.height,
 ) -> DataFrame:
-    perm = permutation_importance(
-        estimator=model,
-        X=x_train,
-        y=y_train,
-        scoring="r2",
-        n_repeats=30,
-        random_state=42,
-        n_jobs=-1,
-    )
     """
     특징 중요도 분석 함수.    
     수업에서 사용된 hs_feature_importance 함수와 동일.
@@ -289,84 +282,86 @@ def feature_importance(
         threshold: 누적 중요도 기준 (기본값: 0.9)
         plot: 중요도 시각화 여부 (기본값: True)
         width: 플롯 너비 (기본값: config.width)
-        height: 플롯 높이 (기본값: config.height)
 
     Returns:
         DataFrame: 특징 중요도 결과 표
     """
+    if isinstance(model, XGBRegressor):          # type: ignore
+        booster = model.get_booster()           # type: ignore
+        imp = booster.get_score(importance_type="gain")
+        imp_sr = Series(imp)
+        imp_df = DataFrame(imp_sr, columns=['importance'])
+    elif isinstance(model, LGBMRegressor):
+        booster = model.booster_
+        imp = booster.feature_importance(importance_type="gain")
+        imp_df = DataFrame({"importance": imp}, index=model.feature_name_)
+    elif isinstance(model, CatBoostRegressor):
+        imp = model.get_feature_importance(type="FeatureImportance")
+        imp_df = DataFrame({"importance": imp}, index=model.feature_names_)
+    else:
+        imp_df = permutation_importance(
+            estimator=model,
+            X=x_train,
+            y=y_train,
+            scoring="r2",
+            n_repeats=30,
+            random_state=42,
+            n_jobs=-1,
+        )
 
-    imp_df = permutation_importance(
-        estimator=model,
-        X=x_train,
-        y=y_train,
-        scoring="r2",
-        n_repeats=30,
-        random_state=42,
-        n_jobs=-1,
-    )
+        # 결과 정리
+        imp_df = DataFrame({"importance": imp_df.importances_mean}, index=x_train.columns)
 
-    # 결과 정리
-    imp_df = DataFrame(
-        {
-            "importance_mean": imp_df.importances_mean, # type: ignore
-            "importance_std": imp_df.importances_std,   # type: ignore
-        },
-        index=x_train.columns,
-    )
-
-    # 중요도 비율
-    imp_df["importance_ratio"] = (
-        imp_df["importance_mean"] / imp_df["importance_mean"].sum()
-    )
-
-    imp_df.sort_values("importance_ratio", ascending=False, inplace=True)
-
-    # 누적 중요도 계산
-    imp_df["importance_cumsum"] = imp_df["importance_ratio"].cumsum()
+    #----------------------------------
+    # 중요도 비율 + 누적 중요도 계산
+    #----------------------------------
+    imp_df["ratio"] = imp_df["importance"] / imp_df["importance"].sum()
+    imp_df.sort_values("ratio", ascending=False, inplace=True)
+    imp_df["cumsum"] = imp_df["ratio"].cumsum()
 
     # ----------------------------------
     # 시각화
     # ----------------------------------
     if plot:
-        df = imp_df.sort_values(by="importance_ratio", ascending=False)
+        df = imp_df.sort_values(by="ratio", ascending=False)
 
         # 90% 처음 도달하는 인덱스 (0-based)
-        cut_idx = np.argmax(imp_df["importance_cumsum"].values >= threshold)    # type: ignore
+        cut_idx = np.argmax(imp_df["cumsum"].values >= threshold)    # type: ignore
 
         # x축은 rank 기준이므로 +1
         cut_rank = (int(cut_idx) + 1) - 0.5
 
         def __callback(ax):
             # 값 라벨 추가
-            for i, v in enumerate(imp_df["importance_mean"]):
+            for i, v in enumerate(imp_df["importance"]):
                 ax.text(
                     v + 0.005,          # 막대 끝에서 약간 오른쪽
                     i,                  # y 위치
                     # 표시 형식
-                    f"{v*100:.1f}% ({imp_df.iloc[i]['importance_cumsum']*100:.1f}%)",
+                    f"{v:.1f} ({imp_df.iloc[i]['cumsum']*100:.1f}%)",
                     va="center",
-                    fontsize=config.text_size
+                    fontsize=config.text_font_size
                 )
 
-            ax.set_xlabel("Permutation Importance (mean)")
-            ax.set_xlim(0, imp_df["importance_mean"].max() * 1.2)
+            ax.set_xlabel("importance(cumsum)", fontsize=config.label_font_size)
+            ax.set_xlim(0, imp_df["importance"].max() * 1.2)
+            ax.set_ylabel(None)
 
             # 90% 도달 지점 수직선 (핵심)
             plt.axhline(
                 y=cut_rank,
                 linestyle=":",
                 color="red",
-                alpha=0.9,
-                linewidth=0.7
+                alpha=0.8
             )
 
         barplot(
             df, 
-            xname="importance_mean", 
+            xname="importance", 
             yname=df.index, 
             width=width, 
-            height=height, 
-            title=f"Feature Importance (Cumulative {threshold*100:.0f}% at rank {cut_idx + 1})",    # type: ignore
+            height=len(df) * 60, 
+            title=f"Feature Importance",    # type: ignore
             callback=__callback
         )
 
@@ -459,7 +454,8 @@ def shap_analysis(
         shap.summary_plot(shap_values, x, show=False)
 
         fig = plt.gcf()
-        fig.set_size_inches(width / config.dpi, height / config.dpi)
+        fig.set_size_inches(width / 100, len(summary_df) * 50 / 100)
+        fig.set_dpi(config.dpi)
         ax = fig.get_axes()[0]
 
         plt.xlabel("SHAP value", fontsize=config.label_font_size)
@@ -558,7 +554,8 @@ def shap_dependence_analysis(
 
         # SHAP figure 직접 제어
         fig = plt.gcf()
-        fig.set_size_inches(width / config.dpi, height / config.dpi)
+        fig.set_size_inches(width / 100, height / 100)
+        fig.set_dpi(config.dpi)
         ax = fig.get_axes()[0]
 
         plt.xlabel(feature_name, fontsize=config.label_font_size)

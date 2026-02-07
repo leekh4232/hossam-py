@@ -128,12 +128,21 @@ def init_pyplot():
                     "font.family": fname,
                     "font.size": hs_plot.config.font_size,
                     "font.weight": hs_plot.config.font_weight,
+                    #"text.fontsize": hs_plot.config.text_font_size,
+                    "xtick.labelsize": hs_plot.config.font_size,
+                    "ytick.labelsize": hs_plot.config.font_size,
+                    "legend.fontsize": hs_plot.config.font_size,
+                    "legend.title_fontsize": hs_plot.config.font_size,
+                    "axes.titlesize": hs_plot.config.title_font_size,
+                    "axes.titlepad": hs_plot.config.title_pad,
+                    "figure.titlesize": hs_plot.config.title_font_size,
+                    "axes.labelsize": hs_plot.config.label_font_size,
                     "axes.unicode_minus": False,
                     "text.antialiased": True,
                     "lines.antialiased": True,
                     "patch.antialiased": True,
                     "figure.dpi": hs_plot.config.dpi,
-                    "savefig.dpi": hs_plot.config.dpi * 2,
+                    "savefig.dpi": hs_plot.config.dpi,
                     "text.hinting": "auto",
                     "text.hinting_factor": 8
                 }
@@ -144,7 +153,7 @@ def init_pyplot():
             )
             return
     except Exception as e:
-        warnings.warn(f"\n한글 폰트 초기화: 패키지 폰트 사용 실패 ({e}).")
+        raise Warning(f"\n한글 폰트 초기화: 패키지 폰트 사용 실패 ({e}).")
 
     from IPython.display import display, HTML   # type: ignore
 

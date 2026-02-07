@@ -41,23 +41,37 @@ from sklearn.metrics import (
 from .hs_util import is_2d
 
 # ===================================================================
+DEFAULT_DPI = 200
+
 config = SimpleNamespace(
-    dpi=200,
+    dpi=DEFAULT_DPI,
     width=1200,
     height=640,
-    font_size=7,
-    text_size=6,
-    title_font_size=16,
-    title_pad=12,
-    label_font_size=12,
+    font_size=10,
+    text_font_size=8,
+    title_font_size=18,
+    title_pad=15,
+    label_font_size=14,
     font_weight="normal",
     frame_width=0.7,
-    line_width=2,
+    line_width=3,
     grid_alpha=0.3,
     grid_width=0.7,
     fill_alpha=0.3,
 )
 
+if DEFAULT_DPI > 200:
+    config.font_size = config.font_size * (DEFAULT_DPI * 0.0011 + 0.7)
+    config.text_font_size = config.text_font_size * (DEFAULT_DPI * 0.0011 + 0.7)
+    config.title_font_size = config.title_font_size * (DEFAULT_DPI * 0.0011 + 0.7)
+    config.title_pad = config.title_pad * (DEFAULT_DPI * 0.0011 + 0.7)
+    config.label_font_size = config.label_font_size * (DEFAULT_DPI * 0.0011 + 0.7)
+elif DEFAULT_DPI > 100:
+    config.font_size = config.font_size * (DEFAULT_DPI * 0.0012 + 0.75)
+    config.text_font_size = config.text_font_size * (DEFAULT_DPI * 0.0012 + 0.75)
+    config.title_font_size = config.title_font_size * (DEFAULT_DPI * 0.0012 + 0.75)
+    config.title_pad = config.title_pad * (DEFAULT_DPI * 0.0012 + 0.75)
+    config.label_font_size = config.label_font_size * (DEFAULT_DPI * 0.0012 + 0.75)
 
 # ===================================================================
 # 기본 크기가 설정된 Figure와 Axes를 생성한다
@@ -2494,9 +2508,9 @@ def distribution_plot(
 
             if save_path:
                 plt.savefig(save_path, bbox_inches="tight")
-                plt.close()
-            else:
-                plt.show()
+
+            plt.show()
+            plt.close()
 
 
 def silhouette_plot(
@@ -2570,8 +2584,8 @@ def silhouette_plot(
 
     ax.axvline(x=sil_avg, color="red", linestyle="--", linewidth=linewidth)  # type: ignore
 
-    ax.set_xlabel("The silhouette coefficient values")  # type: ignore
-    ax.set_ylabel("Cluster label")  # type: ignore
+    ax.set_xlabel("The silhouette coefficient values", fontsize=config.label_font_size)  # type: ignore
+    ax.set_ylabel("Cluster label", fontsize=config.label_font_size)  # type: ignore
     ax.set_xlim([-0.1, 1])  # type: ignore
     ax.set_ylim([0, len(data) + (n_clusters + 1) * 10])  # type: ignore
     ax.set_yticks([])  # type: ignore
@@ -2654,8 +2668,8 @@ def cluster_plot(
     yindex = df.columns.get_loc(yname)  # type: ignore
 
     def callback(ax: Axes) -> None:
-        ax.set_xlabel("Feature space for the " + xname)
-        ax.set_ylabel("Feature space for the " + yname)
+        ax.set_xlabel("Feature space for the " + xname, fontsize=config.label_font_size)
+        ax.set_ylabel("Feature space for the " + yname, fontsize=config.label_font_size)
 
         if hasattr(estimator, "cluster_centers_"):
             # 클러스터 중심점 표시
