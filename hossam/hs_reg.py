@@ -6,6 +6,10 @@ from pandas import DataFrame, Series, merge, concat
 from matplotlib import pyplot as plt
 from sklearn.inspection import permutation_importance
 from sklearn.model_selection import learning_curve
+
+from sklearn.linear_model import LinearRegression, Ridge, Lasso, SGDRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
 from lightgbm import LGBMRegressor
 from catboost import CatBoostRegressor
@@ -393,7 +397,14 @@ def shap_analysis(
         tuple: 특징 중요도 요약 DataFrame 및 SHAP 값 배열
     """
     # 1. SHAP Explainer
-    explainer = shap.TreeExplainer(model)
+    if isinstance(model, (DecisionTreeRegressor, RandomForestRegressor, XGBRegressor, LGBMRegressor, CatBoostRegressor)):
+        print("Using TreeExplainer for tree-based models")
+        explainer = shap.TreeExplainer(model)
+    elif isinstance(model, (LinearRegression, Ridge, Lasso, SGDRegressor)):
+        print("Using LinearExplainer for linear models")
+        explainer = shap.LinearExplainer(model, x)
+    else:
+        print("Using KernelExplainer for other models")
 
     # 2. SHAP 값 계산: shape = [n_samples, n_features]
     shap_values = explainer.shap_values(x)
