@@ -31,7 +31,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 # -------------------------------------------------------------
 from .hs_util import pretty_table
-from .hs_plot import lineplot
+from .hs_plot import lineplot, config
 
 
 # ===================================================================
@@ -43,7 +43,6 @@ def diff(
     plot: bool = True,
     max_diff: int | None = None,
     figsize: tuple = (10, 5),
-    dpi: int = 100,
 ) -> DataFrame:
     """시계열 데이터의 정상성을 검정하고 차분을 통해 정상성을 확보한다.
 
@@ -59,7 +58,6 @@ def diff(
         max_diff (int | None, optional): 최대 차분 횟수 제한. None이면 정상성을 만족할 때까지 반복.
             과도한 차분을 방지하기 위해 설정 권장. 기본값은 None.
         figsize (tuple, optional): 그래프 크기 (width, height). 기본값은 (10, 5).
-        dpi (int, optional): 그래프 해상도. 기본값은 100.
 
     Returns:
         DataFrame: 정상성을 만족하는 차분된 데이터프레임.
@@ -107,7 +105,7 @@ def diff(
             df = df.diff().dropna()
 
         if plot:
-            lineplot(df=df, yname=yname, xname=df.index, figsize=figsize, dpi=dpi)  # type: ignore
+            lineplot(df=df, yname=yname, xname=df.index, figsize=figsize)  # type: ignore
 
         # ADF Test
         ar = adfuller(df[yname])
@@ -146,7 +144,6 @@ def rolling(
     window: int,
     plot: bool = True,
     figsize: tuple = (10, 5),
-    dpi: int = 100,
 ) -> Series:
     """단순 이동평균(Simple Moving Average, SMA)을 계산한다.
 
@@ -159,7 +156,6 @@ def rolling(
             예: window=7이면 최근 7개 데이터의 평균을 계산.
         plot (bool, optional): 이동평균 그래프를 표시할지 여부. 기본값은 True.
         figsize (tuple, optional): 그래프 크기 (width, height). 기본값은 (10, 5).
-        dpi (int, optional): 그래프 해상도. 기본값은 100.
 
     Returns:
         Series: 이동평균이 계산된 시계열 데이터.
@@ -194,8 +190,7 @@ def rolling(
             yname=rolling.name,     # type: ignore
             xname=df.index,         # type: ignore
             figsize=figsize,
-            dpi=dpi,
-            callback=lambda ax: ax.set_title(f"Rolling (window={window})"),
+            callback=lambda ax: ax.set_title(f"Rolling (window={window})", fontsize=config.title_font_size),  # type: ignore
         )
 
     return rolling
@@ -205,7 +200,7 @@ def rolling(
 # 지수가중이동평균
 # ===================================================================
 def ewm(
-    data: Series, span: int, plot: bool = True, figsize: tuple = (10, 5), dpi: int = 100
+    data: Series, span: int, plot: bool = True, figsize: tuple = (10, 5)
 ) -> Series:
     """지수가중이동평균(Exponential Weighted Moving Average, EWMA)을 계산한다.
 
@@ -219,7 +214,6 @@ def ewm(
             span이 클수록 과거 데이터의 영향이 천천히 감소한다.
         plot (bool, optional): EWMA 그래프를 표시할지 여부. 기본값은 True.
         figsize (tuple, optional): 그래프 크기 (width, height). 기본값은 (10, 5).
-        dpi (int, optional): 그래프 해상도. 기본값은 100.
 
     Returns:
         Series: 지수가중이동평균이 계산된 시계열 데이터.
@@ -254,8 +248,7 @@ def ewm(
             yname=ewm.name,     # type: ignore
             xname=df.index,     # type: ignore
             figsize=figsize,
-            dpi=dpi,
-            callback=lambda ax: ax.set_title(f"Ewm (span={span})"),
+            callback=lambda ax: ax.set_title(f"Ewm (span={span})", fontsize=config.title_font_size),  # type: ignore
         )
 
     return ewm
@@ -269,7 +262,6 @@ def seasonal_decompose(
     model: str = "additive",
     plot: bool = True,
     figsize: tuple = (10, 5),
-    dpi: int = 100,
 ):
     """시계열을 추세(Trend), 계절성(Seasonal), 잔차(Residual) 성분으로 분해한다.
 
@@ -288,7 +280,6 @@ def seasonal_decompose(
             그래프를 표시할지 여부. 기본값은 True.
         figsize (tuple, optional): 각 그래프의 기본 크기 (width, height).
             실제 출력은 높이가 4배로 조정된다. 기본값은 (10, 5).
-        dpi (int, optional): 그래프 해상도. 기본값은 100.
 
     Returns:
         DataFrame: 분해된 성분을 포함한 데이터프레임. 다음 컬럼 포함:
@@ -339,7 +330,7 @@ def seasonal_decompose(
     if plot:
         figure = sd.plot()
         figure.set_size_inches((figsize[0], figsize[1] * 4))
-        figure.set_dpi(dpi)
+        figure.set_dpi(config.dpi)
 
         fig, ax1, ax2, ax3, ax4 = figure.get_children()
 
@@ -412,7 +403,7 @@ def train_test_split(data: DataFrame, test_size: float = 0.2) -> tuple[DataFrame
 # 자기상관함수(ACF, Autocorrelation Function) 그래프 시각화
 # ===================================================================
 def acf_plot(
-    data: Series, figsize: tuple = (10, 5), dpi: int = 100, callback: Callable | None = None
+    data: Series, figsize: tuple = (10, 5), callback: Callable | None = None
 ):
     """자기상관함수(ACF, Autocorrelation Function) 그래프를 시각화한다.
 
@@ -422,7 +413,6 @@ def acf_plot(
     Args:
         data (Series): 시계열 데이터. 정상성을 만족하는 것이 권장된다.
         figsize (tuple, optional): 그래프 크기 (width, height). 기본값은 (10, 5).
-        dpi (int, optional): 그래프 해상도. 기본값은 100.
         callback (Callable, optional): 추가 그래프 설정을 위한 콜백 함수.
             함수는 ax(Axes) 객체를 인자로 받아야 한다. 기본값은 None.
 
@@ -444,10 +434,10 @@ def acf_plot(
         hs_timeseries.acf_plot(data)
 
         # 콜백으로 제목 추가:
-        hs_timeseries.acf_plot(data, callback=lambda ax: ax.set_title('My ACF Plot'))
+        hs_timeseries.acf_plot(data, callback=lambda ax: ax.set_title('My ACF Plot', fontsize=config.title_font_size))  # type: ignore
         ```
     """
-    fig = plt.figure(figsize=figsize, dpi=dpi)
+    fig = plt.figure(figsize=figsize, dpi=config.dpi)
     ax = fig.gca()
 
     plot_acf(data, ax=ax)
@@ -464,7 +454,7 @@ def acf_plot(
 # 편자기상관함수(PACF, Partial Autocorrelation Function) 그래프 시각화
 # ===================================================================
 def pacf_plot(
-    data: Series, figsize: tuple = (10, 5), dpi: int = 100, callback: Callable | None = None
+    data: Series, figsize: tuple = (10, 5), callback: Callable | None = None
 ):
     """편자기상관함수(PACF, Partial Autocorrelation Function) 그래프를 시각화한다.
 
@@ -474,7 +464,6 @@ def pacf_plot(
     Args:
         data (Series): 시계열 데이터. 정상성을 만족하는 것이 권장된다.
         figsize (tuple, optional): 그래프 크기 (width, height). 기본값은 (10, 5).
-        dpi (int, optional): 그래프 해상도. 기본값은 100.
         callback (Callable, optional): 추가 그래프 설정을 위한 콜백 함수.
             함수는 ax(Axes) 객체를 인자로 받아야 한다. 기본값은 None.
 
@@ -499,7 +488,7 @@ def pacf_plot(
         hs_timeseries.pacf_plot(data, callback=lambda ax: ax.set_ylabel('Partial Correlation'))
         ```
     """
-    fig = plt.figure(figsize=figsize, dpi=dpi)
+    fig = plt.figure(figsize=figsize, dpi=config.dpi)
     ax = fig.gca()
 
     plot_pacf(data, ax=ax)
@@ -516,7 +505,7 @@ def pacf_plot(
 # ACF와 PACF 그래프 동시 시각화
 # ===================================================================
 def acf_pacf_plot(
-    data: Series, figsize: tuple = (10, 5), dpi: int = 100, callback: Callable | None = None
+    data: Series, figsize: tuple = (10, 5), callback: Callable | None = None
 ):
     """ACF와 PACF 그래프를 동시에 시각화하여 ARIMA 차수를 결정한다.
 
@@ -527,7 +516,6 @@ def acf_pacf_plot(
         data (Series): 시계열 데이터. 정상성을 만족하는 것이 권장된다.
         figsize (tuple, optional): 각 그래프의 기본 크기 (width, height).
             실제 출력은 높이가 2배로 조정된다. 기본값은 (10, 5).
-        dpi (int, optional): 그래프 해상도. 기본값은 100.
         callback (Callable, optional): 추가 그래프 설정을 위한 콜백 함수.
             함수는 ax1, ax2(두 개의 Axes) 객체를 인자로 받아야 한다. 기본값은 None.
 
@@ -553,7 +541,7 @@ def acf_pacf_plot(
         stationary = hs_timeseries.diff(data, 'value')
         hs_timeseries.acf_pacf_plot(stationary)
     """
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(figsize[0], figsize[1] * 2), dpi=dpi)
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(figsize[0], figsize[1] * 2), dpi=config.dpi)
 
     plot_acf(data, ax=ax1)
     ax1.grid()
@@ -581,7 +569,6 @@ def arima(
     s: int | None = None,
     periods: int = 0,
     figsize: tuple = (15, 5),
-    dpi: int = 100,
 ) -> ARIMA:
     """ARIMA 또는 SARIMA 모델을 학습하고 예측 결과를 시각화한다.
 
@@ -607,7 +594,6 @@ def arima(
         periods (int, optional): test 기간 이후 추가 예측 기간 수.
             0이면 test 기간까지만 예측. 기본값은 0.
         figsize (tuple, optional): 그래프 크기 (width, height). 기본값은 (15, 5).
-        dpi (int, optional): 그래프 해상도. 기본값은 100.
 
     Returns:
         ARIMA | AutoARIMA: 학습된 ARIMA 모델 객체.
@@ -690,7 +676,7 @@ def arima(
         pd = None
 
     # 예측 결과 그래프
-    fig = plt.figure(figsize=figsize, dpi=dpi)
+    fig = plt.figure(figsize=figsize, dpi=config.dpi)
     ax = fig.gca()
 
     sb.lineplot(data=train, x=train.index, y=train.columns[0], label="Train", ax=ax)    # type: ignore
@@ -771,7 +757,6 @@ def prophet(
     report: bool = True,
     print_forecast: bool = False,
     figsize=(20, 8),
-    dpi: int = 200,
     callback: Callable | None = None,
     **params,
 ) -> tuple[Prophet, dict, float, DataFrame, DataFrame]:
@@ -799,7 +784,6 @@ def prophet(
         print_forecast (bool, optional): 예측 결과 테이블 출력 여부.
             기본값은 False.
         figsize (tuple, optional): 그래프 크기 (width, height). 기본값은 (20, 8).
-        dpi (int, optional): 그래프 해상도. 기본값은 200.
         callback (Callable, optional): Prophet 모델 객체를 커스터마이징하기 위한 콜백 함수.
             함수는 model 객체를 인자로 받아 add_regressor, add_seasonality 등 추가 설정 가능.
             기본값은 None.
@@ -925,7 +909,7 @@ def prophet(
 
     if report:
         hs_prophet_report(  # type: ignore
-            best_model, best_forecast, best_pred, test, print_forecast, figsize, dpi
+            best_model, best_forecast, best_pred, test, print_forecast, figsize
         )
 
     return best_model, best_params, best_score, best_forecast, best_pred
@@ -941,7 +925,6 @@ def prophet_report(
     test: DataFrame | None = None,
     print_forecast: bool = False,
     figsize: tuple = (20, 8),
-    dpi: int = 100,
 ) -> None:
     """Prophet 모델의 예측 결과와 성분 분해를 시각화하고 성능을 평가한다.
 
@@ -958,7 +941,6 @@ def prophet_report(
         print_forecast (bool, optional): 예측 결과 테이블 전체를 출력할지 여부.
             기본값은 False.
         figsize (tuple, optional): 그래프 크기 (width, height). 기본값은 (20, 8).
-        dpi (int, optional): 그래프 해상도. 기본값은 100.
 
     Returns:
         None: 출력만 수행하고 반환값 없음.
@@ -989,7 +971,7 @@ def prophet_report(
     # ------------------------------------------------------
     # 결과 시각화
     fig = model.plot(forecast, figsize=figsize, xlabel="Date", ylabel="Value")
-    fig.set_dpi(dpi)
+    fig.set_dpi(config.dpi)
     ax = fig.gca()
     add_changepoints_to_plot(ax, model, forecast)
 
@@ -1025,7 +1007,7 @@ def prophet_report(
     height = figsize[1] * (len(model.seasonalities) + 1)
 
     fig = model.plot_components(forecast, figsize=(figsize[0], height))
-    fig.set_dpi(dpi)
+    fig.set_dpi(config.dpi)
     ax = fig.gca()
 
     plt.show()

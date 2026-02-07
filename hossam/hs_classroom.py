@@ -412,7 +412,7 @@ def _balance_group_sizes_only(
 # ===================================================================
 # 조 편성 결과의 인원, 관심사, 점수 분포를 시각화한다
 # ===================================================================
-def report_summary(df: DataFrame, interest_col: str | None = None, width: int = config.width, height: int = config.height, dpi: int = config.dpi) -> None:
+def report_summary(df: DataFrame, interest_col: str | None = None, width: int = config.width, height: int = config.height) -> None:
     """조 편성 결과의 요약 통계를 시각화합니다.
 
     조별 인원 분포, 관심사 분포, 평균점수 분포를 나타냅니다.
@@ -422,7 +422,6 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
         interest_col (str | None): 관심사 컬럼명
         width (int): 그래프 넓이. 기본값: config.width
         height (int): 그래프 높이. 기본값: config.height
-        dpi (int): 그래프 해상도. 기본값: config.dpi
 
     Examples:
         ```python
@@ -470,7 +469,6 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
         height=height,
         rows=n_plots,
         cols=1,
-        dpi=dpi,
         flatten=True
     )
 
@@ -487,14 +485,14 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
         xname='조',
         yname='인원',
         palette='Set2',
-        ax=axes[plot_idx]
+        ax=axes[plot_idx]  # type: ignore
     )
 
-    axes[plot_idx].set_title("조별 인원 분포", fontsize=12, fontweight='bold')
-    axes[plot_idx].set_xlabel("조")
-    axes[plot_idx].set_ylabel("인원")
+    axes[plot_idx].set_title("조별 인원 분포", fontsize=config.title_font_size, fontweight='bold', pad=config.title_pad)  # type: ignore
+    axes[plot_idx].set_xlabel("조")  # type: ignore
+    axes[plot_idx].set_ylabel("인원")  # type: ignore
     for i, v in enumerate(group_sizes.values):
-        axes[plot_idx].text(i, v + 0.1, str(int(v)), ha='center', fontsize=10)
+        axes[plot_idx].text(i, v + 0.1, str(int(v)), ha='center', fontsize=config.font_size)  # type: ignore
     plot_idx += 1
 
     # ===== 2. 조별 관심사 분포 =====
@@ -504,9 +502,9 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
         interest_df['조'] = interest_df['조'].astype(str)
 
         def custom_callback(ax):
-            ax.set_title("조별 관심사 분포 (%)", fontsize=12, fontweight='bold')
-            ax.set_xlabel("조")
-            ax.set_ylabel("비율 (%)")
+            ax.set_title("조별 관심사 분포 (%)", fontsize=config.title_font_size, fontweight='bold', pad=config.title_pad)  # type: ignore
+            ax.set_xlabel("조", fontsize=config.label_font_size)  # type: ignore
+            ax.set_ylabel("비율 (%)", fontsize=config.label_font_size)  # type: ignore
             # x축: 고정된 위치와 라벨 지정
             xticks = ax.get_xticks()
             xticklabels = [tick.get_text() for tick in ax.get_xticklabels()]
@@ -528,7 +526,7 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
             xname='조',
             hue='관심사',
             palette='Set3',
-            ax=axes[plot_idx],
+            ax=axes[plot_idx],  # type: ignore
             callback=custom_callback
         )
 
@@ -545,18 +543,18 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
             xname='조_str',
             yname='mean',
             palette='coolwarm',
-            ax=axes[plot_idx],
+            ax=axes[plot_idx],  # type: ignore
             errorbar='sd',
             err_kws={'linewidth': 2}
         )
 
-        axes[plot_idx].set_title("조별 평균점수 분포 (±1 std)", fontsize=12, fontweight='bold')
-        axes[plot_idx].set_xlabel("조")
-        axes[plot_idx].set_ylabel("평균점수")
-        axes[plot_idx].set_ylim(0, 100)
+        axes[plot_idx].set_title("조별 평균점수 분포 (±1 std)", fontsize=config.title_font_size, fontweight='bold', pad=config.title_pad)  # type: ignore
+        axes[plot_idx].set_xlabel("조", fontsize=config.label_font_size)  # type: ignore
+        axes[plot_idx].set_ylabel("평균점수", fontsize=config.label_font_size)  # type: ignore
+        axes[plot_idx].set_ylim(0, 100)  # type: ignore
 
         for i, row in avg_by_group.iterrows():
-            axes[plot_idx].text(i, row['mean'] + 2, f"{row['mean']:.1f}", ha='center', fontsize=10)
+            axes[plot_idx].text(i, row['mean'] + 2, f"{row['mean']:.1f}", ha='center', fontsize=config.font_size)  # type: ignore
         plot_idx += 1
 
     # hs_plot.finalize_plot을 사용하여 마무리
@@ -566,7 +564,7 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
 # ===================================================================
 # 조별 점수 분포를 커널 밀도 추정(KDE) 그래프로 시각화한다
 # ===================================================================
-def report_kde(df: DataFrame | str, metric: str = 'average', width: int = config.width, height: int = config.height, dpi: int = config.dpi) -> None:
+def report_kde(df: DataFrame | str, metric: str = 'average', width: int = config.width, height: int = config.height) -> None:
     """조별 점수 분포를 KDE(Kernel Density Estimation)로 시각화합니다.
 
     각 조의 점수 분포를 커널 밀도 추정으로 표시하고 평균 및 95% 신뢰구간을 나타냅니다.
@@ -577,7 +575,6 @@ def report_kde(df: DataFrame | str, metric: str = 'average', width: int = config
             'total'이면 총점, 'average'이면 평균점수. 기본값: 'average'
         width (int): 그래프 넓이. 기본값: config.width
         height (int): 그래프 높이. 기본값: config.height
-        dpi (int): 그래프 해상도. 기본값: config.dpi
 
     Examples:
         ```python
@@ -612,7 +609,7 @@ def report_kde(df: DataFrame | str, metric: str = 'average', width: int = config
     # 레이아웃 결정 (2열 기준)
     cols = 2
     rows = (n_groups + cols - 1) // cols
-    fig, axes = hs_plot.get_default_ax(width=width, height=height, rows=rows, cols=cols, dpi=dpi, flatten=True)
+    fig, axes = hs_plot.get_default_ax(width=width, height=height, rows=rows, cols=cols, flatten=True)
 
     plot_idx = 0
     metric_col = '평균점수' if (metric or '').lower() == 'average' else '총점'
@@ -627,13 +624,13 @@ def report_kde(df: DataFrame | str, metric: str = 'average', width: int = config
         if n == 0:
             continue
 
-        hs_plot.kde_confidence_interval(data=group_df, xnames=metric_col, ax=axes[plot_idx], callback=lambda ax: ax.set_title(f"{group}조"))    # type: ignore
+        hs_plot.kde_confidence_interval(data=group_df, xnames=metric_col, ax=axes[plot_idx], callback=lambda ax: ax.set_title(f"{group}조", fontsize=config.title_font_size, pad=config.title_pad))    # type: ignore
 
         plot_idx += 1
 
     # 불필요한 서브플롯 제거
     for idx in range(plot_idx, len(axes)):
-        fig.delaxes(axes[idx])
+        fig.delaxes(axes[idx])  # type: ignore
 
     hs_plot.finalize_plot(axes) # type: ignore
 

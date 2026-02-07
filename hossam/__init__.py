@@ -19,8 +19,8 @@ from .hs_stats import ttest_ind as hs_ttest_ind
 from .hs_stats import outlier_table as hs_outlier_table
 from .hs_stats import oneway_anova as hs_oneway_anova
 from .hs_reg import learning_cv as hs_learning_cv
-from .hs_reg import get_scores as hs_get_scores
-from .hs_reg import get_score_cv as hs_get_score_cv
+from .hs_reg import scores as hs_get_scores
+from .hs_reg import score_cv as hs_get_score_cv
 from .hs_reg import feature_importance as hs_feature_importance
 from .hs_reg import shap_analysis as hs_shap_analysis
 from .hs_reg import shap_dependence_analysis as hs_shap_dependence_analysis
@@ -146,7 +146,7 @@ def init_pyplot():
     except Exception as e:
         warnings.warn(f"\n한글 폰트 초기화: 패키지 폰트 사용 실패 ({e}).")
 
-    from IPython.display import display, HTML
+    from IPython.display import display, HTML   # type: ignore
 
     display(
         HTML(

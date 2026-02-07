@@ -104,7 +104,6 @@ def kmeans_elbow(
     marker: str = None,
     width: int = hs_plot.config.width,
     height: int = hs_plot.config.height,
-    dpi: int = hs_plot.config.dpi,
     linewidth: int = hs_plot.config.line_width,
     save_path: str | None = None,
     ax: Axes | None = None,
@@ -124,7 +123,6 @@ def kmeans_elbow(
         marker (str, optional): 마커 스타일.
         width (int, optional): 플롯 가로 크기.
         height (int, optional): 플롯 세로 크기.
-        dpi (int, optional): 플롯 해상도.
         linewidth (int, optional): 선 두께.
         save_path (str | None, optional): 저장 경로 지정시 파일로 저장.
         ax (Axes | None, optional): 기존 matplotlib Axes 객체. None이면 새로 생성.
@@ -164,7 +162,6 @@ def kmeans_elbow(
         marker=marker,
         width=width,
         height=height,
-        dpi=dpi,
         linewidth=linewidth,
         save_path=save_path,
         title=(
@@ -194,7 +191,6 @@ def kmeans_silhouette(
     width: int = hs_plot.config.width,
     height: int = hs_plot.config.height,
     linewidth: float = hs_plot.config.line_width,
-    dpi: int = hs_plot.config.dpi,
     save_path: str | None = None,
     **params,
 ) -> DataFrame:
@@ -213,7 +209,6 @@ def kmeans_silhouette(
         width (int, optional): 플롯 가로 크기.
         height (int, optional): 플롯 세로 크기.
         linewidth (float, optional): 선 두께.
-        dpi (int, optional): 플롯 해상도.
         save_path (str | None, optional): 저장 경로 지정시 파일로 저장.
         **params: silhouette_plot에 전달할 추가 파라미터.
 
@@ -268,7 +263,6 @@ def kmeans_silhouette(
                         title=title,
                         width=width,
                         height=height,
-                        dpi=dpi,
                         linewidth=linewidth,
                         save_path=save_path,
                         **params,
@@ -283,7 +277,6 @@ def kmeans_silhouette(
                         palette=None,
                         width=width,
                         height=height,
-                        dpi=dpi,
                         title=title,
                         save_path=save_path,
                     )
@@ -297,7 +290,6 @@ def kmeans_silhouette(
                         palette=None,
                         width=width,
                         height=height,
-                        dpi=dpi,
                         title=title,
                         linewidth=linewidth,
                         save_path=save_path,
@@ -323,7 +315,6 @@ def elbow_point(
     marker: str = None,
     width: int = hs_plot.config.width,
     height: int = hs_plot.config.height,
-    dpi: int = hs_plot.config.dpi,
     linewidth: int = hs_plot.config.line_width,
     save_path: str | None = None,
     ax: Axes | None = None,
@@ -350,7 +341,6 @@ def elbow_point(
         marker (str, optional): 마커 스타일.
         width (int, optional): 플롯 가로 크기.
         height (int, optional): 플롯 세로 크기.
-        dpi (int, optional): 플롯 해상도.
         linewidth (int, optional): 선 두께.
         save_path (str | None, optional): 저장 경로 지정시 파일로 저장.
         ax (Axes | None, optional): 기존 matplotlib Axes 객체. None이면 새로 생성.
@@ -421,7 +411,6 @@ def elbow_point(
             width=width,
             height=height,
             linewidth=linewidth,
-            dpi=dpi,
             save_path=save_path,
             callback=hvline,
             ax=ax,
@@ -446,7 +435,6 @@ def cluster_plot(
     width: int = hs_plot.config.width,
     height: int = hs_plot.config.height,
     linewidth: float = hs_plot.config.line_width,
-    dpi: int = hs_plot.config.dpi,
     save_path: str | None = None,
     ax: Axes | None = None,
 ):
@@ -465,7 +453,6 @@ def cluster_plot(
         width (int, optional): 플롯 가로 크기.
         height (int, optional): 플롯 세로 크기.
         linewidth (float, optional): 선 두께.
-        dpi (int, optional): 플롯 해상도.
         save_path (str | None, optional): 저장 경로 지정시 파일로 저장.
         ax (Axes | None, optional): 기존 matplotlib Axes 객체. None이면 새로 생성.
 
@@ -503,7 +490,6 @@ def cluster_plot(
             width=width,
             height=height,
             linewidth=linewidth,
-            dpi=dpi,
             save_path=save_path,
             ax=ax,
         )
@@ -732,7 +718,6 @@ def dbscan_eps(
     width: int = hs_plot.config.width,
     height: int = hs_plot.config.height,
     linewidth: int = hs_plot.config.line_width,
-    dpi: int = hs_plot.config.dpi,
     save_path: str | None = None,
     ax: Axes | None = None,
 ) -> tuple[float, np.ndarray]:
@@ -751,7 +736,6 @@ def dbscan_eps(
         width (int, optional): 플롯 가로 크기.
         height (int, optional): 플롯 세로 크기.
         linewidth (float, optional): 선 두께.
-        dpi (int, optional): 플롯 해상도.
         save_path (str | None, optional): 저장 경로 지정시 파일로 저장.
         ax (Axes | None, optional): 기존 matplotlib Axes 객체. None이면 새로 생성.
 
@@ -787,7 +771,6 @@ def dbscan_eps(
         marker=None,
         width=width,
         height=height,
-        dpi=dpi,
         linewidth=linewidth,
         palette=palette,
         save_path=save_path,

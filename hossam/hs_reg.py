@@ -21,7 +21,7 @@ from .hs_plot import create_figure, finalize_plot, barplot, lineplot, config
 # --------------------------------------------------------
 # 회귀 성능 평가 지표 함수
 # --------------------------------------------------------
-def get_scores(
+def scores(
     estimator, x_test: DataFrame, y_test: DataFrame | np.ndarray
 ) -> DataFrame:
     """
@@ -203,7 +203,7 @@ def learning_cv(
 # --------------------------------------------------------
 # 회귀 성능 평가 + 과적합 판별 통합 함수
 # --------------------------------------------------------
-def get_score_cv(
+def score_cv(
     estimator,
     x_test: DataFrame,
     y_test: DataFrame | np.ndarray,
@@ -239,7 +239,7 @@ def get_score_cv(
     result_df = DataFrame()
 
     for est in estimator:
-        score_df = get_scores(est, x_test, y_test)
+        score_df = scores(est, x_test, y_test)
         cv_df = learning_cv(
             est,
             x_origin,
@@ -268,7 +268,6 @@ def feature_importance(
     plot: bool = True,
     width: int = config.width,
     height: int = config.height,
-    dpi: int = config.dpi,
 ) -> DataFrame:
     perm = permutation_importance(
         estimator=model,
@@ -291,7 +290,6 @@ def feature_importance(
         plot: 중요도 시각화 여부 (기본값: True)
         width: 플롯 너비 (기본값: config.width)
         height: 플롯 높이 (기본값: config.height)
-        dpi: 플롯 해상도 (기본값: config.dpi)
 
     Returns:
         DataFrame: 특징 중요도 결과 표
@@ -310,8 +308,8 @@ def feature_importance(
     # 결과 정리
     imp_df = DataFrame(
         {
-            "importance_mean": imp_df.importances_mean,
-            "importance_std": imp_df.importances_std,
+            "importance_mean": imp_df.importances_mean, # type: ignore
+            "importance_std": imp_df.importances_std,   # type: ignore
         },
         index=x_train.columns,
     )
@@ -332,6 +330,12 @@ def feature_importance(
     if plot:
         df = imp_df.sort_values(by="importance_ratio", ascending=False)
 
+        # 90% 처음 도달하는 인덱스 (0-based)
+        cut_idx = np.argmax(imp_df["importance_cumsum"].values >= threshold)    # type: ignore
+
+        # x축은 rank 기준이므로 +1
+        cut_rank = (int(cut_idx) + 1) - 0.5
+
         def __callback(ax):
             # 값 라벨 추가
             for i, v in enumerate(imp_df["importance_mean"]):
@@ -341,17 +345,11 @@ def feature_importance(
                     # 표시 형식
                     f"{v*100:.1f}% ({imp_df.iloc[i]['importance_cumsum']*100:.1f}%)",
                     va="center",
-                    fontsize=6
+                    fontsize=config.text_size
                 )
 
             ax.set_xlabel("Permutation Importance (mean)")
             ax.set_xlim(0, imp_df["importance_mean"].max() * 1.2)
-
-            # 90% 처음 도달하는 인덱스 (0-based)
-            cut_idx = np.argmax(imp_df["importance_cumsum"].values >= threshold)    # type: ignore
-
-            # x축은 rank 기준이므로 +1
-            cut_rank = (int(cut_idx) + 1) - 0.5
 
             # 90% 도달 지점 수직선 (핵심)
             plt.axhline(
@@ -368,8 +366,7 @@ def feature_importance(
             yname=df.index, 
             width=width, 
             height=height, 
-            dpi=dpi, 
-            title=f"Feature Importance (Cumulative {threshold*100:.0f}% at rank {cut_idx + 1})", 
+            title=f"Feature Importance (Cumulative {threshold*100:.0f}% at rank {cut_idx + 1})",    # type: ignore
             callback=__callback
         )
 
@@ -465,11 +462,11 @@ def shap_analysis(
         fig.set_size_inches(width / config.dpi, height / config.dpi)
         ax = fig.get_axes()[0]
 
-        plt.xlabel("SHAP value", fontsize=8)
-        plt.xticks(fontsize=6)
-        plt.yticks(fontsize=8)
+        plt.xlabel("SHAP value", fontsize=config.label_font_size)
+        plt.xticks(fontsize=config.font_size)
+        plt.yticks(fontsize=config.font_size)
 
-        finalize_plot(ax, outparams=True,title="SHAP Summary Plot")
+        finalize_plot(ax, outparams=True, title="SHAP Summary Plot")
 
     return summary_df, shap_values
 
@@ -564,10 +561,10 @@ def shap_dependence_analysis(
         fig.set_size_inches(width / config.dpi, height / config.dpi)
         ax = fig.get_axes()[0]
 
-        plt.xlabel(feature_name, fontsize=10)
-        plt.ylabel(f"SHAP value for {feature_name}", fontsize=10)
-        plt.xticks(fontsize=6)
-        plt.yticks(fontsize=8)
+        plt.xlabel(feature_name, fontsize=config.label_font_size)
+        plt.ylabel(f"SHAP value for {feature_name}", fontsize=config.label_font_size)
+        plt.xticks(fontsize=config.font_size)
+        plt.yticks(fontsize=config.font_size)
 
         finalize_plot(
             ax, outparams=True, 

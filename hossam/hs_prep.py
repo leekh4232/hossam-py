@@ -1036,7 +1036,6 @@ def pca(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
 ) -> tuple[PCA, DataFrame, DataFrame]:
@@ -1054,7 +1053,6 @@ def pca(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         save_path (str|None): 저장 경로.
         callback (Callable|None): Axes 후처리 콜백.
 
@@ -1103,7 +1101,6 @@ def pca(
             width = width,
             height = height,
             linewidth = linewidth,
-            dpi = dpi,
             save_path = save_path,
             callback = callback,
         )

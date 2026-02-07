@@ -43,12 +43,16 @@ from .hs_util import is_2d
 # ===================================================================
 config = SimpleNamespace(
     dpi=200,
-    width=1280,
+    width=1200,
     height=640,
-    font_size=14,
+    font_size=7,
+    text_size=6,
+    title_font_size=16,
+    title_pad=12,
+    label_font_size=12,
     font_weight="normal",
     frame_width=0.7,
-    line_width=2.5,
+    line_width=2,
     grid_alpha=0.3,
     grid_width=0.7,
     fill_alpha=0.3,
@@ -63,7 +67,6 @@ def get_default_ax(
     height: int = config.height,
     rows: int = 1,
     cols: int = 1,
-    dpi: int = config.dpi,
     flatten: bool = False,
     ws: int | None = None,
     hs: int | None = None,
@@ -76,7 +79,6 @@ def get_default_ax(
         height (int): 세로 픽셀 크기.
         rows (int): 서브플롯 행 개수.
         cols (int): 서브플롯 열 개수.
-        dpi (int): 해상도(DPI).
         flatten (bool): Axes 배열을 1차원 리스트로 평탄화할지 여부.
         ws (int|None): 서브플롯 가로 간격(`wspace`). rows/cols가 1보다 클 때만 적용.
         hs (int|None): 서브플롯 세로 간격(`hspace`). rows/cols가 1보다 클 때만 적용.
@@ -87,7 +89,7 @@ def get_default_ax(
     """
     figsize = (width * cols / 100, height * rows / 100)
     #print(f"📐 Figure 크기: {figsize[0]:.2f} x {figsize[1]:.2f} 인치 (DPI: {dpi})")
-    fig, ax = plt.subplots(rows, cols, figsize=figsize, dpi=dpi)
+    fig, ax = plt.subplots(rows, cols, figsize=figsize, dpi=config.dpi)
 
     # ax가 배열 (subplots)인지 단일 Axes인지 확인
     is_array = isinstance(ax, (np.ndarray, list))
@@ -129,7 +131,6 @@ def create_figure(
     height: int = config.height,
     rows: int = 1,
     cols: int = 1,
-    dpi: int = config.dpi,
     flatten: bool = False,
     ws: int | None = None,
     hs: int | None = None,
@@ -142,16 +143,15 @@ def create_figure(
         height (int): 세로 픽셀 크기.
         rows (int): 서브플롯 행 개수.
         cols (int): 서브플롯 열 개수.
-        dpi (int): 해상도(DPI).
         flatten (bool): Axes 배열을 1차원 리스트로 평탄화할지 여부.
         ws (int|None): 서브플롯 가로 간격(`wspace`). rows/cols가 1보다 클 때만 적용.
         hs (int|None): 서브플롯 세로 간격(`hspace`). rows/cols가 1보다 클 때만 적용.
-        title (str): Figure 제목.
+        title (str|None): Figure 제목.
 
     Returns:
         tuple[Figure, Axes]: 생성된 matplotlib Figure와 Axes 객체.
     """
-    fig, ax = get_default_ax(width, height, rows, cols, dpi, flatten, ws, hs, title)
+    fig, ax = get_default_ax(width, height, rows, cols, flatten, ws, hs, title)
     return fig, ax  # type: ignore
 
 
@@ -200,10 +200,10 @@ def finalize_plot(
     plt.tight_layout()
 
     if title and not is_array:
-        ax.set_title(title, fontsize=config.font_size * 1.5, pad=15, fontweight="bold")
+        ax.set_title(title, fontsize=config.title_font_size, pad=config.title_pad)
 
     if save_path is not None:
-        plt.savefig(save_path, dpi=config.dpi * 2, bbox_inches="tight")
+        plt.savefig(save_path, bbox_inches="tight")
 
     if outparams:
         plt.show()
@@ -252,7 +252,6 @@ def lineplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -271,7 +270,6 @@ def lineplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 해상도.
         save_path (str|None): 이미지 저장 경로. None이면 화면에 표시.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
@@ -283,7 +281,7 @@ def lineplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -324,7 +322,6 @@ def boxplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -346,7 +343,6 @@ def boxplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         save_path (str|None): 이미지 저장 경로. None이면 화면에 표시.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
@@ -358,7 +354,7 @@ def boxplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     if xname is not None or yname is not None:
@@ -421,7 +417,6 @@ def pvalue1_anotation(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -444,7 +439,6 @@ def pvalue1_anotation(
         width=width,
         height=height,
         linewidth=linewidth,
-        dpi=dpi,
         save_path=save_path,
         callback=callback,
         ax=ax,
@@ -468,7 +462,6 @@ def kdeplot(
     quartile_split: bool = False,
     width: int = config.width,
     height: int = config.height,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -492,7 +485,6 @@ def kdeplot(
         linewidth (float): 선 굵기.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
-        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn kdeplot 추가 인자.
@@ -516,7 +508,7 @@ def kdeplot(
         q = series.quantile([0.0, 0.25, 0.5, 0.75, 1.0]).values
         bounds = list(zip(q[:-1], q[1:]))  # [(Q0,Q1),(Q1,Q2),(Q2,Q3),(Q3,Q4)]
 
-        fig, axes = get_default_ax(width, height, len(bounds), 1, dpi, flatten=True)
+        fig, axes = get_default_ax(width, height, len(bounds), 1, flatten=True)
         outparams = True
 
         for idx, (lo, hi) in enumerate(bounds):
@@ -547,14 +539,14 @@ def kdeplot(
             kdeplot_kwargs.update(params)
 
             sb.kdeplot(**kdeplot_kwargs)
-            axes[idx].set_title(f"Q{idx+1}: [{lo:.3g}, {hi:.3g}]")
-            axes[idx].grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
+            axes[idx].set_title(f"Q{idx+1}: [{lo:.3g}, {hi:.3g}]", fontsize=config.title_font_size, pad=config.title_pad) # type: ignore
+            axes[idx].grid(True, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
 
         finalize_plot(axes[0], callback, outparams, save_path, True, title)
         return
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # 기본 kwargs 설정
@@ -601,7 +593,6 @@ def histplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -620,7 +611,6 @@ def histplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn histplot 추가 인자.
@@ -631,7 +621,7 @@ def histplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     if bins:
@@ -685,7 +675,6 @@ def stackplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = 0.25,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -702,7 +691,6 @@ def stackplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn histplot 추가 인자.
@@ -713,7 +701,7 @@ def stackplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     df2 = df[[xname, hue]].copy()
@@ -774,7 +762,6 @@ def scatterplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -794,7 +781,6 @@ def scatterplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn scatterplot 추가 인자.
@@ -805,7 +791,7 @@ def scatterplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     if outline and hue is not None:
@@ -889,7 +875,6 @@ def regplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -906,7 +891,6 @@ def regplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn regplot 추가 인자.
@@ -917,7 +901,7 @@ def regplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # regplot은 hue를 지원하지 않으므로 palette를 color로 변환
@@ -959,7 +943,6 @@ def lmplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     **params,
 ) -> None:
@@ -975,7 +958,6 @@ def lmplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         **params: seaborn lmplot 추가 인자.
 
     Returns:
@@ -997,8 +979,8 @@ def lmplot(
     lmplot_kwargs.update(params)
 
     g = sb.lmplot(**lmplot_kwargs)
-    g.fig.set_size_inches(width / dpi, height / dpi)
-    g.fig.set_dpi(dpi)
+    g.fig.set_size_inches(width / config.dpi, height / config.dpi)
+    g.fig.set_dpi(config.dpi)
 
     # 회귀선에 linewidth 적용
     for ax in g.axes.flat:
@@ -1015,7 +997,7 @@ def lmplot(
     plt.tight_layout()
 
     if save_path is not None:
-        plt.savefig(save_path, dpi=dpi * 2, bbox_inches="tight")
+        plt.savefig(save_path, bbox_inches="tight")
 
     plt.show()
     plt.close()
@@ -1034,7 +1016,6 @@ def pairplot(
     width: int = config.height,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     **params,
 ) -> None:
@@ -1098,8 +1079,8 @@ def pairplot(
 
     g = sb.pairplot(**pairplot_kwargs)
     scale = len(target_cols)
-    g.fig.set_size_inches(w=(width / dpi) * scale, h=(height / dpi) * scale)
-    g.fig.set_dpi(dpi)
+    g.fig.set_size_inches(w=(width / config.dpi) * scale, h=(height / config.dpi) * scale)
+    g.fig.set_dpi(config.dpi)
 
     if title:
         g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight="bold")
@@ -1112,7 +1093,7 @@ def pairplot(
     plt.tight_layout()
 
     if save_path is not None:
-        plt.savefig(save_path, dpi=dpi * 2, bbox_inches="tight")
+        plt.savefig(save_path, bbox_inches="tight")
 
     plt.show()
     plt.close()
@@ -1131,7 +1112,6 @@ def countplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -1149,7 +1129,6 @@ def countplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn countplot 추가 인자.
@@ -1166,7 +1145,7 @@ def countplot(
             sort = sorted(list(df[xname].value_counts().index))
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -1205,7 +1184,6 @@ def barplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -1223,7 +1201,6 @@ def barplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn barplot 추가 인자.
@@ -1234,7 +1211,7 @@ def barplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -1271,7 +1248,6 @@ def boxenplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -1289,7 +1265,6 @@ def boxenplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn boxenplot 추가 인자.
@@ -1300,7 +1275,7 @@ def boxenplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # palette은 hue가 있을 때만 사용
@@ -1335,7 +1310,6 @@ def violinplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -1353,7 +1327,6 @@ def violinplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn violinplot 추가 인자.
@@ -1364,7 +1337,7 @@ def violinplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # palette은 hue가 있을 때만 사용
@@ -1398,7 +1371,6 @@ def pointplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -1416,7 +1388,6 @@ def pointplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn pointplot 추가 인자.
@@ -1427,7 +1398,7 @@ def pointplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -1463,7 +1434,6 @@ def jointplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     **params,
 ) -> None:
@@ -1479,7 +1449,6 @@ def jointplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         **params: seaborn jointplot 추가 인자.
 
     Returns:
@@ -1501,8 +1470,8 @@ def jointplot(
     jointplot_kwargs.update(params)
 
     g = sb.jointplot(**jointplot_kwargs)
-    g.fig.set_size_inches(width / dpi, height / dpi)
-    g.fig.set_dpi(dpi)
+    g.fig.set_size_inches(width / config.dpi, height / config.dpi)
+    g.fig.set_dpi(config.dpi)
 
     if title:
         g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight="bold")
@@ -1515,7 +1484,7 @@ def jointplot(
     plt.tight_layout()
 
     if save_path is not None:
-        plt.savefig(save_path, dpi=dpi * 2, bbox_inches="tight")
+        plt.savefig(save_path, bbox_inches="tight")
 
     plt.show()
     plt.close()
@@ -1531,7 +1500,6 @@ def heatmap(
     width: int | None = None,
     height: int | None = None,
     linewidth: float = 0.25,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -1546,7 +1514,6 @@ def heatmap(
         width (int|None): 캔버스 가로 픽셀. None이면 자동 계산.
         height (int|None): 캔버스 세로 픽셀. None이면 자동 계산.
         linewidth (float): 격자 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn heatmap 추가 인자.
@@ -1561,7 +1528,7 @@ def heatmap(
         height = width * 0.8  # type: ignore
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     heatmatp_kwargs = {
@@ -1594,7 +1561,6 @@ def kde_confidence_interval(
     height: int = config.height,
     linewidth: float = config.line_width,
     fill: bool = False,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -1614,7 +1580,6 @@ def kde_confidence_interval(
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
         fill (bool): KDE 채우기 여부.
-        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
 
@@ -1640,7 +1605,7 @@ def kde_confidence_interval(
     # 외부에서 ax를 전달하지 않은 경우 서브플롯 생성
     if ax is None:
         n_cols = len(target_cols)
-        fig, axes = get_default_ax(width, height, n_cols, 1, dpi, flatten=True)
+        fig, axes = get_default_ax(width, height, n_cols, 1, flatten=True)
         outparams = True
     else:
         # 외부에서 ax를 전달한 경우 (시뮬레이션용)
@@ -1670,29 +1635,29 @@ def kde_confidence_interval(
         sb.kdeplot(data=column, linewidth=linewidth, ax=current_ax, fill=fill, alpha=config.fill_alpha)  # type: ignore
 
         # 그래프 축의 범위
-        xmin, xmax, ymin, ymax = current_ax.get_position().bounds
-        ymin_val, ymax_val = 0, current_ax.get_ylim()[1]
+        xmin, xmax, ymin, ymax = current_ax.get_position().bounds  # type: ignore
+        ymin_val, ymax_val = 0, current_ax.get_ylim()[1]    # type: ignore
 
         # 신뢰구간 그리기
-        current_ax.plot(
+        current_ax.plot(    # type: ignore
             [cmin, cmin], [ymin_val, ymax_val], linestyle=":", linewidth=linewidth * 0.5
         )
-        current_ax.plot(
+        current_ax.plot(    # type: ignore
             [cmax, cmax], [ymin_val, ymax_val], linestyle=":", linewidth=linewidth * 0.5
         )
-        current_ax.fill_between(
+        current_ax.fill_between(    # type: ignore
             [cmin, cmax], y1=ymin_val, y2=ymax_val, alpha=config.fill_alpha
         )
 
         # 평균 그리기
-        current_ax.plot(
+        current_ax.plot(    # type: ignore
             [sample_mean, sample_mean],
             [0, ymax_val],
             linestyle="--",
             linewidth=linewidth,
         )
 
-        current_ax.text(
+        current_ax.text(    # type: ignore
             x=(cmax - cmin) / 2 + cmin,
             y=ymax_val,
             s="[%s] %0.1f ~ %0.1f" % (column.name, cmin, cmax),
@@ -1701,7 +1666,7 @@ def kde_confidence_interval(
             fontdict={"color": "red"},
         )
 
-        current_ax.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
+        current_ax.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
 
     finalize_plot(axes[0] if isinstance(axes, list) and len(axes) > 0 else ax, callback, outparams, save_path, True, title)  # type: ignore
 
@@ -1717,7 +1682,6 @@ def ols_residplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -1738,7 +1702,6 @@ def ols_residplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         save_path (str|None): 저장 경로.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
@@ -1762,7 +1725,7 @@ def ols_residplot(
     y = y_pred + resid  # 실제값 = 적합값 + 잔차
 
     if ax is None:
-        fig, ax = get_default_ax(width + 150 if mse else width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width + 150 if mse else width, height, 1, 1)  # type: ignore
         outparams = True
 
     sb.residplot(
@@ -1830,7 +1793,6 @@ def ols_qqplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -1853,7 +1815,6 @@ def ols_qqplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         save_path (str|None): 저장 경로.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
@@ -1878,7 +1839,7 @@ def ols_qqplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # fit 객체에서 잔차(residuals) 추출
@@ -1922,7 +1883,6 @@ def distribution_by_class(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
 ) -> None:
@@ -1940,7 +1900,6 @@ def distribution_by_class(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
 
     Returns:
@@ -1971,7 +1930,6 @@ def distribution_by_class(
                 width=width,
                 height=height,
                 linewidth=linewidth,
-                dpi=dpi,
                 callback=callback,
                 save_path=save_path,
             )
@@ -1986,7 +1944,6 @@ def distribution_by_class(
                 width=width,
                 height=height,
                 linewidth=linewidth,
-                dpi=dpi,
                 callback=callback,
                 save_path=save_path,
             )
@@ -2001,7 +1958,6 @@ def distribution_by_class(
                 width=width,
                 height=height,
                 linewidth=linewidth,
-                dpi=dpi,
                 callback=callback,
                 save_path=save_path,
             )
@@ -2021,7 +1977,6 @@ def scatter_by_class(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
 ) -> None:
@@ -2038,7 +1993,6 @@ def scatter_by_class(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         callback (Callable|None): Axes 후처리 콜백.
 
     Returns:
@@ -2087,7 +2041,6 @@ def categorical_target_distribution(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     cols: int = 2,
     save_path: str | None = None,
     callback: Callable | None = None,
@@ -2105,7 +2058,6 @@ def categorical_target_distribution(
         width (int): 개별 서브플롯 가로 픽셀.
         height (int): 개별 서브플롯 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 해상도.
         cols (int): 서브플롯 열 수.
         callback (Callable|None): Axes 후처리 콜백.
 
@@ -2130,7 +2082,7 @@ def categorical_target_distribution(
     n_plots = len(target_cols)
     rows = (n_plots + cols - 1) // cols
 
-    fig, axes = get_default_ax(width, height, rows, cols, dpi, flatten=True)
+    fig, axes = get_default_ax(width, height, rows, cols, dpi, flatten=True) # type: ignore
     outparams = True
 
     for idx, col in enumerate(target_cols):
@@ -2162,11 +2114,11 @@ def categorical_target_distribution(
             plot_kwargs.update({"x": col, "y": yname, "hue": col, "palette": palette})
             sb.boxplot(**plot_kwargs, linewidth=linewidth)
 
-        ax.set_title(f"{col} vs {yname}")
+        ax.set_title(f"{col} vs {yname}", fontsize=config.title_font_size, pad=config.title_pad)  # type: ignore
 
     # 불필요한 빈 축 숨기기
     for j in range(n_plots, len(axes)):
-        axes[j].set_visible(False)
+        axes[j].set_visible(False) # type: ignore
 
     finalize_plot(axes[0], callback, outparams, save_path, True, title)
 
@@ -2182,7 +2134,6 @@ def roc_curve_plot(
     width: int = config.height,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -2197,7 +2148,6 @@ def roc_curve_plot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes. None이면 새로 생성.
 
@@ -2210,7 +2160,7 @@ def roc_curve_plot(
     """
     outparams = False
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # 실제값(y_true) 결정
@@ -2236,10 +2186,10 @@ def roc_curve_plot(
 
     ax.set_xlim([0.0, 1.0])  # type: ignore
     ax.set_ylim([0.0, 1.05])  # type: ignore
-    ax.set_xlabel("위양성율 (False Positive Rate)", fontsize=8)  # type: ignore
-    ax.set_ylabel("재현율 (True Positive Rate)", fontsize=8)  # type: ignore
-    ax.set_title("ROC 곡선", fontsize=10, fontweight="bold")  # type: ignore
-    ax.legend(loc="lower right", fontsize=7)  # type: ignore
+    ax.set_xlabel("위양성율 (False Positive Rate)", fontsize=config.label_font_size)  # type: ignore
+    ax.set_ylabel("재현율 (True Positive Rate)", fontsize=config.label_font_size)  # type: ignore
+    ax.set_title("ROC 곡선", fontsize=config.title_font_size, pad=config.title_pad)  # type: ignore
+    ax.legend(loc="lower right", fontsize=config.label_font_size)  # type: ignore
     finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
@@ -2252,7 +2202,6 @@ def confusion_matrix_plot(
     threshold: float = 0.5,
     width: int = config.width,
     height: int = config.height,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -2265,7 +2214,6 @@ def confusion_matrix_plot(
         threshold (float): 예측 확률을 이진 분류로 변환할 임계값. 기본값 0.5.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
-        dpi (int): 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes. None이면 새로 생성.
 
@@ -2274,7 +2222,7 @@ def confusion_matrix_plot(
     """
     outparams = False
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # 학습 데이터 기반 실제값/예측 확률 결정
@@ -2295,7 +2243,7 @@ def confusion_matrix_plot(
         text_kw={"fontsize": 16, "weight": "bold"},
     )
 
-    ax.set_title(f"혼동행렬 (임계값: {threshold})", fontsize=8, fontweight="bold")  # type: ignore
+    ax.set_title(f"혼동행렬 (임계값: {threshold})", fontsize=config.title_font_size, pad=config.title_pad)  # type: ignore
 
     finalize_plot(ax, callback, outparams, save_path, False, title)  # type: ignore
 
@@ -2315,7 +2263,6 @@ def radarplot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -2335,7 +2282,6 @@ def radarplot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 해상도.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: 추가 플롯 옵션.
@@ -2381,7 +2327,7 @@ def radarplot(
 
     # Axes 생성 (polar projection)
     if ax is None:
-        fig = plt.figure(figsize=(width / 100, height / 100), dpi=dpi)
+        fig = plt.figure(figsize=(width / 100, height / 100), dpi=config.dpi)
         ax = fig.add_subplot(111, projection="polar")
         outparams = True
 
@@ -2452,7 +2398,6 @@ def distribution_plot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
 ) -> None:
@@ -2472,7 +2417,6 @@ def distribution_plot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         save_path (str|None): 저장 경로.
         callback (Callable|None): Axes 후처리 콜백.
 
@@ -2488,7 +2432,7 @@ def distribution_plot(
         if hue is None:
             # 1행 2열 서브플롯 생성
             fig, axes = get_default_ax(
-                width, height, rows=1, cols=2, dpi=dpi, title=title
+                width, height, rows=1, cols=2, title=title
             )
 
             kde_confidence_interval(
@@ -2496,11 +2440,11 @@ def distribution_plot(
                 xnames=c,
                 clevel=clevel,
                 linewidth=linewidth,
-                ax=axes[0],
+                ax=axes[0], # type: ignore
             )
 
             if kind == "hist":
-                histplot(df=data, xname=c, linewidth=linewidth, ax=axes[1])
+                histplot(df=data, xname=c, linewidth=linewidth, ax=axes[1])  # type: ignore
             else:
                 boxplot(
                     df=data[column], linewidth=linewidth, ax=axes[1]  # type: ignore
@@ -2515,7 +2459,7 @@ def distribution_plot(
             n_cat = len(categories) if categories else 1
 
             fig, axes = get_default_ax(
-                width, height, rows=n_cat, cols=2, dpi=dpi, title=title
+                width, height, rows=n_cat, cols=2, title=title
             )
             axes_2d = np.atleast_2d(axes)
 
@@ -2530,7 +2474,7 @@ def distribution_plot(
                     linewidth=linewidth,
                     ax=left_ax,
                 )
-                left_ax.set_title(f"{hue} = {cat}")
+                left_ax.set_title(f"{hue} = {cat}", fontsize=config.title_font_size, pad=config.title_pad)  # type: ignore
 
                 if kind == "hist":
                     histplot(
@@ -2549,7 +2493,7 @@ def distribution_plot(
             plt.tight_layout()
 
             if save_path:
-                plt.savefig(save_path, bbox_inches="tight", dpi=dpi)
+                plt.savefig(save_path, bbox_inches="tight")
                 plt.close()
             else:
                 plt.show()
@@ -2562,7 +2506,6 @@ def silhouette_plot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -2577,7 +2520,6 @@ def silhouette_plot(
         width (int, optional): 플롯 가로 크기 (inch 단위).
         height (int, optional): 플롯 세로 크기 (inch 단위).
         linewidth (float, optional): 기준선 등 선 두께.
-        dpi (int, optional): 플롯 해상도(DPI).
         save_path (str, optional): 저장 경로 지정 시 파일로 저장.
         callback (Callable, optional): 추가 커스텀 콜백 함수.
         ax (Axes, optional): 기존 matplotlib Axes 객체. None이면 새로 생성.
@@ -2593,7 +2535,7 @@ def silhouette_plot(
 
     outparams = False
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     sil_avg = silhouette_score(X=data, labels=estimator.labels_)
@@ -2620,7 +2562,7 @@ def silhouette_plot(
         ax.fill_betweenx(  # type: ignore
             np.arange(y_lower, y_upper),
             0,
-            ith_cluster_sil_values,
+            ith_cluster_sil_values,  # type: ignore
             alpha=0.7,
         )
         ax.text(-0.05, y_lower + 0.5 * size_cluster_i, str(i))  # type: ignore
@@ -2657,7 +2599,6 @@ def cluster_plot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     ax: Axes | None = None,
 ) -> None:
@@ -2677,7 +2618,6 @@ def cluster_plot(
         width (int, optional): 플롯 가로 크기 (inch 단위).
         height (int, optional): 플롯 세로 크기 (inch 단위).
         linewidth (float, optional): 중심점 등 선 두께.
-        dpi (int, optional): 플롯 해상도(DPI).
         save_path (str, optional): 저장 경로 지정 시 파일로 저장.
         ax (Axes, optional): 기존 matplotlib Axes 객체. None이면 새로 생성.
 
@@ -2695,7 +2635,7 @@ def cluster_plot(
     """
     outparams = False
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
     df = data.copy() if data is not None else None  # type: ignore
@@ -2723,17 +2663,17 @@ def cluster_plot(
             ax.scatter(  # type: ignore
                 centers[:, xindex],
                 centers[:, yindex],
-                marker="o",
+                marker="o",  # type: ignore
                 color="white",
                 alpha=1,
                 s=200,
                 edgecolor="r",
-                linewidth=linewidth,
+                linewidth=linewidth,  # type: ignore
             )
 
             for i, c in enumerate(centers):
                 ax.scatter(
-                    c[xindex], c[yindex], marker="$%d$" % i, alpha=1, s=50, edgecolor="k"
+                    c[xindex], c[yindex], marker="$%d$" % i, alpha=1, s=50, edgecolor="k"  # type: ignore
                 )
 
     scatterplot(
@@ -2748,7 +2688,6 @@ def cluster_plot(
         width=width,
         height=height,
         linewidth=linewidth,
-        dpi=dpi,
         save_path=save_path,
         callback=callback,
         ax=ax,
@@ -2769,7 +2708,6 @@ def visualize_silhouette(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
 ) -> None:
     """
@@ -2788,7 +2726,6 @@ def visualize_silhouette(
         width (int, optional): 플롯 가로 크기 (inch 단위).
         height (int, optional): 플롯 세로 크기 (inch 단위).
         linewidth (float, optional): 기준선 등 선 두께.
-        dpi (int, optional): 플롯 해상도(DPI).
         save_path (str, optional): 저장 경로 지정 시 파일로 저장.
 
     Returns:
@@ -2798,16 +2735,15 @@ def visualize_silhouette(
         - 실루엣 플롯(왼쪽)과 2차원 군집 산점도(오른쪽)를 동시에 확인 가능
         - 군집 품질과 분포를 한눈에 비교·분석할 때 유용
     """
-    fig, ax = get_default_ax(rows=1, cols=2, width=width, height=height, dpi=dpi, title=title)
+    fig, ax = get_default_ax(rows=1, cols=2, width=width, height=height, title=title)
 
     silhouette_plot(
         estimator=estimator,
         data=data,
-        ax=ax[0],
+        ax=ax[0],  # type: ignore
         linewidth=linewidth,
         width=width,
-        height=height,
-        dpi=dpi
+        height=height
     )
 
     cluster_plot(
@@ -2815,12 +2751,11 @@ def visualize_silhouette(
         data=data,
         xname=xname,
         yname=yname,
-        ax=ax[1],
+        ax=ax[1],  # type: ignore
         outline=outline,
         palette=palette,
         width=width,
-        height=height,
-        dpi=dpi
+        height=height
     )
 
     finalize_plot(ax)
@@ -2837,7 +2772,6 @@ def dandrogram(
     title: str | None = None,
     width: int = config.width,
     height: int = config.height,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None
@@ -2852,7 +2786,6 @@ def dandrogram(
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
-        dpi (int): 그림 크기 및 해상도.
         save_path (str|None): 저장 경로.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes. None이면 새로 생성.
@@ -2866,7 +2799,7 @@ def dandrogram(
 
     for i, merge in enumerate(estimator.children_): # type: ignore
         current_count = 0
-        for child_idx in merge:
+        for child_idx in merge:  # type: ignore
             if child_idx < n_samples:
                 current_count += 1  # leaf node
             else:
@@ -2880,7 +2813,7 @@ def dandrogram(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1, dpi)  # type: ignore
+        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
         outparams = True
 
 
@@ -2912,7 +2845,6 @@ def pca_plot(
     width: int = config.width,
     height: int = config.height,
     linewidth: float = config.line_width,
-    dpi: int = config.dpi,
     save_path: str | None = None,
     callback: Callable | None = None,
 ) -> None:
@@ -2929,7 +2861,6 @@ def pca_plot(
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         linewidth (float): 선 굵기.
-        dpi (int): 그림 크기 및 해상도.
         save_path (str|None): 저장 경로.
         callback (Callable|None): Axes 후처리 콜백.
 
@@ -3031,7 +2962,6 @@ def pca_plot(
             width=width,
             height=height,
             linewidth=linewidth,
-            dpi=dpi,
             save_path=save_path,
             title=title,
             callback=__callable,
