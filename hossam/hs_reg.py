@@ -383,7 +383,6 @@ def shap_analysis(
     x: DataFrame,
     plot: bool = True,
     width: int = config.width,
-    height: int = config.height,
 ) -> tuple[DataFrame, np.ndarray]:
     """
     SHAP 값 기반 특징 중요도 분석 함수.    
@@ -394,7 +393,6 @@ def shap_analysis(
         x: 설명변수 데이터 (DataFrame)
         plot: SHAP 요약 플롯 시각화 여부 (기본값: True
         width: 플롯 너비 (기본값: config.width)
-        height: 플롯 높이 (기본값: config.height)
 
     Returns:
         tuple: 특징 중요도 요약 DataFrame 및 SHAP 값 배열
@@ -468,7 +466,7 @@ def shap_analysis(
         shap.summary_plot(shap_values, x, show=False)
 
         fig = plt.gcf()
-        fig.set_size_inches(width / 100, len(summary_df) * 50 / 100)
+        fig.set_size_inches(width / 100, len(summary_df) * 60 / 100)
         fig.set_dpi(config.dpi)
         ax = fig.get_axes()[0]
 
