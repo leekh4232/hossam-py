@@ -19,6 +19,7 @@ from sklearn.metrics import (
     r2_score,
     mean_absolute_error,
     mean_squared_error,
+    mean_squared_log_error,
     mean_absolute_percentage_error,
 )
 
@@ -56,6 +57,8 @@ def scores(
             "평균절대오차(MAE)": mean_absolute_error(y_test, y_pred),
             "평균제곱오차(MSE)": mean_squared_error(y_test, y_pred),
             "평균오차(RMSE)": np.sqrt(mean_squared_error(y_test, y_pred)),
+            "평균제곱로그오차(MSLE)": mean_squared_log_error(y_test, y_pred),
+            "평균로그오차(RMSLE)": np.sqrt(mean_squared_log_error(y_test, y_pred)),
             "평균 절대 백분오차 비율(MAPE)": mean_absolute_percentage_error(
                 y_test, y_pred
             ),

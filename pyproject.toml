@@ -50,7 +50,7 @@ dependencies = [
     # ML / Statistics
     "pingouin",
     "statannotations",
-    "xgboost",
+    "xgboost<3.0.0",
     "lightgbm>=3.0.0",
     "catboost",
     "shap>=0.40",
