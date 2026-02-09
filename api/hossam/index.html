@@ -4601,13 +4601,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 
 
 <a href="#hossam.hs_shap_analysis" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">hs_shap_analysis</span><span class="p">(</span>
-    <span class="n">model</span><span class="p">,</span>
-    <span class="n">x</span><span class="p">,</span>
-    <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">width</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-    <span class="n">height</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">hs_shap_analysis</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4688,22 +4682,6 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
             </td>
             <td>
                   <code><span title="hossam.hs_plot.config.width">width</span></code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>height</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>플롯 높이 (기본값: config.height)</p>
-              </div>
-            </td>
-            <td>
-                  <code><span title="hossam.hs_plot.config.height">height</span></code>
             </td>
           </tr>
       </tbody>
@@ -4833,14 +4811,11 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="normal">476</span>
 <span class="normal">477</span>
 <span class="normal">478</span>
-<span class="normal">479</span>
-<span class="normal">480</span>
-<span class="normal">481</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_analysis</span><span class="p">(</span>
+<span class="normal">479</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_analysis</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    SHAP 값 기반 특징 중요도 분석 함수.    </span>
@@ -4851,7 +4826,6 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="sd">        x: 설명변수 데이터 (DataFrame)</span>
 <span class="sd">        plot: SHAP 요약 플롯 시각화 여부 (기본값: True</span>
 <span class="sd">        width: 플롯 너비 (기본값: config.width)</span>
-<span class="sd">        height: 플롯 높이 (기본값: config.height)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        tuple: 특징 중요도 요약 DataFrame 및 SHAP 값 배열</span>
@@ -4925,7 +4899,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
         <span class="n">shap</span><span class="o">.</span><span class="n">summary_plot</span><span class="p">(</span><span class="n">shap_values</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">summary_df</span><span class="p">)</span> <span class="o">*</span> <span class="mi">50</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">summary_df</span><span class="p">)</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
         <span class="n">fig</span><span class="o">.</span><span class="n">set_dpi</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">dpi</span><span class="p">)</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_axes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -5101,7 +5075,9 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_reg.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">488</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">486</span>
+<span class="normal">487</span>
+<span class="normal">488</span>
 <span class="normal">489</span>
 <span class="normal">490</span>
 <span class="normal">491</span>
@@ -5195,9 +5171,7 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
 <span class="normal">579</span>
 <span class="normal">580</span>
 <span class="normal">581</span>
-<span class="normal">582</span>
-<span class="normal">583</span>
-<span class="normal">584</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_dependence_analysis</span><span class="p">(</span>
+<span class="normal">582</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_dependence_analysis</span><span class="p">(</span>
     <span class="n">summary_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">shap_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
