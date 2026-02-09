@@ -2178,17 +2178,17 @@ hs_prep.outlier_table(df, "value")</p>
 <span class="sd">        from hossam import *</span>
 <span class="sd">        hs_prep.outlier_table(df, &quot;value&quot;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># columns 인자가 있으면 args보다 우선한다.</span>
+    <span class="c1"># columns 인자가 있으면 fields보다 우선한다.</span>
     <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">args</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;args와 columns 인자는 중복 사용할 수 없습니다.&quot;</span><span class="p">)</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="n">columns</span>
+        <span class="k">if</span> <span class="n">fields</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;fields와 columns 인자는 중복 사용할 수 없습니다.&quot;</span><span class="p">)</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">columns</span> <span class="c1"># type: ignore</span>
 
-    <span class="n">target_fields</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="nb">list</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">fields</span>
-        <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
-    <span class="p">)</span>
+    <span class="n">target_fields</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span> <span class="k">if</span> <span class="n">fields</span> <span class="k">else</span> <span class="n">columns</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">target_fields</span><span class="p">:</span>
+        <span class="n">target_fields</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
     <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">target_fields</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
