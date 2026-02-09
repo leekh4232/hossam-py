@@ -365,16 +365,20 @@ def describe(data: DataFrame, *fields: str, columns: list | None = None):
         - 분포 특성은 왜도 값으로 판정합니다.
         - 로그변환 필요성은 왜도의 절댓값 크기로 판정합니다.
     """
+    if columns is not None:
+        if fields:  # type: ignore
+            raise ValueError("fields와 columns 인자는 중복 사용할 수 없습니다.")
+        fields = columns # type: ignore
+
+    target_fields: list | None = list(fields) if fields else columns
+
     num_columns = data.select_dtypes(include=np.number).columns
 
-    if not fields:
-        fields = tuple(num_columns)
-
     # 기술통계량 구하기
-    desc = data[list(fields)].describe().T
+    desc = data[target_fields].describe().T
 
     # 각 컬럼별 결측치 수(na_count) 추가
-    na_counts = data[list(fields)].isnull().sum()
+    na_counts = data[target_fields].isnull().sum()
     desc.insert(1, 'na_count', na_counts)
 
     # 결측치 비율(na_rate) 추가
@@ -382,7 +386,7 @@ def describe(data: DataFrame, *fields: str, columns: list | None = None):
 
     # 추가 통계량 계산
     additional_stats = []
-    for f in fields:
+    for f in target_fields: # type: ignore
         # 숫자 타입이 아니라면 건너뜀
         if f not in num_columns:
             continue
@@ -448,17 +452,13 @@ def describe(data: DataFrame, *fields: str, columns: list | None = None):
     # 결과 병합
     result = concat([desc, additional_df], axis=1)
 
-    # columns 파라미터가 지정된 경우 해당 컬럼만 필터링
-    if columns is not None:
-        result = result[columns]
-
     return result
 
 
 # ===================================================================
 # 범주형 변수 요약 (Categorical Variable Summary)
 # ===================================================================
-def category_describe(data: DataFrame, *fields: str):
+def category_describe(data: DataFrame, *fields: str, columns: list | None = None):
     """데이터프레임의 명목형(범주형) 변수에 대한 분포 편향을 요약한다.
 
     각 명목형 컬럼의 최다 범주와 최소 범주의 정보를 요약하여 데이터프레임으로 반환한다.
@@ -466,6 +466,7 @@ def category_describe(data: DataFrame, *fields: str):
     Args:
         data (DataFrame): 분석 대상 데이터프레임.
         *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 명목형 컬럼을 처리.
+        columns (list | None, optional): 분석할 컬럼명 목록. fields와 중복 사용 불가. 기본값은 None.
 
     Returns:
         tuple[DataFrame, DataFrame]: 각 컬럼별 최다/최소 범주 정보를 포함한 데이터프레임과
@@ -500,15 +501,23 @@ def category_describe(data: DataFrame, *fields: str):
         - 숫자형 컬럼은 자동으로 제외됩니다.
         - NaN 값도 하나의 범주로 포함됩니다.
     """
+    # columns 인자가 있으면 fields보다 우선한다.
+    if columns is not None:
+        if fields:  # type: ignore
+            raise ValueError("fields와 columns 인자는 중복 사용할 수 없습니다.")
+        fields = columns # type: ignore
+
+    target_fields = list(fields) if fields else columns
+
     num_columns = data.select_dtypes(include=np.number).columns
 
-    if not fields:
+    if not target_fields:
         # 명목형(범주형) 컬럼 선택: object, category, bool 타입
-        fields = data.select_dtypes(include=['object', 'category', 'bool']).columns # type: ignore
+        target_fields = data.select_dtypes(include=['object', 'category', 'bool']).columns # type: ignore
 
     result = []
     summary = []
-    for f in fields:
+    for f in target_fields:
         # 숫자형 컬럼은 건너뜀
         if f in num_columns:
             continue

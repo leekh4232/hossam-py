@@ -260,17 +260,17 @@ def outlier_table(
         from hossam import *
         hs_prep.outlier_table(df, "value")
     """
-    # columns 인자가 있으면 args보다 우선한다.
+    # columns 인자가 있으면 fields보다 우선한다.
     if columns is not None:
-        if args:  # type: ignore
-            raise ValueError("args와 columns 인자는 중복 사용할 수 없습니다.")
-        args = columns
+        if fields:  # type: ignore
+            raise ValueError("fields와 columns 인자는 중복 사용할 수 없습니다.")
+        fields = columns # type: ignore
 
-    target_fields = (
-        list(fields)
-        if fields
-        else list(data.select_dtypes(include=[np.number]).columns)
-    )
+    target_fields = list(fields) if fields else columns
+
+    if not target_fields:
+        target_fields = list(data.select_dtypes(include=[np.number]).columns)
+
     result = []
     for f in target_fields:
         if f not in data.columns:
