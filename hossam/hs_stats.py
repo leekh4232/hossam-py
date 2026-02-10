@@ -110,7 +110,7 @@ def mcar_test(data: DataFrame, columns: list | str | None = None) -> DataFrame:
 # ===================================================================
 # 결측치 분석 (Missing Values Analysis)
 # ===================================================================
-def missing_values(data: DataFrame, *fields: str):
+def missing_values(data: DataFrame, *fields: str, columns: list | None = None) -> DataFrame:
     """데이터프레임의 결측치 정보를 컬럼 단위로 반환한다.
 
     각 컬럼의 결측치 수와 전체 대비 비율을 계산하여 데이터프레임으로 반환한다.
@@ -141,11 +141,15 @@ def missing_values(data: DataFrame, *fields: str):
         print(result)
         ```
     """
-    if not fields:
-        fields = tuple(data.columns)
+    if columns is not None:
+        if fields:  # type: ignore
+            raise ValueError("fields와 columns 인자는 중복 사용할 수 없습니다.")
+        fields = columns # type: ignore
+
+    target_fields: list | None = list(fields) if fields else list(data.columns) # type: ignore
 
     result = []
-    for f in fields:
+    for f in target_fields:
         missing_count = data[f].isna().sum()
         missing_rate = (missing_count / len(data)) * 100
 
@@ -163,7 +167,7 @@ def missing_values(data: DataFrame, *fields: str):
 # ===================================================================
 # 이상치 분석 (Outlier Analysis)
 # ===================================================================
-def outlier_table(data: DataFrame, *fields: str):
+def outlier_table(data: DataFrame, *fields: str, columns: list | None = None):
     """데이터프레임의 사분위수와 이상치 경계값, 왜도를 구한다.
 
     수업에서 사용된 hs_outlier_table() 함수를 개선한 버전    
@@ -175,6 +179,7 @@ def outlier_table(data: DataFrame, *fields: str):
     Args:
         data (DataFrame): 분석 대상 데이터프레임.
         *fields (str): 분석할 컬럼명 목록. 지정하지 않으면 모든 숫자형 컬럼을 처리.
+        columns (list | None): 분석할 컬럼명 목록. 지정하지 않으면 모든 숫자형 컬럼을 처리.
 
     Returns:
         DataFrame: 각 필드별 사분위수 및 이상치 경계값을 포함한 데이터프레임.
@@ -213,13 +218,17 @@ def outlier_table(data: DataFrame, *fields: str):
         - 숫자형이 아닌 컬럼은 자동으로 제외됩니다.
         - Tukey의 1.5 * IQR 규칙을 사용합니다 (상자그림의 표준 방법).
     """
-    if not fields:
-        fields = tuple(data.columns)
+    if columns is not None:
+        if fields:  # type: ignore
+            raise ValueError("fields와 columns 인자는 중복 사용할 수 없습니다.")
+        fields = columns # type: ignore
 
-    num_columns = data.select_dtypes(include=np.number).columns
+    num_columns = list(data.select_dtypes(include=np.number).columns)
+
+    target_fields: list | None = list(fields) if fields else num_columns # type: ignore
 
     result = []
-    for f in fields:
+    for f in target_fields:
         # 숫자 타입이 아니라면 건너뜀
         if f not in num_columns:
             continue
@@ -370,9 +379,9 @@ def describe(data: DataFrame, *fields: str, columns: list | None = None):
             raise ValueError("fields와 columns 인자는 중복 사용할 수 없습니다.")
         fields = columns # type: ignore
 
-    target_fields: list | None = list(fields) if fields else columns
+    num_columns = list(data.select_dtypes(include=np.number).columns)
 
-    num_columns = data.select_dtypes(include=np.number).columns
+    target_fields: list | None = list(fields) if fields else num_columns # type: ignore
 
     # 기술통계량 구하기
     desc = data[target_fields].describe().T
@@ -507,9 +516,9 @@ def category_describe(data: DataFrame, *fields: str, columns: list | None = None
             raise ValueError("fields와 columns 인자는 중복 사용할 수 없습니다.")
         fields = columns # type: ignore
 
-    target_fields = list(fields) if fields else columns
+    num_columns = list(data.select_dtypes(include=np.number).columns)
 
-    num_columns = data.select_dtypes(include=np.number).columns
+    target_fields = list(fields) if fields else columns
 
     if not target_fields:
         # 명목형(범주형) 컬럼 선택: object, category, bool 타입

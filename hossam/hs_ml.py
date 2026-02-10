@@ -77,7 +77,7 @@ def learning_cv(
     estimator,
     x,
     y,
-    scoring="neg_root_mean_squared_error",
+    scoring=None,
     cv=5,
     train_sizes=np.linspace(0.1, 1.0, 10),
     n_jobs=-1,
@@ -98,6 +98,24 @@ def learning_cv(
         DataFrame: 과적합 판별 결과 표
     """
 
+    # -------------------------------------------------
+    # [NEW] 문제 유형 자동 판별
+    # -------------------------------------------------
+    is_classification = (
+        hasattr(estimator, "_estimator_type")
+        and estimator._estimator_type == "classifier"
+    )
+
+    # -------------------------------------------------
+    # [NEW] scoring 자동 설정
+    # -------------------------------------------------
+    if scoring is None:
+        scoring = "roc_auc" if is_classification else "neg_root_mean_squared_error"
+
+
+    # -------------------------------------------------
+    # learning curve 계산
+    # -------------------------------------------------
     train_sizes, train_scores, cv_scores = learning_curve(  # type: ignore
         estimator=estimator,
         X=x,
@@ -110,75 +128,122 @@ def learning_cv(
         random_state=52,
     )
 
+    # -------------------------------------------------
+    # 모델명 추출 (Pipeline 대응)
+    # -------------------------------------------------
     if hasattr(estimator, "named_steps"):
         classname = estimator.named_steps["model"].__class__.__name__
     else:
         classname = estimator.__class__.__name__
 
-    # neg RMSE → RMSE
-    train_rmse = -train_scores
-    cv_rmse = -cv_scores
+    # =================================================
+    # 회귀 전용 처리 (기존 코드)
+    # =================================================
+    if not is_classification:
 
-    # 평균 / 표준편차
-    train_mean = train_rmse.mean(axis=1)
-    cv_mean = cv_rmse.mean(axis=1)
-    cv_std = cv_rmse.std(axis=1)
+        # neg RMSE → RMSE
+        train_rmse = -train_scores
+        cv_rmse = -cv_scores
 
-    # 마지막 지점 기준 정량 판정
-    final_train = train_mean[-1]
-    final_cv = cv_mean[-1]
-    final_std = cv_std[-1]
-    gap_ratio = final_train / final_cv
-    var_ratio = final_std / final_cv
+        # 평균 / 표준편차
+        train_mean = train_rmse.mean(axis=1)
+        cv_mean = cv_rmse.mean(axis=1)
+        cv_std = cv_rmse.std(axis=1)
 
-    # -----------------
-    # 과소적합 기준선 (some_threshold)
-    # -----------------
-    # 기준모형 RMSE (평균 예측)
-    y_mean = y.mean()
-    rmse_naive = np.sqrt(np.mean((y - y_mean) ** 2))
+        # 마지막 지점 기준 정량 판정
+        final_train = train_mean[-1]
+        final_cv = cv_mean[-1]
+        final_std = cv_std[-1]
+        gap_ratio = final_train / final_cv
+        var_ratio = final_std / final_cv
 
-    # 분산 기반
-    std_y = y.std()
+        # -----------------
+        # 과소적합 기준선 (some_threshold)
+        # -----------------
+        # 기준모형 RMSE (평균 예측)
+        y_mean = y.mean()
+        rmse_naive = np.sqrt(np.mean((y - y_mean) ** 2))
 
-    # 최소 설명력(R²) 기반
-    min_r2 = 0.10
-    rmse_r2 = np.sqrt((1 - min_r2) * np.var(y))
+        # 분산 기반
+        std_y = y.std()
 
-    # 최종 threshold (가장 관대한 기준)
-    # -> 원래 some_threshold는 도메인 지식 수준에서 이 모델은 최소 어느 정도의 성능은 내야 한다는 기준을 설정하는 것
-    some_threshold = min(rmse_naive, std_y, rmse_r2)
+        # 최소 설명력(R²) 기반
+        min_r2 = 0.10
+        rmse_r2 = np.sqrt((1 - min_r2) * np.var(y))
 
-    # -----------------
-    # 판정 로직
-    # -----------------
-    # 마지막 두 지점 기울기
-    train_slope = train_mean[-1] - train_mean[-2]
-    cv_slope = cv_mean[-1] - cv_mean[-2]
+        # 최종 threshold (가장 관대한 기준)
+        # -> 원래 some_threshold는 도메인 지식 수준에서 이 모델은 최소 어느 정도의 성능은 내야 한다는 기준을 설정하는 것
+        some_threshold = min(rmse_naive, std_y, rmse_r2)
 
-    if gap_ratio >= 0.95 and final_cv > some_threshold:
-        status = "⚠️ 과소적합"
-    elif gap_ratio <= 0.8 and train_slope > 0 and cv_slope < 0:
-        status = "⚠️ 데이터 추가시 일반화 기대"
-    elif gap_ratio <= 0.8:
-        status = "⚠️ 과대적합"
-    elif gap_ratio <= 0.95 and var_ratio <= 0.10:
-        status = "✅ 일반화 양호"
-    elif var_ratio > 0.15:
-        status = "⚠️ 데이터 부족"
+        # -----------------
+        # 판정 로직
+        # -----------------
+        # 마지막 두 지점 기울기
+        train_slope = train_mean[-1] - train_mean[-2]
+        cv_slope = cv_mean[-1] - cv_mean[-2]
+
+        if gap_ratio >= 0.95 and final_cv > some_threshold:
+            status = "⚠️ 과소적합"
+        elif gap_ratio <= 0.8 and train_slope > 0 and cv_slope < 0:
+            status = "⚠️ 데이터 추가시 일반화 기대"
+        elif gap_ratio <= 0.8:
+            status = "⚠️ 과대적합"
+        elif gap_ratio <= 0.95 and var_ratio <= 0.10:
+            status = "✅ 일반화 양호"
+        elif var_ratio > 0.15:
+            status = "⚠️ 데이터 부족"
+        else:
+            status = "⚠️ 판단유보"
+
+        # [NEW] 평가 지표 이름
+        metric_name = "RMSE"
+
+    # =================================================
+    # 분류 전용 처리
+    # =================================================
     else:
-        status = "⚠️ 판단유보"
+        # [NEW] 분류는 그대로 사용 (AUC, Accuracy 등)
+        train_metric = train_scores
+        cv_metric = cv_scores
+
+        train_mean = train_metric.mean(axis=1)
+        cv_mean = cv_metric.mean(axis=1)
+        cv_std = cv_metric.std(axis=1)
+
+        final_train = train_mean[-1]
+        final_cv = cv_mean[-1]
+        final_std = cv_std[-1]
+
+        # [NEW] 분류용 비율 정의 (차이 기반)
+        gap_ratio = final_train - final_cv
+        var_ratio = final_std
+
+        # -----------------
+        # [NEW] 분류 판정 로직 (객관적 기준)
+        # -----------------
+        if final_train < 0.6 and final_cv < 0.6:
+            status = "⚠️ 과소적합"
+        elif gap_ratio > 0.1:
+            status = "⚠️ 과대적합"
+        elif gap_ratio <= 0.05 and var_ratio <= 0.05:
+            status = "✅ 일반화 양호"
+        elif var_ratio > 0.1:
+            status = "⚠️ 데이터 부족"
+        else:
+            status = "⚠️ 판단유보"
+
+        metric_name = scoring.upper()
 
     # -----------------
-    # 정량 결과 표
+    # 정량 결과 표 (수정된 부분)
     # -----------------
     result_df = DataFrame(
         {
-            "Train RMSE": [final_train],
-            "CV RMSE 평균": [final_cv],
-            "CV RMSE 표준편차": [final_std],
-            "Train/CV 비율": [gap_ratio],
-            "CV 변동성 비율": [var_ratio],
+            f"Train {metric_name}": [final_train],
+            f"CV {metric_name} 평균": [final_cv],
+            f"CV {metric_name} 표준편차": [final_std],
+            f"Train/CV 비율": [gap_ratio],
+            f"CV 변동성 비율": [var_ratio],
             "판정 결과": [status],
         },
         index=[classname],
@@ -194,16 +259,16 @@ def learning_cv(
             marker="o",
             linewidth=config.line_width,
             markeredgecolor="#ffffff",
-            label="CV RMSE",
+            label=f"CV {metric_name}",
         )
 
         ax.set_xlabel("학습 데이터 비율", fontsize=config.label_font_size)  # type : ignore
-        ax.set_ylabel("RMSE", fontsize=config.label_font_size)  # type : ignore
+        ax.set_ylabel(metric_name, fontsize=config.label_font_size)  # type : ignore
 
     lineplot(df=None, xname=train_sizes, yname=train_mean, 
         marker="o",
         markeredgecolor="#ffffff",
-        label="Train RMSE",
+        label=f"Train {metric_name}",
         title=f"{classname} 학습곡선 (Learning Curve)",
         callback=__callback
     )
@@ -317,7 +382,7 @@ def feature_importance(
         )
 
         # 결과 정리
-        imp_df = DataFrame({"importance": imp_df.importances_mean}, index=x_train.columns)
+        imp_df = DataFrame({"importance": imp_df.importances_mean}, index=x_train.columns) # type: ignore
 
     #----------------------------------
     # 중요도 비율 + 누적 중요도 계산

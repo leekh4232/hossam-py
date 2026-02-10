@@ -9,7 +9,7 @@ from . import hs_prep
 from . import hs_stats
 from . import hs_timeserise
 from . import hs_util
-from . import hs_reg
+from . import hs_ml
 from . import hs_cluster
 from . import hs_study
 from .hs_util import load_info
@@ -18,17 +18,17 @@ from .hs_plot import visualize_silhouette
 from .hs_stats import ttest_ind as hs_ttest_ind
 from .hs_stats import outlier_table as hs_outlier_table
 from .hs_stats import oneway_anova as hs_oneway_anova
-from .hs_reg import learning_cv as hs_learning_cv
-from .hs_reg import scores as hs_get_scores
-from .hs_reg import score_cv as hs_get_score_cv
-from .hs_reg import feature_importance as hs_feature_importance
-from .hs_reg import shap_analysis as hs_shap_analysis
-from .hs_reg import shap_dependence_analysis as hs_shap_dependence_analysis
+from .hs_ml import learning_cv as hs_learning_cv
+from .hs_ml import scores as hs_get_scores
+from .hs_ml import score_cv as hs_get_score_cv
+from .hs_ml import feature_importance as hs_feature_importance
+from .hs_ml import shap_analysis as hs_shap_analysis
+from .hs_ml import shap_dependence_analysis as hs_shap_dependence_analysis
+from .hs_stats import describe as hs_describe
+from .hs_stats import category_describe as hs_category_describe
 from .VIFSelector import VIFSelector
 
 # py-modules
-import sys
-import warnings
 import pandas as pd
 import seaborn as sb
 from matplotlib import pyplot as plt
@@ -41,7 +41,7 @@ try:
 except Exception:
     __version__ = "develop"
 
-my_dpi = hs_plot.config.dpi
+my_dpi = hs_plot.config.dpi # type: ignore
 
 __all__ = [
     "my_dpi",
@@ -55,7 +55,7 @@ __all__ = [
     "hs_timeserise",
     "hs_util",
     "hs_cluster",
-    "hs_reg",
+    "hs_ml",
     "hs_study",
     "visualize_silhouette",
     "hs_ttest_ind",
@@ -68,13 +68,16 @@ __all__ = [
     "hs_shap_analysis",
     "hs_shap_dependence_analysis",
     "VIFSelector",
-    "init_pyplot"
+    "init_pyplot",
+    "hs_describe",
+    "hs_category_describe",
 ]
 
 
 def check_pypi_latest(package_name: str):
     # 설치된 버전
     installed = importlib.metadata.version(package_name)
+    print(f"현재 설치된 '{package_name}' 패키지 버전: {installed}")
 
     try:
         # PyPI 최신 버전
@@ -89,7 +92,7 @@ def check_pypi_latest(package_name: str):
         "package": package_name,
         "installed": installed,
         "latest": latest,
-        "outdated": installed != latest,
+        "outdated": installed < latest, # type: ignore
     }
 
 
@@ -190,7 +193,7 @@ def _init():
 
     version_info = check_pypi_latest("hossam")
 
-    if version_info["outdated"]:
+    if __version__ != "develop" and version_info["outdated"]:
         print(
             f"\n⚠️  'hossam' 패키지의 최신 버전이 출시되었습니다! (설치된 버전: {version_info['installed']}, 최신 버전: {version_info['latest']})"
         )
