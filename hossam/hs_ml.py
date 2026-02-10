@@ -29,9 +29,7 @@ from .hs_plot import create_figure, finalize_plot, barplot, lineplot, config
 # --------------------------------------------------------
 # 회귀 성능 평가 지표 함수
 # --------------------------------------------------------
-def scores(
-    estimator, x_test: DataFrame, y_test: DataFrame | np.ndarray
-) -> DataFrame:
+def scores(estimator, x_test: DataFrame, y_test: DataFrame | np.ndarray) -> DataFrame:
     """
     회귀 성능 평가 지표 함수
     수업에서 사용된 hs_get_scores 함수와 동일.
@@ -111,7 +109,6 @@ def learning_cv(
     # -------------------------------------------------
     if scoring is None:
         scoring = "roc_auc" if is_classification else "neg_root_mean_squared_error"
-
 
     # -------------------------------------------------
     # learning curve 계산
@@ -262,18 +259,24 @@ def learning_cv(
             label=f"CV {metric_name}",
         )
 
-        ax.set_xlabel("학습 데이터 비율", fontsize=config.label_font_size)  # type : ignore
+        ax.set_xlabel(
+            "학습 데이터 비율", fontsize=config.label_font_size
+        )  # type : ignore
         ax.set_ylabel(metric_name, fontsize=config.label_font_size)  # type : ignore
 
-    lineplot(df=None, xname=train_sizes, yname=train_mean, 
+    lineplot(
+        df=None,
+        xname=train_sizes,
+        yname=train_mean,
         marker="o",
         markeredgecolor="#ffffff",
         label=f"Train {metric_name}",
         title=f"{classname} 학습곡선 (Learning Curve)",
-        callback=__callback
+        callback=__callback,
     )
 
     return result_df
+
 
 # --------------------------------------------------------
 # 회귀 성능 평가 + 과적합 판별 통합 함수
@@ -326,11 +329,11 @@ def score_cv(
         )
 
         result_df = concat(
-            [result_df, merge(
-                score_df, cv_df, left_index=True, right_index=True)]
+            [result_df, merge(score_df, cv_df, left_index=True, right_index=True)]
         )
 
     return result_df
+
 
 # --------------------------------------------------------
 # 특징 중요도 분석 함수
@@ -344,7 +347,7 @@ def feature_importance(
     width: int = config.width,
 ) -> DataFrame:
     """
-    특징 중요도 분석 함수.    
+    특징 중요도 분석 함수.
     수업에서 사용된 hs_feature_importance 함수와 동일.
 
     Args:
@@ -358,11 +361,11 @@ def feature_importance(
     Returns:
         DataFrame: 특징 중요도 결과 표
     """
-    if isinstance(model, XGBRegressor):          # type: ignore
-        booster = model.get_booster()           # type: ignore
+    if isinstance(model, XGBRegressor):  # type: ignore
+        booster = model.get_booster()  # type: ignore
         imp = booster.get_score(importance_type="gain")
         imp_sr = Series(imp)
-        imp_df = DataFrame(imp_sr, columns=['importance'])
+        imp_df = DataFrame(imp_sr, columns=["importance"])
     elif isinstance(model, LGBMRegressor):
         booster = model.booster_
         imp = booster.feature_importance(importance_type="gain")
@@ -382,11 +385,11 @@ def feature_importance(
         )
 
         # 결과 정리
-        imp_df = DataFrame({"importance": imp_df.importances_mean}, index=x_train.columns) # type: ignore
+        imp_df = DataFrame({"importance": imp_df.importances_mean}, index=x_train.columns)  # type: ignore
 
-    #----------------------------------
+    # ----------------------------------
     # 중요도 비율 + 누적 중요도 계산
-    #----------------------------------
+    # ----------------------------------
     imp_df["ratio"] = imp_df["importance"] / imp_df["importance"].sum()
     imp_df.sort_values("ratio", ascending=False, inplace=True)
     imp_df["cumsum"] = imp_df["ratio"].cumsum()
@@ -398,7 +401,7 @@ def feature_importance(
         df = imp_df.sort_values(by="ratio", ascending=False)
 
         # 90% 처음 도달하는 인덱스 (0-based)
-        cut_idx = np.argmax(imp_df["cumsum"].values >= threshold)    # type: ignore
+        cut_idx = np.argmax(imp_df["cumsum"].values >= threshold)  # type: ignore
 
         # x축은 rank 기준이므로 +1
         cut_rank = (int(cut_idx) + 1) - 0.5
@@ -407,12 +410,12 @@ def feature_importance(
             # 값 라벨 추가
             for i, v in enumerate(imp_df["importance"]):
                 ax.text(
-                    v + 0.005,          # 막대 끝에서 약간 오른쪽
-                    i,                  # y 위치
+                    v + 0.005,  # 막대 끝에서 약간 오른쪽
+                    i,  # y 위치
                     # 표시 형식
                     f"{v:.1f} ({imp_df.iloc[i]['cumsum']*100:.1f}%)",
                     va="center",
-                    fontsize=config.text_font_size
+                    fontsize=config.text_font_size,
                 )
 
             ax.set_xlabel("importance(cumsum)", fontsize=config.label_font_size)
@@ -420,21 +423,16 @@ def feature_importance(
             ax.set_ylabel(None)
 
             # 90% 도달 지점 수직선 (핵심)
-            plt.axhline(
-                y=cut_rank,
-                linestyle=":",
-                color="red",
-                alpha=0.8
-            )
+            plt.axhline(y=cut_rank, linestyle=":", color="red", alpha=0.8)
 
         barplot(
-            df, 
-            xname="importance", 
-            yname=df.index, 
-            width=width, 
-            height=len(df) * 60, 
-            title=f"Feature Importance",    # type: ignore
-            callback=__callback
+            df,
+            xname="importance",
+            yname=df.index,
+            width=width,
+            height=len(df) * 60,
+            title=f"Feature Importance",  # type: ignore
+            callback=__callback,
         )
 
     return imp_df
@@ -450,7 +448,7 @@ def shap_analysis(
     width: int = config.width,
 ) -> tuple[DataFrame, np.ndarray]:
     """
-    SHAP 값 기반 특징 중요도 분석 함수.    
+    SHAP 값 기반 특징 중요도 분석 함수.
     수업에서 사용된 hs_shap_analysis 함수와 동일.
 
     Args:
@@ -463,7 +461,16 @@ def shap_analysis(
         tuple: 특징 중요도 요약 DataFrame 및 SHAP 값 배열
     """
     # 1. SHAP Explainer
-    if isinstance(model, (DecisionTreeRegressor, RandomForestRegressor, XGBRegressor, LGBMRegressor, CatBoostRegressor)):
+    if isinstance(
+        model,
+        (
+            DecisionTreeRegressor,
+            RandomForestRegressor,
+            XGBRegressor,
+            LGBMRegressor,
+            CatBoostRegressor,
+        ),
+    ):
         print("Using TreeExplainer for tree-based models")
         explainer = shap.TreeExplainer(model)
     elif isinstance(model, (LinearRegression, Ridge, Lasso, SGDRegressor)):
@@ -500,8 +507,7 @@ def shap_analysis(
     )
 
     # 6. 변동성 지표
-    summary_df["cv"] = summary_df["std_shap"] / \
-        (summary_df["mean_abs_shap"] + 1e-9)
+    summary_df["cv"] = summary_df["std_shap"] / (summary_df["mean_abs_shap"] + 1e-9)
 
     summary_df["variability"] = np.where(
         summary_df["cv"] < 1,
@@ -516,8 +522,7 @@ def shap_analysis(
 
     # 8. 중요 변수 표시 (누적 80%)
     total_importance = summary_df["mean_abs_shap"].sum()
-    summary_df["importance_ratio"] = summary_df["mean_abs_shap"] / \
-        total_importance
+    summary_df["importance_ratio"] = summary_df["mean_abs_shap"] / total_importance
     summary_df["importance_cumsum"] = summary_df["importance_ratio"].cumsum()
 
     summary_df["is_important"] = np.where(
@@ -548,6 +553,7 @@ def shap_analysis(
 # SHAP 값 기반 특징 의존성 분석 함수
 # --------------------------------------------------------
 
+
 def shap_dependence_analysis(
     summary_df: DataFrame,
     shap_values: np.ndarray,
@@ -566,7 +572,7 @@ def shap_dependence_analysis(
         x: 설명변수 데이터 (DataFrame)
         include_secondary: 상호작용 변수에 보조 변수 포함 여부 (기본값: False)
         width: 플롯 너비 (기본값: config.width)
-        height: 플롯 높이 (기본값: config.height)   
+        height: 플롯 높이 (기본값: config.height)
 
     Returns:
         list: 생성된 특징 상호작용 쌍 목록
@@ -579,15 +585,13 @@ def shap_dependence_analysis(
     ]["feature"].tolist()
 
     # 2. 상호작용 후보 변수
-    interaction_features = summary_df[
-        summary_df["is_important"] == "core"
-    ]["feature"].tolist()
+    interaction_features = summary_df[summary_df["is_important"] == "core"][
+        "feature"
+    ].tolist()
 
     if include_secondary and len(interaction_features) < 2:
         interaction_features.extend(
-            summary_df[
-                summary_df["is_important"] == "secondary"
-            ]["feature"].tolist()
+            summary_df[summary_df["is_important"] == "secondary"]["feature"].tolist()
         )
 
     # 3. 변수 쌍 생성 (자기 자신 제외)
@@ -614,10 +618,7 @@ def shap_dependence_analysis(
     for i, row in summary_df.iterrows():
         importance_rank[row["feature"]] = i
 
-    pairs = sorted(
-        pairs,
-        key=lambda k: importance_rank.get(k[0], 999)
-    )
+    pairs = sorted(pairs, key=lambda k: importance_rank.get(k[0], 999))
 
     # 4. dependence plot 일괄 생성
     for feature_name, interaction_name in pairs:
@@ -641,7 +642,9 @@ def shap_dependence_analysis(
         plt.yticks(fontsize=config.font_size)
 
         finalize_plot(
-            ax, outparams=True, 
-            title=f"SHAP Dependence Plot: {feature_name} vs {interaction_name}")
+            ax,
+            outparams=True,
+            title=f"SHAP Dependence Plot: {feature_name} vs {interaction_name}",
+        )
 
     return pairs
