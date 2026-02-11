@@ -12,6 +12,8 @@ from sklearn.linear_model import (
     LinearRegression,
     Ridge,
     Lasso,
+    ElasticNet,
+    SGDClassifier,
     SGDRegressor,
     LogisticRegression,
 )
@@ -576,7 +578,7 @@ def shap_analysis(
 
     # 선형 계열인지 아닌지 판별
     is_linear_model = isinstance(
-        estimator, (LinearRegression, Ridge, Lasso, SGDRegressor, LogisticRegression)
+        estimator, (LinearRegression, Ridge, Lasso, ElasticNet, SGDRegressor, LogisticRegression, SGDClassifier)
     )
 
     # 전달된 독립변수 복사
