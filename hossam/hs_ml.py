@@ -7,7 +7,14 @@ from matplotlib import pyplot as plt
 from sklearn.inspection import permutation_importance
 from sklearn.model_selection import learning_curve
 
-from sklearn.linear_model import LinearRegression, Ridge, Lasso, SGDRegressor
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import (
+    LinearRegression,
+    Ridge,
+    Lasso,
+    SGDRegressor,
+    LogisticRegression,
+)
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
@@ -16,11 +23,21 @@ from catboost import CatBoostRegressor
 
 # 성능 평가 지표 모듈
 from sklearn.metrics import (
+    # 예측 지표
     r2_score,
     mean_absolute_error,
     mean_squared_error,
     mean_squared_log_error,
     mean_absolute_percentage_error,
+    # 분류 지표
+    log_loss,
+    confusion_matrix,
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_auc_score,
+    roc_curve,
 )
 
 from .hs_plot import create_figure, finalize_plot, barplot, lineplot, config
@@ -29,7 +46,9 @@ from .hs_plot import create_figure, finalize_plot, barplot, lineplot, config
 # --------------------------------------------------------
 # 회귀 성능 평가 지표 함수
 # --------------------------------------------------------
-def scores(estimator, x_test: DataFrame, y_test: DataFrame | np.ndarray) -> DataFrame:
+def reg_scores(
+    estimator, x_test: DataFrame, y_test: DataFrame | np.ndarray
+) -> DataFrame:
     """
     회귀 성능 평가 지표 함수
     수업에서 사용된 hs_get_scores 함수와 동일.
@@ -64,6 +83,90 @@ def scores(estimator, x_test: DataFrame, y_test: DataFrame | np.ndarray) -> Data
         },
         index=[classname],
     )
+
+    return score_df
+
+
+# --------------------------------------------------------
+# 이진 분류 성능 평가 지표 함수
+# --------------------------------------------------------
+def cls_bin_scores(
+    estimator, x_test: DataFrame, y_test: DataFrame | Series | np.ndarray, plot: bool = True,
+    plot_width: int | float = 640,
+) -> DataFrame:
+    """
+    이진 분류 성능 평가 지표 함수.
+
+    Args:
+        estimator: 학습된 사이킷런 이진 분류 모델
+        x_test: 테스트용 설명변수 데이터 (DataFrame)
+        y_test: 실제 목표변수 값 (DataFrame, Series 또는 ndarray)
+        plot: ROC 곡선 그래프 출력 여부 (기본값: True)
+    Returns:
+        DataFrame: 이진 분류 성능 평가 지표 (정확도, 정밀도, 재현율, 위양성율, 특이성, F1 Score, AUC)
+    """
+    # 위,양성 확률
+    y_pred_proba = estimator.predict_proba(x_test)
+    # 1로 분류될 확률
+    y_pred_proba_1 = estimator.predict_proba(x_test)[:, 1]
+    # 예측값
+    y_pred = estimator.predict(x_test)
+
+    # 의사결정계수
+    log_loss_test = -log_loss(y_test, y_pred_proba, normalize=False)
+    y_null = np.ones_like(y_test) * y_test.mean()
+    log_loss_null = -log_loss(y_test, y_null, normalize=False)
+    pseudo_r2 = 1 - (log_loss_test / log_loss_null)
+
+    # 혼동행렬
+    cm = confusion_matrix(y_test, y_pred)
+    ((TN, FP), (FN, TP)) = cm
+
+    # 클래스 이름
+    if hasattr(estimator, "named_steps"):
+        classname = estimator.named_steps["model"].__class__.__name__
+    else:
+        classname = estimator.__class__.__name__
+
+    # auc score
+    auc = roc_auc_score(y_test, y_pred_proba_1)
+
+    score_df = DataFrame(
+        {
+            "정확도(Accuracy)": [accuracy_score(y_test, y_pred)],
+            "정밀도(Precision)": [precision_score(y_test, y_pred)],
+            "재현율(Recall,tpr)": [recall_score(y_test, y_pred)],
+            "위양성율(Fallout,fpr)": [FP / (TN + FP)],
+            "특이성(TNR)": [1 - (FP / (TN + FP))],
+            "F1 Score": [f1_score(y_test, y_pred)],
+            "AUC": [auc],
+        },
+        index=[classname],
+    )
+
+    # -----------------------------
+    # ROC 곡선 그리기
+    # -----------------------------
+    if plot:
+        roc_fpr, roc_tpr, thresholds = roc_curve(y_test, y_pred_proba_1)
+
+        def __callback(ax):
+            sb.lineplot(x=[0, 1], y=[0, 1], color="red", linestyle=":", alpha=0.5)
+            plt.fill_between(x=roc_fpr, y1=roc_tpr, alpha=0.1)
+            ax.set_xlabel("위양성율 (False Positive Rate)", fontsize=config.label_font_size)
+            ax.set_ylabel("재현율 (True Positive Rate)", fontsize=config.label_font_size)
+            ax.set_xlim(0, 1)
+            ax.set_ylim(0, 1)
+
+        lineplot(
+            df=None,
+            xname=roc_fpr,
+            yname=roc_tpr,
+            width=plot_width,
+            height=plot_width*0.9,
+            title=f"ROC Curve (AUC={auc:.4f})",
+            callback=__callback,
+        )
 
     return score_df
 
@@ -317,7 +420,7 @@ def score_cv(
     result_df = DataFrame()
 
     for est in estimator:
-        score_df = scores(est, x_test, y_test)
+        score_df = reg_scores(est, x_test, y_test)
         cv_df = learning_cv(
             est,
             x_origin,
@@ -460,33 +563,50 @@ def shap_analysis(
     Returns:
         tuple: 특징 중요도 요약 DataFrame 및 SHAP 값 배열
     """
-    # 1. SHAP Explainer
-    if isinstance(
-        model,
-        (
-            DecisionTreeRegressor,
-            RandomForestRegressor,
-            XGBRegressor,
-            LGBMRegressor,
-            CatBoostRegressor,
-        ),
-    ):
-        print("Using TreeExplainer for tree-based models")
-        explainer = shap.TreeExplainer(model)
-    elif isinstance(model, (LinearRegression, Ridge, Lasso, SGDRegressor)):
-        print("Using LinearExplainer for linear models")
-        explainer = shap.LinearExplainer(model, x)
+    # =================================================
+    # SHAP 유형 판별
+    # =================================================
+    # Pipeline 라인 객체와 그렇지 않은 경우 모두 처리
+    if isinstance(model, Pipeline):
+        estimator = model.named_steps["model"]
+        is_pipeline = True
     else:
-        print("Using KernelExplainer for other models")
+        estimator = model
+        is_pipeline = False
+
+    # 선형 계열인지 아닌지 판별
+    is_linear_model = isinstance(
+        estimator, (LinearRegression, Ridge, Lasso, SGDRegressor, LogisticRegression)
+    )
+
+    # 전달된 독립변수 복사
+    x_df = x.copy()
+    columns = x.columns.tolist()
+    indexs = x.index.tolist()
+
+    # 1. SHAP Explainer
+    if is_linear_model:
+        # pipeline인 경우 파이프라인의 마지막 step을 제외하고 순환하면서 데이터 변환 적용
+        if is_pipeline:
+            for name, step in list(model.named_steps.items()):
+                if name == "model":
+                    continue
+
+                x_df = step.transform(x_df)  # type: ignore
+
+        masker = shap.maskers.Independent(x_df)
+        explainer = shap.LinearExplainer(estimator, masker=masker)
+    else:
+        explainer = shap.TreeExplainer(estimator)
 
     # 2. SHAP 값 계산: shape = [n_samples, n_features]
-    shap_values = explainer.shap_values(x)
+    shap_values = explainer.shap_values(x_df)
 
     # 3. DataFrame 변환
     shap_df = DataFrame(
         shap_values,
-        columns=x.columns,
-        index=x.index,
+        columns=columns,
+        index=indexs,
     )
 
     # 4. 요약 통계

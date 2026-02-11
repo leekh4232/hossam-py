@@ -19,7 +19,8 @@ from .hs_stats import ttest_ind as hs_ttest_ind
 from .hs_stats import outlier_table as hs_outlier_table
 from .hs_stats import oneway_anova as hs_oneway_anova
 from .hs_ml import learning_cv as hs_learning_cv
-from .hs_ml import scores as hs_get_scores
+from .hs_ml import reg_scores as hs_get_scores
+from .hs_ml import cls_bin_scores as hs_cls_bin_scores
 from .hs_ml import score_cv as hs_get_score_cv
 from .hs_ml import feature_importance as hs_feature_importance
 from .hs_ml import shap_analysis as hs_shap_analysis
@@ -64,6 +65,7 @@ __all__ = [
     "hs_learning_cv",
     "hs_get_scores",
     "hs_get_score_cv",
+    "hs_cls_bin_scores",
     "hs_feature_importance",
     "hs_shap_analysis",
     "hs_shap_dependence_analysis",
