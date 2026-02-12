@@ -93,7 +93,11 @@ def reg_scores(
 # 이진 분류 성능 평가 지표 함수
 # --------------------------------------------------------
 def cls_bin_scores(
-    estimator, x_test: DataFrame, y_test: DataFrame | Series | np.ndarray, plot: bool = True,
+    estimator,
+    x_test: DataFrame,
+    y_test: DataFrame | Series | np.ndarray,
+    pos_label=None,
+    plot: bool = True,
     plot_width: int | float = 640,
 ) -> DataFrame:
     """
@@ -103,25 +107,47 @@ def cls_bin_scores(
         estimator: 학습된 사이킷런 이진 분류 모델
         x_test: 테스트용 설명변수 데이터 (DataFrame)
         y_test: 실제 목표변수 값 (DataFrame, Series 또는 ndarray)
+        pos_label: 양성 클래스 레이블 (기본값: None, sklearn 기본 규칙 따름)
         plot: ROC 곡선 그래프 출력 여부 (기본값: True)
+        plot_width: ROC 곡선 플롯 너비 (기본값: 640
     Returns:
         DataFrame: 이진 분류 성능 평가 지표 (정확도, 정밀도, 재현율, 위양성율, 특이성, F1 Score, AUC)
     """
+    # ---------------------------------
+    # 1️⃣ 입력 안정성 검사
+    # ---------------------------------
+    y_test = np.asarray(y_test).ravel()
+
+    if len(np.unique(y_test)) != 2:
+        raise ValueError("이 함수는 이항분류 전용임.")
+
+    if not hasattr(estimator, "predict_proba"):
+        raise ValueError("predict_proba 지원 모델만 사용 가능.")
+
+    classes = list(estimator.classes_)
+
+    if pos_label is None:
+        pos_label = classes[1]  # sklearn 기본 규칙
+
+    if pos_label not in classes:
+        raise ValueError("pos_label이 클래스에 존재하지 않음.")
+
+    pos_index = classes.index(pos_label)
+
     # 위,양성 확률
     y_pred_proba = estimator.predict_proba(x_test)
     # 1로 분류될 확률
-    y_pred_proba_1 = estimator.predict_proba(x_test)[:, 1]
+    y_pred_proba_1 = estimator.predict_proba(x_test)[:, pos_index]
     # 예측값
     y_pred = estimator.predict(x_test)
 
-    # 의사결정계수
-    log_loss_test = -log_loss(y_test, y_pred_proba, normalize=False)
-    y_null = np.ones_like(y_test) * y_test.mean()
-    log_loss_null = -log_loss(y_test, y_null, normalize=False)
-    pseudo_r2 = 1 - (log_loss_test / log_loss_null)
-
     # 혼동행렬
-    cm = confusion_matrix(y_test, y_pred)
+    neg_label = [c for c in classes if c != pos_label][0]
+    cm = confusion_matrix(y_test, y_pred, labels=[neg_label, pos_label])
+
+    if cm.shape != (2, 2):
+        raise ValueError("혼동행렬이 2x2가 아님.")
+
     ((TN, FP), (FN, TP)) = cm
 
     # 클래스 이름
@@ -136,11 +162,11 @@ def cls_bin_scores(
     score_df = DataFrame(
         {
             "정확도(Accuracy)": [accuracy_score(y_test, y_pred)],
-            "정밀도(Precision)": [precision_score(y_test, y_pred)],
-            "재현율(Recall,tpr)": [recall_score(y_test, y_pred)],
-            "위양성율(Fallout,fpr)": [FP / (TN + FP)],
-            "특이성(TNR)": [1 - (FP / (TN + FP))],
-            "F1 Score": [f1_score(y_test, y_pred)],
+            "정밀도(Precision)": [precision_score(y_test, y_pred, pos_label=pos_label, zero_division=0)],
+            "재현율(Recall,tpr)": [recall_score(y_test, y_pred, pos_label=pos_label, zero_division=0)],
+            "위양성율(Fallout,fpr)": [FP / (TN + FP) if (TN + FP) > 0 else np.nan],
+            "특이성(TNR)": [1 - (FP / (TN + FP)) if (TN + FP) > 0 else np.nan],
+            "F1 Score": [f1_score(y_test, y_pred, pos_label=pos_label, zero_division=0)],
             "AUC": [auc],
         },
         index=[classname],
@@ -150,13 +176,17 @@ def cls_bin_scores(
     # ROC 곡선 그리기
     # -----------------------------
     if plot:
-        roc_fpr, roc_tpr, thresholds = roc_curve(y_test, y_pred_proba_1)
+        roc_fpr, roc_tpr, thresholds = roc_curve(y_test, y_pred_proba_1, pos_label=pos_label)
 
         def __callback(ax):
             sb.lineplot(x=[0, 1], y=[0, 1], color="red", linestyle=":", alpha=0.5)
-            plt.fill_between(x=roc_fpr, y1=roc_tpr, alpha=0.1)
-            ax.set_xlabel("위양성율 (False Positive Rate)", fontsize=config.label_font_size)
-            ax.set_ylabel("재현율 (True Positive Rate)", fontsize=config.label_font_size)
+            plt.fill_between(x=roc_fpr, y1=roc_tpr, alpha=0.1)  # type: ignore
+            ax.set_xlabel(
+                "위양성율 (False Positive Rate)", fontsize=config.label_font_size
+            )
+            ax.set_ylabel(
+                "재현율 (True Positive Rate)", fontsize=config.label_font_size
+            )
             ax.set_xlim(0, 1)
             ax.set_ylim(0, 1)
 
@@ -164,13 +194,26 @@ def cls_bin_scores(
             df=None,
             xname=roc_fpr,
             yname=roc_tpr,
-            width=plot_width,
-            height=plot_width*0.9,
+            width=plot_width,           # type: ignore
+            height=plot_width * 0.9,    # type: ignore
             title=f"ROC Curve (AUC={auc:.4f})",
             callback=__callback,
         )
 
     return score_df
+
+# --------------------------------------------------------
+# 이진 분류 성능 평가 지표 함수
+# --------------------------------------------------------
+def cls_multi_scores(
+    estimator,
+    x_test: DataFrame,
+    y_test: DataFrame | Series | np.ndarray,
+    pos_label=None,
+    plot: bool = True,
+    plot_width: int | float = 640,
+) -> DataFrame:
+    pass
 
 
 # --------------------------------------------------------
@@ -578,7 +621,16 @@ def shap_analysis(
 
     # 선형 계열인지 아닌지 판별
     is_linear_model = isinstance(
-        estimator, (LinearRegression, Ridge, Lasso, ElasticNet, SGDRegressor, LogisticRegression, SGDClassifier)
+        estimator,
+        (
+            LinearRegression,
+            Ridge,
+            Lasso,
+            ElasticNet,
+            SGDRegressor,
+            LogisticRegression,
+            SGDClassifier,
+        ),
     )
 
     # 전달된 독립변수 복사

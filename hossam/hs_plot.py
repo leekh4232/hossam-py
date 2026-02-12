@@ -60,18 +60,43 @@ config = SimpleNamespace(
     fill_alpha=0.3,
 )
 
-if DEFAULT_DPI > 200:
-    config.font_size = config.font_size * (DEFAULT_DPI * 0.0011 + 0.7)
-    config.text_font_size = config.text_font_size * (DEFAULT_DPI * 0.0011 + 0.7)
-    config.title_font_size = config.title_font_size * (DEFAULT_DPI * 0.0011 + 0.7)
-    config.title_pad = config.title_pad * (DEFAULT_DPI * 0.0011 + 0.7)
-    config.label_font_size = config.label_font_size * (DEFAULT_DPI * 0.0011 + 0.7)
-elif DEFAULT_DPI > 100:
-    config.font_size = config.font_size * (DEFAULT_DPI * 0.0012 + 0.75)
-    config.text_font_size = config.text_font_size * (DEFAULT_DPI * 0.0012 + 0.75)
-    config.title_font_size = config.title_font_size * (DEFAULT_DPI * 0.0012 + 0.75)
-    config.title_pad = config.title_pad * (DEFAULT_DPI * 0.0012 + 0.75)
-    config.label_font_size = config.label_font_size * (DEFAULT_DPI * 0.0012 + 0.75)
+
+# ===================================================================
+# 전역 설정 객체의 DPI 및 폰트 크기를 설정한다.
+# ===================================================================
+def set_dpi(dpi: int = DEFAULT_DPI) -> None:
+    """
+    전역 설정 객체의 DPI 및 폰트 크기를 설정한다.
+
+    Args:
+        dpi (int): 설정할 DPI 값.
+
+    Returns:
+        None
+    """
+    config.dpi = dpi
+
+    if dpi > 200:
+        config.font_size = config.font_size * (dpi * 0.0011 + 0.7)
+        config.text_font_size = config.text_font_size * (dpi * 0.0011 + 0.7)
+        config.title_font_size = config.title_font_size * (dpi * 0.0011 + 0.7)
+        config.title_pad = config.title_pad * (dpi * 0.0011 + 0.7)
+        config.label_font_size = config.label_font_size * (dpi * 0.0011 + 0.7)
+    elif dpi > 100:
+        config.font_size = config.font_size * (dpi * 0.0012 + 0.75)
+        config.text_font_size = config.text_font_size * (dpi * 0.0012 + 0.75)
+        config.title_font_size = config.title_font_size * (dpi * 0.0012 + 0.75)
+        config.title_pad = config.title_pad * (dpi * 0.0012 + 0.75)
+        config.label_font_size = config.label_font_size * (dpi * 0.0012 + 0.75)
+    else:
+        config.font_size = 10
+        config.text_font_size = 8
+        config.title_font_size = 18
+        config.title_pad = 15
+        config.label_font_size = 14
+
+# 초기 DPI 설정
+set_dpi(DEFAULT_DPI)
 
 # ===================================================================
 # 기본 크기가 설정된 Figure와 Axes를 생성한다
