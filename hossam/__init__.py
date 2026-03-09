@@ -28,6 +28,8 @@ from .hs_ml import shap_dependence_analysis as hs_shap_dependence_analysis
 from .hs_stats import describe as hs_describe
 from .hs_stats import category_describe as hs_category_describe
 from .VIFSelector import VIFSelector
+from .hs_util import tune_image as hs_tune_image
+from .hs_util import load_image as hs_load_image
 
 # py-modules
 import pandas as pd
@@ -73,6 +75,8 @@ __all__ = [
     "init_pyplot",
     "hs_describe",
     "hs_category_describe",
+    "hs_tune_image",
+    "hs_load_image"
 ]
 
 

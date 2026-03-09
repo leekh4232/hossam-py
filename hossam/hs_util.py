@@ -11,6 +11,8 @@ from importlib.metadata import distributions
 import pandas as pd
 import numpy as np
 import glob as gl
+from typing import Literal
+from PIL import Image, ImageEnhance
 # -------------------------------------------------------------
 from pandas import DataFrame, DatetimeIndex, read_csv, read_excel
 from scipy.stats import normaltest
@@ -494,3 +496,106 @@ def is_2d(x) -> bool:
         len(x) > 0 and
         all(isinstance(i, (list, tuple)) for i in x)
     )
+
+# ===================================================================
+# 이미지 튜닝
+# ===================================================================
+def tune_image(
+    img: Image,
+    mode: Literal["RGB", "color", "L", "gray"] = "RGB",
+    size: tuple = None,
+    color: float = None,
+    contrast: int = None,
+    brightness: float = None,
+    sharpness: float = None,
+) -> Image:
+    """이미지를 튜닝한다.
+
+    Args:
+        img (Image): 이미지 객체
+        mode (Literal['RGB', 'color', 'L', 'gray'], optional): 이미지 색상/흑백 모드
+        size (tuple, optional): 이미지 크기. Defaults to None.
+        color (float, optional): 이미지의 색상 균형을 조정한다. 0 부터 1 사이의 실수값으로 이미지의 색상을 조절 한다. 0 에 가까울 수록 색이 빠진 흑백에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 색이 더해진다. Defaults to None.
+        contrast (int, optional): 이미지의 대비를 조정한다.  0에 가까울 수록 대비가 없는 회색 이미지에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 대비가 강해진다. Defaults to None.
+        brightness (float, optional): 이미지의 밝기를 조정한다.  0에 가까울 수록 그냥 검정 이미지에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 밝기가 강해진다. Defaults to None.
+        sharpness (float, optional): 이미지의 선명도를 조정한다. 0 에 가까울 수록 이미지는 흐릿한 이미지에 가깝게 되고 1 이 원본 값이고 1이 넘어가면 원본에 비해 선명도가 강해진다. Defaults to None.
+
+    Returns:
+        Image: 튜닝된 이미지
+    """
+    if mode:
+        if mode == "color":
+            mode = "RGB"
+        elif mode == "gray":
+            mode = "L"
+
+        img = img.convert(mode=mode)
+
+    if size:
+        w = size[0] if size[0] > 0 else 0
+        h = size[1] if size[1] > 0 else 0
+        img = img.resize(size=(w, h))
+
+    if color:
+        if color < 0:
+            color = 0
+        img = ImageEnhance.Color(image=img).enhance(factor=color)
+
+    if contrast:
+        img = ImageEnhance.Contrast(image=img).enhance(
+            factor=contrast if contrast > 0 else 0
+        )
+
+    if brightness:
+        img = ImageEnhance.Brightness(image=img).enhance(
+            factor=brightness if brightness > 0 else 0
+        )
+
+    if sharpness:
+        img = ImageEnhance.Sharpness(image=img).enhance(
+            factor=sharpness if sharpness > 0 else 0
+        )
+
+    img.array = np.array(img)
+
+    return img
+
+
+# ===================================================================
+# 이미지 로드 + 튜닝
+# ===================================================================
+def load_image(
+    path: str,
+    mode: Literal["RGB", "L"] = None,
+    size: tuple = None,
+    color: float = None,
+    contrast: int = None,
+    brightness: float = None,
+    sharpness: float = None,
+) -> Image:
+    """이미지 파일을 로드한다. 필요한 경우 로드한 이미지에 대해 튜닝을 수행한다. 최종 로드된 이미지에 대한 배열 데이터를 array 속성에 저장한다.
+
+    Args:
+        path (str): 이미지 파일 경로
+        mode (Literal['RGB', 'color', 'L', 'gray'], optional): 이미지 색상/흑백 모드
+        size (tuple, optional): 이미지 크기. Defaults to None.
+        color (float, optional): 이미지의 색상 균형을 조정한다. 0 부터 1 사이의 실수값으로 이미지의 색상을 조절 한다. 0 에 가까울 수록 색이 빠진 흑백에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 색이 더해진다. Defaults to None.
+        contrast (int, optional): 이미지의 대비를 조정한다.  0에 가까울 수록 대비가 없는 회색 이미지에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 대비가 강해진다. Defaults to None.
+        brightness (float, optional): 이미지의 밝기를 조정한다.  0에 가까울 수록 그냥 검정 이미지에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 밝기가 강해진다. Defaults to None.
+        sharpness (float, optional): 이미지의 선명도를 조정한다. 0 에 가까울 수록 이미지는 흐릿한 이미지에 가깝게 되고 1 이 원본 값이고 1이 넘어가면 원본에 비해 선명도가 강해진다. Defaults to None.
+
+    Returns:
+        Image: 로드된 이미지
+    """
+    img = Image.open(fp=path)
+    img = tune_image(
+        img=img,
+        mode=mode,
+        size=size,
+        color=color,
+        contrast=contrast,
+        brightness=brightness,
+        sharpness=sharpness,
+    )
+
+    return img

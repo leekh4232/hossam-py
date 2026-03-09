@@ -126,7 +126,7 @@ def my_pca(
 
 def tune_image(
     img: Image,
-    mode: Literal["RGB", "color", "L", "gray"] = "RGB",
+    mode: Literal["RGB", "L"] = "RGB",
     size: tuple = None,
     color: float = None,
     contrast: int = None,
@@ -137,7 +137,7 @@ def tune_image(
 
     Args:
         img (Image): 이미지 객체
-        mode (Literal['RGB', 'color', 'L', 'gray'], optional): 이미지 색상/흑백 모드
+        mode (Literal['RGB', 'L'], optional): 이미지 색상/흑백 모드
         size (tuple, optional): 이미지 크기. Defaults to None.
         color (float, optional): 이미지의 색상 균형을 조정한다. 0 부터 1 사이의 실수값으로 이미지의 색상을 조절 한다. 0 에 가까울 수록 색이 빠진 흑백에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 색이 더해진다. Defaults to None.
         contrast (int, optional): 이미지의 대비를 조정한다.  0에 가까울 수록 대비가 없는 회색 이미지에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 대비가 강해진다. Defaults to None.
@@ -148,11 +148,6 @@ def tune_image(
         Image: 튜닝된 이미지
     """
     if mode:
-        if mode == "color":
-            mode = "RGB"
-        elif mode == "gray":
-            mode = "L"
-
         img = img.convert(mode=mode)
 
     if size:
