@@ -626,6 +626,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hossam.hs_tune_image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hs_tune_image
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_load_image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hs_load_image
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1074,6 +1096,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hossam.hs_tune_image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hs_tune_image
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.hs_load_image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hs_load_image
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1226,9 +1270,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_util.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">148</span>
 <span class="normal">149</span>
 <span class="normal">150</span>
 <span class="normal">151</span>
@@ -1287,7 +1329,9 @@
 <span class="normal">204</span>
 <span class="normal">205</span>
 <span class="normal">206</span>
-<span class="normal">207</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_info</span><span class="p">(</span><span class="n">search</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">local</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_info</span><span class="p">(</span><span class="n">search</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">local</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;메타데이터에서 사용 가능한 데이터셋 정보를 로드한다.</span>
 
 <span class="sd">    Args:</span>
@@ -1449,9 +1493,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_util.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">212</span>
 <span class="normal">213</span>
 <span class="normal">214</span>
 <span class="normal">215</span>
@@ -1491,7 +1533,9 @@
 <span class="normal">249</span>
 <span class="normal">250</span>
 <span class="normal">251</span>
-<span class="normal">252</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_load_data_remote</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">local</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">]:</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_load_data_remote</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">local</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;키로 지정된 데이터셋을 로드한다.</span>
 
 <span class="sd">    Args:</span>
@@ -6704,6 +6748,556 @@ ANOVA 결과가 유의하면 자동으로 사후검정을 실시한다.</p>
         <span class="p">})</span>
 
     <span class="k">return</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">result</span><span class="p">),</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;변수&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.hs_tune_image" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">hs_tune_image</span>
+
+
+<a href="#hossam.hs_tune_image" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">hs_tune_image</span><span class="p">(</span>
+    <span class="n">img</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span>
+    <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">contrast</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">brightness</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">sharpness</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>이미지를 튜닝한다.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>img</code>
+            </td>
+            <td>
+                  <code><span title="PIL.Image">Image</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>이미지 객체</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>mode</code>
+            </td>
+            <td>
+                  <code><span title="typing.Literal">Literal</span>[&#39;RGB&#39;, &#39;color&#39;, &#39;L&#39;, &#39;gray&#39;]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>이미지 색상/흑백 모드</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;RGB&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                  <code><span title="tuple">tuple</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>이미지 크기. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>color</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>이미지의 색상 균형을 조정한다. 0 부터 1 사이의 실수값으로 이미지의 색상을 조절 한다. 0 에 가까울 수록 색이 빠진 흑백에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 색이 더해진다. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>contrast</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>이미지의 대비를 조정한다.  0에 가까울 수록 대비가 없는 회색 이미지에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 대비가 강해진다. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>brightness</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>이미지의 밝기를 조정한다.  0에 가까울 수록 그냥 검정 이미지에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 밝기가 강해진다. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sharpness</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>이미지의 선명도를 조정한다. 0 에 가까울 수록 이미지는 흐릿한 이미지에 가깝게 되고 1 이 원본 값이고 1이 넘어가면 원본에 비해 선명도가 강해진다. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>Image</code></td>            <td>
+                  <code><span title="PIL.Image">Image</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>튜닝된 이미지</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/hs_util.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">503</span>
+<span class="normal">504</span>
+<span class="normal">505</span>
+<span class="normal">506</span>
+<span class="normal">507</span>
+<span class="normal">508</span>
+<span class="normal">509</span>
+<span class="normal">510</span>
+<span class="normal">511</span>
+<span class="normal">512</span>
+<span class="normal">513</span>
+<span class="normal">514</span>
+<span class="normal">515</span>
+<span class="normal">516</span>
+<span class="normal">517</span>
+<span class="normal">518</span>
+<span class="normal">519</span>
+<span class="normal">520</span>
+<span class="normal">521</span>
+<span class="normal">522</span>
+<span class="normal">523</span>
+<span class="normal">524</span>
+<span class="normal">525</span>
+<span class="normal">526</span>
+<span class="normal">527</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span>
+<span class="normal">531</span>
+<span class="normal">532</span>
+<span class="normal">533</span>
+<span class="normal">534</span>
+<span class="normal">535</span>
+<span class="normal">536</span>
+<span class="normal">537</span>
+<span class="normal">538</span>
+<span class="normal">539</span>
+<span class="normal">540</span>
+<span class="normal">541</span>
+<span class="normal">542</span>
+<span class="normal">543</span>
+<span class="normal">544</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">tune_image</span><span class="p">(</span>
+    <span class="n">img</span><span class="p">:</span> <span class="n">Image</span><span class="p">,</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">,</span> <span class="s2">&quot;gray&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;RGB&quot;</span><span class="p">,</span>
+    <span class="n">size</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">color</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">contrast</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">brightness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">sharpness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;이미지를 튜닝한다.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        img (Image): 이미지 객체</span>
+<span class="sd">        mode (Literal[&#39;RGB&#39;, &#39;color&#39;, &#39;L&#39;, &#39;gray&#39;], optional): 이미지 색상/흑백 모드</span>
+<span class="sd">        size (tuple, optional): 이미지 크기. Defaults to None.</span>
+<span class="sd">        color (float, optional): 이미지의 색상 균형을 조정한다. 0 부터 1 사이의 실수값으로 이미지의 색상을 조절 한다. 0 에 가까울 수록 색이 빠진 흑백에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 색이 더해진다. Defaults to None.</span>
+<span class="sd">        contrast (int, optional): 이미지의 대비를 조정한다.  0에 가까울 수록 대비가 없는 회색 이미지에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 대비가 강해진다. Defaults to None.</span>
+<span class="sd">        brightness (float, optional): 이미지의 밝기를 조정한다.  0에 가까울 수록 그냥 검정 이미지에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 밝기가 강해진다. Defaults to None.</span>
+<span class="sd">        sharpness (float, optional): 이미지의 선명도를 조정한다. 0 에 가까울 수록 이미지는 흐릿한 이미지에 가깝게 되고 1 이 원본 값이고 1이 넘어가면 원본에 비해 선명도가 강해진다. Defaults to None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Image: 튜닝된 이미지</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mode</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;RGB&quot;</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;gray&quot;</span><span class="p">:</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;L&quot;</span>
+
+        <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">size</span><span class="p">:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">color</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">color</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">ImageEnhance</span><span class="o">.</span><span class="n">Color</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">enhance</span><span class="p">(</span><span class="n">factor</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">contrast</span><span class="p">:</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">ImageEnhance</span><span class="o">.</span><span class="n">Contrast</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">enhance</span><span class="p">(</span>
+            <span class="n">factor</span><span class="o">=</span><span class="n">contrast</span> <span class="k">if</span> <span class="n">contrast</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">brightness</span><span class="p">:</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">ImageEnhance</span><span class="o">.</span><span class="n">Brightness</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">enhance</span><span class="p">(</span>
+            <span class="n">factor</span><span class="o">=</span><span class="n">brightness</span> <span class="k">if</span> <span class="n">brightness</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sharpness</span><span class="p">:</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">ImageEnhance</span><span class="o">.</span><span class="n">Sharpness</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">enhance</span><span class="p">(</span>
+            <span class="n">factor</span><span class="o">=</span><span class="n">sharpness</span> <span class="k">if</span> <span class="n">sharpness</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="p">)</span>
+
+    <span class="n">img</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">img</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.hs_load_image" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">hs_load_image</span>
+
+
+<a href="#hossam.hs_load_image" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">hs_load_image</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">contrast</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">brightness</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">sharpness</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>이미지 파일을 로드한다. 필요한 경우 로드한 이미지에 대해 튜닝을 수행한다. 최종 로드된 이미지에 대한 배열 데이터를 array 속성에 저장한다.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>path</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>이미지 파일 경로</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>mode</code>
+            </td>
+            <td>
+                  <code><span title="typing.Literal">Literal</span>[&#39;RGB&#39;, &#39;color&#39;, &#39;L&#39;, &#39;gray&#39;]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>이미지 색상/흑백 모드</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                  <code><span title="tuple">tuple</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>이미지 크기. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>color</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>이미지의 색상 균형을 조정한다. 0 부터 1 사이의 실수값으로 이미지의 색상을 조절 한다. 0 에 가까울 수록 색이 빠진 흑백에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 색이 더해진다. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>contrast</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>이미지의 대비를 조정한다.  0에 가까울 수록 대비가 없는 회색 이미지에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 대비가 강해진다. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>brightness</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>이미지의 밝기를 조정한다.  0에 가까울 수록 그냥 검정 이미지에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 밝기가 강해진다. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sharpness</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>이미지의 선명도를 조정한다. 0 에 가까울 수록 이미지는 흐릿한 이미지에 가깝게 되고 1 이 원본 값이고 1이 넘어가면 원본에 비해 선명도가 강해진다. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>Image</code></td>            <td>
+                  <code><span title="PIL.Image">Image</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>로드된 이미지</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/hs_util.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span>
+<span class="normal">575</span>
+<span class="normal">576</span>
+<span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_image</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">size</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">color</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">contrast</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">brightness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">sharpness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;이미지 파일을 로드한다. 필요한 경우 로드한 이미지에 대해 튜닝을 수행한다. 최종 로드된 이미지에 대한 배열 데이터를 array 속성에 저장한다.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str): 이미지 파일 경로</span>
+<span class="sd">        mode (Literal[&#39;RGB&#39;, &#39;color&#39;, &#39;L&#39;, &#39;gray&#39;], optional): 이미지 색상/흑백 모드</span>
+<span class="sd">        size (tuple, optional): 이미지 크기. Defaults to None.</span>
+<span class="sd">        color (float, optional): 이미지의 색상 균형을 조정한다. 0 부터 1 사이의 실수값으로 이미지의 색상을 조절 한다. 0 에 가까울 수록 색이 빠진 흑백에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 색이 더해진다. Defaults to None.</span>
+<span class="sd">        contrast (int, optional): 이미지의 대비를 조정한다.  0에 가까울 수록 대비가 없는 회색 이미지에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 대비가 강해진다. Defaults to None.</span>
+<span class="sd">        brightness (float, optional): 이미지의 밝기를 조정한다.  0에 가까울 수록 그냥 검정 이미지에 가깝게 되고 1 이 원본 값이되고 1이 넘어가면 밝기가 강해진다. Defaults to None.</span>
+<span class="sd">        sharpness (float, optional): 이미지의 선명도를 조정한다. 0 에 가까울 수록 이미지는 흐릿한 이미지에 가깝게 되고 1 이 원본 값이고 1이 넘어가면 원본에 비해 선명도가 강해진다. Defaults to None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Image: 로드된 이미지</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fp</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">tune_image</span><span class="p">(</span>
+        <span class="n">img</span><span class="o">=</span><span class="n">img</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+        <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+        <span class="n">contrast</span><span class="o">=</span><span class="n">contrast</span><span class="p">,</span>
+        <span class="n">brightness</span><span class="o">=</span><span class="n">brightness</span><span class="p">,</span>
+        <span class="n">sharpness</span><span class="o">=</span><span class="n">sharpness</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">img</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
