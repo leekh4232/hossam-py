@@ -96,6 +96,7 @@ def cls_bin_scores(
     estimator,
     x_test: DataFrame,
     y_test: DataFrame | Series | np.ndarray,
+    threshold: float = 0.5,
     pos_label=None,
     plot: bool = True,
     plot_width: int | float = 640,
@@ -107,6 +108,7 @@ def cls_bin_scores(
         estimator: 학습된 사이킷런 이진 분류 모델
         x_test: 테스트용 설명변수 데이터 (DataFrame)
         y_test: 실제 목표변수 값 (DataFrame, Series 또는 ndarray)
+        threshold: 양성 클래스 예측 확률 임계값 (기본값: 0.5)
         pos_label: 양성 클래스 레이블 (기본값: None, sklearn 기본 규칙 따름)
         plot: ROC 곡선 그래프 출력 여부 (기본값: True)
         plot_width: ROC 곡선 플롯 너비 (기본값: 640
@@ -124,6 +126,9 @@ def cls_bin_scores(
     if not hasattr(estimator, "predict_proba"):
         raise ValueError("predict_proba 지원 모델만 사용 가능.")
 
+    if not (0 <= threshold <= 1):
+        raise ValueError("threshold는 0~1 사이 값이어야 함.")
+
     classes = list(estimator.classes_)
 
     if pos_label is None:
@@ -133,13 +138,15 @@ def cls_bin_scores(
         raise ValueError("pos_label이 클래스에 존재하지 않음.")
 
     pos_index = classes.index(pos_label)
+    neg_label = [c for c in classes if c != pos_label][0]
 
     # 위,양성 확률
     y_pred_proba = estimator.predict_proba(x_test)
     # 1로 분류될 확률
-    y_pred_proba_1 = estimator.predict_proba(x_test)[:, pos_index]
+    y_pred_proba_1 = y_pred_proba[:, pos_index]
     # 예측값
-    y_pred = estimator.predict(x_test)
+    #y_pred = estimator.predict(x_test)
+    y_pred = np.where(y_pred_proba_1 >= threshold, pos_label, neg_label)
 
     # 혼동행렬
     neg_label = [c for c in classes if c != pos_label][0]
@@ -169,7 +176,7 @@ def cls_bin_scores(
             "F1 Score": [f1_score(y_test, y_pred, pos_label=pos_label, zero_division=0)],
             "AUC": [auc],
         },
-        index=[classname],
+        index=[f"{classname} (thr={threshold:.2f})"]
     )
 
     # -----------------------------
@@ -235,14 +242,169 @@ def learning_cv(
         estimator: 사이킷런 Estimator (파이프라인 권장)
         x: 설명변수 (DataFrame 또는 ndarray)
         y: 목표변수 (Series 또는 ndarray)
-        scoring: 평가 지표 (기본값: neg_root_mean_squared_error)
+        scoring: 평가 지표
+            - 회귀 기본값: neg_root_mean_squared_error
+            - 분류 기본값: roc_auc
         cv: 교차검증 폴드 수 (기본값: 5)
-        train_sizes: 학습곡선 학습 데이터 비율 (기본값: np.linspace(0.1, 1.0, 10))
+        train_sizes: 학습곡선 학습 데이터 비율
         n_jobs: 병렬 처리 개수 (기본값: -1, 모든 CPU 사용)
 
     Returns:
         DataFrame: 과적합 판별 결과 표
     """
+
+    # -------------------------------------------------
+    # 내부 유틸
+    # -------------------------------------------------
+    def _safe_mean(arr):
+        return float(np.mean(arr))
+
+    def _safe_std(arr):
+        return float(np.std(arr))
+
+    def _get_metric_name(scoring_value) -> str:
+        if isinstance(scoring_value, str):
+            return scoring_value.upper()
+        if callable(scoring_value):
+            return getattr(scoring_value, "__name__", "CUSTOM_SCORE").upper()
+        return "SCORE"
+
+    def _get_metric_family(scoring_value) -> str:
+        """분류 지표군 판별"""
+        if not isinstance(scoring_value, str):
+            return "generic"
+
+        s = scoring_value.lower()
+
+        # ranking / probability discrimination
+        if s in [
+            "roc_auc",
+            "roc_auc_ovr",
+            "roc_auc_ovo",
+            "average_precision",
+        ]:
+            return "ranking"
+
+        # balanced / harmonic / imbalance-aware
+        if s in [
+            "f1",
+            "f1_macro",
+            "f1_micro",
+            "f1_weighted",
+            "balanced_accuracy",
+            "jaccard",
+            "jaccard_macro",
+            "jaccard_micro",
+            "jaccard_weighted",
+        ]:
+            return "balanced"
+
+        # recall family
+        if s in [
+            "recall",
+            "recall_macro",
+            "recall_micro",
+            "recall_weighted",
+        ]:
+            return "recall"
+
+        # precision family
+        if s in [
+            "precision",
+            "precision_macro",
+            "precision_micro",
+            "precision_weighted",
+        ]:
+            return "precision"
+
+        # plain accuracy
+        if s in ["accuracy"]:
+            return "accuracy"
+
+        return "generic"
+
+    def _judge_classification_metric(
+        final_train: float,
+        final_cv: float,
+        final_std: float,
+        scoring_value,
+    ) -> tuple[str, float, float, str]:
+        """분류 지표군별 과적합 판정"""
+        family = _get_metric_family(scoring_value)
+        gap = final_train - final_cv
+        cv_variability = final_std
+
+        if family == "ranking":
+            if final_train < 0.70 and final_cv < 0.70:
+                status = "⚠️ 과소적합"
+            elif gap >= 0.10 and final_train >= 0.80:
+                status = "⚠️ 과대적합"
+            elif gap <= 0.05 and final_cv >= 0.75 and final_std <= 0.03:
+                status = "✅ 일반화 양호"
+            elif final_std > 0.05:
+                status = "⚠️ 데이터 부족"
+            else:
+                status = "⚠️ 판단유보"
+
+        elif family == "balanced":
+            if final_train < 0.65 and final_cv < 0.65:
+                status = "⚠️ 과소적합"
+            elif gap >= 0.10 and final_train >= 0.75:
+                status = "⚠️ 과대적합"
+            elif gap <= 0.05 and final_cv >= 0.70 and final_std <= 0.04:
+                status = "✅ 일반화 양호"
+            elif final_std > 0.06:
+                status = "⚠️ 데이터 부족"
+            else:
+                status = "⚠️ 판단유보"
+
+        elif family == "recall":
+            if final_train < 0.60 and final_cv < 0.60:
+                status = "⚠️ 과소적합"
+            elif gap >= 0.12 and final_train >= 0.80:
+                status = "⚠️ 과대적합"
+            elif gap <= 0.07 and final_cv >= 0.70 and final_std <= 0.05:
+                status = "✅ 일반화 양호"
+            elif final_std > 0.08:
+                status = "⚠️ 데이터 부족"
+            else:
+                status = "⚠️ 판단유보"
+
+        elif family == "precision":
+            if final_train < 0.60 and final_cv < 0.60:
+                status = "⚠️ 과소적합"
+            elif gap >= 0.12 and final_train >= 0.80:
+                status = "⚠️ 과대적합"
+            elif gap <= 0.07 and final_cv >= 0.70 and final_std <= 0.05:
+                status = "✅ 일반화 양호"
+            elif final_std > 0.08:
+                status = "⚠️ 데이터 부족"
+            else:
+                status = "⚠️ 판단유보"
+
+        elif family == "accuracy":
+            if final_train < 0.65 and final_cv < 0.65:
+                status = "⚠️ 과소적합"
+            elif gap >= 0.08 and final_train >= 0.80:
+                status = "⚠️ 과대적합"
+            elif gap <= 0.03 and final_cv >= 0.75 and final_std <= 0.03:
+                status = "✅ 일반화 양호"
+            elif final_std > 0.05:
+                status = "⚠️ 데이터 부족"
+            else:
+                status = "⚠️ 판단유보"
+
+        else:
+            if gap >= 0.10:
+                status = "⚠️ 과대적합 의심"
+            elif gap <= 0.05 and final_std <= 0.05:
+                status = "✅ 일반화 양호"
+            elif final_std > 0.08:
+                status = "⚠️ 데이터 부족"
+            else:
+                status = "⚠️ 판단유보"
+
+        return status, gap, cv_variability, family
 
     # -------------------------------------------------
     # [NEW] 문제 유형 자동 판별
@@ -296,42 +458,41 @@ def learning_cv(
         cv_std = cv_rmse.std(axis=1)
 
         # 마지막 지점 기준 정량 판정
-        final_train = train_mean[-1]
-        final_cv = cv_mean[-1]
-        final_std = cv_std[-1]
-        gap_ratio = final_train / final_cv
-        var_ratio = final_std / final_cv
+        final_train = float(train_mean[-1])
+        final_cv = float(cv_mean[-1])
+        final_std = float(cv_std[-1])
+
+        gap_ratio = final_train / final_cv if final_cv != 0 else np.nan
+        var_ratio = final_std / final_cv if final_cv != 0 else np.nan
 
         # -----------------
-        # 과소적합 기준선 (some_threshold)
+        # 과소적합 기준선
         # -----------------
-        # 기준모형 RMSE (평균 예측)
-        y_mean = y.mean()
-        rmse_naive = np.sqrt(np.mean((y - y_mean) ** 2))
+        y_mean = float(np.mean(y_arr))
+        rmse_naive = float(np.sqrt(np.mean((y_arr - y_mean) ** 2)))
 
-        # 분산 기반
-        std_y = y.std()
+        std_y = float(np.std(y_arr))
 
-        # 최소 설명력(R²) 기반
         min_r2 = 0.10
-        rmse_r2 = np.sqrt((1 - min_r2) * np.var(y))
+        rmse_r2 = float(np.sqrt((1 - min_r2) * np.var(y_arr)))
 
-        # 최종 threshold (가장 관대한 기준)
-        # -> 원래 some_threshold는 도메인 지식 수준에서 이 모델은 최소 어느 정도의 성능은 내야 한다는 기준을 설정하는 것
         some_threshold = min(rmse_naive, std_y, rmse_r2)
 
         # -----------------
         # 판정 로직
         # -----------------
-        # 마지막 두 지점 기울기
-        train_slope = train_mean[-1] - train_mean[-2]
-        cv_slope = cv_mean[-1] - cv_mean[-2]
+        if len(train_mean) >= 2:
+            train_slope = float(train_mean[-1] - train_mean[-2])
+            cv_slope = float(cv_mean[-1] - cv_mean[-2])
+        else:
+            train_slope = 0.0
+            cv_slope = 0.0
 
         if gap_ratio >= 0.95 and final_cv > some_threshold:
             status = "⚠️ 과소적합"
-        elif gap_ratio <= 0.8 and train_slope > 0 and cv_slope < 0:
+        elif gap_ratio <= 0.80 and train_slope > 0 and cv_slope < 0:
             status = "⚠️ 데이터 추가시 일반화 기대"
-        elif gap_ratio <= 0.8:
+        elif gap_ratio <= 0.80:
             status = "⚠️ 과대적합"
         elif gap_ratio <= 0.95 and var_ratio <= 0.10:
             status = "✅ 일반화 양호"
@@ -340,8 +501,19 @@ def learning_cv(
         else:
             status = "⚠️ 판단유보"
 
-        # [NEW] 평가 지표 이름
         metric_name = "RMSE"
+
+        result_df = DataFrame(
+            {
+                f"Train {metric_name}": [final_train],
+                f"CV {metric_name} 평균": [final_cv],
+                f"CV {metric_name} 표준편차": [final_std],
+                "Train/CV 비율": [gap_ratio],
+                "CV 변동성 비율": [var_ratio],
+                "판정 결과": [status],
+            },
+            index=[classname],
+        )
 
     # =================================================
     # 분류 전용 처리
@@ -355,44 +527,40 @@ def learning_cv(
         cv_mean = cv_metric.mean(axis=1)
         cv_std = cv_metric.std(axis=1)
 
-        final_train = train_mean[-1]
-        final_cv = cv_mean[-1]
-        final_std = cv_std[-1]
+        # 최근 3개 지점 평균 사용
+        tail_n = min(3, len(train_mean))
+
+        final_train = _safe_mean(train_mean[-tail_n:])
+        final_cv = _safe_mean(cv_mean[-tail_n:])
+        final_std = _safe_mean(cv_std[-tail_n:])
+
+        status, generalization_gap, cv_variability, metric_family = (
+            _judge_classification_metric(
+                final_train=final_train,
+                final_cv=final_cv,
+                final_std=final_std,
+                scoring_value=scoring,
+            )
+        )
 
         # [NEW] 분류용 비율 정의 (차이 기반)
         gap_ratio = final_train - final_cv
         var_ratio = final_std
 
-        # -----------------
-        # [NEW] 분류 판정 로직 (객관적 기준)
-        # -----------------
-        if final_train < 0.6 and final_cv < 0.6:
-            status = "⚠️ 과소적합"
-        elif gap_ratio > 0.1:
-            status = "⚠️ 과대적합"
-        elif gap_ratio <= 0.05 and var_ratio <= 0.05:
-            status = "✅ 일반화 양호"
-        elif var_ratio > 0.1:
-            status = "⚠️ 데이터 부족"
-        else:
-            status = "⚠️ 판단유보"
+        metric_name = _get_metric_name(scoring)
 
-        metric_name = scoring.upper()
-
-    # -----------------
-    # 정량 결과 표 (수정된 부분)
-    # -----------------
-    result_df = DataFrame(
-        {
-            f"Train {metric_name}": [final_train],
-            f"CV {metric_name} 평균": [final_cv],
-            f"CV {metric_name} 표준편차": [final_std],
-            f"Train/CV 비율": [gap_ratio],
-            f"CV 변동성 비율": [var_ratio],
-            "판정 결과": [status],
-        },
-        index=[classname],
-    )
+        result_df = DataFrame(
+            {
+                f"Train {metric_name}": [final_train],
+                f"CV {metric_name} 평균": [final_cv],
+                f"CV {metric_name} 표준편차": [final_std],
+                "일반화 격차(Train-CV)": [generalization_gap],
+                "CV 변동성": [cv_variability],
+                "지표군": [metric_family],
+                "판정 결과": [status],
+            },
+            index=[classname],
+        )
 
     # -----------------
     # 학습곡선 시각화

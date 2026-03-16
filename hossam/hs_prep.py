@@ -1068,7 +1068,8 @@ def pca(
             raise ValueError(f"yname '{yname}'이(가) 데이터프레임에 존재하지 않습니다.")
 
         yfield = df[[yname]].copy()
-        df = df.drop(columns=[yname])
+        display(yfield)
+        df = df.drop(yname, axis=1)
 
     estimator = PCA(n_components=n_components, random_state=random_state)
     pca = estimator.fit_transform(df)
@@ -1077,6 +1078,7 @@ def pca(
     cols = [f"PC{i+1}" for i in range(n)]
 
     pca_df = DataFrame(pca, columns=cols)
+    pca_df.index = data.index
 
     if yfield is not None:
         pca_df[yname] = yfield

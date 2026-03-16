@@ -2954,9 +2954,9 @@ def pca_plot(
                 components[x_index, i],
                 components[y_index, i],
                 color="r",
-                head_width=0.007,
-                head_length=0.007,
-                linewidth=linewidth * 0.75,
+                #head_width=0.007,
+                #head_length=0.007,
+                #linewidth=linewidth * 0.75,
                 alpha=0.75,
             )
             ax.text(
