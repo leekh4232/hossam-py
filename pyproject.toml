@@ -17,29 +17,29 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
 ]
-keywords = ["data", "analysis", "helper", "hossam", "tensorflow"]
+keywords = ["data", "analysis", "helper", "hossam", "scikit-learn", "pandas", "numpy", "matplotlib", "seaborn", "plotly"]
 dependencies = [
     # Core
     "tqdm",
     "tabulate",
-    "numpy>=1.21,<1.27",
+    "numpy",
     "pandas",
-    "scipy>=1.6.1,<=1.11.4",
+    "scipy",
     "joblib",
-    "scikit-learn<1.5",
-    "statsmodels>=0.12.1",
-    "requests>=2.27.1",
+    "scikit-learn",
+    "statsmodels",
+    "requests",
     "cloudpickle",
-    "psutil>=5.9.0",
-    "importlib_metadata>=4.12.0",
-    "deprecation>=2.1.0",
+    "psutil",
+    "importlib_metadata",
+    "deprecation",
     "xxhash",
 
     # Visualization
-    "matplotlib<3.8.0",
+    "matplotlib",
     "seaborn",
-    "plotly>=5.14.0",
-    "kaleido>=0.2.1",
+    "plotly",
+    "kaleido",
 
     # Data I/O
     "openpyxl",
@@ -50,19 +50,19 @@ dependencies = [
     # ML / Statistics
     "pingouin",
     "statannotations",
-    "xgboost<3.0.0",
-    "lightgbm>=3.0.0",
+    "xgboost",
+    "lightgbm",
     "catboost",
-    "shap>=0.40",
+    "shap",
 
     # Time series
-    "pmdarima>=2.0.4",
+    "pmdarima",
     "prophet",
 
     # Optional but PyCaret 친화
-    "imbalanced-learn>=0.12.0,<0.14.0",
-    "category-encoders>=2.4.0",
-    "yellowbrick>=1.4",
+    "imbalanced-learn",
+    "category-encoders",
+    "yellowbrick",
 
     # 확장
     "geopandas",

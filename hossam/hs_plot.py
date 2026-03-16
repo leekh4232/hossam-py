@@ -137,7 +137,7 @@ def get_default_ax(
         fig.subplots_adjust(wspace=ws, hspace=hs)
 
     if title and is_array:
-        fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight="bold", pad=15)
+        fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight="bold")
 
     if flatten == True:
         # 단일 Axes인 경우 리스트로 변환

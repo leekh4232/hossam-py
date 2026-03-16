@@ -59,7 +59,7 @@ def kmeans_fit(
     df = data.copy()
 
     if n_clusters is None:
-        n_clusters = kmeans_best_k(data=df, k_range=k_range, random_state=random_state, plot=False)
+        n_clusters = int(kmeans_best_k(data=df, k_range=k_range, random_state=random_state, plot=False))
         print(f"Best k found: {n_clusters}")
 
     kmeans = KMeans(n_clusters=n_clusters, random_state=random_state, **params)
