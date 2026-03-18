@@ -846,8 +846,8 @@ def dbscan_fit(
                     )
                 )
 
-            for i, e in enumerate(executers):
-                estimator, cluster_df, result_df = e.result()
+            for i, ex in enumerate(executers):
+                estimator, cluster_df, result_df = ex.result()
                 estimators.append(estimator)
                 cluster_dfs.append(cluster_df)
 
