@@ -1,5 +1,7 @@
 import importlib.metadata
 import requests
+import os
+from pathlib import Path
 
 # submodules
 from . import hs_classroom
@@ -83,7 +85,6 @@ __all__ = [
 def check_pypi_latest(package_name: str):
     # 설치된 버전
     installed = importlib.metadata.version(package_name)
-    print(f"현재 설치된 '{package_name}' 패키지 버전: {installed}")
 
     try:
         # PyPI 최신 버전
@@ -115,69 +116,57 @@ def init_pyplot():
     pd.options.display.float_format = "{:.3f}".format
 
     # matplotlib 기본값으로 복원
-    plt.rcParams.update(plt.rcParamsDefault)    # type: ignore
+    #plt.rcParams.update(plt.rcParamsDefault)    # type: ignore
 
     # seaborn 스타일 제거
-    sb.reset_defaults()
-    sb.reset_orig()
+    #sb.reset_defaults()
+    #sb.reset_orig()
 
     # 현재 figure에도 반영
-    plt.rcdefaults()
+    #plt.rcdefaults()
 
-    font_file = "NotoSansKR-Regular.ttf"
+    MODULE_DIR = Path(__file__).resolve().parent
+
+    fpath = f"{MODULE_DIR}/fonts"                       # 한글을 지원하는 폰트 파일의 경로
+    font_files = os.listdir(fpath)                  # 폰트 파일이 있는지 확인
+
     try:
-        # 패키지 리소스에서 폰트 파일 경로 확보
-        with as_file(files("hossam") / font_file) as font_path:
+        fname = None
+
+        for f in font_files:
+            font_path = os.path.join(fpath, f)          # 폰트 파일의 전체 경로
             fm.fontManager.addfont(str(font_path))
             fprop = fm.FontProperties(fname=str(font_path)) # type: ignore
-            fname = fprop.get_name()
-
-            plt.rcParams.update(
-                {
-                    "font.family": fname,
-                    "font.size": hs_plot.config.font_size,
-                    "font.weight": hs_plot.config.font_weight,
-                    #"text.fontsize": hs_plot.config.text_font_size,
-                    "xtick.labelsize": hs_plot.config.font_size,
-                    "ytick.labelsize": hs_plot.config.font_size,
-                    "legend.fontsize": hs_plot.config.font_size,
-                    "legend.title_fontsize": hs_plot.config.font_size,
-                    "axes.titlesize": hs_plot.config.title_font_size,
-                    "axes.titlepad": hs_plot.config.title_pad,
-                    "figure.titlesize": hs_plot.config.title_font_size,
-                    "axes.labelsize": hs_plot.config.label_font_size,
-                    "axes.unicode_minus": False,
-                    "text.antialiased": True,
-                    "lines.antialiased": True,
-                    "patch.antialiased": True,
-                    "figure.dpi": hs_plot.config.dpi,
-                    "savefig.dpi": hs_plot.config.dpi,
-                    "text.hinting": "auto",
-                    "text.hinting_factor": 8
-                }
-            )
-
-            print(
-                "\n✅ 시각화를 위한 한글 글꼴(NotoSansKR-Regular)이 자동 적용되었습니다."
-            )
-            return
+            
+            if not fname:
+                fname = fprop.get_name()
+            
+        plt.rcParams.update(
+            {
+                "font.family": fname,
+                "font.size": hs_plot.config.font_size,
+                "font.weight": hs_plot.config.font_weight,
+                #"text.fontsize": hs_plot.config.text_font_size,
+                "xtick.labelsize": hs_plot.config.font_size,
+                "ytick.labelsize": hs_plot.config.font_size,
+                "legend.fontsize": hs_plot.config.font_size,
+                "legend.title_fontsize": hs_plot.config.font_size,
+                "axes.titlesize": hs_plot.config.title_font_size,
+                "axes.titlepad": hs_plot.config.title_pad,
+                "figure.titlesize": hs_plot.config.title_font_size,
+                "axes.labelsize": hs_plot.config.label_font_size,
+                "axes.unicode_minus": False,
+                "text.antialiased": True,
+                "lines.antialiased": True,
+                "patch.antialiased": True,
+                "figure.dpi": hs_plot.config.dpi,
+                "savefig.dpi": hs_plot.config.dpi,
+                "text.hinting": "auto",
+                "text.hinting_factor": 8
+            }
+        )
     except Exception as e:
         raise Warning(f"\n한글 폰트 초기화: 패키지 폰트 사용 실패 ({e}).")
-
-    from IPython.display import display, HTML   # type: ignore
-
-    display(
-        HTML(
-            """
-            <style>      
-            .dataframe tr:hover {
-                background-color: #ffff99 !important;
-                border: 1px solid #ffcc00;
-            }
-            </style>
-            """
-            )
-        )
 
 
 def _init():
@@ -191,8 +180,6 @@ def _init():
         "📝 Blog: https://blog.hossam.kr/",
         f"🔖 Version: {__version__}",
     ]
-
-    
 
     for msg in messages:
         print(f"{msg}")

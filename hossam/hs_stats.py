@@ -45,7 +45,7 @@ from statsmodels.discrete.discrete_model import BinaryResults
 
 from pingouin import anova, pairwise_tukey, welch_anova, pairwise_gameshowell
 
-from .hs_plot import ols_residplot, ols_qqplot, get_default_ax, finalize_plot
+from .hs_plot import ols_residplot, ols_qqplot, init, show
 from .hs_prep import unmelt
 from .hs_util import pretty_table
 
@@ -2750,10 +2750,10 @@ def ols_tests(fit: RegressionResultsWrapper, alpha: float = 0.05, plot: bool = F
     display(independence_df)
 
     if plot:
-        fig, ax = get_default_ax(rows=1, cols=2, title=title)
+        fig, ax = init(rows=1, cols=2, title=title)
         ols_qqplot(fit, ax=ax[0])
         ols_residplot(fit, lowess=True, mse=True, ax=ax[1])
-        finalize_plot(ax, outparams=True)
+        show(ax, outparams=True)
 
 
 # ===================================================================

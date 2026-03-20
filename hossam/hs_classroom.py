@@ -463,8 +463,8 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
     if has_score and has_avg:
         n_plots += 1
 
-    # hs_plot.get_default_ax를 사용하여 Figure와 Axes 생성
-    fig, axes = hs_plot.get_default_ax(
+    # hs_plot.init를 사용하여 Figure와 Axes 생성
+    fig, axes = hs_plot.init(
         width=width,
         height=height,
         rows=n_plots,
@@ -557,8 +557,8 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
             axes[plot_idx].text(i, row['mean'] + 2, f"{row['mean']:.1f}", ha='center', fontsize=config.font_size)  # type: ignore
         plot_idx += 1
 
-    # hs_plot.finalize_plot을 사용하여 마무리
-    hs_plot.finalize_plot(axes, outparams=True, grid=False) # type: ignore
+    # hs_plot.show을 사용하여 마무리
+    hs_plot.show(axes, outparams=True, grid=False) # type: ignore
 
 
 # ===================================================================
@@ -609,7 +609,7 @@ def report_kde(df: DataFrame | str, metric: str = 'average', width: int = config
     # 레이아웃 결정 (2열 기준)
     cols = 2
     rows = (n_groups + cols - 1) // cols
-    fig, axes = hs_plot.get_default_ax(width=width, height=height, rows=rows, cols=cols, flatten=True)
+    fig, axes = hs_plot.init(width=width, height=height, rows=rows, cols=cols, flatten=True)
 
     plot_idx = 0
     metric_col = '평균점수' if (metric or '').lower() == 'average' else '총점'
@@ -632,7 +632,7 @@ def report_kde(df: DataFrame | str, metric: str = 'average', width: int = config
     for idx in range(plot_idx, len(axes)):
         fig.delaxes(axes[idx])  # type: ignore
 
-    hs_plot.finalize_plot(axes) # type: ignore
+    hs_plot.show(axes) # type: ignore
 
 
 # ===================================================================

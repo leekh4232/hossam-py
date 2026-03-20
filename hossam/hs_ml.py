@@ -42,7 +42,7 @@ from sklearn.metrics import (
     roc_curve,
 )
 
-from .hs_plot import create_figure, finalize_plot, barplot, lineplot, config
+from .hs_plot import init, show, barplot, lineplot, config
 
 
 # --------------------------------------------------------
@@ -886,7 +886,7 @@ def shap_analysis(
         plt.xticks(fontsize=config.font_size)
         plt.yticks(fontsize=config.font_size)
 
-        finalize_plot(ax, outparams=True, title="SHAP Summary Plot")
+        show(ax, outparams=True, title="SHAP Summary Plot")
 
     return summary_df, shap_values
 
@@ -983,7 +983,7 @@ def shap_dependence_analysis(
         plt.xticks(fontsize=config.font_size)
         plt.yticks(fontsize=config.font_size)
 
-        finalize_plot(
+        show(
             ax,
             outparams=True,
             title=f"SHAP Dependence Plot: {feature_name} vs {interaction_name}",

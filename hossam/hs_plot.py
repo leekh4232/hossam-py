@@ -45,7 +45,7 @@ DEFAULT_DPI = 200
 
 config = SimpleNamespace(
     dpi=DEFAULT_DPI,
-    width=1200,
+    width=1280,
     height=640,
     font_size=10,
     text_font_size=8,
@@ -54,8 +54,8 @@ config = SimpleNamespace(
     label_font_size=14,
     font_weight="normal",
     frame_width=0.7,
-    line_width=3,
-    grid_alpha=0.3,
+    line_width=2,
+    grid_alpha=0.5,
     grid_width=0.7,
     fill_alpha=0.3,
 )
@@ -101,7 +101,7 @@ set_dpi(DEFAULT_DPI)
 # ===================================================================
 # 기본 크기가 설정된 Figure와 Axes를 생성한다
 # ===================================================================
-def get_default_ax(
+def init(
     width: int = config.width,
     height: int = config.height,
     rows: int = 1,
@@ -110,6 +110,7 @@ def get_default_ax(
     ws: int | None = None,
     hs: int | None = None,
     title: str | None = None,
+    grid: bool = True,
 ):
     """기본 크기의 Figure와 Axes를 생성한다.
 
@@ -122,6 +123,7 @@ def get_default_ax(
         ws (int|None): 서브플롯 가로 간격(`wspace`). rows/cols가 1보다 클 때만 적용.
         hs (int|None): 서브플롯 세로 간격(`hspace`). rows/cols가 1보다 클 때만 적용.
         title (str|None): Figure 제목.
+        grid (bool): 생성된 Axes에 그리드를 표시할지 여부.
 
     Returns:
         tuple[Figure, Axes]: 생성된 matplotlib Figure와 Axes 객체.
@@ -136,8 +138,21 @@ def get_default_ax(
     if is_array and (ws != None and hs != None):
         fig.subplots_adjust(wspace=ws, hspace=hs)
 
-    if title and is_array:
-        fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight="bold")
+    if rows == 1 and cols == 1:
+        if title:
+            ax.set_title(title, fontsize=config.title_font_size * 1.5, fontweight="bold", pad=config.title_pad) # type: ignore
+
+        if grid:
+            ax.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
+    else:
+        if title:
+            fig.suptitle(title, fontsize=config.title_font_size * 1.5, fontweight="bold", y=1.02) # type: ignore
+
+        for a in ax.flat if isinstance(ax, np.ndarray) else ax:
+            if title:
+                a.set_title(title, fontsize=config.title_font_size, pad=config.title_pad) # type: ignore
+            if grid:
+                a.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
 
     if flatten == True:
         # 단일 Axes인 경우 리스트로 변환
@@ -159,122 +174,29 @@ def get_default_ax(
         for spine in ax.spines.values():  # type: ignore
             spine.set_linewidth(config.frame_width)
 
+    plt.tight_layout()
+
     return fig, ax
 
 
 # ===================================================================
-# 기본 크기가 설정된 Figure와 Axes를 생성한다
-# ===================================================================
-def create_figure(
-    width: int = config.width,
-    height: int = config.height,
-    rows: int = 1,
-    cols: int = 1,
-    flatten: bool = False,
-    ws: int | None = None,
-    hs: int | None = None,
-    title: str | None = None,
-) -> tuple[Figure, Axes]:
-    """기본 크기의 Figure와 Axes를 생성한다. get_default_ax의 래퍼 함수.
-
-    Args:
-        width (int): 가로 픽셀 크기.
-        height (int): 세로 픽셀 크기.
-        rows (int): 서브플롯 행 개수.
-        cols (int): 서브플롯 열 개수.
-        flatten (bool): Axes 배열을 1차원 리스트로 평탄화할지 여부.
-        ws (int|None): 서브플롯 가로 간격(`wspace`). rows/cols가 1보다 클 때만 적용.
-        hs (int|None): 서브플롯 세로 간격(`hspace`). rows/cols가 1보다 클 때만 적용.
-        title (str|None): Figure 제목.
-
-    Returns:
-        tuple[Figure, Axes]: 생성된 matplotlib Figure와 Axes 객체.
-    """
-    fig, ax = get_default_ax(width, height, rows, cols, flatten, ws, hs, title)
-    return fig, ax  # type: ignore
-
-
-# ===================================================================
 # 그래프의 그리드, 레이아웃을 정리하고 필요 시 저장 또는 표시한다
 # ===================================================================
-def finalize_plot(
-    ax: Axes | np.ndarray | list,
-    callback: Callable | None = None,
-    outparams: bool = False,
-    save_path: str | None = None,
-    grid: bool = True,
-    title: str | None = None,
+def show(
+    save_path: str | None = None
 ) -> None:
     """공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
 
     Args:
-        ax (Axes|np.ndarray): 대상 Axes (단일 Axes 또는 subplots 배열).
-        callback (Callable|None): 추가 설정을 위한 사용자 콜백.
-        outparams (bool): 내부에서 생성한 Figure인 경우 True.
         save_path (str|None): 이미지 저장 경로. None이 아니면 해당 경로로 저장.
-        grid (bool): 그리드 표시 여부. 기본값은 True입니다.
-        title (str|None): 그래프 제목.
     Returns:
         None
     """
-    # ax가 배열 (subplots)인지 단일 Axes인지 확인
-    is_array = isinstance(ax, (np.ndarray, list))
-
-    # callback 실행
-    if callback:
-        if is_array:
-            for a in ax.flat if isinstance(ax, np.ndarray) else ax:
-                callback(a)
-        else:
-            callback(ax)
-
-    # grid 설정
-    if grid:
-        if is_array:
-            for a in ax.flat if isinstance(ax, np.ndarray) else ax:
-                a.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
-        else:
-            ax.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
-
-    plt.tight_layout()
-
-    if title and not is_array:
-        ax.set_title(title, fontsize=config.title_font_size, pad=config.title_pad)
-
     if save_path is not None:
         plt.savefig(save_path, bbox_inches="tight")
 
-    if outparams:
-        plt.show()
-        plt.close()
-
-
-# ===================================================================
-# 그래프의 그리드, 레이아웃을 정리하고 필요 시 저장 또는 표시한다
-# ===================================================================
-def show_figure(
-    ax: Axes | np.ndarray,
-    callback: Callable | None = None,
-    outparams: bool = False,
-    save_path: str | None = None,
-    grid: bool = True,
-    title: str | None = None,
-) -> None:
-    """공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
-    finalize_plot의 래퍼 함수.
-
-    Args:
-        ax (Axes|np.ndarray): 대상 Axes (단일 Axes 또는 subplots 배열).
-        callback (Callable|None): 추가 설정을 위한 사용자 콜백.
-        outparams (bool): 내부에서 생성한 Figure인 경우 True.
-        save_path (str|None): 이미지 저장 경로. None이 아니면 해당 경로로 저장.
-        grid (bool): 그리드 표시 여부. 기본값은 True입니다.
-        title (str|None): 그래프 제목.
-
-    Returns:
-        None
-    """
-    finalize_plot(ax, callback, outparams, save_path, grid, title)
+    plt.show()
+    plt.close()
 
 
 # ===================================================================
@@ -320,7 +242,7 @@ def lineplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -341,7 +263,7 @@ def lineplot(
     lineplot_kwargs.update(params)
 
     sb.lineplot(**lineplot_kwargs, linewidth=linewidth)
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -393,7 +315,7 @@ def boxplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     if xname is not None or yname is not None:
@@ -438,7 +360,7 @@ def boxplot(
     else:
         sb.boxplot(data=df, orient=orient, ax=ax, linewidth=linewidth, **params)  # type: ignore
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -547,7 +469,7 @@ def kdeplot(
         q = series.quantile([0.0, 0.25, 0.5, 0.75, 1.0]).values
         bounds = list(zip(q[:-1], q[1:]))  # [(Q0,Q1),(Q1,Q2),(Q2,Q3),(Q3,Q4)]
 
-        fig, axes = get_default_ax(width, height, len(bounds), 1, flatten=True)
+        fig, axes = init(width, height, len(bounds), 1, flatten=True)
         outparams = True
 
         for idx, (lo, hi) in enumerate(bounds):
@@ -581,11 +503,11 @@ def kdeplot(
             axes[idx].set_title(f"Q{idx+1}: [{lo:.3g}, {hi:.3g}]", fontsize=config.title_font_size, pad=config.title_pad) # type: ignore
             axes[idx].grid(True, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
 
-        finalize_plot(axes[0], callback, outparams, save_path, True, title)
+        show(axes[0], callback, outparams, save_path, True, title)
         return
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # 기본 kwargs 설정
@@ -615,7 +537,7 @@ def kdeplot(
 
     sb.kdeplot(**kdeplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -660,7 +582,7 @@ def histplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     if bins:
@@ -699,7 +621,7 @@ def histplot(
         histplot_kwargs.update(params)
         sb.histplot(**histplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -740,7 +662,7 @@ def stackplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     df2 = df[[xname, hue]].copy()
@@ -783,7 +705,7 @@ def stackplot(
         ax.set_xticks(xticks)  # type: ignore
         ax.set_xticklabels(xticks)  # type: ignore
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -830,7 +752,7 @@ def scatterplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     if outline and hue is not None:
@@ -899,7 +821,7 @@ def scatterplot(
         scatterplot_kwargs["hue"] = None
         sb.scatterplot(data=df[df[vector] == "noise"], **scatterplot_kwargs)    # type: ignore
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -940,7 +862,7 @@ def regplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # regplot은 hue를 지원하지 않으므로 palette를 color로 변환
@@ -966,7 +888,7 @@ def regplot(
 
     sb.regplot(**regplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1184,7 +1106,7 @@ def countplot(
             sort = sorted(list(df[xname].value_counts().index))
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -1207,7 +1129,7 @@ def countplot(
 
     sb.countplot(**countplot_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1250,7 +1172,7 @@ def barplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -1271,7 +1193,7 @@ def barplot(
     barplot_kwargs.update(params)
 
     sb.barplot(**barplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1314,7 +1236,7 @@ def boxenplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # palette은 hue가 있을 때만 사용
@@ -1333,7 +1255,7 @@ def boxenplot(
     boxenplot_kwargs.update(params)
 
     sb.boxenplot(**boxenplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1376,7 +1298,7 @@ def violinplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # palette은 hue가 있을 때만 사용
@@ -1394,7 +1316,7 @@ def violinplot(
 
     violinplot_kwargs.update(params)
     sb.violinplot(**violinplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1437,7 +1359,7 @@ def pointplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -1457,7 +1379,7 @@ def pointplot(
 
     pointplot_kwargs.update(params)
     sb.pointplot(**pointplot_kwargs)
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1567,7 +1489,7 @@ def heatmap(
         height = width * 0.8  # type: ignore
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     heatmatp_kwargs = {
@@ -1585,7 +1507,7 @@ def heatmap(
     # heatmap은 hue를 지원하지 않으므로 cmap에 palette 사용
     sb.heatmap(**heatmatp_kwargs)
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1644,7 +1566,7 @@ def kde_confidence_interval(
     # 외부에서 ax를 전달하지 않은 경우 서브플롯 생성
     if ax is None:
         n_cols = len(target_cols)
-        fig, axes = get_default_ax(width, height, n_cols, 1, flatten=True)
+        fig, axes = init(width, height, n_cols, 1, flatten=True)
         outparams = True
     else:
         # 외부에서 ax를 전달한 경우 (시뮬레이션용)
@@ -1707,7 +1629,7 @@ def kde_confidence_interval(
 
         current_ax.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
 
-    finalize_plot(axes[0] if isinstance(axes, list) and len(axes) > 0 else ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(axes[0] if isinstance(axes, list) and len(axes) > 0 else ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1764,7 +1686,7 @@ def ols_residplot(
     y = y_pred + resid  # 실제값 = 적합값 + 잔차
 
     if ax is None:
-        fig, ax = get_default_ax(width + 150 if mse else width, height, 1, 1)  # type: ignore
+        fig, ax = init(width + 150 if mse else width, height, 1, 1)  # type: ignore
         outparams = True
 
     sb.residplot(
@@ -1819,7 +1741,7 @@ def ols_residplot(
                 color=c,
             )
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -1878,7 +1800,7 @@ def ols_qqplot(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # fit 객체에서 잔차(residuals) 추출
@@ -1904,7 +1826,7 @@ def ols_qqplot(
     for line in ax.get_lines():  # type: ignore
         line.set_linewidth(linewidth)  # type: ignore
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -2121,7 +2043,7 @@ def categorical_target_distribution(
     n_plots = len(target_cols)
     rows = (n_plots + cols - 1) // cols
 
-    fig, axes = get_default_ax(width, height, rows, cols, dpi, flatten=True) # type: ignore
+    fig, axes = init(width, height, rows, cols, dpi, flatten=True) # type: ignore
     outparams = True
 
     for idx, col in enumerate(target_cols):
@@ -2159,7 +2081,7 @@ def categorical_target_distribution(
     for j in range(n_plots, len(axes)):
         axes[j].set_visible(False) # type: ignore
 
-    finalize_plot(axes[0], callback, outparams, save_path, True, title)
+    show(axes[0], callback, outparams, save_path, True, title)
 
 
 # ===================================================================
@@ -2199,7 +2121,7 @@ def roc_curve_plot(
     """
     outparams = False
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # 실제값(y_true) 결정
@@ -2229,7 +2151,7 @@ def roc_curve_plot(
     ax.set_ylabel("재현율 (True Positive Rate)", fontsize=config.label_font_size)  # type: ignore
     ax.set_title("ROC 곡선", fontsize=config.title_font_size, pad=config.title_pad)  # type: ignore
     ax.legend(loc="lower right", fontsize=config.label_font_size)  # type: ignore
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -2261,7 +2183,7 @@ def confusion_matrix_plot(
     """
     outparams = False
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     # 학습 데이터 기반 실제값/예측 확률 결정
@@ -2284,7 +2206,7 @@ def confusion_matrix_plot(
 
     ax.set_title(f"혼동행렬 (임계값: {threshold})", fontsize=config.title_font_size, pad=config.title_pad)  # type: ignore
 
-    finalize_plot(ax, callback, outparams, save_path, False, title)  # type: ignore
+    show(ax, callback, outparams, save_path, False, title)  # type: ignore
 
 
 # ===================================================================
@@ -2421,7 +2343,7 @@ def radarplot(
     else:
         title = title if title else "Radar Chart"
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -2470,7 +2392,7 @@ def distribution_plot(
 
         if hue is None:
             # 1행 2열 서브플롯 생성
-            fig, axes = get_default_ax(
+            fig, axes = init(
                 width, height, rows=1, cols=2, title=title
             )
 
@@ -2497,7 +2419,7 @@ def distribution_plot(
             categories = list(Series(data[hue].dropna().unique()).sort_values())
             n_cat = len(categories) if categories else 1
 
-            fig, axes = get_default_ax(
+            fig, axes = init(
                 width, height, rows=n_cat, cols=2, title=title
             )
             axes_2d = np.atleast_2d(axes)
@@ -2574,7 +2496,7 @@ def silhouette_plot(
 
     outparams = False
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     sil_avg = silhouette_score(X=data, labels=estimator.labels_)
@@ -2619,7 +2541,7 @@ def silhouette_plot(
     if title is None:
         title = "Number of Cluster : " + str(n_clusters) + ", Silhouette Score :" + str(round(sil_avg, 3))  # type: ignore
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
@@ -2674,7 +2596,7 @@ def cluster_plot(
     """
     outparams = False
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
     df = data.copy() if data is not None else None  # type: ignore
@@ -2774,7 +2696,7 @@ def visualize_silhouette(
         - 실루엣 플롯(왼쪽)과 2차원 군집 산점도(오른쪽)를 동시에 확인 가능
         - 군집 품질과 분포를 한눈에 비교·분석할 때 유용
     """
-    fig, ax = get_default_ax(rows=1, cols=2, width=width, height=height, title=title)
+    fig, ax = init(rows=1, cols=2, width=width, height=height, title=title)
 
     silhouette_plot(
         estimator=estimator,
@@ -2797,7 +2719,7 @@ def visualize_silhouette(
         height=height
     )
 
-    finalize_plot(ax)
+    show(ax)
 
 
 
@@ -2852,7 +2774,7 @@ def dandrogram(
     outparams = False
 
     if ax is None:
-        fig, ax = get_default_ax(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width, height, 1, 1)  # type: ignore
         outparams = True
 
 
@@ -2868,7 +2790,7 @@ def dandrogram(
         above_threshold_color="grey",
     )
 
-    finalize_plot(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(ax, callback, outparams, save_path, True, title)  # type: ignore
 
 
 # ===================================================================
