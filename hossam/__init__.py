@@ -1,4 +1,5 @@
 import importlib.metadata
+import multiprocessing as mp
 import requests
 import os
 from pathlib import Path
@@ -16,22 +17,6 @@ from . import hs_cluster
 from . import hs_study
 from .hs_util import load_info
 from .hs_util import _load_data_remote as load_data
-from .hs_plot import visualize_silhouette
-from .hs_stats import ttest_ind as hs_ttest_ind
-from .hs_stats import outlier_table as hs_outlier_table
-from .hs_stats import oneway_anova as hs_oneway_anova
-from .hs_ml import learning_cv as hs_learning_cv
-from .hs_ml import reg_scores as hs_get_scores
-from .hs_ml import cls_bin_scores as hs_cls_bin_scores
-from .hs_ml import score_cv as hs_get_score_cv
-from .hs_ml import feature_importance as hs_feature_importance
-from .hs_ml import shap_analysis as hs_shap_analysis
-from .hs_ml import shap_dependence_analysis as hs_shap_dependence_analysis
-from .hs_stats import describe as hs_describe
-from .hs_stats import category_describe as hs_category_describe
-from .VIFSelector import VIFSelector
-from .hs_util import tune_image as hs_tune_image
-from .hs_util import load_image as hs_load_image
 
 # py-modules
 import pandas as pd
@@ -49,7 +34,6 @@ except Exception:
 my_dpi = hs_plot.config.dpi # type: ignore
 
 __all__ = [
-    "my_dpi",
     "load_data",
     "load_info",
     "hs_classroom",
@@ -61,24 +45,7 @@ __all__ = [
     "hs_util",
     "hs_cluster",
     "hs_ml",
-    "hs_study",
-    "visualize_silhouette",
-    "hs_ttest_ind",
-    "hs_outlier_table",
-    "hs_oneway_anova",
-    "hs_learning_cv",
-    "hs_get_scores",
-    "hs_get_score_cv",
-    "hs_cls_bin_scores",
-    "hs_feature_importance",
-    "hs_shap_analysis",
-    "hs_shap_dependence_analysis",
-    "VIFSelector",
-    "init_pyplot",
-    "hs_describe",
-    "hs_category_describe",
-    "hs_tune_image",
-    "hs_load_image"
+    "hs_study"
 ]
 
 
@@ -101,73 +68,6 @@ def check_pypi_latest(package_name: str):
         "latest": latest,
         "outdated": installed < latest, # type: ignore
     }
-
-
-def init_pyplot():
-    # 각 열의 넓이 제한 없음
-    pd.set_option("display.max_colwidth", None)
-    # 출력 너비 제한 없음 (가로 스크롤될 수 있음)
-    pd.set_option("display.width", None)
-    # 컬럼 생략 금지
-    pd.set_option("display.max_columns", None)
-    # 행 최대 출력 수 100개로 수정
-    pd.set_option("display.max_rows", 100)
-    # 소수점 자리수 3자리로 설정
-    pd.options.display.float_format = "{:.3f}".format
-
-    # matplotlib 기본값으로 복원
-    #plt.rcParams.update(plt.rcParamsDefault)    # type: ignore
-
-    # seaborn 스타일 제거
-    #sb.reset_defaults()
-    #sb.reset_orig()
-
-    # 현재 figure에도 반영
-    #plt.rcdefaults()
-
-    MODULE_DIR = Path(__file__).resolve().parent
-
-    fpath = f"{MODULE_DIR}/fonts"                       # 한글을 지원하는 폰트 파일의 경로
-    font_files = os.listdir(fpath)                  # 폰트 파일이 있는지 확인
-
-    try:
-        fname = None
-
-        for f in font_files:
-            font_path = os.path.join(fpath, f)          # 폰트 파일의 전체 경로
-            fm.fontManager.addfont(str(font_path))
-            fprop = fm.FontProperties(fname=str(font_path)) # type: ignore
-            
-            if not fname:
-                fname = fprop.get_name()
-            
-        plt.rcParams.update(
-            {
-                "font.family": fname,
-                "font.size": hs_plot.config.font_size,
-                "font.weight": hs_plot.config.font_weight,
-                #"text.fontsize": hs_plot.config.text_font_size,
-                "xtick.labelsize": hs_plot.config.font_size,
-                "ytick.labelsize": hs_plot.config.font_size,
-                "legend.fontsize": hs_plot.config.font_size,
-                "legend.title_fontsize": hs_plot.config.font_size,
-                "axes.titlesize": hs_plot.config.title_font_size,
-                "axes.titlepad": hs_plot.config.title_pad,
-                "figure.titlesize": hs_plot.config.title_font_size,
-                "axes.labelsize": hs_plot.config.label_font_size,
-                "axes.unicode_minus": False,
-                "text.antialiased": True,
-                "lines.antialiased": True,
-                "patch.antialiased": True,
-                "figure.dpi": hs_plot.config.dpi,
-                "savefig.dpi": hs_plot.config.dpi,
-                "text.hinting": "auto",
-                "text.hinting_factor": 8
-            }
-        )
-    except Exception as e:
-        raise Warning(f"\n한글 폰트 초기화: 패키지 폰트 사용 실패 ({e}).")
-
 
 def _init():
 
@@ -195,12 +95,61 @@ def _init():
 
         raise Warning("hossam 패키지가 최신 버전이 아닙니다.")
 
-    init_pyplot()
+    # 각 열의 넓이 제한 없음
+    pd.set_option("display.max_colwidth", None)
+    # 출력 너비 제한 없음 (가로 스크롤될 수 있음)
+    pd.set_option("display.width", None)
+    # 컬럼 생략 금지
+    pd.set_option("display.max_columns", None)
+    # 행 최대 출력 수 100개로 수정
+    pd.set_option("display.max_rows", 100)
+    # 소수점 자리수 3자리로 설정
+    pd.options.display.float_format = "{:.3f}".format
 
-import multiprocessing as mp
+    # 모듈의 현재 위치 (fonts 폴더 접근용)
+    MODULE_DIR = Path(__file__).resolve().parent
 
-def is_parallel_worker():
-    return mp.current_process().name != "MainProcess"
+    # 한글을 지원하는 폰트 파일의 경로
+    fpath = f"{MODULE_DIR}/fonts"
+    font_files = os.listdir(fpath)
 
-if not is_parallel_worker():
+    try:
+        fname = None
+
+        for f in font_files:
+            # 폰트 파일의 전체 경로
+            font_path = os.path.join(fpath, f)
+            fm.fontManager.addfont(str(font_path))
+            fprop = fm.FontProperties(fname=str(font_path)) # type: ignore
+            
+            if not fname:
+                fname = fprop.get_name()
+            
+        plt.rcParams.update(
+            {
+                "font.family": fname,
+                "font.size": hs_plot.config.font_size,
+                "font.weight": hs_plot.config.font_weight,
+                "xtick.labelsize": hs_plot.config.font_size,
+                "ytick.labelsize": hs_plot.config.font_size,
+                "legend.fontsize": hs_plot.config.font_size,
+                "legend.title_fontsize": hs_plot.config.font_size,
+                "axes.titlesize": hs_plot.config.title_font_size,
+                "axes.titlepad": hs_plot.config.title_pad,
+                "figure.titlesize": hs_plot.config.title_font_size,
+                "axes.labelsize": hs_plot.config.label_font_size,
+                "axes.unicode_minus": False,
+                "text.antialiased": True,
+                "lines.antialiased": True,
+                "patch.antialiased": True,
+                "figure.dpi": hs_plot.config.dpi,
+                "savefig.dpi": hs_plot.config.dpi,
+                "text.hinting": "auto",
+                "text.hinting_factor": 8
+            }
+        )
+    except Exception as e:
+        raise Warning(f"\n한글 폰트 초기화: 패키지 폰트 사용 실패 ({e}).")
+
+if mp.current_process().name == "MainProcess":
     _init()
