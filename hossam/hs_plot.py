@@ -49,14 +49,21 @@ config = SimpleNamespace(
     height=640,
     font_size=10,
     text_font_size=8,
-    title_font_size=18,
+    title_font_weight=500,
+    title_font_size=24,
     title_pad=15,
+    xlabel_fontsize=16,
+    xlabel_fontweight=400,
+    xlabel_pad=5,
+    ylabel_fontsize=16,
+    ylabel_fontweight=400,
+    ylabel_pad=5,
     label_font_size=14,
     font_weight="normal",
-    frame_width=0.7,
+    frame_width=1,
     line_width=2,
     grid_alpha=0.5,
-    grid_width=0.7,
+    grid_width=1,
     fill_alpha=0.3,
 )
 
@@ -110,6 +117,14 @@ def init(
     ws: int | None = None,
     hs: int | None = None,
     title: str | None = None,
+    xlabel: str | None = None,
+    xlabel_fontsize: int | None = config.xlabel_fontsize,
+    xlabel_fontweight: str | None = config.xlabel_fontweight,
+    xlabel_pad: int | None = config.xlabel_pad,
+    ylabel: str | None = None,
+    ylabel_fontsize: int | None = config.ylabel_fontsize,
+    ylabel_fontweight: str | None = config.ylabel_fontweight,
+    ylabel_pad: int | None = config.ylabel_pad,
     grid: bool = True,
 ):
     """기본 크기의 Figure와 Axes를 생성한다.
@@ -123,36 +138,43 @@ def init(
         ws (int|None): 서브플롯 가로 간격(`wspace`). rows/cols가 1보다 클 때만 적용.
         hs (int|None): 서브플롯 세로 간격(`hspace`). rows/cols가 1보다 클 때만 적용.
         title (str|None): Figure 제목.
+        xlabel (str|None): x축 레이블.
+        ylabel (str|None): y축 레이블.
         grid (bool): 생성된 Axes에 그리드를 표시할지 여부.
 
     Returns:
         tuple[Figure, Axes]: 생성된 matplotlib Figure와 Axes 객체.
     """
     figsize = (width * cols / 100, height * rows / 100)
-    #print(f"📐 Figure 크기: {figsize[0]:.2f} x {figsize[1]:.2f} 인치 (DPI: {dpi})")
     fig, ax = plt.subplots(rows, cols, figsize=figsize, dpi=config.dpi)
-
-    # ax가 배열 (subplots)인지 단일 Axes인지 확인
-    is_array = isinstance(ax, (np.ndarray, list))
-
-    if is_array and (ws != None and hs != None):
-        fig.subplots_adjust(wspace=ws, hspace=hs)
 
     if rows == 1 and cols == 1:
         if title:
-            ax.set_title(title, fontsize=config.title_font_size * 1.5, fontweight="bold", pad=config.title_pad) # type: ignore
+            ax.set_title(title, fontsize=config.title_font_size, fontweight=config.title_font_weight, pad=config.title_pad) # type: ignore
 
-        if grid:
-            ax.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
+        if xlabel:
+            ax.set_xlabel(xlabel, fontsize=config.xlabel_fontsize, fontweight=config.xlabel_fontweight, labelpad=config.xlabel_pad) # type: ignore
+
+        if ylabel:
+            ax.set_ylabel(ylabel, fontsize=config.ylabel_fontsize, fontweight=config.ylabel_fontweight, labelpad=config.ylabel_pad) # type: ignore
+
+        ax.grid(grid, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
     else:
-        if title:
-            fig.suptitle(title, fontsize=config.title_font_size * 1.5, fontweight="bold", y=1.02) # type: ignore
+        fig.subplots_adjust(wspace=ws, hspace=hs)
 
-        for a in ax.flat if isinstance(ax, np.ndarray) else ax:
+        if title:
+            fig.suptitle(title, fontsize=config.title_font_size, fontweight=config.title_font_weight, y=config.title_pad) # type: ignore
+
+        for a in ax.flat:
             if title:
-                a.set_title(title, fontsize=config.title_font_size, pad=config.title_pad) # type: ignore
-            if grid:
-                a.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
+                a.set_title(title, fontsize=config.title_font_size, fontweight=config.title_font_weight, pad=config.title_pad) # type: ignore
+                a.grid(grid, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
+
+            if xlabel:
+                a.set_xlabel(xlabel, fontsize=config.xlabel_fontsize, fontweight=config.xlabel_fontweight, labelpad=config.xlabel_pad) # type: ignore
+
+            if ylabel:
+                a.set_ylabel(ylabel, fontsize=config.ylabel_fontsize, fontweight=config.ylabel_fontweight, labelpad=config.ylabel_pad) # type: ignore
 
     if flatten == True:
         # 단일 Axes인 경우 리스트로 변환
@@ -252,6 +274,7 @@ def lineplot(
         "y": yname,
         "hue": hue,
         "marker": marker,
+        "linewidth": linewidth,
         "ax": ax,
     }
 
@@ -262,8 +285,8 @@ def lineplot(
 
     lineplot_kwargs.update(params)
 
-    sb.lineplot(**lineplot_kwargs, linewidth=linewidth)
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    sb.lineplot(**lineplot_kwargs)
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -360,7 +383,7 @@ def boxplot(
     else:
         sb.boxplot(data=df, orient=orient, ax=ax, linewidth=linewidth, **params)  # type: ignore
 
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -503,7 +526,7 @@ def kdeplot(
             axes[idx].set_title(f"Q{idx+1}: [{lo:.3g}, {hi:.3g}]", fontsize=config.title_font_size, pad=config.title_pad) # type: ignore
             axes[idx].grid(True, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
 
-        show(axes[0], callback, outparams, save_path, True, title)
+        show(save_path)
         return
 
     if ax is None:
@@ -537,7 +560,7 @@ def kdeplot(
 
     sb.kdeplot(**kdeplot_kwargs)
 
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -621,7 +644,7 @@ def histplot(
         histplot_kwargs.update(params)
         sb.histplot(**histplot_kwargs)
 
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -705,7 +728,7 @@ def stackplot(
         ax.set_xticks(xticks)  # type: ignore
         ax.set_xticklabels(xticks)  # type: ignore
 
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -821,7 +844,7 @@ def scatterplot(
         scatterplot_kwargs["hue"] = None
         sb.scatterplot(data=df[df[vector] == "noise"], **scatterplot_kwargs)    # type: ignore
 
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -888,7 +911,7 @@ def regplot(
 
     sb.regplot(**regplot_kwargs)
 
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -1051,13 +1074,7 @@ def pairplot(
     )
     g.map_upper(func=sb.scatterplot)
 
-    plt.tight_layout()
-
-    if save_path is not None:
-        plt.savefig(save_path, bbox_inches="tight")
-
-    plt.show()
-    plt.close()
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -1129,7 +1146,7 @@ def countplot(
 
     sb.countplot(**countplot_kwargs)
 
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -1193,7 +1210,7 @@ def barplot(
     barplot_kwargs.update(params)
 
     sb.barplot(**barplot_kwargs)
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -1255,7 +1272,7 @@ def boxenplot(
     boxenplot_kwargs.update(params)
 
     sb.boxenplot(**boxenplot_kwargs)
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -1316,7 +1333,7 @@ def violinplot(
 
     violinplot_kwargs.update(params)
     sb.violinplot(**violinplot_kwargs)
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -1379,7 +1396,7 @@ def pointplot(
 
     pointplot_kwargs.update(params)
     sb.pointplot(**pointplot_kwargs)
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -1442,13 +1459,7 @@ def jointplot(
     g.ax_marg_x.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
     g.ax_marg_y.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
 
-    plt.tight_layout()
-
-    if save_path is not None:
-        plt.savefig(save_path, bbox_inches="tight")
-
-    plt.show()
-    plt.close()
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -1507,7 +1518,7 @@ def heatmap(
     # heatmap은 hue를 지원하지 않으므로 cmap에 palette 사용
     sb.heatmap(**heatmatp_kwargs)
 
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -1629,7 +1640,7 @@ def kde_confidence_interval(
 
         current_ax.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
 
-    show(axes[0] if isinstance(axes, list) and len(axes) > 0 else ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -1741,7 +1752,7 @@ def ols_residplot(
                 color=c,
             )
 
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -1826,7 +1837,7 @@ def ols_qqplot(
     for line in ax.get_lines():  # type: ignore
         line.set_linewidth(linewidth)  # type: ignore
 
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -2081,7 +2092,7 @@ def categorical_target_distribution(
     for j in range(n_plots, len(axes)):
         axes[j].set_visible(False) # type: ignore
 
-    show(axes[0], callback, outparams, save_path, True, title)
+    show(save_path)
 
 
 # ===================================================================
@@ -2151,7 +2162,7 @@ def roc_curve_plot(
     ax.set_ylabel("재현율 (True Positive Rate)", fontsize=config.label_font_size)  # type: ignore
     ax.set_title("ROC 곡선", fontsize=config.title_font_size, pad=config.title_pad)  # type: ignore
     ax.legend(loc="lower right", fontsize=config.label_font_size)  # type: ignore
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -2206,7 +2217,7 @@ def confusion_matrix_plot(
 
     ax.set_title(f"혼동행렬 (임계값: {threshold})", fontsize=config.title_font_size, pad=config.title_pad)  # type: ignore
 
-    show(ax, callback, outparams, save_path, False, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -2343,7 +2354,7 @@ def radarplot(
     else:
         title = title if title else "Radar Chart"
 
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -2451,13 +2462,7 @@ def distribution_plot(
 
             fig.suptitle(f"{title} by {hue}", fontsize=14, y=1.02)
 
-            plt.tight_layout()
-
-            if save_path:
-                plt.savefig(save_path, bbox_inches="tight")
-
-            plt.show()
-            plt.close()
+            show(save_path)  # type: ignore
 
 
 def silhouette_plot(
@@ -2541,7 +2546,7 @@ def silhouette_plot(
     if title is None:
         title = "Number of Cluster : " + str(n_clusters) + ", Silhouette Score :" + str(round(sil_avg, 3))  # type: ignore
 
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -2719,7 +2724,7 @@ def visualize_silhouette(
         height=height
     )
 
-    show(ax)
+    show(save_path)  # type: ignore
 
 
 
@@ -2790,7 +2795,7 @@ def dandrogram(
         above_threshold_color="grey",
     )
 
-    show(ax, callback, outparams, save_path, True, title)  # type: ignore
+    show(save_path)  # type: ignore
 
 
 # ===================================================================

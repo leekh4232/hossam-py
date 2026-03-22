@@ -93,8 +93,6 @@ def _init():
         print("   최신 버전으로 업데이트하려면 다음 명령어를 실행하세요:")
         print("   pip install --upgrade hossam\n")
 
-        raise Warning("hossam 패키지가 최신 버전이 아닙니다.")
-
     # 각 열의 넓이 제한 없음
     pd.set_option("display.max_colwidth", None)
     # 출력 너비 제한 없음 (가로 스크롤될 수 있음)
