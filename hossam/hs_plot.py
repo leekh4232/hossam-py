@@ -264,7 +264,7 @@ def lineplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -338,7 +338,7 @@ def boxplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     if xname is not None or yname is not None:
@@ -492,7 +492,7 @@ def kdeplot(
         q = series.quantile([0.0, 0.25, 0.5, 0.75, 1.0]).values
         bounds = list(zip(q[:-1], q[1:]))  # [(Q0,Q1),(Q1,Q2),(Q2,Q3),(Q3,Q4)]
 
-        fig, axes = init(width, height, len(bounds), 1, flatten=True)
+        fig, axes = init(width=width, height=height, rows=len(bounds), cols=1, flatten=True, title=title)
         outparams = True
 
         for idx, (lo, hi) in enumerate(bounds):
@@ -530,7 +530,7 @@ def kdeplot(
         return
 
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     # 기본 kwargs 설정
@@ -605,7 +605,7 @@ def histplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     if bins:
@@ -685,7 +685,7 @@ def stackplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     df2 = df[[xname, hue]].copy()
@@ -775,7 +775,7 @@ def scatterplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     if outline and hue is not None:
@@ -885,7 +885,7 @@ def regplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     # regplot은 hue를 지원하지 않으므로 palette를 color로 변환
@@ -1123,7 +1123,7 @@ def countplot(
             sort = sorted(list(df[xname].value_counts().index))
 
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -1189,7 +1189,7 @@ def barplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -1253,7 +1253,7 @@ def boxenplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     # palette은 hue가 있을 때만 사용
@@ -1315,7 +1315,7 @@ def violinplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     # palette은 hue가 있을 때만 사용
@@ -1376,7 +1376,7 @@ def pointplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -1500,10 +1500,10 @@ def heatmap(
         height = width * 0.8  # type: ignore
 
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
-    heatmatp_kwargs = {
+    heatmatp_kwargs = { 
         "data": data,
         "annot": True,
         "cmap": palette,
@@ -1577,7 +1577,7 @@ def kde_confidence_interval(
     # 외부에서 ax를 전달하지 않은 경우 서브플롯 생성
     if ax is None:
         n_cols = len(target_cols)
-        fig, axes = init(width, height, n_cols, 1, flatten=True)
+        fig, axes = init(width=width, height=height, rows=n_cols, cols=1, flatten=True, title=title)  # type: ignore
         outparams = True
     else:
         # 외부에서 ax를 전달한 경우 (시뮬레이션용)
@@ -1697,7 +1697,7 @@ def ols_residplot(
     y = y_pred + resid  # 실제값 = 적합값 + 잔차
 
     if ax is None:
-        fig, ax = init(width + 150 if mse else width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width + 150 if mse else width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     sb.residplot(
@@ -1811,7 +1811,7 @@ def ols_qqplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     # fit 객체에서 잔차(residuals) 추출
@@ -2000,7 +2000,7 @@ def scatter_by_class(
 
 
 # ===================================================================
-#
+# 명목형 변수별로 종속변수 분포 차이를 시각화한다.
 # ===================================================================
 def categorical_target_distribution(
     data: DataFrame,
@@ -2054,7 +2054,7 @@ def categorical_target_distribution(
     n_plots = len(target_cols)
     rows = (n_plots + cols - 1) // cols
 
-    fig, axes = init(width, height, rows, cols, dpi, flatten=True) # type: ignore
+    fig, axes = init(width=width, height=height, rows=rows, cols=cols, flatten=True, title=title) # type: ignore
     outparams = True
 
     for idx, col in enumerate(target_cols):
@@ -2132,7 +2132,7 @@ def roc_curve_plot(
     """
     outparams = False
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     # 실제값(y_true) 결정
@@ -2194,7 +2194,7 @@ def confusion_matrix_plot(
     """
     outparams = False
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     # 학습 데이터 기반 실제값/예측 확률 결정
@@ -2404,7 +2404,7 @@ def distribution_plot(
         if hue is None:
             # 1행 2열 서브플롯 생성
             fig, axes = init(
-                width, height, rows=1, cols=2, title=title
+                width=width, height=height, rows=1, cols=2, title=title
             )
 
             kde_confidence_interval(
@@ -2431,7 +2431,7 @@ def distribution_plot(
             n_cat = len(categories) if categories else 1
 
             fig, axes = init(
-                width, height, rows=n_cat, cols=2, title=title
+                width=width, height=height, rows=n_cat, cols=2, title=title
             )
             axes_2d = np.atleast_2d(axes)
 
@@ -2501,7 +2501,7 @@ def silhouette_plot(
 
     outparams = False
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     sil_avg = silhouette_score(X=data, labels=estimator.labels_)
@@ -2601,7 +2601,7 @@ def cluster_plot(
     """
     outparams = False
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
     df = data.copy() if data is not None else None  # type: ignore
@@ -2779,7 +2779,7 @@ def dandrogram(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width, height, 1, 1)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
         outparams = True
 
 

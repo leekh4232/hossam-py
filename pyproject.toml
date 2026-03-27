@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hossam"
-version = "0.5.6"
+version = "0.5.7"
 description = "Hossam Data Helper"
 readme = "README.md"
 requires-python = ">=3.11.0"
@@ -34,41 +34,28 @@ dependencies = [
     "importlib_metadata",
     "deprecation",
     "xxhash",
-
-    # Visualization
     "matplotlib",
     "seaborn",
     "plotly",
     "kaleido",
-
-    # Data I/O
     "openpyxl",
     "xlrd",
     "lxml",
     "bs4",
-
-    # ML / Statistics
     "pingouin",
     "statannotations",
     "xgboost",
     "lightgbm",
     "catboost",
     "shap",
-
-    # Time series
     "pmdarima",
     "prophet",
-
-    # Optional but PyCaret 친화
     "imbalanced-learn",
     "category-encoders",
     "yellowbrick",
-
-    # 확장
     "geopandas",
     "kmodes",
     "jenkspy",
-    "flask",
     "kneed"
 ]
 
