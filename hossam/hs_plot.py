@@ -225,12 +225,18 @@ def show(
 # 선 그래프를 그린다
 # ===================================================================
 def lineplot(
-    df: DataFrame | None = None,
-    xname: str | Series | np.ndarray | list | None = None,
-    yname: str | Series | np.ndarray | list | None = None,
+    data: DataFrame | None = None,
+    x: str | Series | np.ndarray | list | None = None,
+    y: str | Series | np.ndarray | list | None = None,
     hue: str | None = None,
     title: str | None = None,
+    xlabel: str | None = None,
+    ylabel: str | None = None,
     marker: str | None = None,
+    markersize: int | None = None,
+    markeredgewidth: int | None = None,
+    markeredgecolor: str | None = None,
+    markerfacecolor: str | None = None,
     palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
@@ -243,12 +249,18 @@ def lineplot(
     """선 그래프를 그린다.
 
     Args:
-        df (DataFrame | None): 시각화할 데이터.
-        xname (str | Series | np.ndarray | list | None): x축 컬럼명 혹은 x축 값 시퀀스.
-        yname (str | Series | np.ndarray | list | None): y축 컬럼명 혹은 y축 값 시퀀스.
+        data (DataFrame | None): 시각화할 데이터.
+        x (str | Series | np.ndarray | list | None): x축 컬럼명 혹은 x축 값 시퀀스.
+        y (str | Series | np.ndarray | list | None): y축 컬럼명 혹은 y축 값 시퀀스.
         hue (str | None): 범주 구분 컬럼명.
         title (str | None): 그래프 제목.
+        xlabel (str | None): x축 레이블.
+        ylabel (str | None): y축 레이블.
         marker (str | None): 마커 모양.
+        markersize (int | None): 마커 크기.
+        markeredgewidth (int | None): 마커 테두리 두께.
+        markeredgecolor (str | None): 마커 테두리 색상.
+        markerfacecolor (str | None): 마커 배경 색상.
         palette (str | None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
@@ -264,16 +276,20 @@ def lineplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, ylabel=ylabel)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
     lineplot_kwargs = {
-        "data": df,
-        "x": xname,
-        "y": yname,
+        "data": data,
+        "x": x,
+        "y": y,
         "hue": hue,
         "marker": marker,
+        "markersize": markersize,
+        "markeredgewidth": markeredgewidth,
+        "markeredgecolor": markeredgecolor,
+        "markerfacecolor": markerfacecolor,
         "linewidth": linewidth,
         "ax": ax,
     }
@@ -289,14 +305,108 @@ def lineplot(
     show(save_path)  # type: ignore
 
 
+
+
+
+# ===================================================================
+# 히스토그램을 그린다
+# ===================================================================
+def histplot(
+    data: DataFrame,
+    x: str,
+    hue: str | None = None,
+    bins: int | None = None,
+    title: str | None = None,
+    xlabel: str | None = None,
+    ylabel: str | None = None,
+    kde: bool = True,
+    palette: str | None = None,
+    width: int = config.width,
+    height: int = config.height,
+    linewidth: float = config.line_width,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
+    **params,
+) -> None:
+    """히스토그램을 그리고 필요 시 KDE를 함께 표시한다.
+
+    Args:
+        data (DataFrame): 시각화할 데이터.
+        x (str): 히스토그램 대상 컬럼명.
+        hue (str|None): 범주 컬럼명.
+        bins (int|sequence|None): 구간 수 또는 경계.
+        title (str|None): 그래프 제목.
+        xlabel (str|None): x축 레이블.
+        ylabel (str|None): y축 레이블.
+        kde (bool): KDE 표시 여부.
+        palette (str|None): 팔레트 이름.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        linewidth (float): 선 굵기.
+        callback (Callable|None): Axes 후처리 콜백.
+        ax (Axes|None): 외부에서 전달한 Axes.
+        **params: seaborn histplot 추가 인자.
+
+    Returns:
+        None
+    """
+    outparams = False
+
+    if ax is None:
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, ylabel=ylabel)  # type: ignore
+        outparams = True
+
+    if bins:
+        histplot_kwargs = {
+            "data": data,
+            "x": x,
+            "hue": hue,
+            "kde": kde,
+            "bins": bins,
+            "linewidth": linewidth,
+            "ax": ax,
+        }
+
+        if hue is not None and palette is not None:
+            histplot_kwargs["palette"] = palette
+        elif hue is None and palette is not None:
+            histplot_kwargs["color"] = sb.color_palette(palette)[0]
+
+        histplot_kwargs.update(params)
+        sb.histplot(**histplot_kwargs)
+    else:
+        histplot_kwargs = {
+            "data": data,
+            "x": x,
+            "hue": hue,
+            "kde": kde,
+            "linewidth": linewidth,
+            "ax": ax,
+        }
+
+        if hue is not None and palette is not None:
+            histplot_kwargs["palette"] = palette
+        elif hue is None and palette is not None:
+            histplot_kwargs["color"] = sb.color_palette(palette)[0]
+
+        histplot_kwargs.update(params)
+        sb.histplot(**histplot_kwargs)
+
+    show(save_path)  # type: ignore
+
+
+
 # ===================================================================
 # 상자그림(boxplot)을 그린다
 # ===================================================================
 def boxplot(
     df: DataFrame | None = None,
-    xname: str | None = None,
-    yname: str | None = None,
+    x: str | None = None,
+    y: str | None = None,
     title: str | None = None,
+    xlabel: str | None = None,
+    ylabel: str | None = None,
     orient: str = "v",
     stat_test: str | None = None,
     stat_pairs: list[tuple] | None = None,
@@ -315,11 +425,13 @@ def boxplot(
 
     Args:
         df (DataFrame|None): 시각화할 데이터.
-        xname (str|None): x축 범주 컬럼명.
-        yname (str|None): y축 값 컬럼명.
+        x (str|None): x축 범주 컬럼명.
+        y (str|None): y축 값 컬럼명.
         title (str|None): 그래프 제목.
+        xlabel (str|None): x축 레이블.
+        ylabel (str|None): y축 레이블.
         orient (str): 'v' 또는 'h' 방향.
-        stat_test (str|None): 통계 검정 방법. None이면 검정 안함. xname과 yname이 모두 지정되어야 함.
+        stat_test (str|None): 통계 검정 방법. None이면 검정 안함. x과 y가 모두 지정되어야 함.
         stat_pairs (list[tuple]|None): 통계 검정할 그룹 쌍 목록.
         stat_text_format (str): 통계 결과 표시 형식.
         stat_loc (str): 통계 결과 위치.
@@ -338,20 +450,20 @@ def boxplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, ylabel=ylabel)  # type: ignore
         outparams = True
 
-    if xname is not None or yname is not None:
-        if xname is not None and yname is None:
+    if x is not None or y is not None:
+        if x is not None and y is None:
             orient = "h"
-        elif xname is None and yname is not None:
+        elif x is None and y is not None:
             orient = "v"
 
 
         boxplot_kwargs = {
             "data": df,
-            "x": xname,
-            "y": yname,
+            "x": x,
+            "y": y,
             "orient": orient,
             "ax": ax,
             "linewidth": linewidth,
@@ -371,10 +483,10 @@ def boxplot(
         # 통계 검정 추가
         if stat_test is not None:
             if stat_pairs is None:
-                stat_pairs = [df[xname].dropna().unique().tolist()] # type: ignore
+                stat_pairs = [df[x].dropna().unique().tolist()] # type: ignore
 
             annotator = Annotator(
-                ax, data=df, x=xname, y=yname, pairs=stat_pairs, orient=orient
+                ax, data=df, x=x, y=y, pairs=stat_pairs, orient=orient
             )
             annotator.configure(
                 test=stat_test, text_format=stat_text_format, loc=stat_loc
@@ -559,90 +671,6 @@ def kdeplot(
     kdeplot_kwargs.update(params)
 
     sb.kdeplot(**kdeplot_kwargs)
-
-    show(save_path)  # type: ignore
-
-
-# ===================================================================
-# 히스토그램을 그린다
-# ===================================================================
-def histplot(
-    df: DataFrame,
-    xname: str,
-    hue: str | None = None,
-    title: str | None = None,
-    bins: int | None = None,
-    kde: bool = True,
-    palette: str | None = None,
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-    ax: Axes | None = None,
-    **params,
-) -> None:
-    """히스토그램을 그리고 필요 시 KDE를 함께 표시한다.
-
-    Args:
-        df (DataFrame): 시각화할 데이터.
-        xname (str): 히스토그램 대상 컬럼명.
-        hue (str|None): 범주 컬럼명.
-        title (str|None): 그래프 제목.
-        bins (int|sequence|None): 구간 수 또는 경계.
-        kde (bool): KDE 표시 여부.
-        palette (str|None): 팔레트 이름.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        callback (Callable|None): Axes 후처리 콜백.
-        ax (Axes|None): 외부에서 전달한 Axes.
-        **params: seaborn histplot 추가 인자.
-
-    Returns:
-        None
-    """
-    outparams = False
-
-    if ax is None:
-        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
-        outparams = True
-
-    if bins:
-        histplot_kwargs = {
-            "data": df,
-            "x": xname,
-            "hue": hue,
-            "kde": kde,
-            "bins": bins,
-            "linewidth": linewidth,
-            "ax": ax,
-        }
-
-        if hue is not None and palette is not None:
-            histplot_kwargs["palette"] = palette
-        elif hue is None and palette is not None:
-            histplot_kwargs["color"] = sb.color_palette(palette)[0]
-
-        histplot_kwargs.update(params)
-        sb.histplot(**histplot_kwargs)
-    else:
-        histplot_kwargs = {
-            "data": df,
-            "x": xname,
-            "hue": hue,
-            "kde": kde,
-            "linewidth": linewidth,
-            "ax": ax,
-        }
-
-        if hue is not None and palette is not None:
-            histplot_kwargs["palette"] = palette
-        elif hue is None and palette is not None:
-            histplot_kwargs["color"] = sb.color_palette(palette)[0]
-
-        histplot_kwargs.update(params)
-        sb.histplot(**histplot_kwargs)
 
     show(save_path)  # type: ignore
 
