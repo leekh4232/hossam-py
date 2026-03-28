@@ -232,6 +232,7 @@ def lineplot(
     title: str | None = None,
     xlabel: str | None = None,
     ylabel: str | None = None,
+    linewidth: float = config.line_width,
     marker: str | None = None,
     markersize: int | None = None,
     markeredgewidth: int | None = None,
@@ -240,7 +241,6 @@ def lineplot(
     palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
-    linewidth: float = config.line_width,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -256,6 +256,7 @@ def lineplot(
         title (str | None): 그래프 제목.
         xlabel (str | None): x축 레이블.
         ylabel (str | None): y축 레이블.
+        linewidth (float): 선 굵기.
         marker (str | None): 마커 모양.
         markersize (int | None): 마커 크기.
         markeredgewidth (int | None): 마커 테두리 두께.
@@ -264,8 +265,7 @@ def lineplot(
         palette (str | None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        save_path (str|None): 이미지 저장 경로. None이면 화면에 표시.
+        save_path (str|None): 이미지 저장 경로.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn lineplot 추가 인자.
@@ -314,16 +314,16 @@ def lineplot(
 def histplot(
     data: DataFrame,
     x: str,
+    bins: int | list | None = None,
     hue: str | None = None,
-    bins: int | None = None,
     title: str | None = None,
     xlabel: str | None = None,
     ylabel: str | None = None,
-    kde: bool = True,
+    linewidth: float = 1,
+    kde: bool = False,
     palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
-    linewidth: float = config.line_width,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -334,16 +334,16 @@ def histplot(
     Args:
         data (DataFrame): 시각화할 데이터.
         x (str): 히스토그램 대상 컬럼명.
-        hue (str|None): 범주 컬럼명.
         bins (int|sequence|None): 구간 수 또는 경계.
+        hue (str|None): 범주 컬럼명.
         title (str|None): 그래프 제목.
         xlabel (str|None): x축 레이블.
         ylabel (str|None): y축 레이블.
+        linewidth (float): 선 굵기.
         kde (bool): KDE 표시 여부.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn histplot 추가 인자.
