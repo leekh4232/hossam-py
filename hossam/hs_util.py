@@ -153,13 +153,13 @@ def load_info(search: str | None = None, local: str | None = None) -> DataFrame:
         local (str, optional): 로컬 메타데이터 경로. None이면 원격(BASE_URL) 사용.
 
     Returns:
-        DataFrame: name, chapter, desc, url 컬럼을 갖는 테이블
+        DataFrame: name, desc, url 컬럼을 갖는 테이블
 
     Examples:
         ```python
         from hossam import *
         info = load_info()
-        list(info.columns) #['name', 'chapter', 'desc', 'url']
+        list(info.columns) #['name', 'desc', 'url']
         ```
     """
     global BASE_URL
@@ -193,15 +193,10 @@ def load_info(search: str | None = None, local: str | None = None) -> DataFrame:
         my_dict[key]['url'] = "%s/%s" % (BASE_URL, my_dict[key]['url'])
         my_dict[key]['name'] = key
 
-        if 'chapter' in my_dict[key]:
-            my_dict[key]['chapter'] = ", ".join(my_dict[key]['chapter'])
-        else:
-            my_dict[key]['chapter'] = '공통'
-
         my_data.append(my_dict[key])
 
     my_df = DataFrame(my_data)
-    my_df2 = my_df.reindex(columns=['name', 'chapter', 'desc', 'url'])
+    my_df2 = my_df.reindex(columns=['name', 'desc', 'url'])
 
     if search:
         my_df2 = my_df2[my_df2['name'].str.contains(search.lower())]

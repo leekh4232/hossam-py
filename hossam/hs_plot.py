@@ -48,7 +48,7 @@ config = SimpleNamespace(
     width=1280,
     height=640,
     font_size=10,
-    text_font_size=8,
+    text_font_size=14,
     title_font_weight=500,
     title_font_size=24,
     title_pad=15,
@@ -65,6 +65,8 @@ config = SimpleNamespace(
     grid_alpha=0.5,
     grid_width=1,
     fill_alpha=0.3,
+    ws=0.1,
+    hs=0.2,
 )
 
 
@@ -114,8 +116,8 @@ def init(
     rows: int = 1,
     cols: int = 1,
     flatten: bool = False,
-    ws: int | None = None,
-    hs: int | None = None,
+    ws: int | None = config.ws,
+    hs: int | None = config.hs,
     title: str | None = None,
     xlabel: str | None = None,
     xlabel_fontsize: int | None = config.xlabel_fontsize,
@@ -158,45 +160,31 @@ def init(
         if ylabel:
             ax.set_ylabel(ylabel, fontsize=config.ylabel_fontsize, fontweight=config.ylabel_fontweight, labelpad=config.ylabel_pad) # type: ignore
 
+        # 그리드 설정
         ax.grid(grid, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
+
+        # 테두리 굵기 설정
+        for spine in ax.spines.values(): # type: ignore
+            spine.set_linewidth(config.frame_width)
+        
+        plt.tight_layout()
+
     else:
+        if title:
+            fig.suptitle(title, fontsize=config.title_font_size * (rows * cols / 2), fontweight=config.title_font_weight) # type: ignore
+
+        # Grid, 테두리 굵기 설정
+        for f in ax.flatten():
+            f.grid(grid, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
+            for spine in f.spines.values(): # type: ignore
+                spine.set_linewidth(config.frame_width)
+        
+        plt.tight_layout()
+        
         fig.subplots_adjust(wspace=ws, hspace=hs)
 
-        if title:
-            fig.suptitle(title, fontsize=config.title_font_size, fontweight=config.title_font_weight, y=config.title_pad) # type: ignore
-
-        for a in ax.flat:
-            if title:
-                a.set_title(title, fontsize=config.title_font_size, fontweight=config.title_font_weight, pad=config.title_pad) # type: ignore
-                a.grid(grid, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
-
-            if xlabel:
-                a.set_xlabel(xlabel, fontsize=config.xlabel_fontsize, fontweight=config.xlabel_fontweight, labelpad=config.xlabel_pad) # type: ignore
-
-            if ylabel:
-                a.set_ylabel(ylabel, fontsize=config.ylabel_fontsize, fontweight=config.ylabel_fontweight, labelpad=config.ylabel_pad) # type: ignore
-
-    if flatten == True:
-        # 단일 Axes인 경우 리스트로 변환
-        if rows == 1 and cols == 1:
-            ax = [ax]
-        else:
-            ax = ax.flatten()
-
-    # 테두리 굵기 설정
-    if flatten and isinstance(ax, list):
-        for a in ax:
-            for spine in a.spines.values(): # type: ignore
-                spine.set_linewidth(config.frame_width)
-    elif isinstance(ax, np.ndarray):
-        for a in ax.flat:
-            for spine in a.spines.values(): # type: ignore
-                spine.set_linewidth(config.frame_width)
-    else:
-        for spine in ax.spines.values():  # type: ignore
-            spine.set_linewidth(config.frame_width)
-
-    plt.tight_layout()
+    if (rows > 1 or cols > 1) and flatten == True:
+        ax = ax.flatten()
 
     return fig, ax
 
@@ -305,7 +293,128 @@ def lineplot(
     show(save_path)  # type: ignore
 
 
+# ===================================================================
+# 단변량 커널 밀도 추정(KDE) 그래프를 그린다
+# ===================================================================
+def kdeplot(
+    data: DataFrame,
+    x: str | None = None,
+    meanline: bool = False,
+    title: str | None = None,
+    xlabel: str | None = None,
+    ylabel: str | None = None,
+    palette: str | None = None,
+    fill: bool = False,
+    alpha: float = config.fill_alpha,
+    linewidth: float = config.line_width,
+    quartile_split: bool = False,
+    width: int = config.width,
+    height: int = config.height,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
+    **params,
+) -> None:
+    """단변량 커널 밀도 추정(KDE) 그래프를 그린다. 범주에 따른 구분은 지원하지 않는다.
 
+    quartile_split=True일 때는 사분위수 구간(Q1~Q4)으로 나누어 4개의 서브플롯에 그린다.
+
+    Args:
+        data (DataFrame): 시각화할 데이터.
+        x (str|None): x축 컬럼명.
+        title (str|None): 그래프 제목.
+        xlabel (str | None): x축 레이블.
+        ylabel (str | None): y축 레이블.
+        palette (str|None): 팔레트 이름.
+        fill (bool): 면적 채우기 여부.
+        alpha (float): 채움 투명도.
+        quartile_split (bool): True면 1D KDE를 사분위수별 서브플롯으로 분할.
+        linewidth (float): 선 굵기.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        save_path (str|None): 이미지 저장 경로.
+        callback (Callable|None): Axes 후처리 콜백.
+        ax (Axes|None): 외부에서 전달한 Axes.
+        **params: seaborn kdeplot 추가 인자.
+
+    Returns:
+        None
+    """
+    outparams = False
+
+    # 사분위수 분할 전용 처리 (1D KDE만 지원)
+    if quartile_split:
+        series = data[x].dropna()
+        if series.empty:
+            raise ValueError(f"{x} 컬럼에 유효한 데이터가 없습니다.")
+
+        q = series.quantile([0.0, 0.25, 0.5, 0.75, 1.0]).values
+        bounds = list(zip(q[:-1], q[1:]))  # [(Q0,Q1),(Q1,Q2),(Q2,Q3),(Q3,Q4)]
+
+        fig, axes = init(width=width, height=height, rows=2, cols=2, flatten=True, title=title, xlabel=xlabel, ylabel=ylabel)  # type: ignore
+        outparams = True
+
+        for idx, (lo, hi) in enumerate(bounds):
+            subset = series[(series >= lo) & (series <= hi)]
+            if subset.empty:
+                continue
+
+            cols = [x]
+            data_quartile = data.loc[subset.index, cols].copy()
+
+            kdeplot_kwargs = {
+                "data": data_quartile,
+                "x": x,
+                "fill": fill,
+                "linewidth": linewidth,
+                "label": f"Q{idx+1} ({lo:.2f}~{hi:.2f})",
+                "ax": axes[idx],
+            }
+
+            if fill:
+                kdeplot_kwargs["alpha"] = alpha
+
+            kdeplot_kwargs.update(params)
+            sb.kdeplot(**kdeplot_kwargs)
+            axes[idx].legend()  # type: ignore
+            
+            if meanline:
+                mean_value = subset.mean()
+                axes[idx].axvline(x=mean_value, color='red', linestyle='--', linewidth=linewidth * 0.5)  # type: ignore
+                axes[idx].text(x=mean_value + 0.05, y=axes[idx].get_ylim()[1]*0.95, 
+                                s=f'Mean: {mean_value:.2f}', color='red', fontsize=config.text_font_size)  # type: ignore
+
+        show(save_path)
+        return
+
+    if ax is None:
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, ylabel=ylabel)  # type: ignore
+        outparams = True
+
+    # 기본 kwargs 설정
+    kdeplot_kwargs = {
+        "data": data,
+        "x": x,
+        "fill": fill,
+        "linewidth": linewidth,
+        "palette": palette,
+        "ax": ax
+    }
+
+    if fill:
+        kdeplot_kwargs["alpha"] = alpha
+
+    # 커널밀도 추정 그래프 그리기
+    sb.kdeplot(**kdeplot_kwargs)
+
+    # 평균선 표시
+    if meanline:
+        mean_value = data[x].mean()
+        ax.axvline(x=mean_value, color='red', linestyle='--', linewidth=linewidth * 0.5)  # type: ignore
+        ax.text(x=mean_value + 0.05, y=ax.get_ylim()[1]*0.95, 
+                s=f'Mean: {mean_value:.2f}', color='red', fontsize=config.text_font_size)
+
+    show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -540,139 +649,6 @@ def pvalue1_anotation(
         ax=ax,
         **params,
     )
-
-
-# ===================================================================
-# 커널 밀도 추정(KDE) 그래프를 그린다
-# ===================================================================
-def kdeplot(
-    df: DataFrame,
-    xname: str | None = None,
-    yname: str | None = None,
-    hue: str | None = None,
-    title: str | None = None,
-    palette: str | None = None,
-    fill: bool = False,
-    fill_alpha: float = config.fill_alpha,
-    linewidth: float = config.line_width,
-    quartile_split: bool = False,
-    width: int = config.width,
-    height: int = config.height,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-    ax: Axes | None = None,
-    **params,
-) -> None:
-    """커널 밀도 추정(KDE) 그래프를 그린다.
-
-    quartile_split=True일 때는 1차원 KDE(xname 지정, yname 없음)를
-    사분위수 구간(Q1~Q4)으로 나누어 4개의 서브플롯에 그린다.
-
-    Args:
-        df (DataFrame): 시각화할 데이터.
-        xname (str|None): x축 컬럼명.
-        yname (str|None): y축 컬럼명.
-        hue (str|None): 범주 컬럼명.
-        title (str|None): 그래프 제목.
-        palette (str|None): 팔레트 이름.
-        fill (bool): 면적 채우기 여부.
-        fill_alpha (float): 채움 투명도.
-        quartile_split (bool): True면 1D KDE를 사분위수별 서브플롯으로 분할.
-        linewidth (float): 선 굵기.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        callback (Callable|None): Axes 후처리 콜백.
-        ax (Axes|None): 외부에서 전달한 Axes.
-        **params: seaborn kdeplot 추가 인자.
-
-    Returns:
-        None
-    """
-    outparams = False
-
-    # 사분위수 분할 전용 처리 (1D KDE만 지원)
-    if quartile_split:
-        if yname is not None:
-            raise ValueError(
-                "quartile_split은 1차원 KDE(xname)에서만 사용할 수 있습니다."
-            )
-
-        series = df[xname].dropna()
-        if series.empty:
-            return
-
-        q = series.quantile([0.0, 0.25, 0.5, 0.75, 1.0]).values
-        bounds = list(zip(q[:-1], q[1:]))  # [(Q0,Q1),(Q1,Q2),(Q2,Q3),(Q3,Q4)]
-
-        fig, axes = init(width=width, height=height, rows=len(bounds), cols=1, flatten=True, title=title)
-        outparams = True
-
-        for idx, (lo, hi) in enumerate(bounds):
-            subset = series[(series >= lo) & (series <= hi)]
-            if subset.empty:
-                continue
-
-            # hue를 지원하려면 원본 데이터에서 해당 인덱스로 슬라이싱
-            cols = [xname]
-            if hue is not None and hue in df.columns:
-                cols.append(hue)
-            df_quartile = df.loc[subset.index, cols].copy()
-
-            kdeplot_kwargs = {
-                "data": df_quartile,
-                "x": xname,
-                "fill": fill,
-                "ax": axes[idx],
-            }
-
-            if hue is not None and hue in df_quartile.columns:
-                kdeplot_kwargs["hue"] = hue
-            if fill:
-                kdeplot_kwargs["alpha"] = fill_alpha
-            if hue is not None and palette is not None:
-                kdeplot_kwargs["palette"] = palette
-            kdeplot_kwargs["linewidth"] = linewidth
-            kdeplot_kwargs.update(params)
-
-            sb.kdeplot(**kdeplot_kwargs)
-            axes[idx].set_title(f"Q{idx+1}: [{lo:.3g}, {hi:.3g}]", fontsize=config.title_font_size, pad=config.title_pad) # type: ignore
-            axes[idx].grid(True, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
-
-        show(save_path)
-        return
-
-    if ax is None:
-        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
-        outparams = True
-
-    # 기본 kwargs 설정
-    kdeplot_kwargs = {
-        "data": df,
-        "x": xname,
-        "y": yname,
-        "hue": hue,
-        "fill": fill,
-        "ax": ax,
-    }
-
-    # fill이 True일 때 alpha 추가
-    if fill:
-        kdeplot_kwargs["alpha"] = fill_alpha
-
-    # hue가 있을 때만 palette 추가
-    if hue is not None and palette is not None:
-        kdeplot_kwargs["palette"] = palette
-
-    # yname이 없을 때만 linewidth 추가 (1D KDE에서만 사용)
-    if yname is None:
-        kdeplot_kwargs["linewidth"] = linewidth
-
-    # 추가 params 병합
-    kdeplot_kwargs.update(params)
-
-    sb.kdeplot(**kdeplot_kwargs)
-
-    show(save_path)  # type: ignore
 
 
 # ===================================================================
