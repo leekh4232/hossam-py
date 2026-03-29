@@ -423,7 +423,7 @@ def kdeplot(
 def histplot(
     data: DataFrame,
     x: str,
-    bins: int | list | None = None,
+    bins: int | list | str = "auto",
     hue: str | None = None,
     title: str | None = None,
     xlabel: str | None = None,
@@ -443,7 +443,7 @@ def histplot(
     Args:
         data (DataFrame): 시각화할 데이터.
         x (str): 히스토그램 대상 컬럼명.
-        bins (int|sequence|None): 구간 수 또는 경계.
+        bins (int|sequence|str): 구간 수 또는 경계.
         hue (str|None): 범주 컬럼명.
         title (str|None): 그래프 제목.
         xlabel (str|None): x축 레이블.
@@ -466,41 +466,23 @@ def histplot(
         fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, ylabel=ylabel)  # type: ignore
         outparams = True
 
-    if bins:
-        histplot_kwargs = {
-            "data": data,
-            "x": x,
-            "hue": hue,
-            "kde": kde,
-            "bins": bins,
-            "linewidth": linewidth,
-            "ax": ax,
-        }
+    histplot_kwargs = {
+        "data": data,
+        "x": x,
+        "hue": hue,
+        "kde": kde,
+        "bins": bins,
+        "linewidth": linewidth,
+        "ax": ax,
+    }
 
-        if hue is not None and palette is not None:
-            histplot_kwargs["palette"] = palette
-        elif hue is None and palette is not None:
-            histplot_kwargs["color"] = sb.color_palette(palette)[0]
+    if hue is not None and palette is not None:
+        histplot_kwargs["palette"] = palette
+    elif hue is None and palette is not None:
+        histplot_kwargs["color"] = sb.color_palette(palette)[0]
 
-        histplot_kwargs.update(params)
-        sb.histplot(**histplot_kwargs)
-    else:
-        histplot_kwargs = {
-            "data": data,
-            "x": x,
-            "hue": hue,
-            "kde": kde,
-            "linewidth": linewidth,
-            "ax": ax,
-        }
-
-        if hue is not None and palette is not None:
-            histplot_kwargs["palette"] = palette
-        elif hue is None and palette is not None:
-            histplot_kwargs["color"] = sb.color_palette(palette)[0]
-
-        histplot_kwargs.update(params)
-        sb.histplot(**histplot_kwargs)
+    histplot_kwargs.update(params)
+    sb.histplot(**histplot_kwargs)
 
     show(save_path)  # type: ignore
 
