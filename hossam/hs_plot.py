@@ -120,13 +120,13 @@ def init(
     hs: int | None = config.hs,
     title: str | None = None,
     xlabel: str | None = None,
-    xlabel_fontsize: int | None = config.xlabel_fontsize,
-    xlabel_fontweight: str | None = config.xlabel_fontweight,
-    xlabel_pad: int | None = config.xlabel_pad,
+    xlabel_fontsize: int = config.xlabel_fontsize,
+    xlabel_fontweight: str = config.xlabel_fontweight,
+    xlabel_pad: int = config.xlabel_pad,
     ylabel: str | None = None,
-    ylabel_fontsize: int | None = config.ylabel_fontsize,
-    ylabel_fontweight: str | None = config.ylabel_fontweight,
-    ylabel_pad: int | None = config.ylabel_pad,
+    ylabel_fontsize: int = config.ylabel_fontsize,
+    ylabel_fontweight: str = config.ylabel_fontweight,
+    ylabel_pad: int = config.ylabel_pad,
     grid: bool = True,
 ):
     """기본 크기의 Figure와 Axes를 생성한다.
@@ -141,7 +141,13 @@ def init(
         hs (int|None): 서브플롯 세로 간격(`hspace`). rows/cols가 1보다 클 때만 적용.
         title (str|None): Figure 제목.
         xlabel (str|None): x축 레이블.
+        xlabel_fontsize (int): x축 레이블 폰트 크기.
+        xlabel_fontweight (str): x축 레이블 폰트 두께.
+        xlabel_pad (int): x축 레이블 패드.
         ylabel (str|None): y축 레이블.
+        ylabel_fontsize (int): y축 레이블 폰트 크기.
+        ylabel_fontweight (str): y축 레이블 폰트 두께.
+        ylabel_pad (int): y축 레이블 패드.
         grid (bool): 생성된 Axes에 그리드를 표시할지 여부.
 
     Returns:
@@ -155,10 +161,10 @@ def init(
             ax.set_title(title, fontsize=config.title_font_size, fontweight=config.title_font_weight, pad=config.title_pad) # type: ignore
 
         if xlabel:
-            ax.set_xlabel(xlabel, fontsize=config.xlabel_fontsize, fontweight=config.xlabel_fontweight, labelpad=config.xlabel_pad) # type: ignore
+            ax.set_xlabel(xlabel, fontsize=xlabel_fontsize, fontweight=config.xlabel_fontweight, labelpad=xlabel_pad) # type: ignore
 
         if ylabel:
-            ax.set_ylabel(ylabel, fontsize=config.ylabel_fontsize, fontweight=config.ylabel_fontweight, labelpad=config.ylabel_pad) # type: ignore
+            ax.set_ylabel(ylabel, fontsize=ylabel_fontsize, fontweight=config.ylabel_fontweight, labelpad=ylabel_pad) # type: ignore
 
         # 그리드 설정
         ax.grid(grid, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
@@ -217,15 +223,22 @@ def lineplot(
     x: str | Series | np.ndarray | list | None = None,
     y: str | Series | np.ndarray | list | None = None,
     hue: str | None = None,
-    title: str | None = None,
-    xlabel: str | None = None,
-    ylabel: str | None = None,
     linewidth: float = config.line_width,
     marker: str | None = None,
     markersize: int | None = None,
     markeredgewidth: int | None = None,
     markeredgecolor: str | None = None,
     markerfacecolor: str | None = None,
+    #----- 공통 파라미터 ------
+    title: str | None = None,
+    xlabel: str | None = None,
+    xlabel_fontsize: int = config.xlabel_fontsize,
+    xlabel_fontweight: str = config.xlabel_fontweight,
+    xlabel_pad: int = config.xlabel_pad,
+    ylabel: str | None = None,
+    ylabel_fontsize: int = config.ylabel_fontsize,
+    ylabel_fontweight: str = config.ylabel_fontweight,
+    ylabel_pad: int = config.ylabel_pad,
     palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
@@ -241,15 +254,23 @@ def lineplot(
         x (str | Series | np.ndarray | list | None): x축 컬럼명 혹은 x축 값 시퀀스.
         y (str | Series | np.ndarray | list | None): y축 컬럼명 혹은 y축 값 시퀀스.
         hue (str | None): 범주 구분 컬럼명.
-        title (str | None): 그래프 제목.
-        xlabel (str | None): x축 레이블.
-        ylabel (str | None): y축 레이블.
         linewidth (float): 선 굵기.
         marker (str | None): 마커 모양.
         markersize (int | None): 마커 크기.
         markeredgewidth (int | None): 마커 테두리 두께.
         markeredgecolor (str | None): 마커 테두리 색상.
         markerfacecolor (str | None): 마커 배경 색상.
+
+    Common Args:
+        title (str | None): 그래프 제목.
+        xlabel (str|None): x축 레이블.
+        xlabel_fontsize (int): x축 레이블 폰트 크기.
+        xlabel_fontweight (str): x축 레이블 폰트 두께.
+        xlabel_pad (int): x축 레이블 패드.
+        ylabel (str|None): y축 레이블.
+        ylabel_fontsize (int): y축 레이블 폰트 크기.
+        ylabel_fontweight (str): y축 레이블 폰트 두께.
+        ylabel_pad (int): y축 레이블 패드.
         palette (str | None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
@@ -264,7 +285,7 @@ def lineplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, ylabel=ylabel)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, xlabel_fontsize=xlabel_fontsize, xlabel_fontweight=xlabel_fontweight, xlabel_pad=xlabel_pad, ylabel=ylabel, ylabel_fontsize=ylabel_fontsize, ylabel_fontweight=ylabel_fontweight, ylabel_pad=ylabel_pad)  # type: ignore
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
@@ -290,7 +311,12 @@ def lineplot(
     lineplot_kwargs.update(params)
 
     sb.lineplot(**lineplot_kwargs)
-    show(save_path)  # type: ignore
+
+    if callback is not None:
+        callback(ax)
+
+    if outparams:
+        show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -300,14 +326,21 @@ def kdeplot(
     data: DataFrame,
     x: str | None = None,
     meanline: bool = False,
-    title: str | None = None,
-    xlabel: str | None = None,
-    ylabel: str | None = None,
-    palette: str | None = None,
     fill: bool = False,
     alpha: float = config.fill_alpha,
     linewidth: float = config.line_width,
     quartile_split: bool = False,
+    #----- 공통 파라미터 ------
+    title: str | None = None,
+    xlabel: str | None = None,
+    xlabel_fontsize: int = config.xlabel_fontsize,
+    xlabel_fontweight: str = config.xlabel_fontweight,
+    xlabel_pad: int = config.xlabel_pad,
+    ylabel: str | None = None,
+    ylabel_fontsize: int = config.ylabel_fontsize,
+    ylabel_fontweight: str = config.ylabel_fontweight,
+    ylabel_pad: int = config.ylabel_pad,
+    palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
     save_path: str | None = None,
@@ -322,14 +355,22 @@ def kdeplot(
     Args:
         data (DataFrame): 시각화할 데이터.
         x (str|None): x축 컬럼명.
-        title (str|None): 그래프 제목.
-        xlabel (str | None): x축 레이블.
-        ylabel (str | None): y축 레이블.
-        palette (str|None): 팔레트 이름.
         fill (bool): 면적 채우기 여부.
         alpha (float): 채움 투명도.
         quartile_split (bool): True면 1D KDE를 사분위수별 서브플롯으로 분할.
         linewidth (float): 선 굵기.
+
+    Common Args:
+        title (str|None): 그래프 제목.
+        xlabel (str|None): x축 레이블.
+        xlabel_fontsize (int): x축 레이블 폰트 크기.
+        xlabel_fontweight (str): x축 레이블 폰트 두께.
+        xlabel_pad (int): x축 레이블 패드.
+        ylabel (str|None): y축 레이블.
+        ylabel_fontsize (int): y축 레이블 폰트 크기.
+        ylabel_fontweight (str): y축 레이블 폰트 두께.
+        ylabel_pad (int): y축 레이블 패드.
+        palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
         save_path (str|None): 이미지 저장 경로.
@@ -351,7 +392,7 @@ def kdeplot(
         q = series.quantile([0.0, 0.25, 0.5, 0.75, 1.0]).values
         bounds = list(zip(q[:-1], q[1:]))  # [(Q0,Q1),(Q1,Q2),(Q2,Q3),(Q3,Q4)]
 
-        fig, axes = init(width=width, height=height, rows=2, cols=2, flatten=True, title=title, xlabel=xlabel, ylabel=ylabel)  # type: ignore
+        fig, axes = init(width=width, height=height, rows=2, cols=2, flatten=True, title=title, xlabel=xlabel, xlabel_fontsize=xlabel_fontsize, xlabel_fontweight=xlabel_fontweight, xlabel_pad=xlabel_pad, ylabel=ylabel, ylabel_fontsize=ylabel_fontsize, ylabel_fontweight=ylabel_fontweight, ylabel_pad=ylabel_pad)  # type: ignore
         outparams = True
 
         for idx, (lo, hi) in enumerate(bounds):
@@ -414,7 +455,11 @@ def kdeplot(
         ax.text(x=mean_value + 0.05, y=ax.get_ylim()[1]*0.95, 
                 s=f'Mean: {mean_value:.2f}', color='red', fontsize=config.text_font_size)
 
-    show(save_path)  # type: ignore
+    if callback is not None:
+        callback(ax)
+
+    if outparams:
+        show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -425,11 +470,18 @@ def histplot(
     x: str,
     bins: int | list | str = "auto",
     hue: str | None = None,
-    title: str | None = None,
-    xlabel: str | None = None,
-    ylabel: str | None = None,
     linewidth: float = 1,
     kde: bool = False,
+    #----- 공통 파라미터 ------
+    title: str | None = None,
+    xlabel: str | None = None,
+    xlabel_fontsize: int = config.xlabel_fontsize,
+    xlabel_fontweight: str = config.xlabel_fontweight,
+    xlabel_pad: int = config.xlabel_pad,
+    ylabel: str | None = None,
+    ylabel_fontsize: int = config.ylabel_fontsize,
+    ylabel_fontweight: str = config.ylabel_fontweight,
+    ylabel_pad: int = config.ylabel_pad,
     palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
@@ -445,14 +497,23 @@ def histplot(
         x (str): 히스토그램 대상 컬럼명.
         bins (int|sequence|str): 구간 수 또는 경계.
         hue (str|None): 범주 컬럼명.
-        title (str|None): 그래프 제목.
-        xlabel (str|None): x축 레이블.
-        ylabel (str|None): y축 레이블.
         linewidth (float): 선 굵기.
         kde (bool): KDE 표시 여부.
+
+    Common Args:
+        title (str|None): 그래프 제목.
+        xlabel (str|None): x축 레이블.
+        xlabel_fontsize (int): x축 레이블 폰트 크기.
+        xlabel_fontweight (str): x축 레이블 폰트 두께.
+        xlabel_pad (int): x축 레이블 패드.
+        ylabel (str|None): y축 레이블.
+        ylabel_fontsize (int): y축 레이블 폰트 크기.
+        ylabel_fontweight (str): y축 레이블 폰트 두께.
+        ylabel_pad (int): y축 레이블 패드.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
+        save_path (str|None): 이미지 저장 경로.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
         **params: seaborn histplot 추가 인자.
@@ -463,7 +524,7 @@ def histplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, ylabel=ylabel)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, xlabel_fontsize=xlabel_fontsize, xlabel_fontweight=xlabel_fontweight, xlabel_pad=xlabel_pad, ylabel=ylabel, ylabel_fontsize=ylabel_fontsize, ylabel_fontweight=ylabel_fontweight, ylabel_pad=ylabel_pad)  # type: ignore
         outparams = True
 
     histplot_kwargs = {
@@ -484,7 +545,11 @@ def histplot(
     histplot_kwargs.update(params)
     sb.histplot(**histplot_kwargs)
 
-    show(save_path)  # type: ignore
+    if callback is not None:
+        callback(ax)
+
+    if outparams:
+        show(save_path)  # type: ignore
 
 
 
@@ -492,21 +557,28 @@ def histplot(
 # 상자그림(boxplot)을 그린다
 # ===================================================================
 def boxplot(
-    df: DataFrame | None = None,
+    data: DataFrame | None = None,
     x: str | None = None,
     y: str | None = None,
-    title: str | None = None,
-    xlabel: str | None = None,
-    ylabel: str | None = None,
+    hue: str | None = None,
     orient: str = "v",
     stat_test: str | None = None,
     stat_pairs: list[tuple] | None = None,
     stat_text_format: str = "star",
     stat_loc: str = "inside",
+    #----- 공통 파라미터 ------
+    title: str | None = None,
+    xlabel: str | None = None,
+    xlabel_fontsize: int = config.xlabel_fontsize,
+    xlabel_fontweight: str = config.xlabel_fontweight,
+    xlabel_pad: int = config.xlabel_pad,
+    ylabel: str | None = None,
+    ylabel_fontsize: int = config.ylabel_fontsize,
+    ylabel_fontweight: str = config.ylabel_fontweight,
+    ylabel_pad: int = config.ylabel_pad,
     palette: str | None = None,
     width: int = config.width,
     height: int = config.height,
-    linewidth: float = config.line_width,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -515,21 +587,29 @@ def boxplot(
     """상자그림(boxplot)을 그린다.
 
     Args:
-        df (DataFrame|None): 시각화할 데이터.
+        data (DataFrame|None): 시각화할 데이터.
         x (str|None): x축 범주 컬럼명.
         y (str|None): y축 값 컬럼명.
-        title (str|None): 그래프 제목.
-        xlabel (str|None): x축 레이블.
-        ylabel (str|None): y축 레이블.
+        hue (str|None): 범주 구분 컬럼명.
         orient (str): 'v' 또는 'h' 방향.
         stat_test (str|None): 통계 검정 방법. None이면 검정 안함. x과 y가 모두 지정되어야 함.
         stat_pairs (list[tuple]|None): 통계 검정할 그룹 쌍 목록.
         stat_text_format (str): 통계 결과 표시 형식.
         stat_loc (str): 통계 결과 위치.
+
+    Common Args:
+        title (str|None): 그래프 제목.
+        xlabel (str|None): x축 레이블.
+        xlabel_fontsize (int): x축 레이블 폰트 크기.
+        xlabel_fontweight (str): x축 레이블 폰트 두께.
+        xlabel_pad (int): x축 레이블 패드.
+        ylabel (str|None): y축 레이블.
+        ylabel_fontsize (int): y축 레이블 폰트 크기.
+        ylabel_fontweight (str): y축 레이블 폰트 두께.
+        ylabel_pad (int): y축 레이블 패드.
         palette (str|None): 팔레트 이름.
         width (int): 캔버스 가로 픽셀.
         height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
         save_path (str|None): 이미지 저장 경로. None이면 화면에 표시.
         callback (Callable|None): Axes 후처리 콜백.
         ax (Axes|None): 외부에서 전달한 Axes.
@@ -541,7 +621,7 @@ def boxplot(
     outparams = False
 
     if ax is None:
-        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, ylabel=ylabel)  # type: ignore
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, xlabel_fontsize=xlabel_fontsize, xlabel_fontweight=xlabel_fontweight, xlabel_pad=xlabel_pad, ylabel=ylabel, ylabel_fontsize=ylabel_fontsize, ylabel_fontweight=ylabel_fontweight, ylabel_pad=ylabel_pad)  # type: ignore
         outparams = True
 
     if x is not None or y is not None:
@@ -550,87 +630,43 @@ def boxplot(
         elif x is None and y is not None:
             orient = "v"
 
+    boxplot_kwargs = {
+        "data": data,
+        "x": x,
+        "y": y,
+        "orient": orient,
+        "ax": ax
+    }
 
-        boxplot_kwargs = {
-            "data": df,
-            "x": x,
-            "y": y,
-            "orient": orient,
-            "ax": ax,
-            "linewidth": linewidth,
-        }
+    # hue 파라미터 확인 (params에 있을 수 있음)
+    hue_value = params.get("hue", None)
 
-        # hue 파라미터 확인 (params에 있을 수 있음)
-        hue_value = params.get("hue", None)
+    if hue_value is not None and palette is not None:
+        boxplot_kwargs["palette"] = palette
+    elif hue_value is None and palette is not None:
+        boxplot_kwargs["color"] = sb.color_palette(palette)[0]
 
-        if hue_value is not None and palette is not None:
-            boxplot_kwargs["palette"] = palette
-        elif hue_value is None and palette is not None:
-            boxplot_kwargs["color"] = sb.color_palette(palette)[0]
+    boxplot_kwargs.update(params)
+    sb.boxplot(**boxplot_kwargs)
 
-        boxplot_kwargs.update(params)
-        sb.boxplot(**boxplot_kwargs)
+    # 통계 검정 추가
+    # if stat_test is not None and x is not None and y is not None:
+    #     if stat_pairs is None:
+    #         stat_pairs = [data[x].dropna().unique().tolist()] # type: ignore
 
-        # 통계 검정 추가
-        if stat_test is not None:
-            if stat_pairs is None:
-                stat_pairs = [df[x].dropna().unique().tolist()] # type: ignore
+    #     annotator = Annotator(
+    #         ax, data=data, x=x, y=y, pairs=stat_pairs, orient=orient
+    #     )
+    #     annotator.configure(
+    #         test=stat_test, text_format=stat_text_format, loc=stat_loc
+    #     )
+    #     annotator.apply_and_annotate()
 
-            annotator = Annotator(
-                ax, data=df, x=x, y=y, pairs=stat_pairs, orient=orient
-            )
-            annotator.configure(
-                test=stat_test, text_format=stat_text_format, loc=stat_loc
-            )
-            annotator.apply_and_annotate()
-    else:
-        sb.boxplot(data=df, orient=orient, ax=ax, linewidth=linewidth, **params)  # type: ignore
+    if callback is not None:
+        callback(ax)
 
-    show(save_path)  # type: ignore
-
-
-# ===================================================================
-# 상자그림에 p-value 주석을 추가한다
-# ===================================================================
-def pvalue1_anotation(
-    data: DataFrame,
-    target: str,
-    hue: str,
-    title: str | None = None,
-    pairs: list | None = None,
-    test: str = "t-test_ind",
-    text_format: str = "star",
-    loc: str = "outside",
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-    ax: Axes | None = None,
-    **params,
-) -> None:
-    """
-    boxplot의 wrapper 함수로, 상자그림에 p-value 주석을 추가한다.
-    """
-    boxplot(
-        data,
-        xname=hue,
-        yname=target,
-        title=title,
-        orient="v",
-        stat_test=test,
-        stat_pairs=pairs,
-        stat_text_format=text_format,
-        stat_loc=loc,
-        palette=None,
-        width=width,
-        height=height,
-        linewidth=linewidth,
-        save_path=save_path,
-        callback=callback,
-        ax=ax,
-        **params,
-    )
+    if outparams:
+        show(save_path)  # type: ignore
 
 
 # ===================================================================
@@ -1199,67 +1235,6 @@ def barplot(
     show(save_path)  # type: ignore
 
 
-# ===================================================================
-# boxen 플롯을 그린다
-# ===================================================================
-def boxenplot(
-    df: DataFrame,
-    xname: str,
-    yname: str,
-    hue=None,
-    title: str | None = None,
-    palette: str | None = None,
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-    ax: Axes | None = None,
-    **params,
-) -> None:
-    """박스앤 위스커 확장(boxen) 플롯을 그린다.
-
-    Args:
-        df (DataFrame): 시각화할 데이터.
-        xname (str): 범주 컬럼.
-        yname (str): 값 컬럼.
-        hue (str|None): 보조 범주 컬럼.
-        title (str|None): 그래프 제목.
-        palette (str|None): 팔레트 이름.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        callback (Callable|None): Axes 후처리 콜백.
-        ax (Axes|None): 외부에서 전달한 Axes.
-        **params: seaborn boxenplot 추가 인자.
-
-    Returns:
-        None
-    """
-    outparams = False
-
-    if ax is None:
-        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
-        outparams = True
-
-    # palette은 hue가 있을 때만 사용
-    boxenplot_kwargs = {
-        "data": df,
-        "x": xname,
-        "y": yname,
-        "hue": hue,
-        "linewidth": linewidth,
-        "ax": ax,
-    }
-
-    if hue is not None and palette is not None:
-        boxenplot_kwargs["palette"] = palette
-
-    boxenplot_kwargs.update(params)
-
-    sb.boxenplot(**boxenplot_kwargs)
-    show(save_path)  # type: ignore
-
 
 # ===================================================================
 # 바이올린 플롯을 그린다
@@ -1319,132 +1294,6 @@ def violinplot(
 
     violinplot_kwargs.update(params)
     sb.violinplot(**violinplot_kwargs)
-    show(save_path)  # type: ignore
-
-
-# ===================================================================
-# 포인트 플롯을 그린다
-# ===================================================================
-def pointplot(
-    df: DataFrame,
-    xname: str,
-    yname: str,
-    hue=None,
-    title: str | None = None,
-    palette: str | None = None,
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-    ax: Axes | None = None,
-    **params,
-) -> None:
-    """포인트 플롯을 그린다.
-
-    Args:
-        df (DataFrame): 시각화할 데이터.
-        xname (str): 범주 컬럼.
-        yname (str): 값 컬럼.
-        hue (str|None): 보조 범주 컬럼.
-        title (str|None): 그래프 제목.
-        palette (str|None): 팔레트 이름.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        callback (Callable|None): Axes 후처리 콜백.
-        ax (Axes|None): 외부에서 전달한 Axes.
-        **params: seaborn pointplot 추가 인자.
-
-    Returns:
-        None
-    """
-    outparams = False
-
-    if ax is None:
-        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
-        outparams = True
-
-    # hue가 있을 때만 palette 사용, 없으면 color 사용
-    pointplot_kwargs = {
-        "data": df,
-        "x": xname,
-        "y": yname,
-        "hue": hue,
-        "linewidth": linewidth,
-        "ax": ax,
-    }
-
-    if hue is not None and palette is not None:
-        pointplot_kwargs["palette"] = palette
-    elif hue is None and palette is not None:
-        pointplot_kwargs["color"] = sb.color_palette(palette)[0]
-
-    pointplot_kwargs.update(params)
-    sb.pointplot(**pointplot_kwargs)
-    show(save_path)  # type: ignore
-
-
-# ===================================================================
-# 공동 분포(joint) 플롯을 그린다
-# ===================================================================
-def jointplot(
-    df: DataFrame,
-    xname: str,
-    yname: str,
-    hue=None,
-    title: str | None = None,
-    palette: str | None = None,
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    save_path: str | None = None,
-    **params,
-) -> None:
-    """공동 분포(joint) 플롯을 그린다.
-
-    Args:
-        df (DataFrame): 시각화할 데이터.
-        xname (str): x축 컬럼.
-        yname (str): y축 컬럼.
-        hue (str|None): 범주 컬럼.
-        title (str|None): 그래프 제목.
-        palette (str|None): 팔레트 이름.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        **params: seaborn jointplot 추가 인자.
-
-    Returns:
-        None
-    """
-    # hue가 있을 때만 palette 사용
-    jointplot_kwargs = {
-        "data": df,
-        "x": xname,
-        "y": yname,
-        "linewidth": linewidth,
-        "hue": hue,
-    }
-
-    if hue is not None and palette is not None:
-        jointplot_kwargs["palette"] = palette
-    # jointplot은 hue 없이 palette만 쓰는 경우가 드물어서 color로 변환 불필요
-
-    jointplot_kwargs.update(params)
-
-    g = sb.jointplot(**jointplot_kwargs)
-    g.fig.set_size_inches(width / config.dpi, height / config.dpi)
-    g.fig.set_dpi(config.dpi)
-
-    if title:
-        g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight="bold")
-
-    # 중앙 및 주변 플롯에 grid 추가
-    g.ax_joint.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
-    g.ax_marg_x.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
-    g.ax_marg_y.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)
-
     show(save_path)  # type: ignore
 
 
