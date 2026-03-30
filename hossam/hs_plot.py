@@ -635,6 +635,7 @@ def boxplot(
         "x": x,
         "y": y,
         "orient": orient,
+        "hue": hue,
         "ax": ax
     }
 
@@ -667,6 +668,202 @@ def boxplot(
 
     if outparams:
         show(save_path)  # type: ignore
+
+
+
+# ===================================================================
+# 바이올린 플롯(violinplot)을 그린다
+# ===================================================================
+def violinplot(
+    data: DataFrame | None = None,
+    x: str | None = None,
+    y: str | None = None,
+    hue: str | None = None,
+    orient: str = "v",
+    #----- 공통 파라미터 ------
+    title: str | None = None,
+    xlabel: str | None = None,
+    xlabel_fontsize: int = config.xlabel_fontsize,
+    xlabel_fontweight: str = config.xlabel_fontweight,
+    xlabel_pad: int = config.xlabel_pad,
+    ylabel: str | None = None,
+    ylabel_fontsize: int = config.ylabel_fontsize,
+    ylabel_fontweight: str = config.ylabel_fontweight,
+    ylabel_pad: int = config.ylabel_pad,
+    palette: str | None = None,
+    width: int = config.width,
+    height: int = config.height,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
+    **params,
+) -> None:
+    """바이올린 플롯(violinplot)을 그린다.
+
+    Args:
+        data (DataFrame|None): 시각화할 데이터.
+        x (str|None): x축 범주 컬럼명.
+        y (str|None): y축 값 컬럼명.
+        hue (str|None): 범주 구분 컬럼명.
+        orient (str): 'v' 또는 'h' 방향.
+
+    Common Args:
+        title (str|None): 그래프 제목.
+        xlabel (str|None): x축 레이블.
+        xlabel_fontsize (int): x축 레이블 폰트 크기.
+        xlabel_fontweight (str): x축 레이블 폰트 두께.
+        xlabel_pad (int): x축 레이블 패드.
+        ylabel (str|None): y축 레이블.
+        ylabel_fontsize (int): y축 레이블 폰트 크기.
+        ylabel_fontweight (str): y축 레이블 폰트 두께.
+        ylabel_pad (int): y축 레이블 패드.
+        palette (str|None): 팔레트 이름.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        save_path (str|None): 이미지 저장 경로. None이면 화면에 표시.
+        callback (Callable|None): Axes 후처리 콜백.
+        ax (Axes|None): 외부에서 전달한 Axes.
+        **params: seaborn violinplot 추가 인자.
+
+    Returns:
+        None
+    """
+    outparams = False
+
+    if ax is None:
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, xlabel_fontsize=xlabel_fontsize, xlabel_fontweight=xlabel_fontweight, xlabel_pad=xlabel_pad, ylabel=ylabel, ylabel_fontsize=ylabel_fontsize, ylabel_fontweight=ylabel_fontweight, ylabel_pad=ylabel_pad)  # type: ignore
+        outparams = True
+
+    if x is not None or y is not None:
+        if x is not None and y is None:
+            orient = "h"
+        elif x is None and y is not None:
+            orient = "v"
+
+    violinplot_kwargs = {
+        "data": data,
+        "x": x,
+        "y": y,
+        "hue": hue,
+        "orient": orient,
+        "ax": ax
+    }
+
+    # hue 파라미터 확인 (params에 있을 수 있음)
+    hue_value = params.get("hue", None)
+
+    if hue_value is not None and palette is not None:
+        violinplot_kwargs["palette"] = palette
+    elif hue_value is None and palette is not None:
+        violinplot_kwargs["color"] = sb.color_palette(palette)[0]
+
+    violinplot_kwargs.update(params)
+    sb.violinplot(**violinplot_kwargs)
+
+    if callback is not None:
+        callback(ax)
+
+    if outparams:
+        show(save_path)  # type: ignore
+
+
+# ===================================================================
+# 히트맵을 그린다
+# ===================================================================
+def heatmap(
+    data: DataFrame,
+    annot: bool = True,
+    fmt: str = "0.2f",
+    linewidth: float = 0.5,
+    #----- 공통 파라미터 ------
+    title: str | None = None,
+    xlabel: str | None = None,
+    xlabel_fontsize: int = config.xlabel_fontsize,
+    xlabel_fontweight: str = config.xlabel_fontweight,
+    xlabel_pad: int = config.xlabel_pad,
+    ylabel: str | None = None,
+    ylabel_fontsize: int = config.ylabel_fontsize,
+    ylabel_fontweight: str = config.ylabel_fontweight,
+    ylabel_pad: int = config.ylabel_pad,
+    palette: str | None = None,
+    width: int | None = None,
+    height: int | None = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
+    **params,
+) -> None:
+    """바이올린 플롯(violinplot)을 그린다.
+
+    Args:
+        data (DataFrame|None): 시각화할 데이터.
+        annot (bool): 셀에 값 표시 여부.
+        fmt (str): 셀에 표시할 값 형식.
+        linewidth (float): 셀 경계선 굵기.
+
+    Common Args:
+        title (str|None): 그래프 제목.
+        xlabel (str|None): x축 레이블.
+        xlabel_fontsize (int): x축 레이블 폰트 크기.
+        xlabel_fontweight (str): x축 레이블 폰트 두께.
+        xlabel_pad (int): x축 레이블 패드.
+        ylabel (str|None): y축 레이블.
+        ylabel_fontsize (int): y축 레이블 폰트 크기.
+        ylabel_fontweight (str): y축 레이블 폰트 두께.
+        ylabel_pad (int): y축 레이블 패드.
+        palette (str|None): 팔레트 이름.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        save_path (str|None): 이미지 저장 경로. None이면 화면에 표시.
+        callback (Callable|None): Axes 후처리 콜백.
+        ax (Axes|None): 외부에서 전달한 Axes.
+        **params: seaborn violinplot 추가 인자.
+
+    Returns:
+        None
+    """
+    outparams = False
+
+    if width == None or height == None:
+        width = (config.font_size * config.dpi / 100) * 4.5 * len(data.columns)
+        height = width * 0.6  # type: ignore
+
+    if ax is None:
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, xlabel_fontsize=xlabel_fontsize, xlabel_fontweight=xlabel_fontweight, xlabel_pad=xlabel_pad, ylabel=ylabel, ylabel_fontsize=ylabel_fontsize, ylabel_fontweight=ylabel_fontweight, ylabel_pad=ylabel_pad)  # type: ignore
+        outparams = True
+
+    ax.grid(False)
+
+    heatmatp_kwargs = { 
+        "data": data,
+        "annot": annot,
+        "cmap": palette,
+        "fmt": fmt,
+        "ax": ax,
+        "linewidths": linewidth,
+        "annot_kws": {"size": config.font_size}  # 셀 안의 텍스트 크기,
+    }
+
+    heatmatp_kwargs.update(params)
+    sb.heatmap(**heatmatp_kwargs)
+
+    if callback is not None:
+        callback(ax)
+
+    if outparams:
+        show(save_path)  # type: ignore
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # ===================================================================
@@ -1236,125 +1433,6 @@ def barplot(
 
 
 
-# ===================================================================
-# 바이올린 플롯을 그린다
-# ===================================================================
-def violinplot(
-    df: DataFrame,
-    xname: str,
-    yname: str,
-    hue=None,
-    title: str | None = None,
-    palette: str | None = None,
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-    ax: Axes | None = None,
-    **params,
-) -> None:
-    """바이올린 플롯을 그린다.
-
-    Args:
-        df (DataFrame): 시각화할 데이터.
-        xname (str): 범주 컬럼.
-        yname (str): 값 컬럼.
-        hue (str|None): 보조 범주 컬럼.
-        title (str|None): 그래프 제목.
-        palette (str|None): 팔레트 이름.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        callback (Callable|None): Axes 후처리 콜백.
-        ax (Axes|None): 외부에서 전달한 Axes.
-        **params: seaborn violinplot 추가 인자.
-
-    Returns:
-        None
-    """
-    outparams = False
-
-    if ax is None:
-        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
-        outparams = True
-
-    # palette은 hue가 있을 때만 사용
-    violinplot_kwargs = {
-        "data": df,
-        "x": xname,
-        "y": yname,
-        "hue": hue,
-        "linewidth": linewidth,
-        "ax": ax,
-    }
-
-    if hue is not None and palette is not None:
-        violinplot_kwargs["palette"] = palette
-
-    violinplot_kwargs.update(params)
-    sb.violinplot(**violinplot_kwargs)
-    show(save_path)  # type: ignore
-
-
-# ===================================================================
-# 히트린띄 그린다
-# ===================================================================
-def heatmap(
-    data: DataFrame,
-    title: str | None = None,
-    palette: str | None = None,
-    width: int | None = None,
-    height: int | None = None,
-    linewidth: float = 0.25,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-    ax: Axes | None = None,
-    **params,
-) -> None:
-    """히트맵을 그린다(값 주석 포함).
-
-    Args:
-        data (DataFrame): 행렬 형태 데이터.
-        title (str|None): 그래프 제목.
-        palette (str|None): 컬러맵 이름.
-        width (int|None): 캔버스 가로 픽셀. None이면 자동 계산.
-        height (int|None): 캔버스 세로 픽셀. None이면 자동 계산.
-        linewidth (float): 격자 선 굵기.
-        callback (Callable|None): Axes 후처리 콜백.
-        ax (Axes|None): 외부에서 전달한 Axes.
-        **params: seaborn heatmap 추가 인자.
-
-    Returns:
-        None
-    """
-    outparams = False
-
-    if width == None or height == None:
-        width = (config.font_size * config.dpi / 72) * 4.5 * len(data.columns)
-        height = width * 0.8  # type: ignore
-
-    if ax is None:
-        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
-        outparams = True
-
-    heatmatp_kwargs = { 
-        "data": data,
-        "annot": True,
-        "cmap": palette,
-        "fmt": ".2f",
-        "ax": ax,
-        "linewidths": linewidth,
-        "annot_kws": {"size": 10},
-    }
-
-    heatmatp_kwargs.update(params)
-
-    # heatmap은 hue를 지원하지 않으므로 cmap에 palette 사용
-    sb.heatmap(**heatmatp_kwargs)
-
-    show(save_path)  # type: ignore
-
 
 # ===================================================================
 # KDE와 신뢰구간을 나타낸 그래프를 그린다
@@ -1675,260 +1753,6 @@ def ols_qqplot(
     show(save_path)  # type: ignore
 
 
-# ===================================================================
-#
-# ===================================================================
-def distribution_by_class(
-    data: DataFrame,
-    title: str | None = None,
-    xnames: list | None = None,
-    hue: str | None = None,
-    type: str = "kde",
-    bins: list[int] | int = 5,
-    palette: str | None = None,
-    fill: bool = False,
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-) -> None:
-    """클래스별로 각 숫자형 특징의 분포를 KDE 또는 히스토그램으로 그린다.
-
-    Args:
-        data (DataFrame): 시각화할 데이터.
-        xnames (list|None): 대상 컬럼 목록(None이면 전 컬럼).
-        hue (str|None): 클래스 컬럼.
-        title (str|None): 그래프 제목.
-        type (str): 'kde' | 'hist' | 'histkde'.
-        bins (int|sequence|None): 히스토그램 구간.
-        palette (str|None): 팔레트 이름.
-        fill (bool): KDE 채움 여부.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        callback (Callable|None): Axes 후처리 콜백.
-
-    Returns:
-        None
-    """
-    if xnames is None:
-        xnames = data.columns  # type: ignore
-
-    for i, v in enumerate(xnames):  # type: ignore
-        # 종속변수이거나 숫자형이 아닌 경우는 제외
-        if v == hue or data[v].dtype not in [
-            "int",
-            "int32",
-            "int64",
-            "float",
-            "float32",
-            "float64",
-        ]:
-            continue
-
-        if type == "kde":
-            kdeplot(
-                df=data,
-                xname=v,
-                hue=hue,
-                palette=palette,
-                fill=fill,
-                width=width,
-                height=height,
-                linewidth=linewidth,
-                callback=callback,
-                save_path=save_path,
-            )
-        elif type == "hist":
-            histplot(
-                df=data,
-                xname=v,
-                hue=hue,
-                bins=bins,  # type: ignore
-                kde=False,
-                palette=palette,
-                width=width,
-                height=height,
-                linewidth=linewidth,
-                callback=callback,
-                save_path=save_path,
-            )
-        elif type == "histkde":
-            histplot(
-                df=data,
-                xname=v,
-                hue=hue,
-                bins=bins,  # type: ignore
-                kde=True,
-                palette=palette,
-                width=width,
-                height=height,
-                linewidth=linewidth,
-                callback=callback,
-                save_path=save_path,
-            )
-
-
-# ===================================================================
-#
-# ===================================================================
-def scatter_by_class(
-    data: DataFrame,
-    yname: str,
-    group: list | None = None,
-    hue: str | None = None,
-    title: str | None = None,
-    palette: str | None = None,
-    outline: bool = False,
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-) -> None:
-    """종속변수(y)와 각 연속형 독립변수(x) 간 산점도/볼록껍질을 그린다.
-
-    Args:
-        data (DataFrame): 시각화할 데이터.
-        yname (str): 종속변수 컬럼명(필수).
-        group (list|None): x 컬럼 목록 또는 [[x, y], ...] 형태. None이면 자동 생성.
-        hue (str|None): 클래스 컬럼.
-        title (str|None): 그래프 제목.
-        palette (str|None): 팔레트 이름.
-        outline (bool): 볼록 껍질을 표시할지 여부.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        callback (Callable|None): Axes 후처리 콜백.
-
-    Returns:
-        None
-    """
-
-    # 자동 생성: yname 제외, hue 제외, 연속형만
-    if group is None:
-        group = []
-
-        numeric_cols = list(data.select_dtypes(include=[np.number]).columns)
-        xnames = [
-            col
-            for col in numeric_cols
-            if col not in [yname, hue]
-            and data[col].dtype.name not in ["category", "bool", "boolean"]
-        ]
-
-        for v in xnames:
-            group.append([v, yname])
-    else:
-        # 사용자가 지정한 경우: 문자열 리스트면 yname과 페어링, 이미 페어면 그대로 사용
-        processed = []
-        for item in group:
-            if isinstance(item, (list, tuple)) and len(item) == 2:
-                processed.append(list(item))
-            else:
-                processed.append([item, yname])
-        group = processed
-
-    for v in group:
-        scatterplot(data=data, xname=v[0], yname=v[1], outline=outline, hue=hue, palette=palette, width=width, height=height, linewidth=linewidth, dpi=dpi, callback=callback, save_path=save_path)  # type: ignore
-
-
-# ===================================================================
-# 명목형 변수별로 종속변수 분포 차이를 시각화한다.
-# ===================================================================
-def categorical_target_distribution(
-    data: DataFrame,
-    yname: str,
-    hue: list | str | None = None,
-    title: str | None = None,
-    kind: str = "box",
-    kde_fill: bool = True,
-    palette: str | None = None,
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    cols: int = 2,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-) -> None:
-    """명목형 변수별로 종속변수 분포 차이를 시각화한다.
-
-    Args:
-        data (DataFrame): 시각화할 데이터.
-        yname (str): 종속변수 컬럼명(연속형 추천).
-        hue (list|str|None): 명목형 독립변수 목록. None이면 자동 탐지.
-        title (str|None): 그래프 제목.
-        kind (str): 'box', 'violin', 'kde'.
-        kde_fill (bool): kind='kde'일 때 영역 채우기 여부.
-        palette (str|None): 팔레트 이름.
-        width (int): 개별 서브플롯 가로 픽셀.
-        height (int): 개별 서브플롯 세로 픽셀.
-        linewidth (float): 선 굵기.
-        cols (int): 서브플롯 열 수.
-        callback (Callable|None): Axes 후처리 콜백.
-
-    Returns:
-        None
-    """
-
-    # 명목형 컬럼 후보: object, category, bool
-    if hue is None:
-        cat_cols = data.select_dtypes(
-            include=["object", "category", "bool", "boolean"]
-        ).columns
-        target_cols = [c for c in cat_cols if c != yname]
-    elif isinstance(hue, str):
-        target_cols = [hue]
-    else:
-        target_cols = list(hue)
-
-    if len(target_cols) == 0:
-        return
-
-    n_plots = len(target_cols)
-    rows = (n_plots + cols - 1) // cols
-
-    fig, axes = init(width=width, height=height, rows=rows, cols=cols, flatten=True, title=title) # type: ignore
-    outparams = True
-
-    for idx, col in enumerate(target_cols):
-        if idx >= len(axes):
-            break
-
-        ax = axes[idx]
-        plot_kwargs = {
-            "data": data.dropna(subset=[col, yname]),
-            "ax": ax,
-        }
-
-        if kind == "violin":
-            plot_kwargs.update({"x": col, "y": yname, "palette": palette})
-            sb.violinplot(**plot_kwargs, linewidth=linewidth)
-        elif kind == "kde":
-            plot_kwargs.update(
-                {
-                    "x": yname,
-                    "hue": col,
-                    "palette": palette,
-                    "fill": kde_fill,
-                    "common_norm": False,
-                    "linewidth": linewidth,
-                }
-            )
-            sb.kdeplot(**plot_kwargs)
-        else:  # box
-            plot_kwargs.update({"x": col, "y": yname, "hue": col, "palette": palette})
-            sb.boxplot(**plot_kwargs, linewidth=linewidth)
-
-        ax.set_title(f"{col} vs {yname}", fontsize=config.title_font_size, pad=config.title_pad)  # type: ignore
-
-    # 불필요한 빈 축 숨기기
-    for j in range(n_plots, len(axes)):
-        axes[j].set_visible(False) # type: ignore
-
-    show(save_path)
-
 
 # ===================================================================
 # ROC 커브를 시각화 한다.
@@ -2054,250 +1878,6 @@ def confusion_matrix_plot(
 
     show(save_path)  # type: ignore
 
-
-# ===================================================================
-# 레이더 차트(방사형 차트)
-# ===================================================================
-def radarplot(
-    df: DataFrame,
-    columns: list | None = None,
-    hue: str | None = None,
-    title: str | None = None,
-    normalize: bool = True,
-    fill: bool = True,
-    fill_alpha: float = 0.25,
-    palette: str | None = None,
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-    ax: Axes | None = None,
-    **params,
-) -> None:
-    """레이더 차트(방사형 차트)를 그린다.
-
-    Args:
-        df (DataFrame): 시각화할 데이터.
-        columns (list|None): 레이더 차트에 표시할 컬럼 목록. None이면 모든 숫자형 컬럼 사용.
-        hue (str|None): 집단 구분 컬럼. None이면 각 행을 개별 객체로 표시.
-        title (str|None): 그래프 제목.
-        normalize (bool): 0-1 범위로 정규화 여부. 기본값 True.
-        fill (bool): 영역 채우기 여부.
-        fill_alpha (float): 채움 투명도.
-        palette (str|None): 팔레트 이름.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        callback (Callable|None): Axes 후처리 콜백.
-        ax (Axes|None): 외부에서 전달한 Axes.
-        **params: 추가 플롯 옵션.
-
-    Returns:
-        None
-    """
-    outparams = False
-
-    # 컬럼 선택
-    if columns is None:
-        # 숫자형 컬럼만 선택 (hue 제외)
-        numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-        if hue is not None and hue in numeric_cols:
-            numeric_cols.remove(hue)
-        columns = numeric_cols
-
-    if len(columns) == 0:
-        raise ValueError("레이더 차트에 표시할 숫자형 컬럼이 없습니다.")
-
-    # 데이터 준비
-    if hue is not None:
-        # 집단별 평균 계산
-        plot_data = df.groupby(hue)[columns].mean()
-        labels = plot_data.index.tolist()
-    else:
-        # 각 행을 개별 객체로 사용
-        plot_data = df[columns].copy()
-        if plot_data.index.name:
-            labels = plot_data.index.tolist()
-        else:
-            labels = [f"Row {i}" for i in range(len(plot_data))]
-
-    # 정규화
-    if normalize:
-        for col in columns:
-            min_val = plot_data[col].min()
-            max_val = plot_data[col].max()
-            if max_val - min_val > 0:
-                plot_data[col] = (plot_data[col] - min_val) / (max_val - min_val)
-            else:
-                plot_data[col] = 0.5
-
-    # Axes 생성 (polar projection)
-    if ax is None:
-        fig = plt.figure(figsize=(width / 100, height / 100), dpi=config.dpi)
-        ax = fig.add_subplot(111, projection="polar")
-        outparams = True
-
-    # 각도 계산
-    num_vars = len(columns)
-    angles = np.linspace(0, 2 * np.pi, num_vars, endpoint=False).tolist()
-    angles += angles[:1]  # 닫힌 도형을 만들기 위해 첫 번째 각도 추가
-
-    # 색상 팔레트 설정
-    if palette is not None:
-        colors = sb.color_palette(palette, len(labels))
-    else:
-        colors = sb.color_palette("husl", len(labels))
-
-    # 각 집단/객체별로 플롯
-    for idx, (label_name, row) in enumerate(plot_data.iterrows()):
-        values = row.tolist()
-        values += values[:1]  # 닫힌 도형을 만들기 위해 첫 번째 값 추가
-
-        color = colors[idx]
-
-        # 선 그리기
-        ax.plot(
-            angles,
-            values,
-            "o-",
-            linewidth=linewidth,
-            label=str(label_name),
-            color=color,
-            **params,
-        )
-
-        # 영역 채우기
-        if fill:
-            ax.fill(angles, values, alpha=fill_alpha, color=color)
-
-    # 축 레이블 설정
-    ax.set_xticks(angles[:-1])
-    ax.set_xticklabels(columns)
-
-    # y축 범위 설정
-    if normalize:
-        ax.set_ylim(0, 1)
-
-    # 범례
-    if len(labels) <= 10:  # 너무 많으면 범례 생략
-        ax.legend(loc="upper right", bbox_to_anchor=(1.3, 1.1))
-
-    # 제목
-    if hue is not None:
-        title = title if title else f"Radar Chart by {hue}"
-    else:
-        title = title if title else "Radar Chart"
-
-    show(save_path)  # type: ignore
-
-
-# ===================================================================
-# 연속형 데이터 분포 시각화 (KDE + Boxplot)
-# ===================================================================
-def distribution_plot(
-    data: DataFrame,
-    column: str | list[str],
-    clevel: float = 0.95,
-    orient: str = "h",
-    hue: str | None = None,
-    kind: str = "boxplot",
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-) -> None:
-    """연속형 데이터의 분포를 KDE와 Boxplot으로 시각화한다.
-
-    1행 2열의 서브플롯을 생성하여:
-    - 왼쪽: KDE with 신뢰구간
-    - 오른쪽: Boxplot
-
-    Args:
-        data (DataFrame): 시각화할 데이터.
-        column (str): 분석할 컬럼명.
-        clevel (float): KDE 신뢰수준 (0~1). 기본값 0.95.
-        orient (str): Boxplot 방향 ('v' 또는 'h'). 기본값 'h'.
-        hue (str|None): 명목형 컬럼명. 지정하면 각 범주별로 행을 늘려 KDE와 boxplot을 그림.
-        kind (str): 두 번째 그래프의 유형 (boxplot, hist). 기본값 "boxplot".
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        save_path (str|None): 저장 경로.
-        callback (Callable|None): Axes 후처리 콜백.
-
-    Returns:
-        None
-    """
-    if isinstance(column, str):
-        column = [column]
-
-    for c in column:
-        title = f"Distribution Plot of {c}"
-
-        if hue is None:
-            # 1행 2열 서브플롯 생성
-            fig, axes = init(
-                width=width, height=height, rows=1, cols=2, title=title
-            )
-
-            kde_confidence_interval(
-                data=data,
-                xnames=c,
-                clevel=clevel,
-                linewidth=linewidth,
-                ax=axes[0], # type: ignore
-            )
-
-            if kind == "hist":
-                histplot(df=data, xname=c, linewidth=linewidth, ax=axes[1])  # type: ignore
-            else:
-                boxplot(
-                    df=data[column], linewidth=linewidth, ax=axes[1]  # type: ignore
-                )
-
-            fig.suptitle(title, fontsize=14, y=1.02)
-        else:
-            if hue not in data.columns:
-                raise ValueError(f"hue column '{hue}' not found in DataFrame")
-
-            categories = list(Series(data[hue].dropna().unique()).sort_values())
-            n_cat = len(categories) if categories else 1
-
-            fig, axes = init(
-                width=width, height=height, rows=n_cat, cols=2, title=title
-            )
-            axes_2d = np.atleast_2d(axes)
-
-            for idx, cat in enumerate(categories):
-                subset = data[data[hue] == cat]
-                left_ax, right_ax = axes_2d[idx, 0], axes_2d[idx, 1]
-
-                kde_confidence_interval(
-                    data=subset,
-                    xnames=c,
-                    clevel=clevel,
-                    linewidth=linewidth,
-                    ax=left_ax,
-                )
-                left_ax.set_title(f"{hue} = {cat}", fontsize=config.title_font_size, pad=config.title_pad)  # type: ignore
-
-                if kind == "hist":
-                    histplot(
-                        df=subset,
-                        xname=c,
-                        linewidth=linewidth,
-                        ax=right_ax,
-                    )
-                else:
-                    boxplot(
-                        df=subset[c], linewidth=linewidth, ax=right_ax  # type: ignore
-                    )
-
-            fig.suptitle(f"{title} by {hue}", fontsize=14, y=1.02)
-
-            show(save_path)  # type: ignore
 
 
 def silhouette_plot(
@@ -2767,4 +2347,96 @@ def pca_plot(
             title=title,
             callback=__callable,
         )
-    
+
+# ===================================================================
+# Matplotlib 컬러맵 팔레트 시각화
+# ===================================================================
+import matplotlib.patches as patches
+import matplotlib as mpl
+
+def colormaps(n_colors=8):
+    """
+    Matplotlib에서 제공하는 다양한 컬러맵을
+    연속형 그라디언트가 아니라 8단계 팔레트 형태로 보여주는 함수.
+    """
+
+    cmaps = [
+        ('Perceptually Uniform Sequential', [
+            'viridis', 'plasma', 'inferno', 'magma', 'cividis'
+        ]),
+        ('Sequential', [
+            'Greys', 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds',
+            'YlOrBr', 'YlOrRd', 'OrRd', 'PuRd', 'RdPu', 'BuPu',
+            'GnBu', 'PuBu', 'YlGnBu', 'PuBuGn', 'BuGn', 'YlGn'
+        ]),
+        ('Sequential (2)', [
+            'binary', 'gist_yarg', 'gist_gray', 'gray', 'bone', 'pink',
+            'spring', 'summer', 'autumn', 'winter', 'cool', 'Wistia',
+            'hot', 'afmhot', 'gist_heat', 'copper'
+        ]),
+        ('Diverging', [
+            'PiYG', 'PRGn', 'BrBG', 'PuOr', 'RdGy', 'RdBu',
+            'RdYlBu', 'RdYlGn', 'Spectral', 'coolwarm', 'bwr', 'seismic'
+        ]),
+        ('Cyclic', [
+            'twilight', 'twilight_shifted', 'hsv'
+        ]),
+        ('Qualitative', [
+            'Pastel1', 'Pastel2', 'Paired', 'Accent',
+            'Dark2', 'Set1', 'Set2', 'Set3',
+            'tab10', 'tab20', 'tab20b', 'tab20c'
+        ])
+    ]
+
+    def plot_color_blocks(cmap_category, cmap_list):
+        nrows = len(cmap_list)
+        figh = 0.5 + (nrows * 0.42)
+
+        fig, axs = plt.subplots(nrows=nrows, figsize=(8, figh))
+
+        # cmap이 1개뿐일 때 axs를 iterable로 맞춤
+        if nrows == 1:
+            axs = [axs]
+
+        fig.subplots_adjust(
+            top=1 - 0.35 / figh,
+            bottom=0.05,
+            left=0.25,
+            right=0.98,
+            hspace=0.45
+        )
+
+        axs[0].set_title(f"{cmap_category} colormaps", fontsize=14)
+
+        for ax, cmap_name in zip(axs, cmap_list):
+            cmap = mpl.colormaps[cmap_name]
+
+            # 0~1 구간에서 n_colors개 샘플 추출
+            sample_points = np.linspace(0, 1, n_colors)
+            colors = cmap(sample_points)
+
+            # 팔레트 블록 그리기
+            for i, color in enumerate(colors):
+                rect = patches.Rectangle(
+                    (i, 0), 1, 1,
+                    facecolor=color,
+                    edgecolor='none'
+                )
+                ax.add_patch(rect)
+
+            # 이름 표시
+            ax.text(
+                -0.02, 0.5, f"{cmap_name:>20}",
+                va='center', ha='right',
+                fontsize=10,
+                transform=ax.transAxes
+            )
+
+            ax.set_xlim(0, n_colors)
+            ax.set_ylim(0, 1)
+            ax.set_axis_off()
+
+        plt.show()
+
+    for cmap_category, cmap_list in cmaps:
+        plot_color_blocks(cmap_category, cmap_list)
