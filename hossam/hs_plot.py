@@ -10,6 +10,8 @@ import seaborn as sb
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure  # type: ignore
 from matplotlib.pyplot import Axes  # type: ignore
+import matplotlib.patches as patches
+import matplotlib as mpl
 from pandas import Index, Series, DataFrame
 from math import sqrt
 from pandas import DataFrame
@@ -127,8 +129,7 @@ def init(
     ylabel_fontsize: int = config.ylabel_fontsize,
     ylabel_fontweight: str = config.ylabel_fontweight,
     ylabel_pad: int = config.ylabel_pad,
-    grid: bool = True,
-):
+    grid: bool = True):
     """기본 크기의 Figure와 Axes를 생성한다.
 
     Args:
@@ -199,8 +200,7 @@ def init(
 # 그래프의 그리드, 레이아웃을 정리하고 필요 시 저장 또는 표시한다
 # ===================================================================
 def show(
-    save_path: str | None = None
-) -> None:
+    save_path: str | None = None) -> None:
     """공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
 
     Args:
@@ -213,6 +213,97 @@ def show(
 
     plt.show()
     plt.close()
+
+
+# ===================================================================
+# Matplotlib 컬러맵 팔레트 시각화
+# ===================================================================
+def colormaps(n_colors=8):
+    """
+    Matplotlib에서 제공하는 다양한 컬러맵을
+    연속형 그라디언트가 아니라 8단계 팔레트 형태로 보여주는 함수.
+    """
+
+    cmaps = [
+        ('Perceptually Uniform Sequential', [
+            'viridis', 'plasma', 'inferno', 'magma', 'cividis'
+        ]),
+        ('Sequential', [
+            'Greys', 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds',
+            'YlOrBr', 'YlOrRd', 'OrRd', 'PuRd', 'RdPu', 'BuPu',
+            'GnBu', 'PuBu', 'YlGnBu', 'PuBuGn', 'BuGn', 'YlGn'
+        ]),
+        ('Sequential (2)', [
+            'binary', 'gist_yarg', 'gist_gray', 'gray', 'bone', 'pink',
+            'spring', 'summer', 'autumn', 'winter', 'cool', 'Wistia',
+            'hot', 'afmhot', 'gist_heat', 'copper'
+        ]),
+        ('Diverging', [
+            'PiYG', 'PRGn', 'BrBG', 'PuOr', 'RdGy', 'RdBu',
+            'RdYlBu', 'RdYlGn', 'Spectral', 'coolwarm', 'bwr', 'seismic'
+        ]),
+        ('Cyclic', [
+            'twilight', 'twilight_shifted', 'hsv'
+        ]),
+        ('Qualitative', [
+            'Pastel1', 'Pastel2', 'Paired', 'Accent',
+            'Dark2', 'Set1', 'Set2', 'Set3',
+            'tab10', 'tab20', 'tab20b', 'tab20c'
+        ])
+    ]
+
+    def plot_color_blocks(cmap_category, cmap_list):
+        nrows = len(cmap_list)
+        figh = 0.5 + (nrows * 0.42)
+
+        fig, axs = plt.subplots(nrows=nrows, figsize=(8, figh))
+
+        # cmap이 1개뿐일 때 axs를 iterable로 맞춤
+        if nrows == 1:
+            axs = [axs]
+
+        fig.subplots_adjust(
+            top=1 - 0.35 / figh,
+            bottom=0.05,
+            left=0.25,
+            right=0.98,
+            hspace=0.45
+        )
+
+        axs[0].set_title(f"{cmap_category} colormaps", fontsize=14)
+
+        for ax, cmap_name in zip(axs, cmap_list):
+            cmap = mpl.colormaps[cmap_name]
+
+            # 0~1 구간에서 n_colors개 샘플 추출
+            sample_points = np.linspace(0, 1, n_colors)
+            colors = cmap(sample_points)
+
+            # 팔레트 블록 그리기
+            for i, color in enumerate(colors):
+                rect = patches.Rectangle(
+                    (i, 0), 1, 1,
+                    facecolor=color,
+                    edgecolor='none'
+                )
+                ax.add_patch(rect)
+
+            # 이름 표시
+            ax.text(
+                -0.02, 0.5, f"{cmap_name:>20}",
+                va='center', ha='right',
+                fontsize=10,
+                transform=ax.transAxes
+            )
+
+            ax.set_xlim(0, n_colors)
+            ax.set_ylim(0, 1)
+            ax.set_axis_off()
+
+        plt.show()
+
+    for cmap_category, cmap_list in cmaps:
+        plot_color_blocks(cmap_category, cmap_list)
 
 
 # ===================================================================
@@ -245,8 +336,7 @@ def lineplot(
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
-    **params,
-) -> None:
+    **params) -> None:
     """선 그래프를 그린다.
 
     Args:
@@ -346,8 +436,7 @@ def kdeplot(
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
-    **params,
-) -> None:
+    **params) -> None:
     """단변량 커널 밀도 추정(KDE) 그래프를 그린다. 범주에 따른 구분은 지원하지 않는다.
 
     quartile_split=True일 때는 사분위수 구간(Q1~Q4)으로 나누어 4개의 서브플롯에 그린다.
@@ -488,8 +577,7 @@ def histplot(
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
-    **params,
-) -> None:
+    **params) -> None:
     """히스토그램을 그리고 필요 시 KDE를 함께 표시한다.
 
     Args:
@@ -552,7 +640,6 @@ def histplot(
         show(save_path)  # type: ignore
 
 
-
 # ===================================================================
 # 상자그림(boxplot)을 그린다
 # ===================================================================
@@ -582,9 +669,9 @@ def boxplot(
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
-    **params,
-) -> None:
-    """상자그림(boxplot)을 그린다.
+    **params) -> None:
+    """
+    상자그림(boxplot)을 그린다.
 
     Args:
         data (DataFrame|None): 시각화할 데이터.
@@ -670,7 +757,6 @@ def boxplot(
         show(save_path)  # type: ignore
 
 
-
 # ===================================================================
 # 바이올린 플롯(violinplot)을 그린다
 # ===================================================================
@@ -696,9 +782,9 @@ def violinplot(
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
-    **params,
-) -> None:
-    """바이올린 플롯(violinplot)을 그린다.
+    **params) -> None:
+    """
+    바이올린 플롯(violinplot)을 그린다.
 
     Args:
         data (DataFrame|None): 시각화할 데이터.
@@ -791,9 +877,9 @@ def heatmap(
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
-    **params,
-) -> None:
-    """바이올린 플롯(violinplot)을 그린다.
+    **params) -> None:
+    """
+    히트맵을 그린다.
 
     Args:
         data (DataFrame|None): 시각화할 데이터.
@@ -854,6 +940,179 @@ def heatmap(
         show(save_path)  # type: ignore
 
 
+# ===================================================================
+# 막대그래프를 그린다
+# ===================================================================
+def barplot(
+    data: DataFrame,
+    x: str | Index,
+    y: str | Index,
+    hue: str | None = None,
+    estimator: Callable = np.mean,
+    #----- 공통 파라미터 ------
+    title: str | None = None,
+    xlabel: str | None = None,
+    xlabel_fontsize: int = config.xlabel_fontsize,
+    xlabel_fontweight: str = config.xlabel_fontweight,
+    xlabel_pad: int = config.xlabel_pad,
+    ylabel: str | None = None,
+    ylabel_fontsize: int = config.ylabel_fontsize,
+    ylabel_fontweight: str = config.ylabel_fontweight,
+    ylabel_pad: int = config.ylabel_pad,
+    palette: str | None = None,
+    width: int | None = None,
+    height: int | None = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
+    **params) -> None:
+    """
+    막대그래프를 그린다.
+
+    Args:
+        data (DataFrame): 시각화할 데이터.
+        x (str | Index): 범주 컬럼.
+        y (str | Index): 값 컬럼.
+        hue (str|None): 보조 범주 컬럼.
+        estimator (Callable): 요약 함수.
+
+    Common Args:
+        title (str|None): 그래프 제목.
+        xlabel (str|None): x축 레이블.
+        xlabel_fontsize (int): x축 레이블 폰트 크기.
+        xlabel_fontweight (str): x축 레이블 폰트 두께.
+        xlabel_pad (int): x축 레이블 패드.
+        ylabel (str|None): y축 레이블.
+        ylabel_fontsize (int): y축 레이블 폰트 크기.
+        ylabel_fontweight (str): y축 레이블 폰트 두께.
+        ylabel_pad (int): y축 레이블 패드.
+        palette (str|None): 팔레트 이름.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        save_path (str|None): 이미지 저장 경로. None이면 화면에 표시.
+        callback (Callable|None): Axes 후처리 콜백.
+        ax (Axes|None): 외부에서 전달한 Axes.
+        **params: seaborn violinplot 추가 인자.
+
+    Returns:
+        None
+    """
+    outparams = False
+
+    if ax is None:
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, xlabel_fontsize=xlabel_fontsize, xlabel_fontweight=xlabel_fontweight, xlabel_pad=xlabel_pad, ylabel=ylabel, ylabel_fontsize=ylabel_fontsize, ylabel_fontweight=ylabel_fontweight, ylabel_pad=ylabel_pad)  # type: ignore
+        outparams = True
+
+    # hue가 있을 때만 palette 사용, 없으면 color 사용
+    barplot_kwargs = {
+        "data": data,
+        "x": x,
+        "y": y,
+        "hue": hue,
+        "estimator": estimator,
+        "ax": ax,
+    }
+
+    if hue is not None and palette is not None:
+        barplot_kwargs["palette"] = palette
+    elif hue is None and palette is not None:
+        barplot_kwargs["color"] = sb.color_palette(palette)[0]
+
+    barplot_kwargs.update(params)
+
+    sb.barplot(**barplot_kwargs)
+
+    if callback is not None:
+        callback(ax)
+
+    if outparams:
+        show(save_path)  # type: ignore
+
+
+# ===================================================================
+# 빈도그래프를 그린다
+# ===================================================================
+def countplot(
+    data: DataFrame,
+    x: str | Index,
+    y: str | Index,
+    hue: str | None = None,
+    #----- 공통 파라미터 ------
+    title: str | None = None,
+    xlabel: str | None = None,
+    xlabel_fontsize: int = config.xlabel_fontsize,
+    xlabel_fontweight: str = config.xlabel_fontweight,
+    xlabel_pad: int = config.xlabel_pad,
+    ylabel: str | None = None,
+    ylabel_fontsize: int = config.ylabel_fontsize,
+    ylabel_fontweight: str = config.ylabel_fontweight,
+    ylabel_pad: int = config.ylabel_pad,
+    palette: str | None = None,
+    width: int | None = None,
+    height: int | None = None,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
+    **params) -> None:
+    """
+    # 빈도그래프를 그린다.
+
+    Args:
+        data (DataFrame): 시각화할 데이터.
+        x (str | Index): 범주 컬럼.
+        y (str | Index): 값 컬럼.
+        hue (str|None): 보조 범주 컬럼.
+
+    Common Args:
+        title (str|None): 그래프 제목.
+        xlabel (str|None): x축 레이블.
+        xlabel_fontsize (int): x축 레이블 폰트 크기.
+        xlabel_fontweight (str): x축 레이블 폰트 두께.
+        xlabel_pad (int): x축 레이블 패드.
+        ylabel (str|None): y축 레이블.
+        ylabel_fontsize (int): y축 레이블 폰트 크기.
+        ylabel_fontweight (str): y축 레이블 폰트 두께.
+        ylabel_pad (int): y축 레이블 패드.
+        palette (str|None): 팔레트 이름.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        save_path (str|None): 이미지 저장 경로. None이면 화면에 표시.
+        callback (Callable|None): Axes 후처리 콜백.
+        ax (Axes|None): 외부에서 전달한 Axes.
+        **params: seaborn violinplot 추가 인자.
+
+    Returns:
+        None
+    """
+    outparams = False
+
+    if ax is None:
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, xlabel_fontsize=xlabel_fontsize, xlabel_fontweight=xlabel_fontweight, xlabel_pad=xlabel_pad, ylabel=ylabel, ylabel_fontsize=ylabel_fontsize, ylabel_fontweight=ylabel_fontweight, ylabel_pad=ylabel_pad)  # type: ignore
+        outparams = True
+
+    # hue가 있을 때만 palette 사용, 없으면 color 사용
+    barplot_kwargs = {
+        "data": data,
+        "x": x,
+        "y": y,
+        "hue": hue,
+        "ax": ax,
+    }
+
+    if hue is not None and palette is not None:
+        barplot_kwargs["palette"] = palette
+    elif hue is None and palette is not None:
+        barplot_kwargs["color"] = sb.color_palette(palette)[0]
+
+    barplot_kwargs.update(params)
+
+    sb.countplot(**barplot_kwargs)
+
+    if callback is not None:
+        callback(ax)
+
+    if outparams:
+        show(save_path)  # type: ignore
 
 
 
@@ -863,6 +1122,7 @@ def heatmap(
 
 
 
+#######################################################################
 
 
 
@@ -1294,144 +1554,6 @@ def pairplot(
     g.map_upper(func=sb.scatterplot)
 
     show(save_path)  # type: ignore
-
-
-# ===================================================================
-# 범주 빠른도 막대그래프를 그린다
-# ===================================================================
-def countplot(
-    df: DataFrame,
-    xname: str,
-    hue=None,
-    title: str | None = None,
-    palette: str | None = None,
-    order: int = 1,
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-    ax: Axes | None = None,
-    **params,
-) -> None:
-    """범주 빈도 막대그래프를 그린다.
-
-    Args:
-        df (DataFrame): 시각화할 데이터.
-        xname (str): 범주 컬럼.
-        hue (str|None): 보조 범주 컬럼.
-        title (str|None): 그래프 제목.
-        palette (str|None): 팔레트 이름.
-        order (int): 숫자형일 때 정렬 방식(1: 값 기준, 기타: 빈도 기준).
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        callback (Callable|None): Axes 후처리 콜백.
-        ax (Axes|None): 외부에서 전달한 Axes.
-        **params: seaborn countplot 추가 인자.
-
-    Returns:
-        None
-    """
-    outparams = False
-    sort = None
-    if str(df[xname].dtype) in ["int", "int32", "int64", "float", "float32", "float64"]:
-        if order == 1:
-            sort = sorted(list(df[xname].unique()))
-        else:
-            sort = sorted(list(df[xname].value_counts().index))
-
-    if ax is None:
-        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
-        outparams = True
-
-    # hue가 있을 때만 palette 사용, 없으면 color 사용
-    countplot_kwargs = {
-        "data": df,
-        "x": xname,
-        "hue": hue,
-        "order": sort,
-        "linewidth": linewidth,
-        "ax": ax,
-    }
-
-    if hue is not None and palette is not None:
-        countplot_kwargs["palette"] = palette
-    elif hue is None and palette is not None:
-        # palette의 첫 번째 색상을 color로 사용
-        countplot_kwargs["color"] = sb.color_palette(palette)[0]
-
-    countplot_kwargs.update(params)
-
-    sb.countplot(**countplot_kwargs)
-
-    show(save_path)  # type: ignore
-
-
-# ===================================================================
-# 막대그래프를 그린다
-# ===================================================================
-def barplot(
-    df: DataFrame,
-    xname: str | Index,
-    yname: str | Index,
-    hue=None,
-    title: str | None = None,
-    palette: str | None = None,
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-    ax: Axes | None = None,
-    **params,
-) -> None:
-    """막대그래프를 그린다.
-
-    Args:
-        df (DataFrame): 시각화할 데이터.
-        xname (str | Index): 범주 컬럼.
-        yname (str | Index): 값 컬럼.
-        hue (str|None): 보조 범주 컬럼.
-        title (str|None): 그래프 제목.
-        palette (str|None): 팔레트 이름.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        callback (Callable|None): Axes 후처리 콜백.
-        ax (Axes|None): 외부에서 전달한 Axes.
-        **params: seaborn barplot 추가 인자.
-
-    Returns:
-        None
-    """
-    outparams = False
-
-    if ax is None:
-        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
-        outparams = True
-
-    # hue가 있을 때만 palette 사용, 없으면 color 사용
-    barplot_kwargs = {
-        "data": df,
-        "x": xname,
-        "y": yname,
-        "hue": hue,
-        "linewidth": linewidth,
-        "ax": ax,
-    }
-
-    if hue is not None and palette is not None:
-        barplot_kwargs["palette"] = palette
-    elif hue is None and palette is not None:
-        barplot_kwargs["color"] = sb.color_palette(palette)[0]
-
-    barplot_kwargs.update(params)
-
-    sb.barplot(**barplot_kwargs)
-    show(save_path)  # type: ignore
-
-
 
 
 # ===================================================================
@@ -2347,96 +2469,3 @@ def pca_plot(
             title=title,
             callback=__callable,
         )
-
-# ===================================================================
-# Matplotlib 컬러맵 팔레트 시각화
-# ===================================================================
-import matplotlib.patches as patches
-import matplotlib as mpl
-
-def colormaps(n_colors=8):
-    """
-    Matplotlib에서 제공하는 다양한 컬러맵을
-    연속형 그라디언트가 아니라 8단계 팔레트 형태로 보여주는 함수.
-    """
-
-    cmaps = [
-        ('Perceptually Uniform Sequential', [
-            'viridis', 'plasma', 'inferno', 'magma', 'cividis'
-        ]),
-        ('Sequential', [
-            'Greys', 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds',
-            'YlOrBr', 'YlOrRd', 'OrRd', 'PuRd', 'RdPu', 'BuPu',
-            'GnBu', 'PuBu', 'YlGnBu', 'PuBuGn', 'BuGn', 'YlGn'
-        ]),
-        ('Sequential (2)', [
-            'binary', 'gist_yarg', 'gist_gray', 'gray', 'bone', 'pink',
-            'spring', 'summer', 'autumn', 'winter', 'cool', 'Wistia',
-            'hot', 'afmhot', 'gist_heat', 'copper'
-        ]),
-        ('Diverging', [
-            'PiYG', 'PRGn', 'BrBG', 'PuOr', 'RdGy', 'RdBu',
-            'RdYlBu', 'RdYlGn', 'Spectral', 'coolwarm', 'bwr', 'seismic'
-        ]),
-        ('Cyclic', [
-            'twilight', 'twilight_shifted', 'hsv'
-        ]),
-        ('Qualitative', [
-            'Pastel1', 'Pastel2', 'Paired', 'Accent',
-            'Dark2', 'Set1', 'Set2', 'Set3',
-            'tab10', 'tab20', 'tab20b', 'tab20c'
-        ])
-    ]
-
-    def plot_color_blocks(cmap_category, cmap_list):
-        nrows = len(cmap_list)
-        figh = 0.5 + (nrows * 0.42)
-
-        fig, axs = plt.subplots(nrows=nrows, figsize=(8, figh))
-
-        # cmap이 1개뿐일 때 axs를 iterable로 맞춤
-        if nrows == 1:
-            axs = [axs]
-
-        fig.subplots_adjust(
-            top=1 - 0.35 / figh,
-            bottom=0.05,
-            left=0.25,
-            right=0.98,
-            hspace=0.45
-        )
-
-        axs[0].set_title(f"{cmap_category} colormaps", fontsize=14)
-
-        for ax, cmap_name in zip(axs, cmap_list):
-            cmap = mpl.colormaps[cmap_name]
-
-            # 0~1 구간에서 n_colors개 샘플 추출
-            sample_points = np.linspace(0, 1, n_colors)
-            colors = cmap(sample_points)
-
-            # 팔레트 블록 그리기
-            for i, color in enumerate(colors):
-                rect = patches.Rectangle(
-                    (i, 0), 1, 1,
-                    facecolor=color,
-                    edgecolor='none'
-                )
-                ax.add_patch(rect)
-
-            # 이름 표시
-            ax.text(
-                -0.02, 0.5, f"{cmap_name:>20}",
-                va='center', ha='right',
-                fontsize=10,
-                transform=ax.transAxes
-            )
-
-            ax.set_xlim(0, n_colors)
-            ax.set_ylim(0, 1)
-            ax.set_axis_off()
-
-        plt.show()
-
-    for cmap_category, cmap_list in cmaps:
-        plot_color_blocks(cmap_category, cmap_list)
