@@ -777,8 +777,8 @@ def violinplot(
     ylabel_fontweight: str = config.ylabel_fontweight,
     ylabel_pad: int = config.ylabel_pad,
     palette: str | None = None,
-    width: int = config.width,
-    height: int = config.height,
+    width: int | None = config.width,
+    height: int | None = config.height,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -872,8 +872,8 @@ def heatmap(
     ylabel_fontweight: str = config.ylabel_fontweight,
     ylabel_pad: int = config.ylabel_pad,
     palette: str | None = None,
-    width: int | None = None,
-    height: int | None = None,
+    width: int | None = config.width,
+    height: int | None = config.height,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -960,8 +960,8 @@ def barplot(
     ylabel_fontweight: str = config.ylabel_fontweight,
     ylabel_pad: int = config.ylabel_pad,
     palette: str | None = None,
-    width: int | None = None,
-    height: int | None = None,
+    width: int | None = config.width,
+    height: int | None = config.height,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -1048,8 +1048,8 @@ def countplot(
     ylabel_fontweight: str = config.ylabel_fontweight,
     ylabel_pad: int = config.ylabel_pad,
     palette: str | None = None,
-    width: int | None = None,
-    height: int | None = None,
+    width: int | None = config.width,
+    height: int | None = config.height,
     save_path: str | None = None,
     callback: Callable | None = None,
     ax: Axes | None = None,
@@ -1115,7 +1115,108 @@ def countplot(
         show(save_path)  # type: ignore
 
 
+# ===================================================================
+# 파이 그래프 혹은 도넛 그래프를 그린다
+# ===================================================================
+def pieplot(
+    x: str | Index,
+    labels: str | Index,
+    autopct: str = "%0.1f%%",
+    startangle: int = 90,
+    counterclock: bool = False,
+    explode: list[float] | None = None,
+    donutchart: bool = False,
+    wedge_width: float = 0.7,
+    wedge_color: str | None = "#ffffff",
+    wedge_linewidth: float = 3,
+    #----- 공통 파라미터 ------
+    title: str | None = None,
+    xlabel: str | None = None,
+    xlabel_fontsize: int = config.xlabel_fontsize,
+    xlabel_fontweight: str = config.xlabel_fontweight,
+    xlabel_pad: int = config.xlabel_pad,
+    ylabel: str | None = None,
+    ylabel_fontsize: int = config.ylabel_fontsize,
+    ylabel_fontweight: str = config.ylabel_fontweight,
+    ylabel_pad: int = config.ylabel_pad,
+    palette: str | None = None,
+    width: int | None = config.width,
+    height: int | None = config.height,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
+    **params) -> None:
+    """
+    # 파이 그래프 혹은 도넛 그래프를 그린다
 
+    Args:
+        x (str | Index): 값 컬럼.
+        labels (str | Index): 범주 컬럼.
+        autopct (str): 조각 안에 표시할 값 형식.
+        startangle (int): 시작 각도.
+        counterclock (bool): 시계 반대 방향으로 그릴지 여부.
+        explode (list[float]|None): 조각 간격.
+        donutchart (bool): 도넛 차트 여부.
+        wedge_width (float): 도넛 차트일 때 조각 너비 비율
+        wedge_color (str|None): 도넛 차트일 때 조각 사이 경계선 색상.
+        wedge_linewidth (float): 도넛 차트일 때 조각 사이 경계선 굵기.
+    Common Args:
+        title (str|None): 그래프 제목.
+        xlabel (str|None): x축 레이블.
+        xlabel_fontsize (int): x축 레이블 폰트 크기.
+        xlabel_fontweight (str): x축 레이블 폰트 두께.
+        xlabel_pad (int): x축 레이블 패드.
+        ylabel (str|None): y축 레이블.
+        ylabel_fontsize (int): y축 레이블 폰트 크기.
+        ylabel_fontweight (str): y축 레이블 폰트 두께.
+        ylabel_pad (int): y축 레이블 패드.
+        palette (str|None): 팔레트 이름.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        save_path (str|None): 이미지 저장 경로. None이면 화면에 표시.
+        callback (Callable|None): Axes 후처리 콜백.
+        ax (Axes|None): 외부에서 전달한 Axes.
+        **params: seaborn violinplot 추가 인자.
+
+    Returns:
+        None
+    """
+    outparams = False
+
+    if ax is None:
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, xlabel_fontsize=xlabel_fontsize, xlabel_fontweight=xlabel_fontweight, xlabel_pad=xlabel_pad, ylabel=ylabel, ylabel_fontsize=ylabel_fontsize, ylabel_fontweight=ylabel_fontweight, ylabel_pad=ylabel_pad)  # type: ignore
+        outparams = True
+
+    barplot_kwargs = {
+        "x": x,
+        "labels": labels,
+        "autopct": autopct,
+        "startangle": startangle,
+        "counterclock": counterclock,
+    }
+
+    if palette is not None:
+        barplot_kwargs["colors"] = sb.color_palette("Set2", n_colors=len(labels))
+
+    if explode is not None:
+        barplot_kwargs["explode"] = explode
+
+    if donutchart:
+        barplot_kwargs["wedgeprops"] = {
+            "width": wedge_width,
+            "edgecolor": wedge_color,
+            "linewidth": wedge_linewidth,
+        }
+
+    barplot_kwargs.update(params)
+
+    ax.pie(**barplot_kwargs)
+
+    if callback is not None:
+        callback(ax)
+
+    if outparams:
+        show(save_path)  # type: ignore
 
 
 
@@ -1125,89 +1226,6 @@ def countplot(
 #######################################################################
 
 
-
-# ===================================================================
-# 범주별 비율을 100% 누적 막대그래프로 나타낸다
-# ===================================================================
-def stackplot(
-    df: DataFrame,
-    xname: str,
-    hue: str,
-    title: str | None = None,
-    palette: str | None = None,
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = 0.25,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-    ax: Axes | None = None,
-    **params,
-) -> None:
-    """클래스 비율을 100% 누적 막대로 표현한다.
-
-    Args:
-        df (DataFrame): 시각화할 데이터.
-        xname (str): x축 기준 컬럼.
-        hue (str): 클래스 컬럼.
-        title (str|None): 그래프 제목.
-        palette (str|None): 팔레트 이름.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        callback (Callable|None): Axes 후처리 콜백.
-        ax (Axes|None): 외부에서 전달한 Axes.
-        **params: seaborn histplot 추가 인자.
-
-    Returns:
-        None
-    """
-    outparams = False
-
-    if ax is None:
-        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
-        outparams = True
-
-    df2 = df[[xname, hue]].copy()
-    df2[xname] = df2[xname].astype(str)
-
-    # stackplot은 hue가 필수이므로 palette를 그대로 사용
-    stackplot_kwargs = {
-        "data": df2,
-        "x": xname,
-        "hue": hue,
-        "linewidth": linewidth,
-        "stat": "probability",  # 전체에서의 비율로 그리기
-        "multiple": "fill",  # 전체를 100%로 그리기
-        "shrink": 0.8,  # 막대의 폭
-        "linewidth": linewidth,
-        "ax": ax,
-    }
-
-    if palette is not None:
-        stackplot_kwargs["palette"] = palette
-
-    stackplot_kwargs.update(params)
-
-    sb.histplot(**stackplot_kwargs)
-
-    # 그래프의 x축 항목 수 만큼 반복
-    for p in ax.patches:  # type: ignore
-        # 각 막대의 위치, 넓이, 높이
-        left, bottom, width, height = p.get_bbox().bounds  # type: ignore
-        # 막대의 중앙에 글자 표시하기
-        ax.annotate(  # type: ignore
-            "%0.1f%%" % (height * 100),
-            xy=(left + width / 2, bottom + height / 2),
-            ha="center",
-            va="center",
-        )
-
-    if str(df[xname].dtype) in ["int", "int32", "int64", "float", "float32", "float64"]:
-        xticks = list(df[xname].unique())
-        ax.set_xticks(xticks)  # type: ignore
-        ax.set_xticklabels(xticks)  # type: ignore
-
-    show(save_path)  # type: ignore
 
 
 # ===================================================================
