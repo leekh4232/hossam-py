@@ -148,7 +148,8 @@ def _init():
                 "figure.dpi": hs_plot.config.dpi,
                 "savefig.dpi": hs_plot.config.dpi,
                 "text.hinting": "auto",
-                "text.hinting_factor": 8
+                "text.hinting_factor": 8,
+                "axes.axisbelow": True
             }
         )
     except Exception as e:

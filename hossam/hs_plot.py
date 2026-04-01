@@ -12,9 +12,8 @@ from matplotlib.figure import Figure  # type: ignore
 from matplotlib.pyplot import Axes  # type: ignore
 import matplotlib.patches as patches
 import matplotlib as mpl
-from pandas import Index, Series, DataFrame
+from pandas import Index, Series, DataFrame, pivot_table
 from math import sqrt
-from pandas import DataFrame
 
 # ===================================================================
 from scipy.stats import t
@@ -1147,7 +1146,7 @@ def pieplot(
     ax: Axes | None = None,
     **params) -> None:
     """
-    # 파이 그래프 혹은 도넛 그래프를 그린다
+    파이 그래프 혹은 도넛 그래프를 그린다
 
     Args:
         x (str | Index): 값 컬럼.
@@ -1219,7 +1218,130 @@ def pieplot(
         show(save_path)  # type: ignore
 
 
+# ===================================================================
+# 누적 막대 그래프를 그린다.
+# ===================================================================
+def stackplot(
+    data: DataFrame,
+    x: str,
+    y: str,
+    hue: str | None = None,
+    aggfunc: Callable = np.sum,
+    ratio: bool = False,
+    orient: str = "v",
+    text: bool = True,
+    text_color: str = "#ffffff",
+    text_fontsize: int = config.text_font_size,
+    text_format: str = "0.1f%%",
+    #----- 공통 파라미터 ------
+    title: str | None = None,
+    xlabel: str | None = None,
+    xlabel_fontsize: int = config.xlabel_fontsize,
+    xlabel_fontweight: str = config.xlabel_fontweight,
+    xlabel_pad: int = config.xlabel_pad,
+    ylabel: str | None = None,
+    ylabel_fontsize: int = config.ylabel_fontsize,
+    ylabel_fontweight: str = config.ylabel_fontweight,
+    ylabel_pad: int = config.ylabel_pad,
+    palette: str | None = None,
+    width: int | None = config.width,
+    height: int | None = config.height,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
+    **params) -> None:
+    """
+    누적 막대 그래프를 그린다.
 
+    Args:
+        data (DataFrame): 시각화할 데이터.
+        x (str): x축 범주 컬럼명.
+        y (str): y축 값 컬럼명.
+        hue (str|None): 보조 범주 컬럼명.
+        aggfunc (Callable): 집계 함수.
+        ratio (bool): 누적 비율로 표시 여부.
+        orient (str): 'v' 또는 'h' 방향.
+        text (bool): 막대 안에 텍스트 표시 여부.
+        text_color (str): 텍스트 색상.
+        text_fontsize (int): 텍스트 폰트 크기.
+        text_format (str): 텍스트 형식.
+
+    Common Args:
+        title (str|None): 그래프 제목.
+        xlabel (str|None): x축 레이블.
+        xlabel_fontsize (int): x축 레이블 폰트 크기.
+        xlabel_fontweight (str): x축 레이블 폰트 두께.
+        xlabel_pad (int): x축 레이블 패드.
+        ylabel (str|None): y축 레이블.
+        ylabel_fontsize (int): y축 레이블 폰트 크기.
+        ylabel_fontweight (str): y축 레이블 폰트 두께.
+        ylabel_pad (int): y축 레이블 패드.
+        palette (str|None): 팔레트 이름.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        save_path (str|None): 이미지 저장 경로. None이면 화면에 표시.
+        callback (Callable|None): Axes 후처리 콜백.
+        ax (Axes|None): 외부에서 전달한 Axes.
+        **params: seaborn violinplot 추가 인자.
+
+    Returns:
+        None
+    """
+    outparams = False
+
+    if ax is None:
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, xlabel_fontsize=xlabel_fontsize, xlabel_fontweight=xlabel_fontweight, xlabel_pad=xlabel_pad, ylabel=ylabel, ylabel_fontsize=ylabel_fontsize, ylabel_fontweight=ylabel_fontweight, ylabel_pad=ylabel_pad)  # type: ignore
+        outparams = True
+
+    # 데이터 피벗팅
+    df = pivot_table(data=data, index=x, values=y, columns=hue, aggfunc=aggfunc, fill_value=0)
+
+    if ratio:
+        text_format = "{:.1f}%"
+        df['sum'] = df.sum(axis=1)
+
+        for col in df.columns:
+            df[col] = df[col] / df['sum'] * 100
+
+        df.drop(columns='sum', inplace=True)
+
+        if orient == 'v':
+            ax.set_ylim(0, 100)
+        else:
+            ax.set_xlim(0, 100)
+    else:
+        text_format = "{:.1f}"
+
+    color_list = None
+    if palette is not None:
+        color_list = sb.color_palette(palette, n_colors=len(df.columns))
+
+    for i, col in enumerate(df.columns):
+        color = None
+        
+        if color_list is not None:
+            color = color_list[i]
+
+        if orient == 'v':
+            ax.bar(df.index, df[col], bottom=df.iloc[:, :i].sum(axis=1), color=color, label=col)
+        else:
+            ax.barh(df.index, df[col], left=df.iloc[:, :i].sum(axis=1), color=color, label=col)
+
+        # 누적값 텍스트 표시
+        if text:
+            for j, val in enumerate(df[col]):
+                if orient == 'v':
+                    ax.text(x=j, y=df.iloc[j, :i].sum() + val / 2, s=text_format.format(val), ha='center', va='center', color=text_color, fontsize=text_fontsize)
+                else:
+                    ax.text(x=df.iloc[j, :i].sum() + val / 2, y=j, s=text_format.format(val), ha='center', va='center', color=text_color, fontsize=text_fontsize)
+
+    ax.legend(bbox_to_anchor=(1, 1))
+
+    if callback is not None:
+        callback(ax)
+
+    if outparams:
+        show(save_path)  # type: ignore
 
 
 
