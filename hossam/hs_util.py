@@ -15,6 +15,7 @@ from typing import Literal
 from PIL import Image, ImageEnhance
 # -------------------------------------------------------------
 from pandas import DataFrame, DatetimeIndex, read_csv, read_excel, read_parquet, read_json
+from geopandas import read_file as read_shapefile
 from scipy.stats import normaltest
 from tabulate import tabulate
 from os.path import join, exists
@@ -30,6 +31,8 @@ def __get_df(path: str, index_col=None) -> DataFrame:
     p = path.rfind(".")
     exec = path[p+1:].lower()
     tmp_dir = None
+
+    print("exec:", exec)
 
     # 파일 확장자가 압축파일인 경우 로컬에 파일을 다운로드 후 압축 해제
     if exec == "zip":
@@ -64,7 +67,7 @@ def __get_df(path: str, index_col=None) -> DataFrame:
         p = path.rfind(".")
         exec = path[p+1:].lower()
 
-    if exec == 'xlsx':
+    if exec == 'xlsx' or exec == 'xls':
         # If path is a remote URL, fetch the file once and reuse the bytes
         if path.lower().startswith(('http://', 'https://')):
             path = path.replace("\\", "/")
@@ -103,9 +106,20 @@ def __get_df(path: str, index_col=None) -> DataFrame:
     elif exec == 'csv':
         df = read_csv(path, index_col=index_col)
     elif exec == 'parquet':
-        df = read_parquet(path, index_col=index_col)
+        df = read_parquet(path)
+
+        if index_col is not None and index_col in df.columns:
+            df.set_index(index_col, inplace=True)
     elif exec == 'json':
-        df = read_json(path, index_col=index_col)
+        df = read_json(path)
+
+        if index_col is not None and index_col in df.columns:
+            df.set_index(index_col, inplace=True)
+    elif exec == 'shp':
+        df = read_shapefile(path)
+
+        if index_col is not None and index_col in df.columns:
+            df.set_index(index_col, inplace=True)
     else:
         raise ValueError(f"지원하지 않는 파일 형식입니다: {exec}")
         
