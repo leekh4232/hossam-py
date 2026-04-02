@@ -14,7 +14,7 @@ import glob as gl
 from typing import Literal
 from PIL import Image, ImageEnhance
 # -------------------------------------------------------------
-from pandas import DataFrame, DatetimeIndex, read_csv, read_excel
+from pandas import DataFrame, DatetimeIndex, read_csv, read_excel, read_parquet, read_json
 from scipy.stats import normaltest
 from tabulate import tabulate
 from os.path import join, exists
@@ -100,9 +100,15 @@ def __get_df(path: str, index_col=None) -> DataFrame:
             except:
                 #print(f"\033[91m[!] Cannot read metadata\033[0m")
                 pass
-    else:
+    elif exec == 'csv':
         df = read_csv(path, index_col=index_col)
-
+    elif exec == 'parquet':
+        df = read_parquet(path, index_col=index_col)
+    elif exec == 'json':
+        df = read_json(path, index_col=index_col)
+    else:
+        raise ValueError(f"지원하지 않는 파일 형식입니다: {exec}")
+        
     if tmp_dir:
         shutil.rmtree(tmp_dir)
 
