@@ -105,7 +105,7 @@ def __get_df(path: str, index_col=None) -> DataFrame:
                 pass
     elif exec == 'csv':
         df = read_csv(path, index_col=index_col)
-    elif exec == 'parquet':
+    elif exec == 'hossam' or exec == 'parquet':
         df = read_parquet(path)
 
         if index_col is not None and index_col in df.columns:
