@@ -162,7 +162,7 @@ def __get_data_url(key: str, local: str | None = None) -> Tuple[str, Any, Any]:
         info = my_dict.get(key.lower())
         path = join(local, info['url'])
 
-    return path, info.get('desc'), info.get('index')
+    return path, info.get('desc'), info.get('index'), info.get('metadata')
 
 # -------------------------------------------------------------
 def load_info(search: str | None = None, local: str | None = None) -> DataFrame:
@@ -242,7 +242,7 @@ def _load_data_remote(key: str, local: str | None = None) -> Optional[DataFrame]
     """
     index = None
     try:
-        url, desc, index = __get_data_url(key, local=local)
+        url, desc, index, metadata = __get_data_url(key, local=local)
     except Exception as e:
         try:
             print(f"\033[91m{str(e)}\033[0m")
@@ -265,6 +265,9 @@ def _load_data_remote(key: str, local: str | None = None) -> Optional[DataFrame]
             print(e)
         return
 
+    if metadata:
+        meta_df = DataFrame(metadata.items(), columns=['field', 'description'])
+        pretty_table(meta_df)
 
     return df
 
