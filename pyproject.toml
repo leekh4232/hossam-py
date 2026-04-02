@@ -21,6 +21,8 @@ keywords = ["data", "analysis", "helper", "hossam", "scikit-learn", "pandas", "n
 dependencies = [
     # Core
     "tqdm",
+    "pyarrow",
+    "fastparquet",
     "tabulate",
     "numpy",
     "pandas",
