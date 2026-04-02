@@ -32,7 +32,7 @@ def __get_df(path: str, index_col=None) -> DataFrame:
     exec = path[p+1:].lower()
     tmp_dir = None
 
-    print("exec:", exec)
+    #print("exec:", exec)
 
     # 파일 확장자가 압축파일인 경우 로컬에 파일을 다운로드 후 압축 해제
     if exec == "zip":
