@@ -1227,12 +1227,12 @@ def stackplot(
     y: str,
     hue: str | None = None,
     aggfunc: Callable = np.sum,
-    ratio: bool = False,
     orient: str = "v",
+    ratio: bool = False,
     text: bool = True,
     text_color: str = "#ffffff",
     text_fontsize: int = config.text_font_size,
-    text_format: str = "0.1f%%",
+    text_format: str = None,
     #----- 공통 파라미터 ------
     title: str | None = None,
     xlabel: str | None = None,
@@ -1259,8 +1259,8 @@ def stackplot(
         y (str): y축 값 컬럼명.
         hue (str|None): 보조 범주 컬럼명.
         aggfunc (Callable): 집계 함수.
-        ratio (bool): 누적 비율로 표시 여부.
         orient (str): 'v' 또는 'h' 방향.
+        ratio (bool): 누적 비율로 표시 여부.
         text (bool): 막대 안에 텍스트 표시 여부.
         text_color (str): 텍스트 색상.
         text_fontsize (int): 텍스트 폰트 크기.
@@ -1293,24 +1293,29 @@ def stackplot(
         fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, xlabel_fontsize=xlabel_fontsize, xlabel_fontweight=xlabel_fontweight, xlabel_pad=xlabel_pad, ylabel=ylabel, ylabel_fontsize=ylabel_fontsize, ylabel_fontweight=ylabel_fontweight, ylabel_pad=ylabel_pad)  # type: ignore
         outparams = True
 
-    # 데이터 피벗팅
+    # 데이터 피벗팅 (fill_value=0 --> 결측치를 0으로 채움)후 인덱스를 문자열 카테고리로 변환
     df = pivot_table(data=data, index=x, values=y, columns=hue, aggfunc=aggfunc, fill_value=0)
+    df.index = df.index.astype("str").astype("category")
 
+    # 누적값을 비율로 변환하는 경우
     if ratio:
-        text_format = "{:.1f}%"
-        df['sum'] = df.sum(axis=1)
+        if text_format is None:                     # 텍스트 포멧이 없다면 강제 지정
+            text_format = "{:.1f}%"
+        
+        df['sum'] = df.sum(axis=1)                  # 각 행의 합 계산하여 'sum' 열에 저장
 
-        for col in df.columns:
+        for col in df.columns:                      # 각 열에 대해 누적값을 비율로 변환
             df[col] = df[col] / df['sum'] * 100
 
-        df.drop(columns='sum', inplace=True)
+        df.drop(columns='sum', inplace=True)        # 'sum' 열 제거
 
-        if orient == 'v':
+        if orient == 'v':                           # 그래프 방향에 따라 축 범위 설정
             ax.set_ylim(0, 100)
         else:
             ax.set_xlim(0, 100)
     else:
-        text_format = "{:.1f}"
+        if text_format is None:                     # 텍스트 포멧이 없다면 강제 지정
+            text_format = "{:.1f}"
 
     color_list = None
     if palette is not None:
