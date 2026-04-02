@@ -21,6 +21,76 @@ RANDOM_STATE = 52
 
 
 # ===================================================================
+# 지정된 컬럼들을 범주형 데이터로 설정한다
+# ===================================================================
+def set_category(data: DataFrame, columns: list) -> DataFrame:
+    """
+    카테고리 데이터를 설정한다.
+
+    Args:
+        data (DataFrame): 데이터프레임 객체
+        columns (list): 변환할 컬럼명 목록
+
+    Returns:
+        DataFrame: 카테고리 설정된 데이터프레임
+    """
+    df = data.copy()
+
+    for k in columns:
+        df[k] = df[k].astype("category")
+
+    return df
+
+
+# ===================================================================
+# 지정된 변수에 로그 먼저 변환을 적용한다
+# ===================================================================
+def log_transform(
+    data: DataFrame, columns: list | None = None
+) -> DataFrame:
+    """수치형 변수에 대해 로그 변환을 수행한다.
+
+    자연로그(ln)를 사용하여 변환하며, 0 또는 음수 값이 있을 경우
+    최소값을 기준으로 보정(shift)을 적용한다.
+
+    Args:
+        data (DataFrame): 변환할 데이터프레임.
+        columns (list, optional): 변환할 컬럼명 목록. 지정하지 않으면 모든 수치형 컬럼을 처리.
+
+    Returns:
+        DataFrame: 로그 변환된 데이터프레임.
+    """
+    df = data.copy()
+
+    # 대상 컬럼 결정
+    if not columns:
+        # 모든 수치형 컬럼 선택
+        columns = df.select_dtypes(include=[np.number]).columns.tolist()
+
+    # 각 컬럼에 대해 로그 변환 수행
+    for col in columns:
+        # 컬럼이 존재하지 않으면 건너뜀
+        if not col in df.columns:
+            continue
+        
+        # 수치형이 아닌 컬럼은 건너뜀
+        if df[col].dtype not in ["int", "int32", "int64", "float", "float32", "float64"]:
+            continue
+
+        # 최소값 확인
+        min_val = df[col].min()
+
+        # 0 또는 음수가 있으면 shift 적용
+        if min_val <= 0:
+            shift = 1 - min_val
+            df[col] = np.log(df[col] + shift)
+        else:
+            df[col] = np.log(df[col])
+
+    return df
+
+
+# ===================================================================
 # 연속형 변수를 표준정규화(Z-score)로 변환한다
 # ===================================================================
 def standard_scaler(
@@ -164,34 +234,6 @@ def minmax_scaler(
         std_df[yname] = y
 
     return std_df
-
-
-# ===================================================================
-# 지정된 컬럼들을 범주형 데이터로 설정한다
-# ===================================================================
-def set_category(data: DataFrame, *args: str, columns: list | None = None) -> DataFrame:
-    """카테고리 데이터를 설정한다.
-
-    Args:
-        data (DataFrame): 데이터프레임 객체
-        *args (str): 컬럼명 목록
-        columns (list, optional): 변환할 컬럼명 목록. args와 중복 사용 불가.
-
-    Returns:
-        DataFrame: 카테고리 설정된 데이터프레임
-    """
-    # columns 인자가 있으면 args보다 우선한다.
-    if columns is not None:
-        if args:
-            raise ValueError("args와 columns 인자는 중복 사용할 수 없습니다.")
-        args = columns  # type: ignore
-
-    df = data.copy()
-
-    for k in args:
-        df[k] = df[k].astype("category")
-
-    return df
 
 
 # ===================================================================
@@ -379,7 +421,7 @@ def replace_outliner(
 
 
 # ===================================================================
-# 중빈 이상치를 제거한 연처리된 데이터프레임을 반환한다
+# 이상치를 제거한 데이터프레임을 반환한다
 # ===================================================================
 def drop_outliner(
     data: DataFrame, *fields: str, columns: list | None = None
@@ -839,186 +881,6 @@ def bin_continuous(
     # 기본 폴백: 분위수 4구간
     df[new_col] = pd.qcut(series, q=4, labels=labels, duplicates="drop")
     df[new_col] = df[new_col].astype("category")
-    return df
-
-
-# ===================================================================
-# 지정된 변수에 로그 먼저 변환을 적용한다
-# ===================================================================
-def log_transform(
-    data: DataFrame, *fields: str, columns: list | None = None
-) -> DataFrame:
-    """수치형 변수에 대해 로그 변환을 수행한다.
-
-    자연로그(ln)를 사용하여 변환하며, 0 또는 음수 값이 있을 경우
-    최소값을 기준으로 보정(shift)을 적용한다.
-
-    Args:
-        data (DataFrame): 변환할 데이터프레임.
-        *fields (str): 변환할 컬럼명 목록. 지정하지 않으면 모든 수치형 컬럼을 처리.
-        columns (list, optional): 변환할 컬럼명 목록. fields와 중복 사용 불가.
-
-    Returns:
-        DataFrame: 로그 변환된 데이터프레임.
-
-    Examples:
-        ```python
-        from hossam import *
-        from pandas import DataFrame
-        df = DataFrame({'x': [1, 10, 100], 'y': [2, 20, 200], 'z': ['a', 'b', 'c']})
-
-        # 전체 수치형 컬럼에 대한 로그 변환:
-        result = hs_prep.log_transform(df)
-        print(result)
-
-        # 특정 컬럼만 변환:
-        result = hs_prep.log_transform(df, 'x', 'y')
-        print(result)
-        ```
-
-    Notes:
-        - 수치형이 아닌 컬럼은 자동으로 제외됩니다.
-        - 0 또는 음수 값이 있는 경우 자동으로 보정됩니다.
-        - 변환 공식: log(x + shift), 여기서 shift = 1 - min(x) (min(x) <= 0인 경우)
-    """
-    df = data.copy()
-
-    if columns is not None:
-        if fields:
-            raise ValueError("fields와 columns 인자는 중복 사용할 수 없습니다.")
-        fields = columns  # type: ignore
-
-    # 대상 컬럼 결정
-    if not fields:
-        # 모든 수치형 컬럼 선택
-        target_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-    else:
-        target_cols = list(fields)
-
-    # 각 컬럼에 대해 로그 변환 수행
-    for col in target_cols:
-        # 컬럼이 존재하고 수치형인지 확인
-        if col not in df.columns:
-            continue
-
-        if df[col].dtype not in [
-            "int",
-            "int32",
-            "int64",
-            "float",
-            "float32",
-            "float64",
-        ]:
-            continue
-
-        # 최소값 확인
-        min_val = df[col].min()
-
-        # 0 또는 음수가 있으면 shift 적용
-        if min_val <= 0:
-            shift = 1 - min_val
-            df[col] = np.log(df[col] + shift)
-        else:
-            df[col] = np.log(df[col])
-
-    return df
-
-
-# ===================================================================
-# 변수 간의 상호작용 항을 추가한 데이터프레임을 반환한다
-# ===================================================================
-def add_interaction(
-    data: DataFrame, pairs: list[tuple[str, str]] | None = None
-) -> DataFrame:
-    """데이터프레임에 상호작용(interaction) 항을 추가한다.
-
-    수치형 및 명목형 변수 간의 상호작용 항을 생성하여 데이터프레임에 추가한다.
-    - `수치형 * 수치형`: 두 변수의 곱셈 (col1*col2)
-    - `수치형 * 명목형`: 명목형의 각 카테고리별 수치형 변수 생성 (col1*col2_category)
-    - `명목형 * 명목형`: 두 명목형을 결합한 새 명목형 변수 생성 (col1_col2)
-
-    Args:
-        data (DataFrame): 원본 데이터프레임.
-        pairs (list[tuple[str, str]], optional): 직접 지정할 교호작용 쌍의 리스트.
-            예: [("age", "gender"), ("color", "cut")]
-            None이면 모든 수치형 컬럼의 2-way 상호작용을 생성.
-
-    Returns:
-        DataFrame: 상호작용 항이 추가된 새 데이터프레임.
-
-    Examples:
-        ```python
-        from hossam import *
-        from padas import DataFrame
-
-        # 수치형 변수들의 상호작용:
-        df = DataFrame({'x1': [1, 2, 3], 'x2': [4, 5, 6]})
-        result = hs_prep.add_interaction(df)
-        print(result.columns)  # x1, x2, x1*x2
-
-        # 수치형과 명목형의 상호작용:
-        df = DataFrame({'age': [20, 30, 40], 'gender': ['M', 'F', 'M']})
-        result = hs_prep.add_interaction(df, pairs=[('age', 'gender')])
-        print(result.columns)  # age, gender, age*gender_M, age*gender_F
-
-        # 명목형끼리의 상호작용:
-        df = DataFrame({'color': ['R', 'G', 'B'], 'cut': ['A', 'B', 'A']})
-        result = hs_prep.add_interaction(df, pairs=[('color', 'cut')])
-        print(result.columns)  # color, cut, color_cut
-        ```
-    """
-    df = data.copy()
-
-    # pairs가 제공되면 그것을 사용, 아니면 모든 수치형 컬럼의 2-way 상호작용 생성
-    if pairs is not None:
-        cols_to_interact = [
-            (col1, col2)
-            for col1, col2 in pairs
-            if col1 in df.columns and col2 in df.columns
-        ]
-    else:
-        numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-        cols_to_interact = list(combinations(numeric_cols, 2))
-
-    # 상호작용 항 생성
-    for col1, col2 in cols_to_interact:
-        is_col1_numeric = pd.api.types.is_numeric_dtype(df[col1])
-        is_col2_numeric = pd.api.types.is_numeric_dtype(df[col2])
-
-        # Case 1: 둘 다 수치형 -> 곱셈
-        if is_col1_numeric and is_col2_numeric:
-            interaction_col_name = f"{col1}*{col2}"
-            df[interaction_col_name] = df[col1] * df[col2]
-
-        # Case 2: 하나는 수치형, 하나는 명목형 -> 명목형의 각 카테고리별로 수치형 변수 생성
-        elif is_col1_numeric and not is_col2_numeric:
-            # col1은 수치형, col2는 명목형
-            categories = df[col2].unique()
-            for cat in categories:
-                # 결측치 처리
-                cat_str = str(cat) if pd.notna(cat) else "nan"
-                interaction_col_name = f"{col1}*{col2}_{cat_str}"
-                # 해당 카테고리인 경우 수치형 값, 아니면 0
-                df[interaction_col_name] = df[col1] * (df[col2] == cat).astype(int)
-
-        elif not is_col1_numeric and is_col2_numeric:
-            # col1은 명목형, col2는 수치형
-            categories = df[col1].unique()
-            for cat in categories:
-                cat_str = str(cat) if pd.notna(cat) else "nan"
-                interaction_col_name = f"{col2}*{col1}_{cat_str}"
-                df[interaction_col_name] = df[col2] * (df[col1] == cat).astype(int)
-
-        # Case 3: 둘 다 명목형 -> 두 변수를 결합한 새로운 명목형 변수
-        else:
-            interaction_col_name = f"{col1}_{col2}"
-            # 문자열로 변환 후 결합 (결측치 처리 포함)
-            df[interaction_col_name] = (
-                df[col1].astype(str).fillna("nan")
-                + "_"
-                + df[col2].astype(str).fillna("nan")
-            )
-
     return df
 
 

@@ -50,64 +50,6 @@ from .hs_prep import unmelt
 from .hs_util import pretty_table
 
 # ===================================================================
-# MCAR(결측치 무작위성) 검정
-# ===================================================================
-def mcar_test(data: DataFrame, columns: list | str | None = None) -> DataFrame:
-    if isinstance(columns, str):
-        columns = [c.strip() for c in columns.split(",")]
-
-    cols = data.columns if columns is None else columns
-    df = data[cols]
-
-    # 결측치가 있는 컬럼만 사용
-    cols_with_na = [c for c in df.columns if df[c].isna().any()]
-    if len(cols_with_na) < 2:
-        raise ValueError("MCAR 검정은 결측치가 있는 변수가 최소 2개 이상 필요합니다.")
-
-    X = df[cols_with_na].to_numpy()
-    n, p = X.shape
-
-    # complete cases로 평균·공분산 추정
-    complete = ~np.isnan(X).any(axis=1)
-    if complete.sum() < p + 1:
-        raise ValueError("완전관측치(complete cases)가 부족하여 MCAR 검정을 수행할 수 없습니다.")
-
-    mu = X[complete].mean(axis=0)
-    S = np.cov(X[complete], rowvar=False)
-    S_inv = np.linalg.pinv(S)
-
-    chi_sq = 0.0
-    dfree = 0
-
-    for i in range(n):
-        obs = ~np.isnan(X[i])
-        if obs.sum() == p:
-            continue  # complete case는 제외
-        diff = X[i, obs] - mu[obs]
-        S_obs = S[np.ix_(obs, obs)]
-        S_obs_inv = np.linalg.pinv(S_obs)
-
-        chi_sq += diff @ S_obs_inv @ diff
-        dfree += obs.sum()
-
-    dfree -= p  # Little's adjustment
-
-    p_value = 1 - chi2.cdf(chi_sq, dfree)
-    is_mcar = p_value > 0.05
-
-    return DataFrame([{
-        "statistic": chi_sq,
-        "dof": dfree,
-        "p-value": p_value,
-        "is_mcar": is_mcar,
-        "interpretation": (
-            "결측치는 완전 무작위(MCAR)로 판단됨 → 결측치 삭제 가능"
-            if is_mcar else
-            "결측치는 완전 무작위(MCAR)가 아님 → 삭제 시 편향 가능"
-        )
-    }])
-
-# ===================================================================
 # 결측치 분석 (Missing Values Analysis)
 # ===================================================================
 def missing_values(data: DataFrame, *fields: str, columns: list | None = None) -> DataFrame:

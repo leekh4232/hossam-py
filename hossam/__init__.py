@@ -8,15 +8,14 @@ from pathlib import Path
 
 # submodules
 from . import hs_classroom
-from . import hs_gis
-from . import hs_plot
+from . import hs_util
 from . import hs_prep
+from . import hs_plot
 from . import hs_stats
 from . import hs_timeserise
-from . import hs_util
-from . import hs_ml
 from . import hs_cluster
-from . import hs_study
+from . import hs_ml
+from . import hs_gis
 from .hs_util import load_info
 from .hs_util import _load_data_remote as load_data
 
@@ -39,15 +38,14 @@ __all__ = [
     "load_data",
     "load_info",
     "hs_classroom",
-    "hs_gis",
-    "hs_plot",
+    "hs_util",
     "hs_prep",
+    "hs_plot",
     "hs_stats",
     "hs_timeserise",
-    "hs_util",
     "hs_cluster",
     "hs_ml",
-    "hs_study"
+    "hs_gis"
 ]
 
 

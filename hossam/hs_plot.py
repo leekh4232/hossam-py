@@ -68,6 +68,7 @@ config = SimpleNamespace(
     fill_alpha=0.3,
     ws=0.1,
     hs=0.2,
+    scatter_edge_linewidth=1.5,
 )
 
 
@@ -92,18 +93,27 @@ def set_dpi(dpi: int = DEFAULT_DPI) -> None:
         config.title_font_size = config.title_font_size * (dpi * 0.0011 + 0.7)
         config.title_pad = config.title_pad * (dpi * 0.0011 + 0.7)
         config.label_font_size = config.label_font_size * (dpi * 0.0011 + 0.7)
+        config.line_width = config.line_width * (dpi * 0.0011 + 0.7)
+        config.grid_width = config.grid_width * (dpi * 0.0011 + 0.7)
+        config.scatter_edge_linewidth = config.scatter_edge_linewidth * (dpi * 0.0011 + 0.7)
     elif dpi > 100:
         config.font_size = config.font_size * (dpi * 0.0012 + 0.75)
         config.text_font_size = config.text_font_size * (dpi * 0.0012 + 0.75)
         config.title_font_size = config.title_font_size * (dpi * 0.0012 + 0.75)
         config.title_pad = config.title_pad * (dpi * 0.0012 + 0.75)
         config.label_font_size = config.label_font_size * (dpi * 0.0012 + 0.75)
+        config.line_width = config.line_width * (dpi * 0.0012 + 0.75)
+        config.grid_width = config.grid_width * (dpi * 0.0012 + 0.75)
+        config.scatter_edge_linewidth = config.scatter_edge_linewidth * (dpi * 0.0012 + 0.75)
     else:
         config.font_size = 10
         config.text_font_size = 8
         config.title_font_size = 18
         config.title_pad = 15
         config.label_font_size = 14
+        config.line_width = 2
+        config.grid_width = 1
+        config.scatter_edge_linewidth = 1.5
 
 # 초기 DPI 설정
 set_dpi(DEFAULT_DPI)
@@ -1003,7 +1013,7 @@ def barplot(
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
-    barplot_kwargs = {
+    kwargs = {
         "data": data,
         "x": x,
         "y": y,
@@ -1013,13 +1023,13 @@ def barplot(
     }
 
     if hue is not None and palette is not None:
-        barplot_kwargs["palette"] = palette
+        kwargs["palette"] = palette
     elif hue is None and palette is not None:
-        barplot_kwargs["color"] = sb.color_palette(palette)[0]
+        kwargs["color"] = sb.color_palette(palette)[0]
 
-    barplot_kwargs.update(params)
+    kwargs.update(params)
 
-    sb.barplot(**barplot_kwargs)
+    sb.barplot(**kwargs)
 
     if callback is not None:
         callback(ax)
@@ -1090,7 +1100,7 @@ def countplot(
         outparams = True
 
     # hue가 있을 때만 palette 사용, 없으면 color 사용
-    barplot_kwargs = {
+    kwargs = {
         "data": data,
         "x": x,
         "y": y,
@@ -1099,13 +1109,13 @@ def countplot(
     }
 
     if hue is not None and palette is not None:
-        barplot_kwargs["palette"] = palette
+        kwargs["palette"] = palette
     elif hue is None and palette is not None:
-        barplot_kwargs["color"] = sb.color_palette(palette)[0]
+        kwargs["color"] = sb.color_palette(palette)[0]
 
-    barplot_kwargs.update(params)
+    kwargs.update(params)
 
-    sb.countplot(**barplot_kwargs)
+    sb.countplot(**kwargs)
 
     if callback is not None:
         callback(ax)
@@ -1186,7 +1196,7 @@ def pieplot(
         fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, xlabel_fontsize=xlabel_fontsize, xlabel_fontweight=xlabel_fontweight, xlabel_pad=xlabel_pad, ylabel=ylabel, ylabel_fontsize=ylabel_fontsize, ylabel_fontweight=ylabel_fontweight, ylabel_pad=ylabel_pad)  # type: ignore
         outparams = True
 
-    barplot_kwargs = {
+    kwargs = {
         "x": x,
         "labels": labels,
         "autopct": autopct,
@@ -1195,21 +1205,21 @@ def pieplot(
     }
 
     if palette is not None:
-        barplot_kwargs["colors"] = sb.color_palette("Set2", n_colors=len(labels))
+        kwargs["colors"] = sb.color_palette("Set2", n_colors=len(labels))
 
     if explode is not None:
-        barplot_kwargs["explode"] = explode
+        kwargs["explode"] = explode
 
     if donutchart:
-        barplot_kwargs["wedgeprops"] = {
+        kwargs["wedgeprops"] = {
             "width": wedge_width,
             "edgecolor": wedge_color,
             "linewidth": wedge_linewidth,
         }
 
-    barplot_kwargs.update(params)
+    kwargs.update(params)
 
-    ax.pie(**barplot_kwargs)
+    ax.pie(**kwargs)
 
     if callback is not None:
         callback(ax)
@@ -1349,6 +1359,112 @@ def stackplot(
         show(save_path)  # type: ignore
 
 
+# ===================================================================
+# 산점도 그래프를 그린다
+# ===================================================================
+def scatterplot(
+    data: DataFrame,
+    x: str | Index,
+    y: str | Index,
+    hue: str | None = None,
+    marker: str = "o",
+    color: str | None = None,
+    size: int = 100,
+    edgecolor: str = "#ffffff",
+    linewidth: float = config.scatter_edge_linewidth,
+    alpha: float = 1.0,
+    #----- 공통 파라미터 ------
+    title: str | None = None,
+    xlabel: str | None = None,
+    xlabel_fontsize: int = config.xlabel_fontsize,
+    xlabel_fontweight: str = config.xlabel_fontweight,
+    xlabel_pad: int = config.xlabel_pad,
+    ylabel: str | None = None,
+    ylabel_fontsize: int = config.ylabel_fontsize,
+    ylabel_fontweight: str = config.ylabel_fontweight,
+    ylabel_pad: int = config.ylabel_pad,
+    palette: str | None = None,
+    width: int | None = config.width,
+    height: int | None = config.height,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    ax: Axes | None = None,
+    **params) -> None:
+    """
+    산점도 그래프를 그린다.
+
+    Args:
+        data (DataFrame): 시각화할 데이터.
+        x (str | Index): x축 값 컬럼명.
+        y (str | Index): y축 값 컬럼명.
+        hue (str|None): 범주 구분 컬럼명.
+        marker (str): 점 모양.
+        color (str|None): 점 색상. hue가 있을 때는 무시됨.
+        size (int): 점 크기.
+        edgecolor (str): 점 외곽선 색상.
+        linewidth (float): 점 외곽선 굵기.
+        alpha (float): 점 투명도.
+
+    Common Args:
+        title (str|None): 그래프 제목.
+        xlabel (str|None): x축 레이블.
+        xlabel_fontsize (int): x축 레이블 폰트 크기.
+        xlabel_fontweight (str): x축 레이블 폰트 두께.
+        xlabel_pad (int): x축 레이블 패드.
+        ylabel (str|None): y축 레이블.
+        ylabel_fontsize (int): y축 레이블 폰트 크기.
+        ylabel_fontweight (str): y축 레이블 폰트 두께.
+        ylabel_pad (int): y축 레이블 패드.
+        palette (str|None): 팔레트 이름.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        save_path (str|None): 이미지 저장 경로. None이면 화면에 표시.
+        callback (Callable|None): Axes 후처리 콜백.
+        ax (Axes|None): 외부에서 전달한 Axes.
+        **params: seaborn violinplot 추가 인자.
+
+    Returns:
+        None
+    """
+    outparams = False
+
+    if ax is None:
+        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, xlabel_fontsize=xlabel_fontsize, xlabel_fontweight=xlabel_fontweight, xlabel_pad=xlabel_pad, ylabel=ylabel, ylabel_fontsize=ylabel_fontsize, ylabel_fontweight=ylabel_fontweight, ylabel_pad=ylabel_pad)  # type: ignore
+        outparams = True
+
+    # hue가 있을 때만 palette 사용, 없으면 color 사용
+    kwargs = {
+        "data": data,
+        "x": x,
+        "y": y,
+        "hue": hue,
+        "marker": marker,
+        "s": size,
+        "edgecolor": edgecolor,
+        "linewidth": linewidth,
+        "alpha": alpha,
+    }
+
+    # 군집을 구분할 분류값이 없다면 palette 옵션이 무의미하므로 None으로 설정
+    if hue == None:
+        if color is None and palette is not None:
+            kwargs["color"] = sb.color_palette(palette)[0]
+        else:
+            kwargs["color"] = color
+    else:
+        kwargs["palette"] = palette
+        
+
+    kwargs.update(params)
+
+    sb.scatterplot(**kwargs)
+
+    if callback is not None:
+        callback(ax)
+
+    if outparams:
+        show(save_path)  # type: ignore
+
 
 #######################################################################
 
@@ -1358,7 +1474,7 @@ def stackplot(
 # ===================================================================
 # 산점도를 그린다
 # ===================================================================
-def scatterplot(
+def xscatterplot(
     df: DataFrame | None,
     xname: str | Index,
     yname: str | Index,
