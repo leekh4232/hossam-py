@@ -1373,6 +1373,7 @@ def scatterplot(
     edgecolor: str = "#ffffff",
     linewidth: float = config.scatter_edge_linewidth,
     alpha: float = 1.0,
+    outline: bool = False,
     #----- 공통 파라미터 ------
     title: str | None = None,
     xlabel: str | None = None,
@@ -1404,6 +1405,7 @@ def scatterplot(
         edgecolor (str): 점 외곽선 색상.
         linewidth (float): 점 외곽선 굵기.
         alpha (float): 점 투명도.
+        outline (bool): 점 외곽선 표시 여부.
 
     Common Args:
         title (str|None): 그래프 제목.
@@ -1459,11 +1461,60 @@ def scatterplot(
 
     sb.scatterplot(**kwargs)
 
+    if outline:
+        plot_hull(data=data, x=x, y=y, hue=hue, palette=palette, ax=ax)
+
     if callback is not None:
         callback(ax)
 
     if outparams:
         show(save_path)  # type: ignore
+
+
+# ===================================================================
+# ConvexHull을 이용하여 각 군집의 외곽선을 그리는 함수
+# ===================================================================
+def plot_hull(data: DataFrame, 
+              x: str, 
+              y: str, 
+              hue: str, 
+              palette: str, 
+              ax: Axes) -> None:
+    """
+    ConvexHull을 이용하여 각 군집의 외곽선을 그리는 함수
+
+    Args:
+        data (DataFrame): 시각화할 데이터.
+        x (str): x축 값 컬럼명.
+        y (str): y축 값 컬럼명.
+        hue (str): 범주 구분 컬럼명.
+        palette (str): 팔레트 이름.
+        ax (Axes): 외부에서 전달한 Axes.
+    """
+
+    # 데이터의 군집 종류 얻기
+    classes = list(data[hue].unique())
+    
+    # 각 클래스에 대하여 반복 수행
+    for i, v in enumerate(classes):
+        # 현재 클래스에 해당하는 데이터 포인트 추출
+        df_c = data.loc[data[hue] == v, [x, y]]
+
+        # ConvexHull은 3개 이상의 점이 필요하므로, 데이터 포인트가 3개 미만인 경우 중단해야 함
+        if len(df_c) < 3:
+            continue
+
+        hull = ConvexHull(df_c)
+        points = np.append(hull.vertices, hull.vertices[0])
+
+        # 현재 클래스에 적용될 색상값 생성
+        color = sb.color_palette(palette)[i]
+
+        # points를 index로 하는 데이터 포인트를 선과 면으로 표시
+        ax.plot(df_c.iloc[points, 0], df_c.iloc[points, 1], linewidth=1, linestyle=":", color=color)
+        ax.fill(df_c.iloc[points, 0], df_c.iloc[points, 1], alpha=0.1, color=color)
+
+
 
 
 #######################################################################
