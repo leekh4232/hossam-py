@@ -923,7 +923,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>name, chapter, desc, url 컬럼을 갖는 테이블</p>
+                <p>name, desc, url 컬럼을 갖는 테이블</p>
               </div>
             </td>
           </tr>
@@ -934,33 +934,13 @@
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">hossam</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="n">info</span> <span class="o">=</span> <span class="n">load_info</span><span class="p">()</span>
-<span class="nb">list</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="c1">#[&#39;name&#39;, &#39;chapter&#39;, &#39;desc&#39;, &#39;url&#39;]</span>
+<span class="nb">list</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="c1">#[&#39;name&#39;, &#39;desc&#39;, &#39;url&#39;]</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_util.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">168</span>
 <span class="normal">169</span>
 <span class="normal">170</span>
 <span class="normal">171</span>
@@ -1001,7 +981,22 @@
 <span class="normal">206</span>
 <span class="normal">207</span>
 <span class="normal">208</span>
-<span class="normal">209</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_info</span><span class="p">(</span><span class="n">search</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">local</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_info</span><span class="p">(</span><span class="n">search</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">local</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;메타데이터에서 사용 가능한 데이터셋 정보를 로드한다.</span>
 
 <span class="sd">    Args:</span>
@@ -1009,13 +1004,13 @@
 <span class="sd">        local (str, optional): 로컬 메타데이터 경로. None이면 원격(BASE_URL) 사용.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        DataFrame: name, chapter, desc, url 컬럼을 갖는 테이블</span>
+<span class="sd">        DataFrame: name, desc, url 컬럼을 갖는 테이블</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        ```python</span>
 <span class="sd">        from hossam import *</span>
 <span class="sd">        info = load_info()</span>
-<span class="sd">        list(info.columns) #[&#39;name&#39;, &#39;chapter&#39;, &#39;desc&#39;, &#39;url&#39;]</span>
+<span class="sd">        list(info.columns) #[&#39;name&#39;, &#39;desc&#39;, &#39;url&#39;]</span>
 <span class="sd">        ```</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">BASE_URL</span>
@@ -1049,15 +1044,10 @@
         <span class="n">my_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">BASE_URL</span><span class="p">,</span> <span class="n">my_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">])</span>
         <span class="n">my_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
 
-        <span class="k">if</span> <span class="s1">&#39;chapter&#39;</span> <span class="ow">in</span> <span class="n">my_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
-            <span class="n">my_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;chapter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">my_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;chapter&#39;</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">my_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;chapter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;공통&#39;</span>
-
         <span class="n">my_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">my_dict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
 
     <span class="n">my_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">my_data</span><span class="p">)</span>
-    <span class="n">my_df2</span> <span class="o">=</span> <span class="n">my_df</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;chapter&#39;</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">])</span>
+    <span class="n">my_df2</span> <span class="o">=</span> <span class="n">my_df</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">])</span>
 
     <span class="k">if</span> <span class="n">search</span><span class="p">:</span>
         <span class="n">my_df2</span> <span class="o">=</span> <span class="n">my_df2</span><span class="p">[</span><span class="n">my_df2</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">search</span><span class="o">.</span><span class="n">lower</span><span class="p">())]</span>
@@ -1163,22 +1153,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_util.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">212</span>
-<span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span>
-<span class="normal">227</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">227</span>
 <span class="normal">228</span>
 <span class="normal">229</span>
 <span class="normal">230</span>
@@ -1205,7 +1180,27 @@
 <span class="normal">251</span>
 <span class="normal">252</span>
 <span class="normal">253</span>
-<span class="normal">254</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_load_data_remote</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">local</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">]:</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_load_data_remote</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">local</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DataFrame</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;키로 지정된 데이터셋을 로드한다.</span>
 
 <span class="sd">    Args:</span>
@@ -1223,7 +1218,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">index</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">url</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">__get_data_url</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="n">local</span><span class="p">)</span>
+        <span class="n">url</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">__get_data_url</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">local</span><span class="o">=</span><span class="n">local</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[91m</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="se">\033</span><span class="s2">[0m&quot;</span><span class="p">)</span>
@@ -1233,7 +1228,7 @@
 
     <span class="c1">#print(&quot;\033[94m[data]\033[0m&quot;, url.replace(&quot;\\&quot;, &quot;/&quot;))</span>
     <span class="c1">#print(&quot;\033[94m[desc]\033[0m&quot;, desc)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[94m</span><span class="si">{</span><span class="n">desc</span><span class="si">}</span><span class="se">\033</span><span class="s2">[0m&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[94m📚 </span><span class="si">{</span><span class="n">desc</span><span class="si">}</span><span class="se">\033</span><span class="s2">[0m&quot;</span><span class="p">)</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -1246,6 +1241,11 @@
             <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
         <span class="k">return</span>
 
+    <span class="k">if</span> <span class="n">metadata</span><span class="p">:</span>
+        <span class="n">meta_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;field&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">pretty_table</span><span class="p">(</span><span class="n">meta_df</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">df</span>
 </code></pre></div></td></tr></table></div>
