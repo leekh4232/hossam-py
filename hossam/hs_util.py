@@ -224,12 +224,13 @@ def load_info(search: str | None = None, local: str | None = None) -> DataFrame:
     return my_df2
 
 # -------------------------------------------------------------
-def _load_data_remote(key: str, local: str | None = None) -> Optional[DataFrame]:
+def _load_data_remote(key: str, local: str | None = None, view_url: bool = False) -> Optional[DataFrame]:
     """키로 지정된 데이터셋을 로드한다.
 
     Args:
         key (str): 메타데이터에 정의된 데이터 식별자(파일명 또는 별칭)
         local (str, optional): 로컬 메타데이터 경로. None이면 원격(BASE_URL) 사용.
+        view_url (bool, optional): URL을 출력할지 여부. Defaults to False.
 
     Returns:
         DataFrame | None: 성공 시 데이터프레임, 실패 시 None
@@ -254,6 +255,9 @@ def _load_data_remote(key: str, local: str | None = None) -> Optional[DataFrame]
     #print("\033[94m[desc]\033[0m", desc)
     print(f"\033[94m📚 {desc}\033[0m")
 
+    if view_url:
+        print(f"\033[94m🌐 URL: {url}\033[0m")
+view_url
     df = None
 
     try:
