@@ -20,6 +20,7 @@ classifiers = [
 keywords = ["data", "analysis", "helper", "hossam", "scikit-learn", "pandas", "numpy", "matplotlib", "seaborn", "plotly"]
 dependencies = [
     # Core
+    "jupyter",
     "tqdm",
     "pyarrow",
     "fastparquet",
