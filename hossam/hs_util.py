@@ -104,18 +104,30 @@ def __get_df(path: str, index_col=None) -> DataFrame:
                 #print(f"\033[91m[!] Cannot read metadata\033[0m")
                 pass
     elif exec == 'csv':
+        if path.lower().startswith(('http://', 'https://')):
+            path = path.replace("\\", "/")
+
         df = read_csv(path, index_col=index_col)
     elif exec == 'hossam' or exec == 'parquet':
+        if path.lower().startswith(('http://', 'https://')):
+            path = path.replace("\\", "/")
+
         df = read_parquet(path)
 
         if index_col is not None and index_col in df.columns:
             df.set_index(index_col, inplace=True)
     elif exec == 'json':
+        if path.lower().startswith(('http://', 'https://')):
+            path = path.replace("\\", "/")
+
         df = read_json(path)
 
         if index_col is not None and index_col in df.columns:
             df.set_index(index_col, inplace=True)
     elif exec == 'shp':
+        if path.lower().startswith(('http://', 'https://')):
+            path = path.replace("\\", "/")
+
         df = read_shapefile(path)
 
         if index_col is not None and index_col in df.columns:
