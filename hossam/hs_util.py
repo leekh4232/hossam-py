@@ -257,7 +257,7 @@ def _load_data_remote(key: str, local: str | None = None, view_url: bool = False
 
     if view_url:
         print(f"\033[94m🌐 URL: {url}\033[0m")
-view_url
+
     df = None
 
     try:
