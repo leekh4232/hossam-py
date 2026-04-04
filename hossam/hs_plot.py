@@ -360,7 +360,7 @@ def lineplot(
         markeredgecolor (str | None): 마커 테두리 색상.
         markerfacecolor (str | None): 마커 배경 색상.
 
-    Common Args:
+    CommonArgs:
         title (str | None): 그래프 제목.
         xlabel (str|None): x축 레이블.
         xlabel_fontsize (int): x축 레이블 폰트 크기.
@@ -458,7 +458,7 @@ def kdeplot(
         quartile_split (bool): True면 1D KDE를 사분위수별 서브플롯으로 분할.
         linewidth (float): 선 굵기.
 
-    Common Args:
+    CommonArgs:
         title (str|None): 그래프 제목.
         xlabel (str|None): x축 레이블.
         xlabel_fontsize (int): x축 레이블 폰트 크기.
@@ -597,7 +597,7 @@ def histplot(
         linewidth (float): 선 굵기.
         kde (bool): KDE 표시 여부.
 
-    Common Args:
+    CommonArgs:
         title (str|None): 그래프 제목.
         xlabel (str|None): x축 레이블.
         xlabel_fontsize (int): x축 레이블 폰트 크기.
@@ -693,7 +693,7 @@ def boxplot(
         stat_text_format (str): 통계 결과 표시 형식.
         stat_loc (str): 통계 결과 위치.
 
-    Common Args:
+    CommonArgs:
         title (str|None): 그래프 제목.
         xlabel (str|None): x축 레이블.
         xlabel_fontsize (int): x축 레이블 폰트 크기.
@@ -802,7 +802,7 @@ def violinplot(
         hue (str|None): 범주 구분 컬럼명.
         orient (str): 'v' 또는 'h' 방향.
 
-    Common Args:
+    CommonArgs:
         title (str|None): 그래프 제목.
         xlabel (str|None): x축 레이블.
         xlabel_fontsize (int): x축 레이블 폰트 크기.
@@ -896,7 +896,7 @@ def heatmap(
         fmt (str): 셀에 표시할 값 형식.
         linewidth (float): 셀 경계선 굵기.
 
-    Common Args:
+    CommonArgs:
         title (str|None): 그래프 제목.
         xlabel (str|None): x축 레이블.
         xlabel_fontsize (int): x축 레이블 폰트 크기.
@@ -985,7 +985,7 @@ def barplot(
         hue (str|None): 보조 범주 컬럼.
         estimator (Callable): 요약 함수.
 
-    Common Args:
+    CommonArgs:
         title (str|None): 그래프 제목.
         xlabel (str|None): x축 레이블.
         xlabel_fontsize (int): x축 레이블 폰트 크기.
@@ -1064,7 +1064,7 @@ def countplot(
     ax: Axes | None = None,
     **params) -> None:
     """
-    # 빈도그래프를 그린다.
+    빈도그래프를 그린다.
 
     Args:
         data (DataFrame): 시각화할 데이터.
@@ -1072,7 +1072,7 @@ def countplot(
         y (str | Index): 값 컬럼.
         hue (str|None): 보조 범주 컬럼.
 
-    Common Args:
+    CommonArgs:
         title (str|None): 그래프 제목.
         xlabel (str|None): x축 레이블.
         xlabel_fontsize (int): x축 레이블 폰트 크기.
@@ -1169,7 +1169,7 @@ def pieplot(
         wedge_width (float): 도넛 차트일 때 조각 너비 비율
         wedge_color (str|None): 도넛 차트일 때 조각 사이 경계선 색상.
         wedge_linewidth (float): 도넛 차트일 때 조각 사이 경계선 굵기.
-    Common Args:
+    CommonArgs:
         title (str|None): 그래프 제목.
         xlabel (str|None): x축 레이블.
         xlabel_fontsize (int): x축 레이블 폰트 크기.
@@ -1276,7 +1276,7 @@ def stackplot(
         text_fontsize (int): 텍스트 폰트 크기.
         text_format (str): 텍스트 형식.
 
-    Common Args:
+    CommonArgs:
         title (str|None): 그래프 제목.
         xlabel (str|None): x축 레이블.
         xlabel_fontsize (int): x축 레이블 폰트 크기.
@@ -1407,7 +1407,7 @@ def scatterplot(
         alpha (float): 점 투명도.
         outline (bool): 점 외곽선 표시 여부.
 
-    Common Args:
+    CommonArgs:
         title (str|None): 그래프 제목.
         xlabel (str|None): x축 레이블.
         xlabel_fontsize (int): x축 레이블 폰트 크기.
