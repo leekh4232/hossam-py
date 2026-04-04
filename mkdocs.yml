@@ -1,0 +1,88 @@
+site_name: HOSSAM API Docs
+site_description: HOSSAM 패키지의 모듈별 API 레퍼런스와 개요 문서
+site_author: HOSSAM
+repo_name: hossam-py
+site_url: https://py.hossam.kr
+theme:
+  name: material
+  language: ko
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.expand
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
+  - assets/javascripts/mermaid-init.js
+
+plugins:
+  - search
+  - autorefs
+  - redirects:
+      redirect_maps:
+        docs/index.md: api/hossam.md
+  - mkdocstrings:
+      handlers:
+        python:
+          paths:
+            - .
+          options:
+            show_root_heading: true
+            show_root_full_path: true
+            show_source: true
+            members_order: source
+            docstring_style: google
+            separate_signature: true
+            filters:
+              - "!^_"
+            show_docstring_parameters: true
+            show_docstring_returns: true
+            show_docstring_raises: true
+            show_docstring_examples: true
+
+markdown_extensions:
+  - admonition
+  - footnotes
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      base_path: .
+  - pymdownx.tabbed
+  - pymdownx.critic
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+nav:
+  - Overview: index.md
+  - API Reference:
+      - Package: api/hossam.md
+      - hs_classroom: api/hs_classroom.md
+      - hs_gis: api/hs_gis.md
+      - hs_plot: api/hs_plot.md
+      - hs_prep: api/hs_prep.md
+      - hs_stats: api/hs_stats.md
+      - hs_util: api/hs_util.md
+      - hs_timeserise: api/hs_timeserise.md
+      - hs_cluster: api/hs_cluster.md
