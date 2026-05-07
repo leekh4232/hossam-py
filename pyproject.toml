@@ -59,7 +59,8 @@ dependencies = [
     "geopandas",
     "kmodes",
     "jenkspy",
-    "kneed"
+    "kneed",
+    "fastparquet"
 ]
 
 [project.urls]
