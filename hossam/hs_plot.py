@@ -423,6 +423,7 @@ def lineplot(
 def kdeplot(
     data: DataFrame,
     x: str | None = None,
+    hue: str | None = None,
     meanline: bool = False,
     fill: bool = False,
     alpha: float = config.fill_alpha,
@@ -445,7 +446,7 @@ def kdeplot(
     callback: Callable | None = None,
     ax: Axes | None = None,
     **params) -> None:
-    """단변량 커널 밀도 추정(KDE) 그래프를 그린다. 범주에 따른 구분은 지원하지 않는다.
+    """단변량 커널 밀도 추정(KDE) 그래프를 그린다. 평균선은 hue가 설정된 경우 지원하지 않는다.
 
     quartile_split=True일 때는 사분위수 구간(Q1~Q4)으로 나누어 4개의 서브플롯에 그린다.
 
@@ -514,7 +515,7 @@ def kdeplot(
             sb.kdeplot(**kdeplot_kwargs)
             axes[idx].legend()  # type: ignore
             
-            if meanline:
+            if meanline and not hue:
                 mean_value = subset.mean()
                 axes[idx].axvline(x=mean_value, color='red', linestyle='--', linewidth=linewidth * 0.5)  # type: ignore
                 axes[idx].text(x=mean_value + 0.05, y=axes[idx].get_ylim()[1]*0.95, 
@@ -531,6 +532,7 @@ def kdeplot(
     kdeplot_kwargs = {
         "data": data,
         "x": x,
+        "hue": hue,
         "fill": fill,
         "linewidth": linewidth,
         "palette": palette,
@@ -544,7 +546,7 @@ def kdeplot(
     sb.kdeplot(**kdeplot_kwargs)
 
     # 평균선 표시
-    if meanline:
+    if meanline and not hue:
         mean_value = data[x].mean()
         ax.axvline(x=mean_value, color='red', linestyle='--', linewidth=linewidth * 0.5)  # type: ignore
         ax.text(x=mean_value + 0.05, y=ax.get_ylim()[1]*0.95, 
