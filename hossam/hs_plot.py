@@ -1336,6 +1336,9 @@ def stackplot(
 
         # 누적값 텍스트 표시
         if text:
+            if val == 0:  # 누적값이 0인 경우 텍스트 표시 안함
+                continue
+
             for j, val in enumerate(df[col]):
                 if orient == 'v':
                     ax.text(x=j, y=df.iloc[j, :i].sum() + val / 2, s=text_format.format(val), ha='center', va='center', color=text_color, fontsize=text_fontsize)
