@@ -546,11 +546,26 @@ def kdeplot(
     sb.kdeplot(**kdeplot_kwargs)
 
     # 평균선 표시
-    if meanline and not hue:
-        mean_value = data[x].mean()
-        ax.axvline(x=mean_value, color='red', linestyle='--', linewidth=linewidth * 0.5)  # type: ignore
-        ax.text(x=mean_value + 0.05, y=ax.get_ylim()[1]*0.95, 
-                s=f'Mean: {mean_value:.2f}', color='red', fontsize=config.text_font_size)
+    if meanline:
+        y_max = ax.get_ylim()[1]
+
+        if hue is None:
+            mv = data[x].mean()
+            ax.axvline(x=mv, color='red', linestyle='--',
+                       linewidth=linewidth * 0.5)
+            ax.text(x=mv + 0.05, y=y_max * 0.95, s=f'Mean: {mv:.2f}', color='red', fontsize=14)
+        else:
+            # hue 범주별 평균선 표시 (kdeplot이 그린 라인의 색상과 일치시킴)
+            categories = list(data[hue].unique())
+
+            # 팔레트에서 범주의 수에 맞는 색상값 추출
+            colors = sb.color_palette(palette, n_colors=len(categories))
+
+            # 각 범주에 대해 평균선 표시
+            for i, cat in enumerate(categories):
+                mv = data.loc[data[hue] == cat, x].mean()
+                ax.axvline(x=mv, color=colors[i], linestyle='--', linewidth=linewidth * 0.5)
+                ax.text(x=mv + 0.05, y=y_max * (0.95 - i * 0.07), s=f'{cat} Mean: {mv:.2f}', color=colors[i], fontsize=14)
 
     if callback is not None:
         callback(ax)
