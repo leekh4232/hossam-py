@@ -8775,7 +8775,10 @@
 <span class="normal">1348</span>
 <span class="normal">1349</span>
 <span class="normal">1350</span>
-<span class="normal">1351</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stackplot</span><span class="p">(</span>
+<span class="normal">1351</span>
+<span class="normal">1352</span>
+<span class="normal">1353</span>
+<span class="normal">1354</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stackplot</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">y</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -8886,6 +8889,9 @@
 
         <span class="c1"># 누적값 텍스트 표시</span>
         <span class="k">if</span> <span class="n">text</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># 누적값이 0인 경우 텍스트 표시 안함</span>
+                <span class="k">continue</span>
+
             <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]):</span>
                 <span class="k">if</span> <span class="n">orient</span> <span class="o">==</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span>
                     <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">j</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="p">:</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">+</span> <span class="n">val</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">text_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">text_color</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">text_fontsize</span><span class="p">)</span>
@@ -9420,10 +9426,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1357</span>
-<span class="normal">1358</span>
-<span class="normal">1359</span>
-<span class="normal">1360</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1360</span>
 <span class="normal">1361</span>
 <span class="normal">1362</span>
 <span class="normal">1363</span>
@@ -9524,7 +9527,10 @@
 <span class="normal">1458</span>
 <span class="normal">1459</span>
 <span class="normal">1460</span>
-<span class="normal">1461</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">scatterplot</span><span class="p">(</span>
+<span class="normal">1461</span>
+<span class="normal">1462</span>
+<span class="normal">1463</span>
+<span class="normal">1464</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">scatterplot</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Index</span><span class="p">,</span>
     <span class="n">y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Index</span><span class="p">,</span>
@@ -9764,10 +9770,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1467</span>
-<span class="normal">1468</span>
-<span class="normal">1469</span>
-<span class="normal">1470</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1470</span>
 <span class="normal">1471</span>
 <span class="normal">1472</span>
 <span class="normal">1473</span>
@@ -9802,7 +9805,10 @@
 <span class="normal">1502</span>
 <span class="normal">1503</span>
 <span class="normal">1504</span>
-<span class="normal">1505</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">plot_hull</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> 
+<span class="normal">1505</span>
+<span class="normal">1506</span>
+<span class="normal">1507</span>
+<span class="normal">1508</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">plot_hull</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> 
               <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
               <span class="n">y</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
               <span class="n">hue</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
@@ -10142,10 +10148,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1518</span>
-<span class="normal">1519</span>
-<span class="normal">1520</span>
-<span class="normal">1521</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1521</span>
 <span class="normal">1522</span>
 <span class="normal">1523</span>
 <span class="normal">1524</span>
@@ -10252,7 +10255,10 @@
 <span class="normal">1625</span>
 <span class="normal">1626</span>
 <span class="normal">1627</span>
-<span class="normal">1628</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">xscatterplot</span><span class="p">(</span>
+<span class="normal">1628</span>
+<span class="normal">1629</span>
+<span class="normal">1630</span>
+<span class="normal">1631</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">xscatterplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Index</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Index</span><span class="p">,</span>
@@ -10613,10 +10619,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1634</span>
-<span class="normal">1635</span>
-<span class="normal">1636</span>
-<span class="normal">1637</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1637</span>
 <span class="normal">1638</span>
 <span class="normal">1639</span>
 <span class="normal">1640</span>
@@ -10674,7 +10677,10 @@
 <span class="normal">1692</span>
 <span class="normal">1693</span>
 <span class="normal">1694</span>
-<span class="normal">1695</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">regplot</span><span class="p">(</span>
+<span class="normal">1695</span>
+<span class="normal">1696</span>
+<span class="normal">1697</span>
+<span class="normal">1698</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">regplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -10969,10 +10975,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1701</span>
-<span class="normal">1702</span>
-<span class="normal">1703</span>
-<span class="normal">1704</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1704</span>
 <span class="normal">1705</span>
 <span class="normal">1706</span>
 <span class="normal">1707</span>
@@ -11036,7 +11039,10 @@
 <span class="normal">1765</span>
 <span class="normal">1766</span>
 <span class="normal">1767</span>
-<span class="normal">1768</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">lmplot</span><span class="p">(</span>
+<span class="normal">1768</span>
+<span class="normal">1769</span>
+<span class="normal">1770</span>
+<span class="normal">1771</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">lmplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -11357,10 +11363,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1774</span>
-<span class="normal">1775</span>
-<span class="normal">1776</span>
-<span class="normal">1777</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1777</span>
 <span class="normal">1778</span>
 <span class="normal">1779</span>
 <span class="normal">1780</span>
@@ -11441,7 +11444,10 @@
 <span class="normal">1855</span>
 <span class="normal">1856</span>
 <span class="normal">1857</span>
-<span class="normal">1858</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">pairplot</span><span class="p">(</span>
+<span class="normal">1858</span>
+<span class="normal">1859</span>
+<span class="normal">1860</span>
+<span class="normal">1861</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">pairplot</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">xnames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -11764,10 +11770,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1864</span>
-<span class="normal">1865</span>
-<span class="normal">1866</span>
-<span class="normal">1867</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1867</span>
 <span class="normal">1868</span>
 <span class="normal">1869</span>
 <span class="normal">1870</span>
@@ -11880,7 +11883,10 @@
 <span class="normal">1977</span>
 <span class="normal">1978</span>
 <span class="normal">1979</span>
-<span class="normal">1980</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kde_confidence_interval</span><span class="p">(</span>
+<span class="normal">1980</span>
+<span class="normal">1981</span>
+<span class="normal">1982</span>
+<span class="normal">1983</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">kde_confidence_interval</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">xnames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -12256,10 +12262,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1986</span>
-<span class="normal">1987</span>
-<span class="normal">1988</span>
-<span class="normal">1989</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1989</span>
 <span class="normal">1990</span>
 <span class="normal">1991</span>
 <span class="normal">1992</span>
@@ -12362,7 +12365,10 @@
 <span class="normal">2089</span>
 <span class="normal">2090</span>
 <span class="normal">2091</span>
-<span class="normal">2092</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_residplot</span><span class="p">(</span>
+<span class="normal">2092</span>
+<span class="normal">2093</span>
+<span class="normal">2094</span>
+<span class="normal">2095</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_residplot</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">lowess</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -12720,10 +12726,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2098</span>
-<span class="normal">2099</span>
-<span class="normal">2100</span>
-<span class="normal">2101</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2101</span>
 <span class="normal">2102</span>
 <span class="normal">2103</span>
 <span class="normal">2104</span>
@@ -12799,7 +12802,10 @@
 <span class="normal">2174</span>
 <span class="normal">2175</span>
 <span class="normal">2176</span>
-<span class="normal">2177</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_qqplot</span><span class="p">(</span>
+<span class="normal">2177</span>
+<span class="normal">2178</span>
+<span class="normal">2179</span>
+<span class="normal">2180</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ols_qqplot</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">line</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;s&quot;</span><span class="p">,</span>
@@ -13103,10 +13109,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2184</span>
-<span class="normal">2185</span>
-<span class="normal">2186</span>
-<span class="normal">2187</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2187</span>
 <span class="normal">2188</span>
 <span class="normal">2189</span>
 <span class="normal">2190</span>
@@ -13167,7 +13170,10 @@
 <span class="normal">2245</span>
 <span class="normal">2246</span>
 <span class="normal">2247</span>
-<span class="normal">2248</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">roc_curve_plot</span><span class="p">(</span>
+<span class="normal">2248</span>
+<span class="normal">2249</span>
+<span class="normal">2250</span>
+<span class="normal">2251</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">roc_curve_plot</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">,</span>
     <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">Series</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">X</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -13414,10 +13420,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2254</span>
-<span class="normal">2255</span>
-<span class="normal">2256</span>
-<span class="normal">2257</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2257</span>
 <span class="normal">2258</span>
 <span class="normal">2259</span>
 <span class="normal">2260</span>
@@ -13463,7 +13466,10 @@
 <span class="normal">2300</span>
 <span class="normal">2301</span>
 <span class="normal">2302</span>
-<span class="normal">2303</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">confusion_matrix_plot</span><span class="p">(</span>
+<span class="normal">2303</span>
+<span class="normal">2304</span>
+<span class="normal">2305</span>
+<span class="normal">2306</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">confusion_matrix_plot</span><span class="p">(</span>
     <span class="n">fit</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
@@ -13738,10 +13744,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2307</span>
-<span class="normal">2308</span>
-<span class="normal">2309</span>
-<span class="normal">2310</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2310</span>
 <span class="normal">2311</span>
 <span class="normal">2312</span>
 <span class="normal">2313</span>
@@ -13819,7 +13822,10 @@
 <span class="normal">2385</span>
 <span class="normal">2386</span>
 <span class="normal">2387</span>
-<span class="normal">2388</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">silhouette_plot</span><span class="p">(</span>
+<span class="normal">2388</span>
+<span class="normal">2389</span>
+<span class="normal">2390</span>
+<span class="normal">2391</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">silhouette_plot</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span> <span class="o">|</span> <span class="n">AgglomerativeClustering</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -14216,10 +14222,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2394</span>
-<span class="normal">2395</span>
-<span class="normal">2396</span>
-<span class="normal">2397</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2397</span>
 <span class="normal">2398</span>
 <span class="normal">2399</span>
 <span class="normal">2400</span>
@@ -14321,7 +14324,10 @@
 <span class="normal">2496</span>
 <span class="normal">2497</span>
 <span class="normal">2498</span>
-<span class="normal">2499</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cluster_plot</span><span class="p">(</span>
+<span class="normal">2499</span>
+<span class="normal">2500</span>
+<span class="normal">2501</span>
+<span class="normal">2502</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cluster_plot</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span> <span class="o">|</span> <span class="n">AgglomerativeClustering</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -14686,10 +14692,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2505</span>
-<span class="normal">2506</span>
-<span class="normal">2507</span>
-<span class="normal">2508</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2508</span>
 <span class="normal">2509</span>
 <span class="normal">2510</span>
 <span class="normal">2511</span>
@@ -14747,7 +14750,10 @@
 <span class="normal">2563</span>
 <span class="normal">2564</span>
 <span class="normal">2565</span>
-<span class="normal">2566</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">visualize_silhouette</span><span class="p">(</span>
+<span class="normal">2566</span>
+<span class="normal">2567</span>
+<span class="normal">2568</span>
+<span class="normal">2569</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">visualize_silhouette</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">:</span> <span class="n">KMeans</span> <span class="o">|</span> <span class="n">AgglomerativeClustering</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">xname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -15041,10 +15047,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2573</span>
-<span class="normal">2574</span>
-<span class="normal">2575</span>
-<span class="normal">2576</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2576</span>
 <span class="normal">2577</span>
 <span class="normal">2578</span>
 <span class="normal">2579</span>
@@ -15105,7 +15108,10 @@
 <span class="normal">2634</span>
 <span class="normal">2635</span>
 <span class="normal">2636</span>
-<span class="normal">2637</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dandrogram</span><span class="p">(</span>
+<span class="normal">2637</span>
+<span class="normal">2638</span>
+<span class="normal">2639</span>
+<span class="normal">2640</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dandrogram</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">:</span> <span class="n">AgglomerativeClustering</span><span class="p">,</span>
     <span class="n">p</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
     <span class="n">count_sort</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;ascending&quot;</span><span class="p">,</span> <span class="s2">&quot;descending&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ascending&quot;</span><span class="p">,</span>
@@ -15420,10 +15426,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/hs_plot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2643</span>
-<span class="normal">2644</span>
-<span class="normal">2645</span>
-<span class="normal">2646</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2646</span>
 <span class="normal">2647</span>
 <span class="normal">2648</span>
 <span class="normal">2649</span>
@@ -15550,7 +15553,10 @@
 <span class="normal">2770</span>
 <span class="normal">2771</span>
 <span class="normal">2772</span>
-<span class="normal">2773</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">pca_plot</span><span class="p">(</span>
+<span class="normal">2773</span>
+<span class="normal">2774</span>
+<span class="normal">2775</span>
+<span class="normal">2776</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">pca_plot</span><span class="p">(</span>
     <span class="n">estimator</span><span class="p">:</span> <span class="n">PCA</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">yname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
