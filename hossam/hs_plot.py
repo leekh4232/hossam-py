@@ -621,6 +621,14 @@ def histplot(
         fig, ax = init(width=width, height=height, rows=1, cols=1, title=title, xlabel=xlabel, xlabel_fontsize=xlabel_fontsize, xlabel_fontweight=xlabel_fontweight, xlabel_pad=xlabel_pad, ylabel=ylabel, ylabel_fontsize=ylabel_fontsize, ylabel_fontweight=ylabel_fontweight, ylabel_pad=ylabel_pad)  # type: ignore
         outparams = True
 
+    # 구간 산정
+    if isinstance(bins, int):
+        hist, bins = np.histogram(data[x], bins=bins)
+        bins = np.round(bins, 1)
+        ax.set_xticks(bins, bins)
+    elif isinstance(bins, (list, np.ndarray)):
+        ax.set_xticks(bins, bins)
+
     histplot_kwargs = {
         "data": data,
         "x": x,
