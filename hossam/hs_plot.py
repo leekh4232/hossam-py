@@ -1383,7 +1383,7 @@ def scatterplot(
     edgecolor: str = "#ffffff",
     linewidth: float = config.scatter_edge_linewidth,
     alpha: float = 1.0,
-    outline: bool = False,
+    outline: bool = True,
     #----- 공통 파라미터 ------
     title: str | None = None,
     xlabel: str | None = None,
