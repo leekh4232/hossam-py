@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import annotations
+
 from typing import overload, Tuple, Literal, LiteralString, Union, Any
 
 # -------------------------------------------------------------
@@ -45,9 +46,9 @@ from statsmodels.discrete.discrete_model import BinaryResults
 
 from pingouin import anova, pairwise_tukey, welch_anova, pairwise_gameshowell
 
-from .my_plot import ols_residplot, ols_qqplot, init, show
-from .my_prep import unmelt
-from .my_util import pretty_table
+from ..my_plot import ols_residplot, ols_qqplot, init, show
+#from .my_prep import unmelt
+from ..my_util import pretty_table
 
 # ===================================================================
 # 결측치 분석 (Missing Values Analysis)
@@ -895,10 +896,10 @@ def ttest_ind(
         ```
     """
     # data가 주어지고 x, y가 컬럼명인 경우 데이터 추출
-    if data is not None and isinstance(x, str) and isinstance(y, str):
-        df = unmelt(data=data, value_vars=x, id_vars=y)
-        x = df[df.columns[0]]
-        y = df[df.columns[1]]
+    # if data is not None and isinstance(x, str) and isinstance(y, str):
+    #     df = unmelt(data=data, value_vars=x, id_vars=y)
+    #     x = df[df.columns[0]]
+    #     y = df[df.columns[1]]
 
     # 데이터를 Series로 변환
     if isinstance(x, Series):

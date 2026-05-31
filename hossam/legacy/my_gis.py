@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # ===================================================================
 # 패키지 참조
 # ===================================================================
@@ -13,7 +14,7 @@ from tqdm.auto import tqdm
 from geopandas import GeoDataFrame, read_file, points_from_xy
 from pyproj import CRS
 
-from .my_util import pretty_table
+from ..my_util import pretty_table
 
 # ===================================================================
 # 단일 주소를 VWorld API로 지오코딩

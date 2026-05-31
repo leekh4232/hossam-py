@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # -------------------------------------------------------------
 from typing import Callable
 import numpy as np
@@ -30,8 +31,8 @@ from sklearn.model_selection import ParameterGrid
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 # -------------------------------------------------------------
-from .my_util import pretty_table
-from .my_plot import lineplot, config
+from ..my_util import pretty_table
+from ..my_plot import lineplot, config
 
 
 # ===================================================================

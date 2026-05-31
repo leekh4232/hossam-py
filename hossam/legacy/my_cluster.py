@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # ===================================================================
 # 파이썬 기본 패키지 참조
 # ===================================================================
@@ -22,8 +23,8 @@ from sklearn.metrics import silhouette_score, adjusted_rand_score
 # ===================================================================
 # hossam 패키지 참조
 # ===================================================================
-from . import my_plot
-from .my_util import is_2d
+from .. import my_plot
+from ..my_util import is_2d
 
 RANDOM_STATE = 52
 

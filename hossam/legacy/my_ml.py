@@ -42,7 +42,7 @@ from sklearn.metrics import (
     roc_curve,
 )
 
-from .my_plot import init, show, barplot, lineplot, config
+from ..my_plot import init, show, barplot, lineplot, config
 
 
 # --------------------------------------------------------
