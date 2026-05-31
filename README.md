@@ -2,7 +2,7 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-0.5.13-green.svg)](https://pypi.org/project/hossam/)
+[![Version](https://img.shields.io/badge/version-0.5.15-green.svg)](https://pypi.org/project/hossam/)
 [![Documentation](https://img.shields.io/badge/docs-py.hossam.kr-blue.svg)](https://py.hossam.kr)
 
 **Hossam**은 데이터 분석, 시각화, 통계 처리를 위한 종합 헬퍼 라이브러리입니다.
@@ -17,7 +17,6 @@
 - 📦 **샘플 데이터**: 학습용 데이터셋 즉시 로드
 - 🔧 **데이터 전처리**: 결측치 처리, 이상치 탐지, 스케일링
 - 📈 **교육용 최적화**: 데이터 분석 교육에 특화된 설계
-
 
 ## 📦 설치
 
@@ -44,7 +43,6 @@ pip install hossam --upgrade-strategy eager
 - **hs_cls**: 머신러닝 분류 분석 유틸리티 (예정)
 
 자세한 사용법은 [API 문서](https://py.hossam.kr/api/hossam/)를 참고하세요.
-
 
 ## 📄 라이선스
 
