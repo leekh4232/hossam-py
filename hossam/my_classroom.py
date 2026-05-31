@@ -8,9 +8,9 @@ from kmodes.kmodes import KModes
 from matplotlib import pyplot as plt
 from prompt_toolkit.formatted_text.ansi import i
 import seaborn as sns
-from .hs_util import load_data, pretty_table
-from .hs_plot import config
-from . import hs_plot
+from .my_util import load_data, pretty_table
+from .my_plot import config
+from . import my_plot
 
 # ===================================================================
 # 학생들을 관심사와 성적으로 균형잡힌 조로 편성한다
@@ -32,7 +32,7 @@ def cluster_students(
     Args:
         df: 학생 정보를 담은 데이터프레임 또는 엑셀/CSV 파일 경로.
             데이터프레임의 경우: 반드시 '학생번호' 컬럼 포함.
-            파일 경로의 경우: 자동으로 hs_load_data 함수를 사용하여 로드.
+            파일 경로의 경우: 자동으로 my_load_data 함수를 사용하여 로드.
             interest_col이 지정된 경우 해당 컬럼 필수.
             score_cols이 지정된 경우 해당 컬럼들 필수.
         n_groups: 목표 조의 개수.
@@ -58,7 +58,7 @@ def cluster_students(
         df = read_csv('students.csv')
 
         from hossam import *
-        result = hs_classroom.cluster_students(
+        result = my_classroom.cluster_students(
                     df=df,
                     n_groups=5,
                     score_cols=['국어', '영어', '수학'],
@@ -426,8 +426,8 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
     Examples:
         ```python
         from hossam import *
-        df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
-        hs_classroom.report_summary(df_result)
+        df_result = my_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
+        my_classroom.report_summary(df_result)
         ```
     """
 
@@ -463,8 +463,8 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
     if has_score and has_avg:
         n_plots += 1
 
-    # hs_plot.init를 사용하여 Figure와 Axes 생성
-    fig, axes = hs_plot.init(
+    # my_plot.init를 사용하여 Figure와 Axes 생성
+    fig, axes = my_plot.init(
         width=width,
         height=height,
         rows=n_plots,
@@ -479,8 +479,8 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
     group_sizes = group_sizes.reindex(ordered_labels, fill_value=0)
     plot_df = DataFrame({'조': group_sizes.index, '인원': group_sizes.values})
 
-    # hs_plot.barplot 사용
-    hs_plot.barplot(
+    # my_plot.barplot 사용
+    my_plot.barplot(
         df=plot_df,
         xname='조',
         yname='인원',
@@ -497,7 +497,7 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
 
     # ===== 2. 조별 관심사 분포 =====
     if has_interest:
-        # hs_plot.stackplot 사용을 위한 데이터 준비
+        # my_plot.stackplot 사용을 위한 데이터 준비
         interest_df = df[['조', '관심사']].copy()
         interest_df['조'] = interest_df['조'].astype(str)
 
@@ -521,7 +521,7 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
             if handles and any(l for l in labels if l):
                 ax.legend(title='관심사', bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=9)
 
-        hs_plot.stackplot(
+        my_plot.stackplot(
             df=interest_df,
             xname='조',
             hue='관심사',
@@ -537,8 +537,8 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
         avg_by_group = df.groupby('조')['평균점수'].agg(['mean', 'std']).reset_index()
         avg_by_group['조_str'] = avg_by_group['조'].astype(str)
 
-        # hs_plot.barplot 사용 (errorbar 지원)
-        hs_plot.barplot(
+        # my_plot.barplot 사용 (errorbar 지원)
+        my_plot.barplot(
             df=avg_by_group,
             xname='조_str',
             yname='mean',
@@ -557,8 +557,8 @@ def report_summary(df: DataFrame, interest_col: str | None = None, width: int = 
             axes[plot_idx].text(i, row['mean'] + 2, f"{row['mean']:.1f}", ha='center', fontsize=config.font_size)  # type: ignore
         plot_idx += 1
 
-    # hs_plot.show을 사용하여 마무리
-    hs_plot.show(axes, outparams=True, grid=False) # type: ignore
+    # my_plot.show을 사용하여 마무리
+    my_plot.show(axes, outparams=True, grid=False) # type: ignore
 
 
 # ===================================================================
@@ -579,8 +579,8 @@ def report_kde(df: DataFrame | str, metric: str = 'average', width: int = config
     Examples:
         ```python
         from hossam import *
-        df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
-        hs_classroom.report_kde(df_result, metric='average')
+        df_result = my_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
+        my_classroom.report_kde(df_result, metric='average')
         ```
     """
     if df is None or len(df) == 0:
@@ -609,7 +609,7 @@ def report_kde(df: DataFrame | str, metric: str = 'average', width: int = config
     # 레이아웃 결정 (2열 기준)
     cols = 2
     rows = (n_groups + cols - 1) // cols
-    fig, axes = hs_plot.init(width=width, height=height, rows=rows, cols=cols, flatten=True)
+    fig, axes = my_plot.init(width=width, height=height, rows=rows, cols=cols, flatten=True)
 
     plot_idx = 0
     metric_col = '평균점수' if (metric or '').lower() == 'average' else '총점'
@@ -624,7 +624,7 @@ def report_kde(df: DataFrame | str, metric: str = 'average', width: int = config
         if n == 0:
             continue
 
-        hs_plot.kde_confidence_interval(data=group_df, xnames=metric_col, ax=axes[plot_idx], callback=lambda ax: ax.set_title(f"{group}조", fontsize=config.title_font_size, pad=config.title_pad))    # type: ignore
+        my_plot.kde_confidence_interval(data=group_df, xnames=metric_col, ax=axes[plot_idx], callback=lambda ax: ax.set_title(f"{group}조", fontsize=config.title_font_size, pad=config.title_pad))    # type: ignore
 
         plot_idx += 1
 
@@ -632,7 +632,7 @@ def report_kde(df: DataFrame | str, metric: str = 'average', width: int = config
     for idx in range(plot_idx, len(axes)):
         fig.delaxes(axes[idx])  # type: ignore
 
-    hs_plot.show(axes) # type: ignore
+    my_plot.show(axes) # type: ignore
 
 
 # ===================================================================
@@ -653,8 +653,8 @@ def group_summary(df: DataFrame, name_col: str = '학생이름') -> DataFrame:
     Examples:
         ```python
         from hossam import *
-        df_result = hs_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
-        summary = hs_classroom.group_summary(df_result, name_col='이름')
+        df_result = my_classroom.cluster_students(df, n_groups=5, score_cols=['국어', '영어', '수학'])
+        summary = my_classroom.group_summary(df_result, name_col='이름')
         print(summary)
         ```
     """
@@ -744,7 +744,7 @@ def analyze_classroom(
     Examples:
         ```python
         from hossam import *
-        summary = hs_classroom.analyze_classroom(df='students.csv',
+        summary = my_classroom.analyze_classroom(df='students.csv',
                                                  n_groups=5,
                                                  score_cols=['국어', '영어', '수학'],
                                                  interest_col='관심사',

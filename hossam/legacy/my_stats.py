@@ -45,9 +45,9 @@ from statsmodels.discrete.discrete_model import BinaryResults
 
 from pingouin import anova, pairwise_tukey, welch_anova, pairwise_gameshowell
 
-from .hs_plot import ols_residplot, ols_qqplot, init, show
-from .hs_prep import unmelt
-from .hs_util import pretty_table
+from .my_plot import ols_residplot, ols_qqplot, init, show
+from .my_prep import unmelt
+from .my_util import pretty_table
 
 # ===================================================================
 # 결측치 분석 (Missing Values Analysis)
@@ -75,11 +75,11 @@ def missing_values(data: DataFrame, *fields: str, columns: list | None = None) -
 
         # 전체 컬럼에 대한 결측치 확인:
         df = DataFrame({'x': [1, 2, None, 4], 'y': [10, None, None, 40]})
-        result = hs_stats.missing_values(df)
+        result = my_stats.missing_values(df)
         print(result)
 
         # 특정 컬럼만 분석:
-        result = hs_stats.missing_values(df, 'x', 'y')
+        result = my_stats.missing_values(df, 'x', 'y')
         print(result)
         ```
     """
@@ -112,7 +112,7 @@ def missing_values(data: DataFrame, *fields: str, columns: list | None = None) -
 def outlier_table(data: DataFrame, *fields: str, columns: list | None = None):
     """데이터프레임의 사분위수와 이상치 경계값, 왜도를 구한다.
 
-    수업에서 사용된 hs_outlier_table() 함수를 개선한 버전    
+    수업에서 사용된 my_outlier_table() 함수를 개선한 버전    
 
     Tukey의 방법을 사용하여 각 숫자형 컬럼에 대한 사분위수(Q1, Q2, Q3)와
     이상치 판단을 위한 하한(DOWN)과 상한(UP) 경계값을 계산한다.
@@ -147,11 +147,11 @@ def outlier_table(data: DataFrame, *fields: str, columns: list | None = None):
         df = DataFrame({'x': [1, 2, 3, 100], 'y': [10, 20, 30, 40]})
 
         # 전체 숫자형 컬럼에 대한 이상치 경계 확인:
-        result = hs_stats.outlier_table(df)
+        result = my_stats.outlier_table(df)
         print(result)
 
         # 특정 컬럼만 분석:
-        result = hs_stats.outlier_table(df, 'x', 'y')
+        result = my_stats.outlier_table(df, 'x', 'y')
         print(result[['q1', 'q3', 'up', 'down']])
         ```
 
@@ -301,11 +301,11 @@ def describe(data: DataFrame, *fields: str, columns: list | None = None):
         })
 
         # 전체 숫자형 컬럼에 대한 확장된 기술통계:
-        result = hs_stats.describe(df)
+        result = my_stats.describe(df)
         print(result)
 
         # 특정 컬럼만 분석:
-        result = hs_stats.describe(df, 'x', 'y')
+        result = my_stats.describe(df, 'x', 'y')
         print(result)
         ```
 
@@ -442,10 +442,10 @@ def category_describe(data: DataFrame, *fields: str, columns: list | None = None
         })
 
         # 전체 명목형 컬럼에 대한 요약:
-        result, summary = hs_stats.category_describe(df)
+        result, summary = my_stats.category_describe(df)
 
         # 특정 컬럼만 분석:
-        result, summary = hs_stats.category_describe(df, 'cut', 'color')
+        result, summary = my_stats.category_describe(df, 'cut', 'color')
         ```
 
     Notes:
@@ -550,13 +550,13 @@ def normal_test(data: DataFrame, columns: list | str | None = None, method: str 
         })
 
         # 모든 수치형 컬럼 검정
-        result = hs_stats.normal_test(df, method='n')
+        result = my_stats.normal_test(df, method='n')
 
         # 특정 컬럼만 검정 (리스트)
-        result = hs_stats.normal_test(df, columns=['x'], method='n')
+        result = my_stats.normal_test(df, columns=['x'], method='n')
 
         # 특정 컬럼만 검정 (문자열)
-        result = hs_stats.normal_test(df, columns='x, y', method='n')
+        result = my_stats.normal_test(df, columns='x, y', method='n')
         ```
     """
     if method not in ["n", "s"]:
@@ -669,16 +669,16 @@ def equal_var_test(data: DataFrame, columns: list | str | None = None, normal_di
         })
 
         # 모든 수치형 컬럼 자동 판별
-        result = hs_stats.equal_var_test(df)
+        result = my_stats.equal_var_test(df)
 
         # 특정 컬럼만 검정 (리스트)
-        result = hs_stats.equal_var_test(df, columns=['x', 'y'])
+        result = my_stats.equal_var_test(df, columns=['x', 'y'])
 
         # 특정 컬럼만 검정 (문자열)
-        result = hs_stats.equal_var_test(df, columns='x, y')
+        result = my_stats.equal_var_test(df, columns='x, y')
 
         # 명시적 지정
-        result = hs_stats.equal_var_test(df, normal_dist=True)
+        result = my_stats.equal_var_test(df, normal_dist=True)
         ```
     """
     # columns가 문자열인 경우 리스트로 변환
@@ -785,11 +785,11 @@ def ttest_1samp(data, mean_value: float = 0.0) -> DataFrame:
 
         # 리스트 데이터로 검정
         data = [5.1, 4.9, 5.3, 5.0, 4.8]
-        result = hs_stats.ttest_1samp(data, mean_value=5.0)
+        result = my_stats.ttest_1samp(data, mean_value=5.0)
 
         # Series 데이터로 검정
         s = Series(np.random.normal(5, 1, 100))
-        result = hs_stats.ttest_1samp(s, mean_value=5)
+        result = my_stats.ttest_1samp(s, mean_value=5)
         ```
     """
     # 데이터를 Series로 변환하고 이름 감지
@@ -849,7 +849,7 @@ def ttest_ind(
 ) -> DataFrame:
     """두 독립 집단의 평균 차이를 검정한다 (독립표본 t-검정 또는 Welch's t-test).
 
-    수업에서 사용한 hs_ttest_ind() 함수를 확장한 버전이다.
+    수업에서 사용한 my_ttest_ind() 함수를 확장한 버전이다.
 
     독립표본 t-검정은 두 독립된 집단의 평균이 같은지를 검정한다.
     귀무가설(H0): μ1 = μ2 (두 집단의 평균이 같다)
@@ -886,12 +886,12 @@ def ttest_ind(
         # 리스트로 검정
         group1 = [5.1, 4.9, 5.3, 5.0, 4.8]
         group2 = [5.5, 5.7, 5.4, 5.6, 5.8]
-        result = hs_stats.ttest_ind(group1, group2)
+        result = my_stats.ttest_ind(group1, group2)
 
         # Series로 검정
         s1 = Series(np.random.normal(5, 1, 100))
         s2 = Series(np.random.normal(5.5, 1, 100))
-        result = hs_stats.ttest_ind(s1, s2, equal_var=False)
+        result = my_stats.ttest_ind(s1, s2, equal_var=False)
         ```
     """
     # data가 주어지고 x, y가 컬럼명인 경우 데이터 추출
@@ -1012,12 +1012,12 @@ def ttest_rel(x, y, normality: bool | None = None) -> DataFrame:
         # 리스트로 검정
         before = [5.1, 4.9, 5.3, 5.0, 4.8]
         after = [5.5, 5.2, 5.7, 5.3, 5.1]
-        result = hs_stats.ttest_rel(before, after)
+        result = my_stats.ttest_rel(before, after)
 
         # Series로 검정
         s1 = Series(np.random.normal(5, 1, 100))
         s2 = Series(np.random.normal(5.3, 1, 100))
-        result = hs_stats.ttest_rel(s1, s2, parametric=False)
+        result = my_stats.ttest_rel(s1, s2, parametric=False)
         ```
     """
     # 데이터를 Series로 변환
@@ -1111,7 +1111,7 @@ def ttest_rel(x, y, normality: bool | None = None) -> DataFrame:
 def oneway_anova(data: DataFrame, dv: str, between: str, alpha: float = 0.05, posthoc: bool = False) -> DataFrame | tuple[DataFrame, DataFrame] :
     """일원분산분석(One-way ANOVA)을 일괄 처리한다.
 
-    수업에서 사용된 hs_oneway_anova() 함수를 개선한 버전    
+    수업에서 사용된 my_oneway_anova() 함수를 개선한 버전    
 
     정규성 및 등분산성 검정을 자동으로 수행한 후,
     그 결과에 따라 적절한 ANOVA 방식을 선택하여 분산분석을 수행한다.
@@ -1145,7 +1145,7 @@ def oneway_anova(data: DataFrame, dv: str, between: str, alpha: float = 0.05, po
             'group': ['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B']
         })
 
-        anova_df, posthoc_df = hs_stats.oneway_anova(df, dv='score', between='group')
+        anova_df, posthoc_df = my_stats.oneway_anova(df, dv='score', between='group')
 
         # 사후검정결과는 ANOVA가 유의할 때만 생성됨
         if posthoc_df is not None:
@@ -1491,7 +1491,7 @@ def corr_effect_size(data: DataFrame, dv: str, *fields: str, alpha: float = 0.05
                    'bmi': [22, 25, 28, 30],
                    'charges': [1000, 2000, 3000, 4000]})
 
-        result = hs_stats.corr_effect_size(df, 'charges', 'age', 'bmi')
+        result = my_stats.corr_effect_size(df, 'charges', 'age', 'bmi')
         ```
     """
 
@@ -1616,9 +1616,9 @@ def corr_pairwise(
 
         df = DataFrame({'x1': [1,2,3,4,5], 'x2': [2,4,5,4,6], 'x3': [10,20,25,24,30]})
         # 전체 숫자형 컬럼에 대해 상관분석
-        result_df, corr_matrix = hs_stats.corr_pairwise(df)
+        result_df, corr_matrix = my_stats.corr_pairwise(df)
         # 특정 컬럼만 분석
-        result_df, corr_matrix = hs_stats.corr_pairwise(df, fields=['x1', 'x2'])
+        result_df, corr_matrix = my_stats.corr_pairwise(df, fields=['x1', 'x2'])
         ```
     """
 
@@ -1795,7 +1795,7 @@ def vif_filter(
         ```python
         # 기본 사용 예
         from hossam import *
-        filtered = hs_stats.vif_filter(df, yname="target", ignore=["id"], threshold=10.0)
+        filtered = my_stats.vif_filter(df, yname="target", ignore=["id"], threshold=10.0)
         ```
     """
 
@@ -1910,7 +1910,7 @@ def trend(x: Any, y: Any, degree: int = 1, value_count: int = 100) -> Tuple[np.n
         ```python
         # 2차 다항 회귀 추세선
         from hossam import *
-        vx, vy = hs_stats.trend(x, y, degree=2, value_count=200)
+        vx, vy = my_stats.trend(x, y, degree=2, value_count=200)
         print(len(vx), len(vy)) # 200, 200
         ```
     """
@@ -1992,14 +1992,14 @@ def ols_report(
         ```python
         from hossam import *
 
-        df = hs_util.load_data("some_data.csv")
-        fit = hs_stats.ols(df, yname="target")
+        df = my_util.load_data("some_data.csv")
+        fit = my_stats.ols(df, yname="target")
 
         # 전체 리포트
-        pdf, rdf, result_report, model_report, variable_reports, eq = hs_stats.ols_report(fit, data, full=True)
+        pdf, rdf, result_report, model_report, variable_reports, eq = my_stats.ols_report(fit, data, full=True)
 
         # 간단한 버전 (성능지표, 회귀계수 테이블만)
-        pdf, rdf = hs_stats.ols_report(fit, data)
+        pdf, rdf = my_stats.ols_report(fit, data)
         ```
     """
 
@@ -2263,13 +2263,13 @@ def ols(df: DataFrame, yname: str, report: Literal[False, "summary", "full"] = "
         })
 
         # 적합 결과만 반환
-        fit = hs_stats.ols(df, 'target')
+        fit = my_stats.ols(df, 'target')
 
         # 요약 리포트 반환
-        fit, pdf, rdf = hs_stats.ols(df, 'target', report='summary')
+        fit, pdf, rdf = my_stats.ols(df, 'target', report='summary')
 
         # 풀 리포트 반환
-        fit, pdf, rdf, result_report, model_report, var_reports, eq = hs_stats.ols(df, 'target', report='full')
+        fit, pdf, rdf, result_report, model_report, var_reports, eq = my_stats.ols(df, 'target', report='full')
         ```
     """
     x = df.drop(yname, axis=1)
@@ -2320,8 +2320,8 @@ def ols_linearity_test(fit: RegressionResultsWrapper, power: int = 2, alpha: flo
     Examples:
         ```python
         from hossam import *
-        fit = hs_stats.logit(df, 'target')
-        result = hs_stats.ols_linearity_test(fit)
+        fit = my_stats.logit(df, 'target')
+        result = my_stats.ols_linearity_test(fit)
         ```
 
     Notes:
@@ -2425,8 +2425,8 @@ def ols_normality_test(fit: RegressionResultsWrapper, alpha: float = 0.05, plot:
     Examples:
         ```python
         from hossam import *
-        fit = hs_stats.logit(df, 'target')
-        result = hs_stats.ols_normality_test(fit)
+        fit = my_stats.logit(df, 'target')
+        result = my_stats.ols_normality_test(fit)
         ```
 
     Notes:
@@ -2524,8 +2524,8 @@ def ols_variance_test(fit: RegressionResultsWrapper, alpha: float = 0.05, plot: 
     Examples:
         ```python
         from hossam import *
-        fit = hs_stats.logit(df, 'target')
-        result = hs_stats.ols_variance_test(fit)
+        fit = my_stats.logit(df, 'target')
+        result = my_stats.ols_variance_test(fit)
         ```
 
     Notes:
@@ -2617,8 +2617,8 @@ def ols_independence_test(fit: RegressionResultsWrapper, alpha: float = 0.05) ->
     Examples:
         ```python
         from hossam import *
-        fit = hs_stats.logit(df, 'target')
-        result = hs_stats.ols_independence_test(fit)
+        fit = my_stats.logit(df, 'target')
+        result = my_stats.ols_independence_test(fit)
         ```
 
     Notes:
@@ -2675,8 +2675,8 @@ def ols_tests(fit: RegressionResultsWrapper, alpha: float = 0.05, plot: bool = F
     Examples:
         ```python
         from hossam import *
-        fit = hs_stats.ols(df, 'target')
-        hs_stats.ols_tests(fit)
+        fit = my_stats.ols(df, 'target')
+        my_stats.ols_tests(fit)
         ```
     """
     # 각 검정 함수 호출
@@ -2753,13 +2753,13 @@ def logit_report(
         })
 
         # 로지스틱 회귀 적합
-        fit = hs_stats.logit(df, yname="target")
+        fit = my_stats.logit(df, yname="target")
 
         # 전체 리포트
-        cdf, rdf, result_report, model_report, variable_reports, cm = hs_stats.logit_report(fit, df, full=True)
+        cdf, rdf, result_report, model_report, variable_reports, cm = my_stats.logit_report(fit, df, full=True)
 
         # 간단한 버전 (주요 테이블만)
-        cdf, rdf = hs_stats.logit_report(fit, df)
+        cdf, rdf = my_stats.logit_report(fit, df)
         ```
     """
 
@@ -2973,13 +2973,13 @@ def logit(
         })
 
         # 적합 결과만 반환
-        fit = hs_stats.logit(df, 'target')
+        fit = my_stats.logit(df, 'target')
 
         # 요약 리포트 반환
-        fit, rdf, result_report, var_reports = hs_stats.logit(df, 'target', report='summary')
+        fit, rdf, result_report, var_reports = my_stats.logit(df, 'target', report='summary')
 
         # 풀 리포트 반환
-        fit, cdf, rdf, result_report, model_report, var_reports = hs_stats.logit(df, 'target', report='full')
+        fit, cdf, rdf, result_report, model_report, var_reports = my_stats.logit(df, 'target', report='full')
         ```
     """
     x = df.drop(yname, axis=1)
@@ -3045,14 +3045,14 @@ def predict(fit, data: DataFrame | Series) -> DataFrame | Series | float:
         ```python
         from hossam import *
 
-        df = hs_util.load_data("some_data.csv")
-        fit1 = hs_stats.ols(df, yname="target")
+        df = my_util.load_data("some_data.csv")
+        fit1 = my_stats.ols(df, yname="target")
 
-        pred = hs_stats.predict(fit1, df_new[['x1', 'x2']])  # DataFrame 반환
+        pred = my_stats.predict(fit1, df_new[['x1', 'x2']])  # DataFrame 반환
 
         # 로지스틱 회귀 (상수항 자동 추가)
-        fit2 = hs_stats.logit(df, yname="target")
-        pred_prob = hs_stats.predict(fit2, df_new[['x1', 'x2']])  # DataFrame 반환 (해석 포함)
+        fit2 = my_stats.logit(df, yname="target")
+        pred_prob = my_stats.predict(fit2, df_new[['x1', 'x2']])  # DataFrame 반환 (해석 포함)
         ```
     """
     # fit 객체의 타입 확인

@@ -42,7 +42,7 @@ from sklearn.metrics import (
     roc_curve,
 )
 
-from .hs_plot import init, show, barplot, lineplot, config
+from .my_plot import init, show, barplot, lineplot, config
 
 
 # --------------------------------------------------------
@@ -53,7 +53,7 @@ def reg_scores(
 ) -> DataFrame:
     """
     회귀 성능 평가 지표 함수
-    수업에서 사용된 hs_get_scores 함수와 동일.
+    수업에서 사용된 my_get_scores 함수와 동일.
 
     Args:
         estimator: 학습된 사이킷런 회귀 모델
@@ -236,7 +236,7 @@ def learning_cv(
     n_jobs=-1,
 ) -> DataFrame:
     """학습곡선 기반 과적합 판별 함수.
-    수업에서 사용된 hs_learning_cv 함수와 동일.
+    수업에서 사용된 my_learning_cv 함수와 동일.
 
     Args:
         estimator: 사이킷런 Estimator (파이프라인 권장)
@@ -610,7 +610,7 @@ def score_cv(
 ) -> DataFrame:
     """
     회귀 성능 평가 지표 함수.
-    수업에서 사용된 hs_get_score_cv 함수와 동일.
+    수업에서 사용된 my_get_score_cv 함수와 동일.
 
     Args:
         estimator: 학습된 사이킷런 회귀 모델
@@ -664,7 +664,7 @@ def feature_importance(
 ) -> DataFrame:
     """
     특징 중요도 분석 함수.
-    수업에서 사용된 hs_feature_importance 함수와 동일.
+    수업에서 사용된 my_feature_importance 함수와 동일.
 
     Args:
         model: 학습된 사이킷런 회귀 모델
@@ -765,7 +765,7 @@ def shap_analysis(
 ) -> tuple[DataFrame, np.ndarray]:
     """
     SHAP 값 기반 특징 중요도 분석 함수.
-    수업에서 사용된 hs_shap_analysis 함수와 동일.
+    수업에서 사용된 my_shap_analysis 함수와 동일.
 
     Args:
         model: 학습된 사이킷런 회귀 모델
@@ -906,7 +906,7 @@ def shap_dependence_analysis(
 ):
     """
     SHAP 값 기반 특징 의존성 분석 함수
-    수업에서 사용된 hs_shap_dependence_analysis 함수와 동일.
+    수업에서 사용된 my_shap_dependence_analysis 함수와 동일.
 
     Args:
         summary_df: shap_analysis 함수의 요약 DataFrame

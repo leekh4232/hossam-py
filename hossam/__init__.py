@@ -7,17 +7,16 @@ import requests
 from pathlib import Path
 
 # submodules
-from . import hs_classroom
-from . import hs_util
-from . import hs_prep
-from . import hs_plot
-from . import hs_stats
-from . import hs_timeserise
-from . import hs_cluster
-from . import hs_ml
-from . import hs_gis
-from .hs_util import load_info
-from .hs_util import _load_data_remote as load_data
+from . import my_classroom
+from . import my_util
+from . import my_plot
+from .legacy import my_stats
+from .legacy import my_timeserise
+from .legacy import my_cluster
+from .legacy import my_ml
+from .legacy import my_gis
+from .my_util import load_info
+from .my_util import _load_data_remote as load_data
 
 # py-modules
 import pandas as pd
@@ -32,20 +31,19 @@ try:
 except Exception:
     __version__ = "develop"
 
-my_dpi = hs_plot.config.dpi # type: ignore
+my_dpi = my_plot.config.dpi # type: ignore
 
 __all__ = [
     "load_data",
     "load_info",
-    "hs_classroom",
-    "hs_util",
-    "hs_prep",
-    "hs_plot",
-    "hs_stats",
-    "hs_timeserise",
-    "hs_cluster",
-    "hs_ml",
-    "hs_gis"
+    "my_classroom",
+    "my_util",
+    "my_plot",
+    "my_stats",
+    "my_timeserise",
+    "my_cluster",
+    "my_ml",
+    "my_gis"
 ]
 
 
@@ -129,22 +127,22 @@ def _init():
         plt.rcParams.update(
             {
                 "font.family": fname,
-                "font.size": hs_plot.config.font_size,
-                "font.weight": hs_plot.config.font_weight,
-                "xtick.labelsize": hs_plot.config.font_size,
-                "ytick.labelsize": hs_plot.config.font_size,
-                "legend.fontsize": hs_plot.config.font_size,
-                "legend.title_fontsize": hs_plot.config.font_size,
-                "axes.titlesize": hs_plot.config.title_font_size,
-                "axes.titlepad": hs_plot.config.title_pad,
-                "figure.titlesize": hs_plot.config.title_font_size,
-                "axes.labelsize": hs_plot.config.label_font_size,
+                "font.size": my_plot.config.font_size,
+                "font.weight": my_plot.config.font_weight,
+                "xtick.labelsize": my_plot.config.font_size,
+                "ytick.labelsize": my_plot.config.font_size,
+                "legend.fontsize": my_plot.config.font_size,
+                "legend.title_fontsize": my_plot.config.font_size,
+                "axes.titlesize": my_plot.config.title_font_size,
+                "axes.titlepad": my_plot.config.title_pad,
+                "figure.titlesize": my_plot.config.title_font_size,
+                "axes.labelsize": my_plot.config.label_font_size,
                 "axes.unicode_minus": False,
                 "text.antialiased": True,
                 "lines.antialiased": True,
                 "patch.antialiased": True,
-                "figure.dpi": hs_plot.config.dpi,
-                "savefig.dpi": hs_plot.config.dpi,
+                "figure.dpi": my_plot.config.dpi,
+                "savefig.dpi": my_plot.config.dpi,
                 "text.hinting": "auto",
                 "text.hinting_factor": 8,
                 "axes.axisbelow": True

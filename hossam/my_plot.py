@@ -39,7 +39,7 @@ from sklearn.metrics import (
     silhouette_samples,
 )
 
-from .hs_util import is_2d
+from .my_util import is_2d
 
 # ===================================================================
 DEFAULT_DPI = 200
@@ -208,8 +208,7 @@ def init(
 # ===================================================================
 # 그래프의 그리드, 레이아웃을 정리하고 필요 시 저장 또는 표시한다
 # ===================================================================
-def show(
-    save_path: str | None = None) -> None:
+def show(save_path: str | None = None) -> None:
     """공통 후처리를 수행한다: 콜백 실행, 레이아웃 정리, 필요 시 표시/종료.
 
     Args:
@@ -1525,6 +1524,142 @@ def plot_hull(data: DataFrame,
 
 
 
+# ===================================================================
+# 범주별 회귀선이 표시된 선형 모델 그래프를 그린다
+# ===================================================================
+def lmplot(
+    data: DataFrame,
+    x: str,
+    y: str,
+    hue=None,
+    col: str | None = None,
+    row: str | None = None,
+    markers: str | list[str] = "o",
+    scatter_edgecolor: str | None = "#ffffff",
+    scatter_linewidths: float = 1,
+    scatter_size: int = 50,
+    scatter_alpha: float = 0.8,
+    linestyle: str = "-",
+    linecolor: str | None = None,
+    linewidth: float = 2,
+    #----- 공통 파라미터 ------
+    title: str | None = None,
+    xlabel: str | None = None,
+    xlabel_fontsize: int = config.xlabel_fontsize,
+    xlabel_fontweight: str = config.xlabel_fontweight,
+    xlabel_pad: int = config.xlabel_pad,
+    ylabel: str | None = None,
+    ylabel_fontsize: int = config.ylabel_fontsize,
+    ylabel_fontweight: str = config.ylabel_fontweight,
+    ylabel_pad: int = config.ylabel_pad,
+    palette: str | None = None,
+    width: int | None = config.width,
+    height: int | None = config.height,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    **params,
+) -> None:
+    """seaborn lmplot으로 선형 모델 시각화를 수행한다.
+
+    Args:
+        data (DataFrame): 시각화할 데이터.
+        x (str): 독립변수 컬럼.
+        y (str): 종속변수 컬럼.
+        hue (str|None): 범주 컬럼.
+        col (str|None): 열 패싯 컬럼.
+        row (str|None): 행 패싯 컬럼.
+        markers (str|list[str]): 산점도 점 모양.
+        scatter_edgecolor (str|None): 산점도 점 외곽선 색상.
+        scatter_linewidths (float): 산점도 점 외곽선 굵기
+        scatter_size (int): 산점도 점 크기.
+        scatter_alpha (float): 산점도 점 투명도.
+        linestyle (str): 회귀선 스타일.
+        linecolor (str|None): 회귀선 색상. hue가 있을 때는 무시됨.
+        linewidth (float): 회귀선 굵기.
+        title (str|None): 그래프 제목.
+        xlabel (str|None): x축 레이블.
+        xlabel_fontsize (int): x축 레이블 폰트 크기.
+        xlabel_fontweight (str): x축 레이블 폰트 두께.
+        xlabel_pad (int): x축 레이블 패드.
+        ylabel (str|None): y축 레이블.
+        ylabel_fontsize (int): y축 레이블 폰트 크기.
+        ylabel_fontweight (str): y축 레이블 폰트 두께.
+        ylabel_pad (int): y축 레이블 패드.
+        palette (str|None): 팔레트 이름.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        save_path (str|None): 이미지 저장 경로. None이면 화면에 표시.
+        callback (Callable|None): Axes 후처리 콜백.
+        **params: seaborn lmplot 추가 인자.
+
+    Returns:
+        None
+    """
+    w = width / 100
+    h = height / 100
+
+    if not hue and palette:
+        palette = None
+        linecolor = None
+
+    # hue가 있을 때만 palette 사용, 없으면 scatter_kws에 color 설정
+    lmplot_kwargs = {
+        "data": data,
+        "x": x,
+        "y": y,
+        "hue": hue,
+        "col": col,
+        "row": row,
+        "height": h,
+        "aspect": w / h,
+        "legend": False,
+        "markers": markers,
+        "scatter_kws": {
+            "edgecolor": scatter_edgecolor,
+            "linewidths": scatter_linewidths,
+            "s": scatter_size,
+            "alpha": scatter_alpha,
+        },
+        "line_kws": {
+            "color": linecolor,
+            "linestyle": linestyle,
+            "linewidth": linewidth,
+        },
+    }
+
+    if hue is not None and palette is not None:
+        lmplot_kwargs["palette"] = palette
+    elif hue is None and palette is not None:
+        lmplot_kwargs["scatter_kws"] = {"color": sb.color_palette(palette)[0]}
+
+    lmplot_kwargs.update(params)
+
+    g = sb.lmplot(**lmplot_kwargs)
+    g.fig.set_dpi(config.dpi)
+
+    if title:
+        g.fig.suptitle(title, fontsize=config.title_font_size, fontweight=config.title_font_weight, y=1)
+
+    for a in g.axes.flatten():
+        a.set_xlabel(xlabel or x, fontsize=xlabel_fontsize, fontweight=config.xlabel_fontweight, labelpad=xlabel_pad)
+        a.set_ylabel(ylabel or y, fontsize=ylabel_fontsize, fontweight=config.ylabel_fontweight, labelpad=ylabel_pad)
+        a.grid(True, alpha=config.grid_alpha)
+
+        if hue is not None:
+            a.legend(bbox_to_anchor=(1, 1), loc='upper left') # 범례 위치 조정
+
+        if callback is not None:
+            callback(a)
+
+    plt.tight_layout()
+
+    show(save_path)  # type: ignore
+
+
+
+
+
+
 #######################################################################
 
 
@@ -1645,145 +1780,6 @@ def xscatterplot(
 
     show(save_path)  # type: ignore
 
-
-# ===================================================================
-# 회귀선이 포함된 산점도를 그린다
-# ===================================================================
-def regplot(
-    df: DataFrame,
-    xname: str,
-    yname: str,
-    title: str | None = None,
-    palette: str | None = None,
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    save_path: str | None = None,
-    callback: Callable | None = None,
-    ax: Axes | None = None,
-    **params,
-) -> None:
-    """단순 회귀선이 포함된 산점도를 그린다.
-
-    Args:
-        df (DataFrame): 시각화할 데이터.
-        xname (str): 독립변수 컬럼.
-        yname (str): 종속변수 컬럼.
-        title (str|None): 그래프 제목.
-        palette (str|None): 선/점 색상.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        callback (Callable|None): Axes 후처리 콜백.
-        ax (Axes|None): 외부에서 전달한 Axes.
-        **params: seaborn regplot 추가 인자.
-
-    Returns:
-        None
-    """
-    outparams = False
-
-    if ax is None:
-        fig, ax = init(width=width, height=height, rows=1, cols=1, title=title)  # type: ignore
-        outparams = True
-
-    # regplot은 hue를 지원하지 않으므로 palette를 color로 변환
-    scatter_color = None
-    if palette is not None:
-        scatter_color = sb.color_palette(palette)[0]
-
-    regplot_kwargs = {
-        "data": df,
-        "x": xname,
-        "y": yname,
-        "scatter_kws": {
-            "s": 20,
-            "linewidths": 0.5,
-            "edgecolor": "w",
-            "color": scatter_color,
-        },
-        "line_kws": {"color": "red", "linestyle": "--", "linewidth": linewidth},
-        "ax": ax,
-    }
-
-    regplot_kwargs.update(params)
-
-    sb.regplot(**regplot_kwargs)
-
-    show(save_path)  # type: ignore
-
-
-# ===================================================================
-# 범주별 회귀선이 표시된 선형 모델 그래프를 그린다
-# ===================================================================
-def lmplot(
-    df: DataFrame,
-    xname: str,
-    yname: str,
-    hue=None,
-    title: str | None = None,
-    palette: str | None = None,
-    width: int = config.width,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    save_path: str | None = None,
-    **params,
-) -> None:
-    """seaborn lmplot으로 선형 모델 시각화를 수행한다.
-
-    Args:
-        df (DataFrame): 시각화할 데이터.
-        xname (str): 독립변수 컬럼.
-        yname (str): 종속변수 컬럼.
-        hue (str|None): 범주 컬럼.
-        title (str|None): 그래프 제목.
-        palette (str|None): 팔레트 이름.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        **params: seaborn lmplot 추가 인자.
-
-    Returns:
-        None
-    """
-    # hue가 있을 때만 palette 사용, 없으면 scatter_kws에 color 설정
-    lmplot_kwargs = {
-        "data": df,
-        "x": xname,
-        "y": yname,
-        "hue": hue,
-    }
-
-    if hue is not None and palette is not None:
-        lmplot_kwargs["palette"] = palette
-    elif hue is None and palette is not None:
-        lmplot_kwargs["scatter_kws"] = {"color": sb.color_palette(palette)[0]}
-
-    lmplot_kwargs.update(params)
-
-    g = sb.lmplot(**lmplot_kwargs)
-    g.fig.set_size_inches(width / config.dpi, height / config.dpi)
-    g.fig.set_dpi(config.dpi)
-
-    # 회귀선에 linewidth 적용
-    for ax in g.axes.flat:
-        for line in ax.get_lines():
-            if line.get_marker() == "o":  # 산점도는 건너뛰기
-                continue
-            line.set_linewidth(linewidth)
-
-    g.fig.grid(True, alpha=config.grid_alpha, linewidth=config.grid_width)  # type: ignore
-
-    if title:
-        g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight="bold")
-
-    plt.tight_layout()
-
-    if save_path is not None:
-        plt.savefig(save_path, bbox_inches="tight")
-
-    plt.show()
-    plt.close()
 
 
 # ===================================================================
@@ -2040,7 +2036,7 @@ def ols_residplot(
     Examples:
         ```python
         from hossam import *
-        fit = hs_stats.ols(data, yname='target', report=False)
+        fit = my_stats.ols(data, yname='target', report=False)
         residplot(fit, lowess=True, mse=True)
         ```
     """
@@ -2154,7 +2150,7 @@ def ols_qqplot(
         ```python
         from hossam import *
         # 선형회귀 모형 적합
-        fit = hs_stats.ols(data, yname='target', report=False)
+        fit = my_stats.ols(data, yname='target', report=False)
         # 표준화된 선 (권장)
         qqplot(fit)
         # 회귀선 (데이터 추세 반영)

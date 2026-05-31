@@ -393,7 +393,7 @@ def pretty_table(data: DataFrame, tablefmt="simple", headers: str = "keys") -> N
         ```python
         from hossam import *
         from pandas import DataFrame
-        hs_util.pretty_table(DataFrame({"a":[1,2],"b":[3,4]}))
+        my_util.pretty_table(DataFrame({"a":[1,2],"b":[3,4]}))
         ```
     """
 
@@ -433,7 +433,7 @@ def __data_info(
         data.index = DatetimeIndex(data.index)
 
     if categories:
-        from .hs_prep import set_category  # type: ignore
+        from .my_prep import set_category  # type: ignore
         data = set_category(data, *categories)
 
     if info:
@@ -486,7 +486,7 @@ def load_data(key: str,
     Examples:
         ```python
         from hossam import *
-        df = hs_util.load_data("AD_SALES", index_col=None, timeindex=False, info=False)
+        df = my_util.load_data("AD_SALES", index_col=None, timeindex=False, info=False)
         ```
     """
 

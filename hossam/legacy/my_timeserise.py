@@ -30,8 +30,8 @@ from sklearn.model_selection import ParameterGrid
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 # -------------------------------------------------------------
-from .hs_util import pretty_table
-from .hs_plot import lineplot, config
+from .my_util import pretty_table
+from .my_plot import lineplot, config
 
 
 # ===================================================================
@@ -76,13 +76,13 @@ def diff(
         # 기본 사용 (정상성 만족까지 자동 차분):
         df = DataFrame({'value': [100, 102, 105, 110, 120]},
                           index=date_range('2020-01', periods=5, freq='M'))
-        stationary_df = hs_timeseries.diff(df, 'value')
+        stationary_df = my_timeseries.diff(df, 'value')
 
         # 최대 2차 차분으로 제한:
-        stationary_df = hs_timeseries.diff(df, 'value', max_diff=2)
+        stationary_df = my_timeseries.diff(df, 'value', max_diff=2)
 
         # 그래프 없이 실행:
-        stationary_df = hs_timeseries.diff(df, 'value', plot=False)
+        stationary_df = my_timeseries.diff(df, 'value', plot=False)
         ```
     """
     df = data.copy()
@@ -174,10 +174,10 @@ def rolling(
         # 7일 이동평균 계산:
         data = Series([10, 12, 13, 15, 14, 16, 18],
                         index=date_range('2020-01-01', periods=7))
-        ma7 = hs_timeseries.rolling(data, window=7)
+        ma7 = my_timeseries.rolling(data, window=7)
 
         # 30일 이동평균, 그래프 없이:
-        ma30 = hs_timeseries.rolling(data, window=30, plot=False)
+        ma30 = my_timeseries.rolling(data, window=30, plot=False)
         ```
     """
     rolling = data.rolling(window=window).mean()
@@ -232,10 +232,10 @@ def ewm(
         # 12기간 지수가중이동평균:
         data = Series([10, 12, 13, 15, 14, 16, 18],
                          index=date_range('2020-01-01', periods=7))
-        ewma = hs_timeseries.ewm(data, span=12)
+        ewma = my_timeseries.ewm(data, span=12)
 
         # 단기 추세 파악 (span=5):
-        ewma_short = hs_timeseries.ewm(data, span=5, plot=False)
+        ewma_short = my_timeseries.ewm(data, span=5, plot=False)
         ```
     """
     ewm = data.ewm(span=span).mean()
@@ -305,10 +305,10 @@ def seasonal_decompose(
         # 월별 데이터 가법 분해:
         data = Series([100, 120, 110, 130, 150, 140],
                          index=date_range('2020-01', periods=6, freq='M'))
-        components = hs_timeseries.seasonal_decompose(data, model='additive')
+        components = my_timeseries.seasonal_decompose(data, model='additive')
 
         # 승법 모델 사용:
-        components = hs_timeseries.seasonal_decompose(data, model='multiplicative', plot=False)
+        components = my_timeseries.seasonal_decompose(data, model='multiplicative', plot=False)
         print(components[['trend', 'seasonal']].head())
         ```
     """
@@ -380,11 +380,11 @@ def train_test_split(data: DataFrame, test_size: float = 0.2) -> tuple[DataFrame
 
         # 80:20 분할 (기본):
         df = DataFrame({'value': range(100)}, index=date_range('2020-01-01', periods=100))
-        train, test = hs_timeseries.train_test_split(df)
+        train, test = my_timeseries.train_test_split(df)
         print(len(train), len(test))  # 80, 20
 
         # 70:30 분할:
-        train, test = hs_timeseries.train_test_split(df, test_size=0.3)
+        train, test = my_timeseries.train_test_split(df, test_size=0.3)
         print(len(train), len(test))  # 70, 30
         ```
     """
@@ -431,10 +431,10 @@ def acf_plot(
         # 기본 ACF 플롯:
         data = Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                          index=date_range('2020-01-01', periods=10))
-        hs_timeseries.acf_plot(data)
+        my_timeseries.acf_plot(data)
 
         # 콜백으로 제목 추가:
-        hs_timeseries.acf_plot(data, callback=lambda ax: ax.set_title('My ACF Plot', fontsize=config.title_font_size))  # type: ignore
+        my_timeseries.acf_plot(data, callback=lambda ax: ax.set_title('My ACF Plot', fontsize=config.title_font_size))  # type: ignore
         ```
     """
     fig = plt.figure(figsize=figsize, dpi=config.dpi)
@@ -482,10 +482,10 @@ def pacf_plot(
         # 기본 PACF 플롯:
         data = Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                          index=date_range('2020-01-01', periods=10))
-        hs_timeseries.pacf_plot(data)
+        my_timeseries.pacf_plot(data)
 
         # 콜백으로 커스터마이징:
-        hs_timeseries.pacf_plot(data, callback=lambda ax: ax.set_ylabel('Partial Correlation'))
+        my_timeseries.pacf_plot(data, callback=lambda ax: ax.set_ylabel('Partial Correlation'))
         ```
     """
     fig = plt.figure(figsize=figsize, dpi=config.dpi)
@@ -538,8 +538,8 @@ def acf_pacf_plot(
                          index=date_range('2020-01-01', periods=8))
 
         # 1차 차분 후 ACF/PACF 플롯:
-        stationary = hs_timeseries.diff(data, 'value')
-        hs_timeseries.acf_pacf_plot(stationary)
+        stationary = my_timeseries.diff(data, 'value')
+        my_timeseries.acf_pacf_plot(stationary)
     """
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(figsize[0], figsize[1] * 2), dpi=config.dpi)
 
@@ -615,14 +615,14 @@ def arima(
         # 수동으로 ARIMA(2,1,2) 모델 생성:
         data = Series([100, 102, 105, 110, 115, 120, 125, 130],
                          index=date_range('2020-01', periods=8, freq='M'))
-        train, test = hs_timeseries.train_test_split(data, test_size=0.25)
-        model = hs_timeseries.arima(train, test, p=2, d=1, q=2)
+        train, test = my_timeseries.train_test_split(data, test_size=0.25)
+        model = my_timeseries.arima(train, test, p=2, d=1, q=2)
 
         # auto_arima로 최적 모델 탐색:
-        model = hs_timeseries.arima(train, test, auto=True)
+        model = my_timeseries.arima(train, test, auto=True)
 
         # 계절성 모델 SARIMA(1,1,1)(1,1,1,12):
-        model = hs_timeseries.arima(train, test, p=1, d=1, q=1, s=12)
+        model = my_timeseries.arima(train, test, p=1, d=1, q=1, s=12)
         ```
     """
     model = None
@@ -819,11 +819,11 @@ def prophet(
                     'ds': date_range('2020-01-01', periods=100),
                     'y': range(100)
                 })
-        model, params, score, forecast, pred = hs_timeseries.prophet(train)
+        model, params, score, forecast, pred = my_timeseries.prophet(train)
 
         하이퍼파라미터 그리드 서치:
 
-        model, params, score, forecast, pred = hs_timeseries.prophet(
+        model, params, score, forecast, pred = my_timeseries.prophet(
                 train,
                 changepoint_prior_scale=[0.001, 0.01, 0.1],
                 seasonality_prior_scale=[0.01, 0.1, 1.0],
@@ -834,7 +834,7 @@ def prophet(
         def add_holidays(m):
             m.add_country_holidays(country_name='KR')
 
-        model, _, _, _, _ = hs_timeseries.prophet(train, callback=add_holidays)
+        model, _, _, _, _ = my_timeseries.prophet(train, callback=add_holidays)
         ```
     """
 
@@ -908,7 +908,7 @@ def prophet(
     # )
 
     if report:
-        hs_prophet_report(  # type: ignore
+        my_prophet_report(  # type: ignore
             best_model, best_forecast, best_pred, test, print_forecast, figsize
         )
 
@@ -957,14 +957,14 @@ def prophet_report(
         from pandas import DataFrame, date_range
 
         # 기본 리포트 출력:
-        model, _, _, forecast, pred = hs_timeseries.prophet(train)
-        hs_timeseries.prophet_report(model, forecast, pred)
+        model, _, _, forecast, pred = my_timeseries.prophet(train)
+        my_timeseries.prophet_report(model, forecast, pred)
 
         # test 데이터와 함께 성능 평가:
-        hs_timeseries.prophet_report(model, forecast, pred, test=test)
+        my_timeseries.prophet_report(model, forecast, pred, test=test)
 
         # 예측 테이블 출력:
-        hs_timeseries.prophet_report(model, forecast, pred, print_forecast=True)
+        my_timeseries.prophet_report(model, forecast, pred, print_forecast=True)
         ```
     """
 
@@ -1063,16 +1063,16 @@ def get_weekend_df(start: dt.datetime | str, end: dt.datetime | str | None = Non
         from pandas import DataFrame, date_range
 
         # 2020년 전체 주말 생성:
-        weekends = hs_timeseries.get_weekend_df('2020-01-01', '2020-12-31')
+        weekends = my_timeseries.get_weekend_df('2020-01-01', '2020-12-31')
         print(len(weekends))  # 104 (52주 × 2일)
 
         # 현재까지의 주말:
-        weekends = hs_timeseries.get_weekend_df('2023-01-01')
+        weekends = my_timeseries.get_weekend_df('2023-01-01')
         print(weekends.head())
 
         # Prophet 모델에 주말 효과 추가:
-        weekends = hs_timeseries.get_weekend_df('2020-01-01', '2025-12-31')
-        model = hs_timeseries.prophet(train, holidays=weekends)
+        weekends = my_timeseries.get_weekend_df('2020-01-01', '2025-12-31')
+        model = my_timeseries.prophet(train, holidays=weekends)
         ```
     """
     if end is None:

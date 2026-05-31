@@ -22,8 +22,8 @@ from sklearn.metrics import silhouette_score, adjusted_rand_score
 # ===================================================================
 # hossam 패키지 참조
 # ===================================================================
-from . import hs_plot
-from .hs_util import is_2d
+from . import my_plot
+from .my_util import is_2d
 
 RANDOM_STATE = 52
 
@@ -79,7 +79,7 @@ def kmeans_fit(
         #     title=f"K-Means Clustering (k={n_clusters})",
         # )
         for f in fields:  # type: ignore
-            hs_plot.visualize_silhouette(
+            my_plot.visualize_silhouette(
                 estimator=kmeans,
                 data=data,
                 xname=f[0],     # type: ignore
@@ -102,9 +102,9 @@ def kmeans_elbow(
     plot: bool = True,
     title: str = None,
     marker: str = None,
-    width: int = hs_plot.config.width,
-    height: int = hs_plot.config.height,
-    linewidth: int = hs_plot.config.line_width,
+    width: int = my_plot.config.width,
+    height: int = my_plot.config.height,
+    linewidth: int = my_plot.config.line_width,
     save_path: str | None = None,
     ax: Axes | None = None,
     callback: Callable | None = None,
@@ -138,8 +138,8 @@ def kmeans_elbow(
         ```python
         from hossam import *
 
-        data = hs_util.load_data('iris')
-        best_k, inertia_list = hs_cluster.kmeans_elbow(data.iloc[:, :-1])
+        data = my_util.load_data('iris')
+        best_k, inertia_list = my_cluster.kmeans_elbow(data.iloc[:, :-1])
         ```
     """
 
@@ -188,9 +188,9 @@ def kmeans_silhouette(
     title: str = None,
     xname: str = None,
     yname: str = None,
-    width: int = hs_plot.config.width,
-    height: int = hs_plot.config.height,
-    linewidth: float = hs_plot.config.line_width,
+    width: int = my_plot.config.width,
+    height: int = my_plot.config.height,
+    linewidth: float = my_plot.config.line_width,
     save_path: str | None = None,
     **params,
 ) -> DataFrame:
@@ -219,8 +219,8 @@ def kmeans_silhouette(
         ```python
         from hossam import *
 
-        data = hs_util.load_data('iris')
-        silhouette_scores = hs_cluster.kmeans_silhouette(data.iloc[:, :-1], k=3)
+        data = my_util.load_data('iris')
+        silhouette_scores = my_cluster.kmeans_silhouette(data.iloc[:, :-1], k=3)
         ```
     """
 
@@ -257,7 +257,7 @@ def kmeans_silhouette(
                 pbar.set_description(f"K-Means Plotting: k={estimator.n_clusters}")
 
                 if plot == "silhouette":
-                    hs_plot.silhouette_plot(
+                    my_plot.silhouette_plot(
                         estimator=estimator,
                         data=data,
                         title=title,
@@ -268,7 +268,7 @@ def kmeans_silhouette(
                         **params,
                     )
                 elif plot == "cluster":
-                    hs_plot.cluster_plot(
+                    my_plot.cluster_plot(
                         estimator=estimator,
                         data=data,
                         xname=xname,
@@ -281,7 +281,7 @@ def kmeans_silhouette(
                         save_path=save_path,
                     )
                 elif plot == "both":
-                    hs_plot.visualize_silhouette(
+                    my_plot.visualize_silhouette(
                         estimator=estimator,
                         data=data,
                         xname=xname,
@@ -313,9 +313,9 @@ def elbow_point(
     plot: bool = True,
     title: str = None,
     marker: str = None,
-    width: int = hs_plot.config.width,
-    height: int = hs_plot.config.height,
-    linewidth: int = hs_plot.config.line_width,
+    width: int = my_plot.config.width,
+    height: int = my_plot.config.height,
+    linewidth: int = my_plot.config.line_width,
     save_path: str | None = None,
     ax: Axes | None = None,
     callback: Callable | None = None,
@@ -402,7 +402,7 @@ def elbow_point(
             if callback is not None:
                 callback(ax)
 
-        hs_plot.lineplot(
+        my_plot.lineplot(
             df=None,
             xname=x,
             yname=y,
@@ -432,9 +432,9 @@ def cluster_plot(
     title: str | None = None,
     palette: str | None = None,
     outline: bool = True,
-    width: int = hs_plot.config.width,
-    height: int = hs_plot.config.height,
-    linewidth: float = hs_plot.config.line_width,
+    width: int = my_plot.config.width,
+    height: int = my_plot.config.height,
+    linewidth: float = my_plot.config.line_width,
     save_path: str | None = None,
     ax: Axes | None = None,
 ):
@@ -460,9 +460,9 @@ def cluster_plot(
         ```python
         from hossam import *
 
-        data = hs_util.load_data('iris')
-        estimator, cdf, score = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)
-        hs_cluster.cluster_plot(cdf, hue='cluster')
+        data = my_util.load_data('iris')
+        estimator, cdf, score = my_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)
+        my_cluster.cluster_plot(cdf, hue='cluster')
         ```
     """
 
@@ -477,7 +477,7 @@ def cluster_plot(
     for field_pair in fields:
         xname, yname = field_pair
 
-        hs_plot.cluster_plot(
+        my_plot.cluster_plot(
             estimator=estimator,    # type: ignore
             data=data,
             xname=xname,
@@ -519,9 +519,9 @@ def persona(
         ```python
         from hossam import *
 
-        data = hs_util.load_data('iris')
-        estimator, df, score = hs_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)
-        persona_df = hs_cluster.persona(df, hue='cluster')
+        data = my_util.load_data('iris')
+        estimator, df, score = my_cluster.kmeans_fit(data.iloc[:, :-1], n_clusters=3)
+        persona_df = my_cluster.persona(df, hue='cluster')
         print(persona_df)
         ```
     """
@@ -618,8 +618,8 @@ def kmeans_best_k(
     Examples:
         ```python
         from hossam import *
-        data = hs_util.load_data('iris')
-        best_k = hs_cluster.kmeans_best_k(data.iloc[:, :-1])
+        data = my_util.load_data('iris')
+        best_k = my_cluster.kmeans_best_k(data.iloc[:, :-1])
         ```
     """
 
@@ -715,9 +715,9 @@ def dbscan_eps(
     plot: bool = True,
     title: str | None = None,
     palette: str | None = None,
-    width: int = hs_plot.config.width,
-    height: int = hs_plot.config.height,
-    linewidth: int = hs_plot.config.line_width,
+    width: int = my_plot.config.width,
+    height: int = my_plot.config.height,
+    linewidth: int = my_plot.config.line_width,
     save_path: str | None = None,
     ax: Axes | None = None,
 ) -> tuple[float, np.ndarray]:
@@ -747,8 +747,8 @@ def dbscan_eps(
     Examples:
         ```python
         from hossam import *
-        data = hs_util.load_data('iris')
-        best_eps, eps_grid = hs_cluster.dbscan_eps(data, plot=True)
+        data = my_util.load_data('iris')
+        best_eps, eps_grid = my_cluster.dbscan_eps(data, plot=True)
         ```
     """
 
@@ -912,7 +912,7 @@ def dbscan_fit(
     if len(estimators) == 1:
 
         if plot:
-            hs_plot.scatterplot(
+            my_plot.scatterplot(
                 df=cluster_dfs[0],
                 xname=cluster_dfs[0].columns[0],
                 yname=cluster_dfs[0].columns[1],
@@ -936,7 +936,7 @@ def dbscan_fit(
     best_cluster_df = cluster_dfs[best_index]
 
     if plot:
-        hs_plot.scatterplot(
+        my_plot.scatterplot(
             df=best_cluster_df,
             xname=best_cluster_df.columns[0],
             yname=best_cluster_df.columns[1],
@@ -987,7 +987,7 @@ def __agg_fit(
     score = float(silhouette_score(X=data, labels=df["cluster"]))
 
     if plot:
-        hs_plot.visualize_silhouette(estimator=estimator, data=data)
+        my_plot.visualize_silhouette(estimator=estimator, data=data)
 
     return estimator, df, score
 
@@ -1019,8 +1019,8 @@ def agg_fit(
         ```python
         from hossam import *
 
-        data = hs_util.load_data('iris')
-        estimators, cluster_dfs, score_df = hs_cluster.agg_fit(data.iloc[:, :-1], n_clusters=[2,3,4])
+        data = my_util.load_data('iris')
+        estimators, cluster_dfs, score_df = my_cluster.agg_fit(data.iloc[:, :-1], n_clusters=[2,3,4])
         ```
     """
     compute_distances = False
@@ -1061,7 +1061,7 @@ def agg_fit(
                 scores.append({"k": estimator.n_clusters, "silhouette_score": score})
 
                 if plot:
-                    hs_plot.visualize_silhouette(
+                    my_plot.visualize_silhouette(
                         estimator=estimator,
                         data=data,
                         outline=True,
