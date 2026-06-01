@@ -1644,6 +1644,7 @@ def lmplot(
         a.set_xlabel(xlabel or x, fontsize=xlabel_fontsize, fontweight=config.xlabel_fontweight, labelpad=xlabel_pad)
         a.set_ylabel(ylabel or y, fontsize=ylabel_fontsize, fontweight=config.ylabel_fontweight, labelpad=ylabel_pad)
         a.grid(True, alpha=config.grid_alpha)
+        a.set_axisbelow(True)
 
         if hue is not None:
             a.legend(bbox_to_anchor=(1, 1), loc='upper left') # 범례 위치 조정
@@ -1656,6 +1657,115 @@ def lmplot(
     show(save_path)  # type: ignore
 
 
+
+
+
+# ===================================================================
+# 산점도 행렬 시각화
+# ===================================================================
+def pairplot(
+    data: DataFrame,
+    x: str | list[str] | None = None,
+    y: str | list[str] | None = None,
+    hue=None,
+    diag_kind: str = "kde",
+    reg: bool = False,
+    markers: str | list[str] = "o",
+    scatter_size: int = 20, 
+    scatter_alpha: float = 0.8,
+    linecolor: str | None = None, 
+    linewidth: float = 1.5, 
+    linestyle: str = "-",
+    #----- 공통 파라미터 ------
+    title: str | None = None,
+    palette: str | None = None,
+    width: int | None = config.width,
+    height: int | None = config.height,
+    save_path: str | None = None,
+    callback: Callable | None = None,
+    **params,
+) -> None:
+    """
+    산점도 행렬 시각화
+
+    Args:
+        data (DataFrame): 시각화할 데이터.
+        x (str|list[str]|None): 대상 컬럼명.
+            - None: 모든 연속형(숫자형) 데이터에 대해 처리.
+            - str: 해당 컬럼에 대해서만 처리.
+            - list: 주어진 컬럼들에 대해서만 처리.
+            기본값은 None.
+        y (str|list[str]|None): 대상 컬럼명.
+            - None: 모든 연속형(숫자형) 데이터에 대해 처리.
+            - str: 해당 컬럼에 대해서만 처리.
+            - list: 주어진 컬럼들에 대해서만 처리.
+            기본값은 None.
+        hue (str|None): 범주 컬럼명. None이면 범주 구분 없이 하나의 색상으로 표시.
+        diag_kind (str): 대각선 그래프 종류. 'hist' 또는 'kde'.
+        reg (bool): 회귀선 표시 여부. True이면 산점도에 회귀선이 추가되고 diag_kind는 'kde'로 고정됨.
+        markers (str|list[str]): 산점도 점 모양. str이면 모든 그래프에 동일한 모양이 적용되고, list이면 hue의 범주별로 순서대로 적용됨.
+        scatter_size (int): 산점도 점 크기.
+        scatter_alpha (float): 산점도 점 투명도.
+        linecolor (str|None): 회귀선 색상
+        linewidth (float): 회귀선 굵기.
+        linestyle (str): 회귀선 스타일.
+        title (str|None): 그래프 제목.
+        palette (str|None): 팔레트 이름.
+        width (int): 캔버스 가로 픽셀.
+        height (int): 캔버스 세로 픽셀.
+        save_path (str|None): 이미지 저장 경로. None이면 화면에 표시.
+        callback (Callable|None): Axes 후처리 콜백.
+        **params: seaborn pairplot 추가 인자.
+
+    Returns:
+        None
+    """
+    # 1) 그래프 초기화
+    w = width / 100             # 가로 크기
+    h = height / 100            # 세로 크기
+
+    # hue가 지정되지 않았는데 palette와 linecolor가 지정된 경우, 무의미하므로 None으로 설정
+    if not hue and palette:
+        palette = None
+
+    # 회귀선의 표시 여부에 따라서 plot_kws 분기
+    if reg:
+        plot_kws = {
+            "scatter_kws": { "s": scatter_size, "alpha": scatter_alpha},
+            "line_kws": { "color": linecolor, "linewidth": linewidth, "linestyle": linestyle}
+        }
+    else:
+        plot_kws = { "s": scatter_size, "alpha": scatter_alpha }
+
+    # hue가 있을 때만 palette 사용
+    pairplot_kwargs = {
+        "data": data,
+        "hue": hue,
+        "markers": markers,
+        "palette": palette,
+        "kind": "reg" if reg else "scatter",
+        "diag_kind": diag_kind,
+        "x_vars": x,
+        "y_vars": y,
+        "plot_kws": plot_kws
+    }
+
+    pairplot_kwargs.update(params)
+
+    g = sb.pairplot(**pairplot_kwargs)
+    g.fig.set_dpi(config.dpi)
+    g.fig.set_figwidth(w)
+    g.fig.set_figheight(h)
+
+    if title:
+        g.fig.suptitle(title, fontsize=config.title_font_size, fontweight=config.title_font_weight, y=1.02)
+
+    # 3) 개별 그래프 설정
+    for ax in g.axes.flatten():
+        ax.set_axisbelow(True)  # 격자를 그래프 뒤로 이동
+        ax.grid(True, alpha=config.grid_alpha)  # 격자 추가
+
+    show(save_path)  # type: ignore
 
 
 
@@ -1777,97 +1887,6 @@ def xscatterplot(
         scatterplot_kwargs["color"] = "#ff0000"
         scatterplot_kwargs["hue"] = None
         sb.scatterplot(data=df[df[vector] == "noise"], **scatterplot_kwargs)    # type: ignore
-
-    show(save_path)  # type: ignore
-
-
-
-# ===================================================================
-# 연속형 변수들의 차속 관계 그래프 매트릭스를 그린다
-# ===================================================================
-def pairplot(
-    df: DataFrame,
-    xnames=None,
-    title: str | None = None,
-    diag_kind: str = "kde",
-    hue=None,
-    palette: str | None = None,
-    width: int = config.height,
-    height: int = config.height,
-    linewidth: float = config.line_width,
-    save_path: str | None = None,
-    **params,
-) -> None:
-    """연속형 변수의 숫자형 컬럼 쌍에 대한 관계를 그린다.
-
-    Args:
-        df (DataFrame): 시각화할 데이터.
-        xnames (str|list|None): 대상 컬럼명.
-            - None: 모든 연속형(숫자형) 데이터에 대해 처리.
-            - str: 해당 컬럼에 대해서만 처리.
-            - list: 주어진 컬럼들에 대해서만 처리.
-            기본값은 None.
-        title (str|None): 그래프 제목.
-        diag_kind (str): 대각선 플롯 종류('kde' 등).
-        hue (str|None): 범주 컬럼.
-        palette (str|None): 팔레트 이름.
-        width (int): 캔버스 가로 픽셀.
-        height (int): 캔버스 세로 픽셀.
-        linewidth (float): 선 굵기.
-        dpi (int): 기본 크기 및 해상도(컬럼 수에 비례해 확대됨).
-        **params: seaborn pairplot 추가 인자.
-
-    Returns:
-        None
-    """
-    # xnames 파라미터 처리 (연속형 변수만, 명목형 제외)
-    if xnames is None:
-        # 모든 연속형(숫자형) 컬럼 선택 (명목형/카테고리 제외)
-        numeric_cols = df.select_dtypes(include=[np.number]).columns
-        target_cols = [col for col in numeric_cols if df[col].dtype.name != "category"]
-    elif isinstance(xnames, str):
-        # 문자열: 해당 컬럼만
-        target_cols = [xnames]
-    elif isinstance(xnames, list):
-        # 리스트: 주어진 컬럼들
-        target_cols = xnames
-    else:
-        # 기본값으로 연속형 컬럼
-        numeric_cols = df.select_dtypes(include=[np.number]).columns
-        target_cols = [col for col in numeric_cols if df[col].dtype.name != "category"]
-
-    # hue 컬럼이 있으면 target_cols에 포함시키기 (pairplot 자체에서 필요)
-    if hue is not None and hue not in target_cols:
-        target_cols = target_cols + [hue]
-
-    # target_cols를 포함하는 부분 데이터프레임 생성
-    df_filtered = df[target_cols].copy()
-
-    # hue가 있을 때만 palette 사용
-    pairplot_kwargs = {
-        "data": df_filtered,
-        "hue": hue,
-        "diag_kind": diag_kind,
-    }
-
-    if hue is not None and palette is not None:
-        pairplot_kwargs["palette"] = palette
-    # pairplot은 hue 없이 palette만 쓰는 경우가 드물어서 color로 변환 불필요
-
-    pairplot_kwargs.update(params)
-
-    g = sb.pairplot(**pairplot_kwargs)
-    scale = len(target_cols)
-    g.fig.set_size_inches(w=(width / config.dpi) * scale, h=(height / config.dpi) * scale)
-    g.fig.set_dpi(config.dpi)
-
-    if title:
-        g.fig.suptitle(title, fontsize=config.font_size * 1.5, fontweight="bold")
-
-    g.map_lower(
-        func=sb.kdeplot, fill=True, alpha=config.fill_alpha
-    )
-    g.map_upper(func=sb.scatterplot)
 
     show(save_path)  # type: ignore
 
