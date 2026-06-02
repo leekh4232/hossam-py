@@ -182,8 +182,6 @@ def init(
         # 테두리 굵기 설정
         for spine in ax.spines.values(): # type: ignore
             spine.set_linewidth(config.frame_width)
-        
-        plt.tight_layout()
 
     else:
         if title:
@@ -194,8 +192,6 @@ def init(
             f.grid(grid, alpha=config.grid_alpha, linewidth=config.grid_width) # type: ignore
             for spine in f.spines.values(): # type: ignore
                 spine.set_linewidth(config.frame_width)
-        
-        plt.tight_layout()
         
         fig.subplots_adjust(wspace=ws, hspace=hs)
 
@@ -219,6 +215,7 @@ def show(save_path: str | None = None) -> None:
     if save_path is not None:
         plt.savefig(save_path, bbox_inches="tight")
 
+    plt.tight_layout()
     plt.show()
     plt.close()
 
