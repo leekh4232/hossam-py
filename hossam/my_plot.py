@@ -126,7 +126,8 @@ def init(
     height: int = config.height,
     rows: int = 1,
     cols: int = 1,
-    flatten: bool = False,
+    flatten: bool = True, 
+    twinx: bool =False,
     ws: int | None = config.ws,
     hs: int | None = config.hs,
     title: str | None = None,
@@ -147,6 +148,7 @@ def init(
         rows (int): 서브플롯 행 개수.
         cols (int): 서브플롯 열 개수.
         flatten (bool): Axes 배열을 1차원 리스트로 평탄화할지 여부.
+        twinx (bool): twinx 서브플롯 생성 여부. True면 마지막 서브플롯에 twinx Axes 추가.
         ws (int|None): 서브플롯 가로 간격(`wspace`). rows/cols가 1보다 클 때만 적용.
         hs (int|None): 서브플롯 세로 간격(`hspace`). rows/cols가 1보다 클 때만 적용.
         title (str|None): Figure 제목.
@@ -195,8 +197,12 @@ def init(
         
         fig.subplots_adjust(wspace=ws, hspace=hs)
 
-    if (rows > 1 or cols > 1) and flatten == True:
-        ax = ax.flatten()
+        if flatten == True:
+            ax = ax.flatten()
+
+    if twinx:
+        ax_right = ax.twinx()
+        ax = (ax, ax_right)
 
     return fig, ax
 
@@ -1051,8 +1057,8 @@ def barplot(
 # ===================================================================
 def countplot(
     data: DataFrame,
-    x: str | Index,
-    y: str | Index,
+    x: str | Index = None,
+    y: str | Index = None,
     hue: str | None = None,
     #----- 공통 파라미터 ------
     title: str | None = None,
@@ -1347,10 +1353,10 @@ def stackplot(
 
         # 누적값 텍스트 표시
         if text:
-            if val == 0:  # 누적값이 0인 경우 텍스트 표시 안함
-                continue
-
             for j, val in enumerate(df[col]):
+                if val == 0:  # 누적값이 0인 경우 텍스트 표시 안함
+                    continue
+
                 if orient == 'v':
                     ax.text(x=j, y=df.iloc[j, :i].sum() + val / 2, s=text_format.format(val), ha='center', va='center', color=text_color, fontsize=text_fontsize)
                 else:
@@ -1465,7 +1471,7 @@ def scatterplot(
 
     sb.scatterplot(**kwargs)
 
-    if outline:
+    if outline and hue is not None:
         plot_hull(data=data, x=x, y=y, hue=hue, palette=palette, ax=ax)
 
     if callback is not None:
