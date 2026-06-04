@@ -974,6 +974,7 @@ def barplot(
     y: str | Index,
     hue: str | None = None,
     estimator: Callable = np.mean,
+    order: list | None = None,
     #----- 공통 파라미터 ------
     title: str | None = None,
     xlabel: str | None = None,
@@ -1000,6 +1001,7 @@ def barplot(
         y (str | Index): 값 컬럼.
         hue (str|None): 보조 범주 컬럼.
         estimator (Callable): 요약 함수.
+        order (list|None): x축 범주 순서. None이면 데이터에 나타난 순서.
         title (str|None): 그래프 제목.
         xlabel (str|None): x축 레이블.
         xlabel_fontsize (int): x축 레이블 폰트 크기.
@@ -1033,6 +1035,7 @@ def barplot(
         "y": y,
         "hue": hue,
         "estimator": estimator,
+        "order": order,
         "ax": ax,
     }
 
@@ -1060,6 +1063,7 @@ def countplot(
     x: str | Index = None,
     y: str | Index = None,
     hue: str | None = None,
+    order: list | None = None,
     #----- 공통 파라미터 ------
     title: str | None = None,
     xlabel: str | None = None,
@@ -1085,6 +1089,7 @@ def countplot(
         x (str | Index): 범주 컬럼.
         y (str | Index): 값 컬럼.
         hue (str|None): 보조 범주 컬럼.
+        order (list|None): x축 범주 순서. None이면 데이터에 나타난 순서.
         title (str|None): 그래프 제목.
         xlabel (str|None): x축 레이블.
         xlabel_fontsize (int): x축 레이블 폰트 크기.
@@ -1117,6 +1122,7 @@ def countplot(
         "x": x,
         "y": y,
         "hue": hue,
+        "order": order,
         "ax": ax,
     }
 
