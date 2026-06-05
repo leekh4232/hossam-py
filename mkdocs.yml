@@ -29,9 +29,6 @@ extra_javascript:
 plugins:
   - search
   - autorefs
-  - redirects:
-      redirect_maps:
-        docs/index.md: api/hossam.md
   - mkdocstrings:
       handlers:
         python:
@@ -78,11 +75,7 @@ nav:
   - Overview: index.md
   - API Reference:
       - Package: api/hossam.md
-      - hs_classroom: api/hs_classroom.md
-      - hs_gis: api/hs_gis.md
-      - hs_plot: api/hs_plot.md
-      - hs_prep: api/hs_prep.md
-      - hs_stats: api/hs_stats.md
-      - hs_util: api/hs_util.md
-      - hs_timeserise: api/hs_timeserise.md
-      - hs_cluster: api/hs_cluster.md
+      - my_util: api/my_util.md
+      - my_plot: api/my_plot.md
+      - my_classroom: api/my_classroom.md
+      - my_qtcheck: api/my_qtcheck.md

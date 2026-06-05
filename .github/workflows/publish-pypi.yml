@@ -1,21 +1,30 @@
-name: Publish to PyPI (on push)
+name: Publish to PyPI (on "build" commit)
 
 on:
   push:
     branches:
-      - main  # main 브랜치로의 모든 push에 대해 실행됩니다.
+      - main  # main 브랜치 push 중 커밋 메시지에 'build'가 포함된 경우에만 배포
+  workflow_dispatch:  # 필요 시 수동 실행
 
 concurrency:
   group: pypi-publish
-  cancel-in-progress: true
+  cancel-in-progress: false  # 업로드/버전증가 도중 취소되면 배포가 깨질 수 있으므로 취소하지 않음
+
+permissions:
+  contents: write  # 버전 자동 증가 커밋을 main 브랜치에 push 하기 위해 필요
 
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.message, 'build')
+    # 수동 실행이거나, 커밋 메시지에 'build' 문자열이 포함된 push일 때만 실행
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.message, 'build')
     steps:
       - name: Check out
         uses: actions/checkout@v4
+        with:
+          ref: main  # 버전 증가 커밋을 다시 push 할 수 있도록 브랜치를 체크아웃
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -28,12 +37,40 @@ jobs:
           python -m pip install --upgrade pip
           pip install build
 
-      - name: Build sdist and wheel
+      - name: Bump patch version
+        id: bump
         run: |
-          python -m build
+          python - <<'PY'
+          import os, re, pathlib
+          p = pathlib.Path("pyproject.toml")
+          s = p.read_text(encoding="utf-8")
+          m = re.search(r'(?m)^version\s*=\s*"(\d+)\.(\d+)\.(\d+)"', s)
+          if not m:
+              raise SystemExit("pyproject.toml 에서 version 항목을 찾을 수 없습니다.")
+          major, minor, patch = (int(x) for x in m.groups())
+          new = f"{major}.{minor}.{patch + 1}"
+          s = re.sub(r'(?m)^(version\s*=\s*")\d+\.\d+\.\d+(")', rf'\g<1>{new}\g<2>', s, count=1)
+          p.write_text(s, encoding="utf-8")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write(f"version={new}\n")
+          print(f"버전 자동 증가 → {new}")
+          PY
+
+      - name: Build sdist and wheel
+        run: python -m build  # 위에서 증가시킨 버전으로 빌드됨
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
           skip-existing: true  # 동일 버전 재업로드 시 오류 대신 건너뜀
+
+      - name: Commit bumped version back to main
+        if: success()  # PyPI 배포가 성공한 경우에만 버전 증가를 기록
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pyproject.toml
+          # [skip ci] 로 이 커밋이 워크플로를 재실행하지 않도록 함
+          git commit -m "chore: bump version to ${{ steps.bump.outputs.version }} [skip ci]"
+          git push origin HEAD:main

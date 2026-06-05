@@ -1,7 +1,7 @@
 ---
-title: hossam.hs_plot
+title: hossam.my_plot
 ---
 
-# hossam.hs_plot
+# hossam.my_plot
 
-::: hossam.hs_plot
+::: hossam.my_plot

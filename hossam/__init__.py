@@ -10,11 +10,7 @@ from pathlib import Path
 from . import my_classroom
 from . import my_util
 from . import my_plot
-from .legacy import my_stats
-from .legacy import my_timeserise
-from .legacy import my_cluster
-from .legacy import my_ml
-from .legacy import my_gis
+from . import my_qtcheck
 from .my_util import load_info
 from .my_util import _load_data_remote as load_data
 
@@ -36,14 +32,10 @@ my_dpi = my_plot.config.dpi # type: ignore
 __all__ = [
     "load_data",
     "load_info",
-    "my_classroom",
     "my_util",
     "my_plot",
-    "my_stats",
-    "my_timeserise",
-    "my_cluster",
-    "my_ml",
-    "my_gis"
+    "my_classroom",
+    "my_qtcheck"
 ]
 
 
