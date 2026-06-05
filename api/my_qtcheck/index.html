@@ -1,0 +1,2572 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="HOSSAM 패키지의 모듈별 API 레퍼런스와 개요 문서">
+      
+      
+        <meta name="author" content="HOSSAM">
+      
+      
+        <link rel="canonical" href="https://py.hossam.kr/api/my_qtcheck/">
+      
+      
+        <link rel="prev" href="../my_classroom/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>hossam.my_qtcheck - HOSSAM API Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#hossammy_qtcheck" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="HOSSAM API Docs" class="md-header__button md-logo" aria-label="HOSSAM API Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            HOSSAM API Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              hossam.my_qtcheck
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="탭" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../hossam/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="HOSSAM API Docs" class="md-nav__button md-logo" aria-label="HOSSAM API Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    HOSSAM API Docs
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hossam/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Package
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../my_util/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    my_util
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../my_plot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    my_plot
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../my_classroom/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    my_classroom
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    my_qtcheck
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    my_qtcheck
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        my_qtcheck
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="my_qtcheck">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.set_type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        set_type
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.get_number_column_names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_number_column_names
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.get_categorical_column_names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_categorical_column_names
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.check_duplicates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_duplicates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.check_missing_values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_missing_values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.categorical_summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        categorical_summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.numerical_summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        numerical_summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.auto_qtcheck" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        auto_qtcheck
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        my_qtcheck
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="my_qtcheck">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.set_type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        set_type
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.get_number_column_names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_number_column_names
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.get_categorical_column_names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_categorical_column_names
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.check_duplicates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_duplicates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.check_missing_values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_missing_values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.categorical_summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        categorical_summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.numerical_summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        numerical_summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_qtcheck.auto_qtcheck" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        auto_qtcheck
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="hossammy_qtcheck">hossam.my_qtcheck<a class="headerlink" href="#hossammy_qtcheck" title="Permanent link">&para;</a></h1>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="hossam.my_qtcheck" class="doc doc-heading">
+            <span class="doc doc-object-name doc-module-name">hossam.my_qtcheck</span>
+
+
+<a href="#hossam.my_qtcheck" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents first">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_qtcheck.set_type" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">set_type</span>
+
+
+<a href="#hossam.my_qtcheck.set_type" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_type</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">as_int</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">as_float</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">as_string</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">as_category</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">as_datetime</span><span class="o">=</span><span class="p">[],</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>데이터프레임의 컬럼 타입을 변경하고 
+변경된 데이터프레임의 정보를 출력하는 함수</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>타입을 변경할 데이터프레임</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>as_int</code>
+            </td>
+            <td>
+                  <code><span title="list">list</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>int 타입으로 변경할 컬럼 리스트</p>
+              </div>
+            </td>
+            <td>
+                  <code>[]</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>as_float</code>
+            </td>
+            <td>
+                  <code><span title="list">list</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>float 타입으로 변경할 컬럼 리스트</p>
+              </div>
+            </td>
+            <td>
+                  <code>[]</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>as_string</code>
+            </td>
+            <td>
+                  <code><span title="list">list</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>string 타입으로 변경할 컬럼 리스트</p>
+              </div>
+            </td>
+            <td>
+                  <code>[]</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>as_category</code>
+            </td>
+            <td>
+                  <code><span title="list">list</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>category 타입으로 변경할 컬럼 리스트</p>
+              </div>
+            </td>
+            <td>
+                  <code>[]</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>as_datetime</code>
+            </td>
+            <td>
+                  <code><span title="list">list</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>datetime 타입으로 변경할 컬럼 리스트</p>
+              </div>
+            </td>
+            <td>
+                  <code>[]</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>DataFrame</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>타입이 변경된 데이터프레임</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/my_qtcheck.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_type</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">as_int</span><span class="o">=</span><span class="p">[],</span> <span class="n">as_float</span><span class="o">=</span><span class="p">[],</span> <span class="n">as_string</span><span class="o">=</span><span class="p">[],</span> 
+             <span class="n">as_category</span><span class="o">=</span><span class="p">[],</span> <span class="n">as_datetime</span><span class="o">=</span><span class="p">[]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    데이터프레임의 컬럼 타입을 변경하고 </span>
+<span class="sd">    변경된 데이터프레임의 정보를 출력하는 함수</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (DataFrame): 타입을 변경할 데이터프레임</span>
+<span class="sd">        as_int (list): int 타입으로 변경할 컬럼 리스트</span>
+<span class="sd">        as_float (list): float 타입으로 변경할 컬럼 리스트</span>
+<span class="sd">        as_string (list): string 타입으로 변경할 컬럼 리스트</span>
+<span class="sd">        as_category (list): category 타입으로 변경할 컬럼 리스트</span>
+<span class="sd">        as_datetime (list): datetime 타입으로 변경할 컬럼 리스트</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame: 타입이 변경된 데이터프레임</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">as_int</span><span class="p">:</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">as_float</span><span class="p">:</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">as_string</span><span class="p">:</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">as_category</span><span class="p">:</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">as_datetime</span><span class="p">:</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
+
+    <span class="n">df</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_qtcheck.get_number_column_names" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">get_number_column_names</span>
+
+
+<a href="#hossam.my_qtcheck.get_number_column_names" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_number_column_names</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>데이터프레임에서 숫자형 컬럼의 이름을 리스트로 반환하는 함수</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>숫자형 컬럼의 이름을 추출할 데이터프레임</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>list</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>숫자형 컬럼의 이름 리스트</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/my_qtcheck.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_number_column_names</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    데이터프레임에서 숫자형 컬럼의 이름을 리스트로 반환하는 함수</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (DataFrame): 숫자형 컬럼의 이름을 추출할 데이터프레임</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: 숫자형 컬럼의 이름 리스트</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s2">&quot;number&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_qtcheck.get_categorical_column_names" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">get_categorical_column_names</span>
+
+
+<a href="#hossam.my_qtcheck.get_categorical_column_names" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_categorical_column_names</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>데이터프레임에서 범주형 컬럼의 이름을 리스트로 반환하는 함수</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>범주형 컬럼의 이름을 추출할 데이터프레임</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>list</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>범주형 컬럼의 이름 리스트</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/my_qtcheck.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_categorical_column_names</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    데이터프레임에서 범주형 컬럼의 이름을 리스트로 반환하는 함수</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (DataFrame): 범주형 컬럼의 이름을 추출할 데이터프레임</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: 범주형 컬럼의 이름 리스트</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s2">&quot;category&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_qtcheck.check_duplicates" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">check_duplicates</span>
+
+
+<a href="#hossam.my_qtcheck.check_duplicates" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">check_duplicates</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>데이터프레임에서 행 단위 중복을 검사하고, 중복된 행을 제거하는 함수</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>중복을 검사할 데이터프레임</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>drop</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>중복된 행을 제거할지 여부 (기본값: True)</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>DataFrame</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>중복이 제거된 데이터프레임</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/my_qtcheck.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">check_duplicates</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    데이터프레임에서 행 단위 중복을 검사하고, 중복된 행을 제거하는 함수</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (DataFrame): 중복을 검사할 데이터프레임</span>
+<span class="sd">        drop (bool): 중복된 행을 제거할지 여부 (기본값: True)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame: 중복이 제거된 데이터프레임</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">duplicate_rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">duplicated</span><span class="p">()</span>
+    <span class="n">num_duplicates</span> <span class="o">=</span> <span class="n">duplicate_rows</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> 
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;중복된 행의 수: </span><span class="si">{</span><span class="n">num_duplicates</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">drop</span> <span class="ow">and</span> <span class="n">num_duplicates</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;중복된 행이 제거되었습니다.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_qtcheck.check_missing_values" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">check_missing_values</span>
+
+
+<a href="#hossam.my_qtcheck.check_missing_values" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">check_missing_values</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>데이터프레임에서 컬럼별 결측치 개수와 비율을 계산하여 데이터 프레임으로 반환하는 함수</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>결측치를 점검할 데이터프레임</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>DataFrame</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>컬럼별 결측치 개수와 비율이 포함된 데이터프레임</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/my_qtcheck.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">check_missing_values</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    데이터프레임에서 컬럼별 결측치 개수와 비율을 계산하여 데이터 프레임으로 반환하는 함수</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (DataFrame): 결측치를 점검할 데이터프레임</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame: 컬럼별 결측치 개수와 비율이 포함된 데이터프레임</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">na_count</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">na_ratio</span> <span class="o">=</span> <span class="p">(</span><span class="n">na_count</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span>
+
+    <span class="k">return</span> <span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s1">&#39;Missing Count&#39;</span><span class="p">:</span> <span class="n">na_count</span><span class="p">,</span>
+        <span class="s1">&#39;Missing Ratio (%)&#39;</span><span class="p">:</span> <span class="n">na_ratio</span>
+    <span class="p">})</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_qtcheck.categorical_summary" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">categorical_summary</span>
+
+
+<a href="#hossam.my_qtcheck.categorical_summary" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">categorical_summary</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>데이터프레임의 범주형 컬럼에 대한 요약 통계를 반환하는 함수</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>범주형 컬럼의 요약 통계를 출력할 데이터프레임</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>columns</code>
+            </td>
+            <td>
+                  <code><span title="list">list</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>요약 통계를 출력할 범주형 컬럼 리스트</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>value_counts</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>각 범주형 컬럼의 value_counts()를 출력할지 여부 (기본값: True)</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>save_path</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>요약 통계 결과를 CSV 파일로 저장할 경로 (기본값: None, 저장하지 않음)</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>DataFrame</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>범주형 컬럼에 대한 요약 통계가 포함된 데이터프레임</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/my_qtcheck.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">categorical_summary</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    데이터프레임의 범주형 컬럼에 대한 요약 통계를 반환하는 함수</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (DataFrame): 범주형 컬럼의 요약 통계를 출력할 데이터프레임</span>
+<span class="sd">        columns (list): 요약 통계를 출력할 범주형 컬럼 리스트</span>
+<span class="sd">        value_counts (bool): 각 범주형 컬럼의 value_counts()를 출력할지 여부 (기본값: True)</span>
+<span class="sd">        save_path (str): 요약 통계 결과를 CSV 파일로 저장할 경로 (기본값: None, 저장하지 않음)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame: 범주형 컬럼에 대한 요약 통계가 포함된 데이터프레임</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># columns가 비어있으면 데이터프레임에서 범주형 컬럼의 이름을 가져옴</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">columns</span><span class="p">:</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="n">get_categorical_column_names</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="c1"># 대상 컬럼으로 데이터프레임 생성</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># 명목형 변수의 기술 통계량 계산</span>
+    <span class="n">desc_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+
+    <span class="c1"># 저장될 파일 경로가 전달된 경우 기술 통계량을 Excel 파일로 저장</span>
+    <span class="k">if</span> <span class="n">save_path</span><span class="p">:</span>
+        <span class="n">desc_df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s1">&#39;Summary&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># 각 범주형 컬럼의 value_counts()를 출력해야 한다면?</span>
+    <span class="k">if</span> <span class="n">value_counts</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+            <span class="n">cdf</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">())</span>
+            <span class="n">cdf</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">col</span>
+            <span class="n">cdf</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;📊 컬럼 &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39;의 value_counts():&quot;</span><span class="p">)</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">cdf</span><span class="p">)</span>
+
+            <span class="c1"># 저장될 파일 경로가 전달된 경우 value_counts 결과를 Excel 파일로 저장</span>
+            <span class="k">if</span> <span class="n">save_path</span><span class="p">:</span>
+                <span class="c1"># 기존 파일에 이어 쓰기를 수행하기 위해 ExcelWriter를 사용하여 시트별로 저장</span>
+                <span class="k">with</span> <span class="n">ExcelWriter</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">excel_writer</span><span class="p">:</span>
+                    <span class="n">cdf</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">excel_writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">desc_df</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_qtcheck.numerical_summary" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">numerical_summary</span>
+
+
+<a href="#hossam.my_qtcheck.numerical_summary" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">numerical_summary</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>데이터프레임의 숫자형 컬럼에 대한 요약 통계를 반환하는 함수</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>숫자형 컬럼의 요약 통계를 출력할 데이터프레임</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>columns</code>
+            </td>
+            <td>
+                  <code><span title="list">list</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>요약 통계를 출력할 숫자형 컬럼 리스트</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>save_path</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>요약 통계 결과를 CSV 파일로 저장할 경로 (기본값: None, 저장하지 않음)</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>DataFrame</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>숫자형 컬럼에 대한 요약 통계가 포함된 데이터프레임</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/my_qtcheck.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">numerical_summary</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    데이터프레임의 숫자형 컬럼에 대한 요약 통계를 반환하는 함수</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (DataFrame): 숫자형 컬럼의 요약 통계를 출력할 데이터프레임</span>
+<span class="sd">        columns (list): 요약 통계를 출력할 숫자형 컬럼 리스트</span>
+<span class="sd">        save_path (str): 요약 통계 결과를 CSV 파일로 저장할 경로 (기본값: None, 저장하지 않음)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame: 숫자형 컬럼에 대한 요약 통계가 포함된 데이터프레임</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 1) columns가 비어있으면 데이터프레임에서 숫자형 컬럼의 이름을 가져옴</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">columns</span><span class="p">:</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="n">get_number_column_names</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="n">desc_df</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 2) 평균-중앙값의 상대 차이율을 계산하여 중심 수준 파악</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># &quot;평균-중앙값 상대 차이율 = |평균 - 중앙값| / 중앙값&quot; 컬럼 추가</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;rel_diff&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;50%&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;50%&#39;</span><span class="p">]</span>
+
+    <span class="c1"># 상대 차이율 의미 컬럼 추가</span>
+    <span class="n">conditions</span> <span class="o">=</span> <span class="p">[</span><span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;rel_diff&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;rel_diff&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">]</span>
+    <span class="n">choices</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;similar&#39;</span><span class="p">,</span> <span class="s1">&#39;diff&#39;</span><span class="p">]</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;rdiff_flag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">conditions</span><span class="p">,</span> <span class="n">choices</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;large_diff&#39;</span><span class="p">)</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 3) IQR, 이상치 경계값 계산</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># iqr</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;iqr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;75%&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;25%&#39;</span><span class="p">]</span>
+
+    <span class="c1"># 상한 이상치 경계</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;upper_bound&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;75%&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;iqr&#39;</span><span class="p">]</span>
+
+    <span class="c1"># 하한 이상치 경계</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;lower_bound&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;25%&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;iqr&#39;</span><span class="p">]</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 4) 명목형 변수를 제외한 데이터 프레임 생성</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 5) 상한 이상치 탐지</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 상한 이상치 수</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;upper_outliers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">df</span> <span class="o">&gt;</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;upper_bound&#39;</span><span class="p">]))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="c1"># 상한 이상치 수 비율</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;upper_outliers_ratio&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;upper_outliers&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 6) 하한 이상치 탐지</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 하한 이상치 수</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;lower_outliers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">df</span> <span class="o">&lt;</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;lower_bound&#39;</span><span class="p">]))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="c1"># 하한 이상치 수 비율</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;lower_outliers_ratio&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;lower_outliers&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 7) 전체 이상치 집계</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 통합 이상치 수</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;outliers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;upper_outliers&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;lower_outliers&#39;</span><span class="p">]</span>
+
+    <span class="c1"># 통합 이상치 수 비율</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;outliers_ratio&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;outliers&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 8) 왜도 점검</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 왜도 계산</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;skew&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">skew</span><span class="p">()</span>
+
+    <span class="c1"># 왜도를 통한 분포 형태 해석</span>
+    <span class="n">conditions_skew</span> <span class="o">=</span> <span class="p">[(</span><span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;skew&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;skew&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)]</span>
+    <span class="n">choices_skew</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;left tail&#39;</span><span class="p">,</span> <span class="s1">&#39;right tail&#39;</span><span class="p">]</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;skew_interpret&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">conditions_skew</span><span class="p">,</span> <span class="n">choices_skew</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;symmetric&#39;</span><span class="p">)</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 9) 첨도 점검</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 첨도 계산</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;kurt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">kurt</span><span class="p">()</span>
+
+    <span class="c1"># 첨도를 통한 분포 형태 해석</span>
+    <span class="n">conditions_kurt</span> <span class="o">=</span> <span class="p">[(</span><span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;kurt&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;kurt&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)]</span>
+    <span class="n">choices_kurt</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;platykurtic&#39;</span><span class="p">,</span> <span class="s1">&#39;leptokurtic&#39;</span><span class="p">]</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;kurt_interpret&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">conditions_kurt</span><span class="p">,</span> <span class="n">choices_kurt</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;mesokurtic&#39;</span><span class="p">)</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 10) 로그 변환 필요성 판단 함수 정의 (inner function)</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">judge_log_transform</span><span class="p">(</span><span class="n">skew</span><span class="p">,</span> <span class="n">kurt</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">skew</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>                        <span class="c1"># 강한 우측 꼬리 분포</span>
+            <span class="k">return</span> <span class="s2">&quot;log1p&quot;</span>
+        <span class="k">elif</span> <span class="n">skew</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="ow">and</span> <span class="n">kurt</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>       <span class="c1"># 우측 꼬리 분포이면서 첨도가 높은 경우</span>
+            <span class="k">return</span> <span class="s2">&quot;log1p&quot;</span>
+        <span class="k">elif</span> <span class="n">skew</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>                    <span class="c1"># 강한 좌측 꼬리 분포</span>
+            <span class="k">return</span> <span class="s2">&quot;reverse_log1p&quot;</span>
+        <span class="k">elif</span> <span class="n">skew</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.5</span> <span class="ow">and</span> <span class="n">kurt</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>      <span class="c1"># 좌측 꼬리 분포이면서 첨도가 높은 경우</span>
+            <span class="k">return</span> <span class="s2">&quot;reverse_log1p&quot;</span>
+        <span class="k">else</span><span class="p">:</span>                               <span class="c1"># 대칭 분포</span>
+            <span class="k">return</span> <span class="s2">&quot;none&quot;</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 11) 로그 변환 필요성 판정</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;log_need&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">judge_log_transform</span><span class="p">(</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;skew&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;kurt&#39;</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 12) 기술 통계량 표 저장</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 저장 경로 파라미터가 전달되었다면 기술 통계량 표를 Excel 파일로 저장</span>
+    <span class="k">if</span> <span class="n">save_path</span><span class="p">:</span>
+        <span class="n">desc_df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 13) 결과 리턴</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="k">return</span> <span class="n">desc_df</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_qtcheck.auto_qtcheck" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">auto_qtcheck</span>
+
+
+<a href="#hossam.my_qtcheck.auto_qtcheck" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">auto_qtcheck</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dataset_name</span><span class="o">=</span><span class="s1">&#39;dataset&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>데이터 품질 점검 프로세스(a.ipynb)를 대화형으로 자동 실행하는 함수.</p>
+<p>호출하면 아래 단계를 순서대로 진행하며, 각 단계의 분기점마다 사용자 입력을
+받아 my_qtcheck의 기존 기능들을 자동으로 호출한다. 모든 질문은 엔터만 누르면
+대괄호 안의 기본값이 적용된다.</p>
+<div class="highlight"><pre><span></span><code>1. 자료형 확인            → DataFrame.info()
+2. 자료형 변환            → set_type()
+3. 중복 점검/제거         → check_duplicates()
+4. 결측치 점검/삭제       → check_missing_values() (발견 시 삭제 여부 질문)
+5. 명목형 기술 통계량     → categorical_summary()
+6. 연속형 기술 통계량     → numerical_summary()
+7. 이상치 점검/삭제       → IQR 1.5배 경계 기준 (발견 시 삭제 여부 질문)
+8. 품질 검사 결과 저장    → DataFrame.to_excel() (정제 완료본)
+</code></pre></div>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>품질 점검 대상 데이터프레임 (예: load_data로 불러온 origin)</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>dataset_name</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>저장 파일명 접두어로 사용할 데이터셋 이름</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;dataset&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>DataFrame</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>모든 점검/정제를 마친 데이터프레임</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/my_qtcheck.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span>
+<span class="normal">469</span>
+<span class="normal">470</span>
+<span class="normal">471</span>
+<span class="normal">472</span>
+<span class="normal">473</span>
+<span class="normal">474</span>
+<span class="normal">475</span>
+<span class="normal">476</span>
+<span class="normal">477</span>
+<span class="normal">478</span>
+<span class="normal">479</span>
+<span class="normal">480</span>
+<span class="normal">481</span>
+<span class="normal">482</span>
+<span class="normal">483</span>
+<span class="normal">484</span>
+<span class="normal">485</span>
+<span class="normal">486</span>
+<span class="normal">487</span>
+<span class="normal">488</span>
+<span class="normal">489</span>
+<span class="normal">490</span>
+<span class="normal">491</span>
+<span class="normal">492</span>
+<span class="normal">493</span>
+<span class="normal">494</span>
+<span class="normal">495</span>
+<span class="normal">496</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">auto_qtcheck</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dataset_name</span><span class="o">=</span><span class="s2">&quot;dataset&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    데이터 품질 점검 프로세스(a.ipynb)를 대화형으로 자동 실행하는 함수.</span>
+
+<span class="sd">    호출하면 아래 단계를 순서대로 진행하며, 각 단계의 분기점마다 사용자 입력을</span>
+<span class="sd">    받아 my_qtcheck의 기존 기능들을 자동으로 호출한다. 모든 질문은 엔터만 누르면</span>
+<span class="sd">    대괄호 안의 기본값이 적용된다.</span>
+
+<span class="sd">        1. 자료형 확인            → DataFrame.info()</span>
+<span class="sd">        2. 자료형 변환            → set_type()</span>
+<span class="sd">        3. 중복 점검/제거         → check_duplicates()</span>
+<span class="sd">        4. 결측치 점검/삭제       → check_missing_values() (발견 시 삭제 여부 질문)</span>
+<span class="sd">        5. 명목형 기술 통계량     → categorical_summary()</span>
+<span class="sd">        6. 연속형 기술 통계량     → numerical_summary()</span>
+<span class="sd">        7. 이상치 점검/삭제       → IQR 1.5배 경계 기준 (발견 시 삭제 여부 질문)</span>
+<span class="sd">        8. 품질 검사 결과 저장    → DataFrame.to_excel() (정제 완료본)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (DataFrame): 품질 점검 대상 데이터프레임 (예: load_data로 불러온 origin)</span>
+<span class="sd">        dataset_name (str): 저장 파일명 접두어로 사용할 데이터셋 이름</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame: 모든 점검/정제를 마친 데이터프레임</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;🔍 [</span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">] 데이터 품질 점검을 시작합니다.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   (각 질문에 엔터만 누르면 대괄호 안의 기본값이 적용됩니다.)&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 1) 자료형 확인</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">## #02. 자료형 점검 — 1. 자료형 확인</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 2) 자료형 변환</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">## #02. 자료형 점검 — 2. 자료형 변환</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">object_cols</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+    <span class="n">default_cat</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">object_cols</span><span class="p">)</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">_prompt</span><span class="p">(</span><span class="s2">&quot;범주형(category)으로 변환할 컬럼을 콤마로 구분해 입력하세요. &quot;</span>
+                  <span class="s2">&quot;(변환하지 않으려면 none 입력)&quot;</span><span class="p">,</span> <span class="n">default_cat</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">raw</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span> <span class="ow">or</span> <span class="n">raw</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;➡️  자료형 변환을 건너뜁니다.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">category_cols</span> <span class="o">=</span> <span class="n">_parse_columns</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">set_type</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">as_category</span><span class="o">=</span><span class="n">category_cols</span><span class="p">)</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 3) 중복 점검 / 제거</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">## #03. 데이터 중복 점검</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">drop</span> <span class="o">=</span> <span class="n">_prompt_yes_no</span><span class="p">(</span><span class="s2">&quot;중복된 행을 제거할까요?&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">check_duplicates</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="n">drop</span><span class="p">)</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 4) 결측치 점검 / 삭제</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">## #04. 결측치 점검</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">missing</span> <span class="o">=</span> <span class="n">check_missing_values</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">_show</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span>
+
+    <span class="n">total_missing</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">missing</span><span class="p">[</span><span class="s2">&quot;Missing Count&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">total_missing</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ 결측치가 없습니다.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;⚠️  총 </span><span class="si">{</span><span class="n">total_missing</span><span class="si">}</span><span class="s2">개의 결측치가 발견되었습니다.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_prompt_yes_no</span><span class="p">(</span><span class="s2">&quot;결측치가 포함된 행을 삭제할까요?&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">before</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;🧹 결측치가 포함된 행 </span><span class="si">{</span><span class="n">before</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">개를 삭제했습니다. &quot;</span>
+                  <span class="sa">f</span><span class="s2">&quot;(현재 </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">행)&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;➡️  결측치를 유지합니다.&quot;</span><span class="p">)</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 5) 명목형 변수 기술 통계량</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">## #05. 기술 통계량 — 명목형 변수</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">get_categorical_column_names</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+        <span class="n">cat_save</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">_prompt_yes_no</span><span class="p">(</span><span class="s2">&quot;명목형 요약을 Excel로 저장할까요?&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">cat_save</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">_category_summary.xlsx&quot;</span>   <span class="c1"># 용도에 맞는 파일명 자동 지정</span>
+        <span class="n">categorical_summary</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="n">cat_save</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cat_save</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;💾 저장 완료: </span><span class="si">{</span><span class="n">cat_save</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ℹ️  범주형(category) 컬럼이 없어 건너뜁니다. &quot;</span>
+              <span class="s2">&quot;(2단계에서 자료형을 변환했는지 확인하세요.)&quot;</span><span class="p">)</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 6) 연속형 변수 기술 통계량</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">## #06. 기술 통계량 — 연속형 변수</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">num_save</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">_prompt_yes_no</span><span class="p">(</span><span class="s2">&quot;연속형 요약을 Excel로 저장할까요?&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">num_save</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">_numerical_summary.xlsx&quot;</span>      <span class="c1"># 용도에 맞는 파일명 자동 지정</span>
+    <span class="n">desc_df</span> <span class="o">=</span> <span class="n">numerical_summary</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="n">num_save</span><span class="p">)</span>
+    <span class="n">_show</span><span class="p">(</span><span class="n">desc_df</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_save</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;💾 저장 완료: </span><span class="si">{</span><span class="n">num_save</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 7) 이상치 점검 / 삭제</span>
+    <span class="c1">#    numerical_summary가 계산한 IQR(1.5배) 경계값을 이용해 이상치 행을 탐지</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">## #07. 이상치 점검</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">num_cols</span> <span class="o">=</span> <span class="n">get_number_column_names</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">lower</span> <span class="o">=</span> <span class="n">desc_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">num_cols</span><span class="p">,</span> <span class="s2">&quot;lower_bound&quot;</span><span class="p">]</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="n">desc_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">num_cols</span><span class="p">,</span> <span class="s2">&quot;upper_bound&quot;</span><span class="p">]</span>
+    <span class="n">outlier_mask</span> <span class="o">=</span> <span class="p">((</span><span class="n">df</span><span class="p">[</span><span class="n">num_cols</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">lower</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">num_cols</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">upper</span><span class="p">))</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">n_outlier_rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">outlier_mask</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">n_outlier_rows</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ 이상치가 없습니다.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;⚠️  이상치가 포함된 행이 </span><span class="si">{</span><span class="n">n_outlier_rows</span><span class="si">}</span><span class="s2">개 발견되었습니다. &quot;</span>
+              <span class="s2">&quot;(IQR 1.5배 경계 기준)&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_prompt_yes_no</span><span class="p">(</span><span class="s2">&quot;이상치가 포함된 행을 삭제할까요?&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="n">outlier_mask</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;🧹 이상치가 포함된 행 </span><span class="si">{</span><span class="n">n_outlier_rows</span><span class="si">}</span><span class="s2">개를 삭제했습니다. &quot;</span>
+                  <span class="sa">f</span><span class="s2">&quot;(현재 </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">행)&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;➡️  이상치를 유지합니다.&quot;</span><span class="p">)</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 8) 정제 결과 저장 (결측치·이상치 처리가 모두 반영된 최종 데이터셋)</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">## #08. 품질 검사 결과 저장</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">_prompt_yes_no</span><span class="p">(</span><span class="s2">&quot;정제된 데이터셋을 Excel로 저장할까요?&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">_qtcheck.xlsx&quot;</span>          <span class="c1"># 용도에 맞는 파일명 자동 지정</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;💾 저장 완료: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;➡️  저장을 건너뜁니다.&quot;</span><span class="p">)</span>
+
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="c1"># 9) 완료</span>
+    <span class="c1">#-----------------------------------------------------</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🎉 데이터 품질 점검이 완료되었습니다.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.expand", "content.code.copy", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+        <script src="../../assets/javascripts/mermaid-init.js"></script>
+      
+    
+  </body>
+</html>
