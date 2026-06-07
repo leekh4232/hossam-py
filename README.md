@@ -2,7 +2,7 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-0.5.16-green.svg)](https://pypi.org/project/hossam/)
+[![PyPI version](https://img.shields.io/pypi/v/hossam.svg)](https://pypi.org/project/hossam/)
 [![Documentation](https://img.shields.io/badge/docs-py.hossam.kr-blue.svg)](https://py.hossam.kr)
 
 **Hossam**은 데이터 분석, 시각화, 통계 처리를 위한 종합 헬퍼 라이브러리입니다.

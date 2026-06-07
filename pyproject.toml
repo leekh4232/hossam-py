@@ -63,6 +63,9 @@ dependencies = [
     "fastparquet"
 ]
 
+[project.scripts]
+hossam = "hossam.cli:main"
+
 [project.urls]
 Homepage = "https://github.com/leekh4232/hossam-py"
 Repository = "https://github.com/leekh4232/hossam-py"
