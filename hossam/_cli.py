@@ -87,7 +87,7 @@ def _run_qtcheck(args):
     """
     품질 점검(qtcheck) 모드: 데이터셋을 읽어 대화형 품질 점검을 수행한다.
     """
-    from .qtcheck_cli import auto_qtcheck
+    from ._cli_qtcheck import auto_qtcheck
 
     data = _load_dataset(args.dataset)
 

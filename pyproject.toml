@@ -64,7 +64,7 @@ dependencies = [
 ]
 
 [project.scripts]
-hossam = "hossam.cli:main"
+hossam = "hossam._cli:main"
 
 [project.urls]
 Homepage = "https://github.com/leekh4232/hossam-py"

@@ -11,7 +11,7 @@ from . import my_classroom
 from . import my_util
 from . import my_plot
 from . import my_qtcheck
-from . import qtcheck_cli
+from . import _cli_qtcheck
 from .my_util import load_info
 from .my_util import _load_data_remote as load_data
 
@@ -37,7 +37,7 @@ __all__ = [
     "my_plot",
     "my_classroom",
     "my_qtcheck",
-    "qtcheck_cli"
+    "_cli_qtcheck"
 ]
 
 
