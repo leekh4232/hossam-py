@@ -403,81 +403,14 @@ def pretty_table(data: DataFrame, tablefmt="simple", headers: str = "keys") -> N
     )
 
 # ===================================================================
-# 데이터 프레임을 통해 필요한 초기 작업을 수행
-# ===================================================================
-def __data_info(
-    origin: DataFrame,
-    index_col: str | None = None,
-    timeindex: bool = False,
-    info: bool = True,
-    categories: list | None = None) -> DataFrame:
-    """데이터 프레임을 통해 필요한 초기 작업을 수행한다.
-
-    Args:
-        origin (DataFrame): 원본 데이터 프레임
-        index_col (str, optional): 인덱스 필드의 이름. Defaults to None.
-        timeindex (bool, optional): True일 경우 인덱스를 시계열로 설정. Defaults to False.
-        info (bool, optional): True일 경우 정보 출력. Defaults to True.
-        categories (list, optional): 카테고리로 지정할 필드 목록. Defaults to None.
-
-    Returns:
-        DataFrame: 데이터프레임 객체
-    """
-
-    data = origin.copy()
-
-    if index_col is not None and index_col in data.columns:
-        data.set_index(index_col, inplace=True)
-
-    if timeindex:
-        data.index = DatetimeIndex(data.index)
-
-    if categories:
-        from .my_prep import set_category  # type: ignore
-        data = set_category(data, *categories)
-
-    if info:
-        print("\n✅ 테이블 정보")
-        pretty_table(data.info(), tablefmt="pretty") # type: ignore
-
-        print("\n✅ 상위 5개 행")
-        pretty_table(data.head(), tablefmt="pretty")
-
-        print("\n✅ 하위 5개 행")
-        pretty_table(data.tail(), tablefmt="pretty")
-
-        print("\n📊 기술통계")
-        desc = data.describe().T
-        desc["nan"] = data.isnull().sum()
-        pretty_table(desc, tablefmt="pretty")
-
-        # 전달된 필드 이름 리스트가 있다면 반복
-        if categories:
-            print("\n🗂️ 카테고리 정보")
-            for c in categories:
-                d = DataFrame({"count": data[c].value_counts()})
-                d.index.name = c
-                pretty_table(d, tablefmt="pretty")
-
-    return data
-
-# ===================================================================
 # 데이터 로드
 # ===================================================================
-def load_data(key: str,
-                index_col: str | None = None,
-                timeindex: bool = False,
-                info: bool = True,
-                categories: list | None = None,
-                local: str | None = None) -> DataFrame:
+def load_data(key: str, index_col: str | None = None, local: str | None = None) -> DataFrame:
     """데이터 키를 통해 데이터를 로드한 뒤 기본 전처리/출력을 수행한다.
 
     Args:
         key (str): 데이터 키 (metadata.json에 정의된 데이터 식별자)
         index_col (str, optional): 인덱스로 설정할 컬럼명. Defaults to None.
-        timeindex (bool, optional): True일 경우 인덱스를 시계열(DatetimeIndex)로 설정한다. Defaults to False.
-        info (bool, optional): True일 경우 데이터 정보(head, tail, 기술통계, 카테고리 정보)를 출력한다. Defaults to True.
-        categories (list, optional): 카테고리 dtype으로 설정할 컬럼명 목록. Defaults to None.
         local (str, optional): 원격 데이터 대신 로컬 메타데이터 경로를 사용한다. Defaults to None.
 
     Returns:
@@ -486,7 +419,7 @@ def load_data(key: str,
     Examples:
         ```python
         from hossam import *
-        df = my_util.load_data("AD_SALES", index_col=None, timeindex=False, info=False)
+        df = my_util.load_data("AD_SALES")
         ```
     """
 
@@ -494,19 +427,15 @@ def load_data(key: str,
 
     origin = None
 
-    if k.endswith(".xlsx"):
-        print("\033[94m[Excel]\033[0m", key)
-        origin = read_excel(key)
-    elif k.endswith(".csv"):
-        print("\033[94m[CSV]\033[0m", key)
-        origin = read_csv(key)
+    if k.endswith(".csv") or k.endswith(".xlsx") or k.endswith(".xls") or k.endswith(".hossam") or k.endswith(".parquet"):
+        origin = __get_df(key, index_col=index_col)
     else:
         origin = _load_data_remote(key, local) # type: ignore
 
     if origin is None:
         raise RuntimeError("Data loading failed: origin is None")
 
-    return __data_info(origin, index_col, timeindex, info, categories)
+    return origin
 
 # ===================================================================
 # 2차원 리스트 여부 확인
