@@ -495,8 +495,10 @@ def load_data(key: str,
     origin = None
 
     if k.endswith(".xlsx"):
+        print("\033[94m[Excel]\033[0m", key)
         origin = read_excel(key)
     elif k.endswith(".csv"):
+        print("\033[94m[CSV]\033[0m", key)
         origin = read_csv(key)
     else:
         origin = _load_data_remote(key, local) # type: ignore

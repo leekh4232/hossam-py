@@ -13,7 +13,7 @@ from . import my_plot
 from . import my_qtcheck
 from . import _cli_qtcheck
 from .my_util import load_info
-from .my_util import _load_data_remote as load_data
+from .my_util import load_data
 
 # py-modules
 import pandas as pd
