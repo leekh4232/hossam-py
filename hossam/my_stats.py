@@ -1,8 +1,12 @@
 from math import sqrt
-from pandas import DataFrame
+from pandas import DataFrame, Series, concat
 from scipy.stats import t
 from scipy.stats import normaltest, bartlett, levene
+from scipy.stats import ttest_1samp, ttest_ind, ttest_rel, wilcoxon, mannwhitneyu
 
+# ===================================================================
+# 모평균의 신뢰구간 계산
+# ===================================================================
 def ci(data, column=None, clevel=0.95):
     """
     주어진 데이터에 대한 모평균의 신뢰구간을 계산하는 함수
@@ -29,7 +33,9 @@ def ci(data, column=None, clevel=0.95):
     return t.interval(clevel, dof, loc=sample_mean, scale=sample_std_error)
 
 
-
+# ===================================================================
+# 가설검정의 가정 검정
+# ===================================================================
 def test_assumptions(data, columns=None, alpha=0.05, center="median"):
     """
     가설검정의 가정(정규성, 등분산성)을 일괄적으로 검정하여 결과표를 반환하는 함수
@@ -52,12 +58,17 @@ def test_assumptions(data, columns=None, alpha=0.05, center="median"):
     if columns is None:
         columns = data.select_dtypes(include="number").columns.tolist()
 
+    # 하나의 컬럼명이 문자열로 전달된 경우 리스트로 감싸준다
+    if type(columns) == str:
+        columns = [columns]
+
     report = []         # 결과를 누적할 리스트
     normal_dist = True  # 모든 변수가 정규성을 충족하는지 여부
 
-    # 1) 각 변수에 대한 정규성 검정
+    # 각 변수에 대한 정규성 검정
     for c in columns:
-        s, p = normaltest(data[c])
+        # 결측치 제거 후 검정 (불균형 표본 대응)
+        s, p = normaltest(data[c].dropna())
         normalize = p >= alpha
 
         report.append({
@@ -70,17 +81,15 @@ def test_assumptions(data, columns=None, alpha=0.05, center="median"):
 
         normal_dist = normal_dist and normalize
 
-    # 2) 변수가 두 개 이상인 경우 등분산성 검정
+    # 변수가 두 개 이상인 경우 등분산성 검정
     if len(columns) > 1:
-        # 각 컬럼을 실수형으로 변환하여 리스트로 추출 (Bartlett은 실수형 필요)
-        samples = [data[c].astype("float") for c in columns]
+        # 각 컬럼을 결측 제거 후 실수형으로 변환하여 리스트로 추출 (Bartlett은 실수형 필요)
+        samples = [data[c].dropna().astype("float") for c in columns]
 
-        if normal_dist:
-            # 모든 변수가 정규성을 충족 → Bartlett 검정
+        if normal_dist: # 모든 변수가 정규성을 충족 → Bartlett 검정
             name = "Bartlett"
             s, p = bartlett(*samples)
-        else:
-            # 하나라도 정규성을 충족하지 못함 → Levene 검정 (중앙값 기준)
+        else:           # 하나라도 정규성을 충족하지 못함 → Levene 검정
             name = "Levene"
             s, p = levene(*samples, center=center)
 
@@ -94,3 +103,214 @@ def test_assumptions(data, columns=None, alpha=0.05, center="median"):
 
     # 결과표 리턴
     return DataFrame(report).set_index("field")
+
+
+
+# ===================================================================
+# 단일표본 T검정
+# ===================================================================
+def test_1sample(data, column, popmean=0, alpha=0.05):
+    """한 집단의 평균이 기준값(popmean)과 같은지 검정하는 함수
+
+    정규성 충족 시 일표본 t검정, 미충족 시 Wilcoxon 부호순위 검정을 수행하며,
+    양측·좌측단측·우측단측 세 가지 대립가설을 일괄 검정한다.
+
+    Args:
+        data (DataFrame): 검정 대상 데이터프레임
+        column (str): 검정할 연속형 컬럼명
+        popmean (float): 비교 기준이 되는 모평균 μ₀ (기본값: 0)
+        alpha (float): 유의수준 (기본값: 0.05)
+
+    Returns:
+        DataFrame: 대립가설(alternative)별 검정·통계량·p-value·유의성 결과표
+                   (two-sided / less / greater 3행)
+    """
+    # 대상 컬럼을 결측 제거하여 추출
+    sample = data[column].dropna()
+
+    # test_assumptions로 정규성 검정 (단일 컬럼이라 등분산성은 수행되지 않음)
+    report = test_assumptions(data, columns=[column], alpha=alpha)
+
+    # 정규성 충족 여부 추출
+    is_normal = bool(report.loc[column, "result"])
+
+    # 정규성 충족 여부에 따라 적용할 검정 이름 결정
+    test_name = "One-sample t-test" if is_normal else "Wilcoxon signed-rank test"
+
+    # 대립가설 방향별 해석 문구 (유의할 때 표시)
+    verdicts = {"two-sided": "차이 있음", "less": "μ₀보다 작음", "greater": "μ₀보다 큼"}
+
+    rows = []
+    # 양측·좌측단측·우측단측을 일괄 검정
+    for alt in ("two-sided", "less", "greater"):
+        # 정규성 충족 → 일표본 t검정, 미충족 → 차이값의 Wilcoxon 부호순위 검정
+        if is_normal:
+            stat, p = ttest_1samp(sample, popmean, alternative=alt)
+        else:
+            stat, p = wilcoxon(sample - popmean, alternative=alt)
+
+        # p < alpha 이면 통계적으로 유의(귀무가설 기각)
+        significant = p < alpha
+
+        rows.append({
+            "test": test_name,
+            "alternative": alt,
+            "statistic": round(float(stat), 4),
+            "p-value": round(float(p), 4),
+            "significant": significant,
+            "result": verdicts[alt] if significant else "차이 없음",
+        })
+
+    # 세 방향 결과를 표로 정리하여 반환
+    return DataFrame(rows).set_index(["test", "alternative"])
+
+
+# ===================================================================
+# 독립표본 T검정
+# ===================================================================
+def test_2sample(data, group, value, alpha=0.05):
+    """독립된 두 집단의 평균이 같은지 검정하는 함수 (long 형식)
+
+    두 집단 모두 정규성 충족 시 등분산성에 따라 Student/Welch t검정,
+    하나라도 미충족 시 Mann–Whitney U 검정을 수행하며,
+    양측·좌측단측·우측단측 세 가지 대립가설을 일괄 검정한다.
+
+    Args:
+        data (DataFrame): 검정 대상 데이터프레임
+        group (str): 집단을 구분하는 범주형 컬럼명 (수준 2개)
+        value (str): 비교할 연속형 측정값 컬럼명
+        alpha (float): 유의수준 (기본값: 0.05)
+
+    Returns:
+        DataFrame: 대립가설(alternative)별 검정·통계량·p-value·유의성 결과표
+                   (방향은 첫 번째 수준 A, 두 번째 수준 B 기준 / 3행)
+    """
+    # group 컬럼의 고유 수준(=두 집단)을 추출
+    levels = list(data[group].dropna().unique())
+
+    # 독립표본은 집단이 정확히 두 개여야 함
+    if len(levels) != 2:
+        raise ValueError(f"독립표본은 group 수준이 2개여야 합니다. 현재: {len(levels)}개")
+
+    # 수준별로 측정값을 분리하고 결측 제거
+    a = data.loc[data[group] == levels[0], value].dropna()
+    b = data.loc[data[group] == levels[1], value].dropna()
+
+    # 두 집단을 컬럼으로 묶어 정규성+등분산성을 동시에 검정 (길이가 달라도 무방)
+    paired = concat([a.reset_index(drop=True), b.reset_index(drop=True)], axis=1)
+    paired.columns = [str(levels[0]), str(levels[1])]
+    report = test_assumptions(paired, columns=list(paired.columns), alpha=alpha)
+
+    # 두 집단 모두 정규성을 충족하는지 확인
+    both_normal = bool(report.loc[str(levels[0]), "result"]) and bool(report.loc[str(levels[1]), "result"])
+
+    # 등분산성 충족 여부 추출
+    equal_var = bool(report[report["test"] == "equal_var"]["result"].iloc[0])
+
+    # 가정 검정 결과에 따라 적용할 검정 이름 결정
+    if not both_normal:
+        test_name = "Mann-Whitney U test"      # 정규성 미충족 → 비모수 검정
+    elif equal_var:
+        test_name = "Student t-test"           # 정규성 충족 + 등분산
+    else:
+        test_name = "Welch t-test"             # 정규성 충족 + 이분산
+
+    # 대립가설 방향별 해석 문구 (유의할 때 표시, A=levels[0] / B=levels[1])
+    verdicts = {
+        "two-sided": "차이 있음",
+        "less": f"{levels[0]} < {levels[1]}",
+        "greater": f"{levels[0]} > {levels[1]}",
+    }
+
+    rows = []
+    # 양측·좌측단측·우측단측을 일괄 검정
+    for alt in ("two-sided", "less", "greater"):
+        # 적용 검정에 맞춰 대립가설 방향을 전달하여 검정 수행
+        if test_name == "Mann-Whitney U test":
+            stat, p = mannwhitneyu(a, b, alternative=alt)
+        elif test_name == "Student t-test":
+            stat, p = ttest_ind(a, b, equal_var=True, alternative=alt)
+        else:
+            stat, p = ttest_ind(a, b, equal_var=False, alternative=alt)
+
+        # p < alpha 이면 통계적으로 유의(귀무가설 기각)
+        significant = p < alpha
+
+        rows.append({
+            "test": test_name,
+            "alternative": alt,
+            "statistic": round(float(stat), 4),
+            "p-value": round(float(p), 4),
+            "significant": significant,
+            "result": verdicts[alt] if significant else "차이 없음",
+        })
+
+    # 세 방향 결과를 표로 정리하여 반환
+    return DataFrame(rows).set_index(["test", "alternative"])
+
+
+# ===================================================================
+# 대응표본 T검정
+# ===================================================================
+def test_paired(data, before, after, alpha=0.05):
+    """짝지어진 두 측정값(전/후)의 차이가 있는지 검정하는 함수 (wide 형식)
+
+    차이값 d = after − before 의 정규성 충족 시 대응표본 t검정,
+    미충족 시 Wilcoxon 부호순위 검정을 수행하며,
+    양측·좌측단측·우측단측 세 가지 대립가설을 일괄 검정한다.
+
+    Args:
+        data (DataFrame): 검정 대상 데이터프레임
+        before (str): 사전 측정값 컬럼명
+        after (str): 사후 측정값 컬럼명
+        alpha (float): 유의수준 (기본값: 0.05)
+
+    Returns:
+        DataFrame: 대립가설(alternative)별 검정·통계량·p-value·유의성 결과표
+                   (방향은 after, before 기준 / 3행)
+    """
+    # 같은 행끼리 짝지어야 하므로 두 컬럼을 함께 결측 행 제거
+    paired = data[[before, after]].dropna()
+
+    # 차이값 d = after − before 를 계산
+    d = (paired[after] - paired[before]).rename("diff")
+
+    # test_assumptions로 차이값의 정규성만 검정 (단일 컬럼)
+    report = test_assumptions(DataFrame({"diff": d}), columns=["diff"], alpha=alpha)
+
+    # 차이값의 정규성 충족 여부
+    is_normal = bool(report.loc["diff", "result"])
+
+    # 정규성 충족 여부에 따라 적용할 검정 이름 결정
+    test_name = "Paired t-test" if is_normal else "Wilcoxon signed-rank test"
+
+    # 대립가설 방향별 해석 문구 (유의할 때 표시)
+    verdicts = {
+        "two-sided": "차이 있음",
+        "less": f"{after} < {before}",
+        "greater": f"{after} > {before}",
+    }
+
+    rows = []
+    # 양측·좌측단측·우측단측을 일괄 검정 (항상 after, before 순)
+    for alt in ("two-sided", "less", "greater"):
+        # 정규성 충족 → 대응표본 t검정, 미충족 → Wilcoxon 부호순위 검정
+        if is_normal:
+            stat, p = ttest_rel(paired[after], paired[before], alternative=alt)
+        else:
+            stat, p = wilcoxon(paired[after], paired[before], alternative=alt)
+
+        # p < alpha 이면 통계적으로 유의(귀무가설 기각)
+        significant = p < alpha
+
+        rows.append({
+            "test": test_name,
+            "alternative": alt,
+            "statistic": round(float(stat), 4),
+            "p-value": round(float(p), 4),
+            "significant": significant,
+            "result": verdicts[alt] if significant else "차이 없음",
+        })
+
+    # 세 방향 결과를 표로 정리하여 반환
+    return DataFrame(rows).set_index(["test", "alternative"])
