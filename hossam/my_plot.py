@@ -812,8 +812,8 @@ def boxplot(
 
     if hue_value is not None and palette is not None:
         boxplot_kwargs["palette"] = palette
-    elif hue_value is None and palette is not None:
-        boxplot_kwargs["color"] = sb.color_palette(palette)[0]
+    # elif hue_value is None and palette is not None:
+    #     boxplot_kwargs["color"] = sb.color_palette(palette)[0]
 
     boxplot_kwargs.update(params)
     sb.boxplot(**boxplot_kwargs)
