@@ -129,7 +129,7 @@ def test_1sample(data, column, popmean=0, alpha=0.05):
     sample = data[column].dropna()
 
     # test_assumptions로 정규성 검정 (단일 컬럼이라 등분산성은 수행되지 않음)
-    report = test_assumptions(data, columns=[column], alpha=alpha)
+    report = test_assumptions(data, columns=column, alpha=alpha)
 
     # 정규성 충족 여부 추출
     is_normal = bool(report.loc[column, "result"])
@@ -143,95 +143,10 @@ def test_1sample(data, column, popmean=0, alpha=0.05):
     rows = []
     # 양측·좌측단측·우측단측을 일괄 검정
     for alt in ("two-sided", "less", "greater"):
-        # 정규성 충족 → 일표본 t검정, 미충족 → 차이값의 Wilcoxon 부호순위 검정
-        if is_normal:
+        if is_normal:   # 정규성 충족 → 일표본 t검정
             stat, p = ttest_1samp(sample, popmean, alternative=alt)
-        else:
+        else:           # 미충족 → 차이값의 Wilcoxon 부호순위 검정
             stat, p = wilcoxon(sample - popmean, alternative=alt)
-
-        # p < alpha 이면 통계적으로 유의(귀무가설 기각)
-        significant = p < alpha
-
-        rows.append({
-            "test": test_name,
-            "alternative": alt,
-            "statistic": round(float(stat), 4),
-            "p-value": round(float(p), 4),
-            "significant": significant,
-            "result": verdicts[alt] if significant else "차이 없음",
-        })
-
-    # 세 방향 결과를 표로 정리하여 반환
-    return DataFrame(rows).set_index(["test", "alternative"])
-
-
-# ===================================================================
-# 독립표본 T검정
-# ===================================================================
-def test_2sample(data, group, value, alpha=0.05):
-    """독립된 두 집단의 평균이 같은지 검정하는 함수 (long 형식)
-
-    두 집단 모두 정규성 충족 시 등분산성에 따라 Student/Welch t검정,
-    하나라도 미충족 시 Mann–Whitney U 검정을 수행하며,
-    양측·좌측단측·우측단측 세 가지 대립가설을 일괄 검정한다.
-
-    Args:
-        data (DataFrame): 검정 대상 데이터프레임
-        group (str): 집단을 구분하는 범주형 컬럼명 (수준 2개)
-        value (str): 비교할 연속형 측정값 컬럼명
-        alpha (float): 유의수준 (기본값: 0.05)
-
-    Returns:
-        DataFrame: 대립가설(alternative)별 검정·통계량·p-value·유의성 결과표
-                   (방향은 첫 번째 수준 A, 두 번째 수준 B 기준 / 3행)
-    """
-    # group 컬럼의 고유 수준(=두 집단)을 추출
-    levels = list(data[group].dropna().unique())
-
-    # 독립표본은 집단이 정확히 두 개여야 함
-    if len(levels) != 2:
-        raise ValueError(f"독립표본은 group 수준이 2개여야 합니다. 현재: {len(levels)}개")
-
-    # 수준별로 측정값을 분리하고 결측 제거
-    a = data.loc[data[group] == levels[0], value].dropna()
-    b = data.loc[data[group] == levels[1], value].dropna()
-
-    # 두 집단을 컬럼으로 묶어 정규성+등분산성을 동시에 검정 (길이가 달라도 무방)
-    paired = concat([a.reset_index(drop=True), b.reset_index(drop=True)], axis=1)
-    paired.columns = [str(levels[0]), str(levels[1])]
-    report = test_assumptions(paired, columns=list(paired.columns), alpha=alpha)
-
-    # 두 집단 모두 정규성을 충족하는지 확인
-    both_normal = bool(report.loc[str(levels[0]), "result"]) and bool(report.loc[str(levels[1]), "result"])
-
-    # 등분산성 충족 여부 추출
-    equal_var = bool(report[report["test"] == "equal_var"]["result"].iloc[0])
-
-    # 가정 검정 결과에 따라 적용할 검정 이름 결정
-    if not both_normal:
-        test_name = "Mann-Whitney U test"      # 정규성 미충족 → 비모수 검정
-    elif equal_var:
-        test_name = "Student t-test"           # 정규성 충족 + 등분산
-    else:
-        test_name = "Welch t-test"             # 정규성 충족 + 이분산
-
-    # 대립가설 방향별 해석 문구 (유의할 때 표시, A=levels[0] / B=levels[1])
-    verdicts = {
-        "two-sided": "차이 있음",
-        "less": f"{levels[0]} < {levels[1]}",
-        "greater": f"{levels[0]} > {levels[1]}",
-    }
-
-    rows = []
-    # 양측·좌측단측·우측단측을 일괄 검정
-    for alt in ("two-sided", "less", "greater"):
-        # 적용 검정에 맞춰 대립가설 방향을 전달하여 검정 수행
-        if test_name == "Mann-Whitney U test":
-            stat, p = mannwhitneyu(a, b, alternative=alt)
-        elif test_name == "Student t-test":
-            stat, p = ttest_ind(a, b, equal_var=True, alternative=alt)
-        else:
-            stat, p = ttest_ind(a, b, equal_var=False, alternative=alt)
 
         # p < alpha 이면 통계적으로 유의(귀무가설 기각)
         significant = p < alpha
@@ -299,6 +214,90 @@ def test_paired(data, before, after, alpha=0.05):
             stat, p = ttest_rel(paired[after], paired[before], alternative=alt)
         else:
             stat, p = wilcoxon(paired[after], paired[before], alternative=alt)
+
+        # p < alpha 이면 통계적으로 유의(귀무가설 기각)
+        significant = p < alpha
+
+        rows.append({
+            "test": test_name,
+            "alternative": alt,
+            "statistic": round(float(stat), 4),
+            "p-value": round(float(p), 4),
+            "significant": significant,
+            "result": verdicts[alt] if significant else "차이 없음",
+        })
+
+    # 세 방향 결과를 표로 정리하여 반환
+    return DataFrame(rows).set_index(["test", "alternative"])
+
+
+# ===================================================================
+# 독립표본 T검정
+# ===================================================================
+def test_independent(data, group, value, alpha=0.05):
+    """독립된 두 집단의 평균이 같은지 검정하는 함수 (long 형식)
+
+    두 집단 모두 정규성 충족 시 등분산성에 따라 Student/Welch t검정,
+    하나라도 미충족 시 Mann–Whitney U 검정을 수행하며,
+    양측·좌측단측·우측단측 세 가지 대립가설을 일괄 검정한다.
+
+    Args:
+        data (DataFrame): 검정 대상 데이터프레임
+        group (str): 집단을 구분하는 범주형 컬럼명 (수준 2개)
+        value (str): 비교할 연속형 측정값 컬럼명
+        alpha (float): 유의수준 (기본값: 0.05)
+
+    Returns:
+        DataFrame: 대립가설(alternative)별 검정·통계량·p-value·유의성 결과표
+                   (방향은 첫 번째 수준 A, 두 번째 수준 B 기준 / 3행)
+    """
+    # group 컬럼의 고유 수준(=두 집단)을 추출
+    levels = list(data[group].dropna().unique())
+
+    # 독립표본은 집단이 정확히 두 개여야 함
+    if len(levels) != 2:
+        raise ValueError(f"독립표본은 group 수준이 2개여야 합니다. 현재: {len(levels)}개")
+
+    # 수준별로 측정값을 분리하고 결측 제거
+    a = data.loc[data[group] == levels[0], value].dropna()
+    b = data.loc[data[group] == levels[1], value].dropna()
+
+    # 두 집단을 컬럼으로 묶어 정규성+등분산성을 동시에 검정 (길이가 달라도 무방)
+    paired = concat([a.reset_index(drop=True), b.reset_index(drop=True)], axis=1)
+    paired.columns = [str(levels[0]), str(levels[1])]
+    report = test_assumptions(paired, columns=list(paired.columns), alpha=alpha)
+
+    # 두 집단 모두 정규성을 충족하는지 확인
+    both_normal = bool(report.loc[str(levels[0]), "result"]) and bool(report.loc[str(levels[1]), "result"])
+
+    # 등분산성 충족 여부 추출
+    equal_var = bool(report[report["test"] == "equal_var"]["result"].iloc[0])
+
+    # 가정 검정 결과에 따라 적용할 검정 이름 결정
+    if not both_normal:
+        test_name = "Mann-Whitney U test"      # 정규성 미충족 → 비모수 검정
+    elif equal_var:
+        test_name = "Student t-test"           # 정규성 충족 + 등분산
+    else:
+        test_name = "Welch t-test"             # 정규성 충족 + 이분산
+
+    # 대립가설 방향별 해석 문구 (유의할 때 표시, A=levels[0] / B=levels[1])
+    verdicts = {
+        "two-sided": "차이 있음",
+        "less": f"{levels[0]} < {levels[1]}",
+        "greater": f"{levels[0]} > {levels[1]}",
+    }
+
+    rows = []
+    # 양측·좌측단측·우측단측을 일괄 검정
+    for alt in ("two-sided", "less", "greater"):
+        # 적용 검정에 맞춰 대립가설 방향을 전달하여 검정 수행
+        if test_name == "Mann-Whitney U test":
+            stat, p = mannwhitneyu(a, b, alternative=alt)
+        elif test_name == "Student t-test":
+            stat, p = ttest_ind(a, b, equal_var=True, alternative=alt)
+        else:
+            stat, p = ttest_ind(a, b, equal_var=False, alternative=alt)
 
         # p < alpha 이면 통계적으로 유의(귀무가설 기각)
         significant = p < alpha
