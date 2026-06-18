@@ -1,8 +1,12 @@
 from math import sqrt
-from pandas import DataFrame, Series, concat
+from pandas import DataFrame, Series, concat, melt
 from scipy.stats import t
 from scipy.stats import normaltest, bartlett, levene
-from scipy.stats import ttest_1samp, ttest_ind, ttest_rel, wilcoxon, mannwhitneyu
+from scipy.stats import ttest_1samp, wilcoxon, ttest_ind, ttest_rel, mannwhitneyu
+
+from statannotations.Annotator import Annotator
+
+from . import my_plot
 
 # ===================================================================
 # 모평균의 신뢰구간 계산
@@ -167,10 +171,12 @@ def test_1sample(data, column, popmean=0, alpha=0.05):
 # ===================================================================
 # 대응표본 T검정
 # ===================================================================
-def test_paired(data, before, after, alpha=0.05):
+def test_paired(data, before, after, alpha=0.05, 
+            plot=True, palette=None, title=None, xlabel=None, ylabel=None,
+            width=1280, height=640, save_path=None):
     """짝지어진 두 측정값(전/후)의 차이가 있는지 검정하는 함수 (wide 형식)
 
-    차이값 d = after − before 의 정규성 충족 시 대응표본 t검정,
+    차이값 d = after - before 의 정규성 충족 시 대응표본 t검정,
     미충족 시 Wilcoxon 부호순위 검정을 수행하며,
     양측·좌측단측·우측단측 세 가지 대립가설을 일괄 검정한다.
 
@@ -179,10 +185,17 @@ def test_paired(data, before, after, alpha=0.05):
         before (str): 사전 측정값 컬럼명
         after (str): 사후 측정값 컬럼명
         alpha (float): 유의수준 (기본값: 0.05)
+        plot (bool): 결과를 시각화할지 여부 (기본값: True)
+        palette (str or list, optional): 색상 팔레트
+        title (str, optional): 그래프 제목
+        xlabel (str, optional): x축 라벨
+        ylabel (str, optional): y축 라벨
+        width (int, optional): 그래프 가로 크기
+        height (int, optional): 그래프 세로 크기
+        save_path (str, optional): 그래프 저장 경로
 
     Returns:
         DataFrame: 대립가설(alternative)별 검정·통계량·p-value·유의성 결과표
-                   (방향은 after, before 기준 / 3행)
     """
     # 같은 행끼리 짝지어야 하므로 두 컬럼을 함께 결측 행 제거
     paired = data[[before, after]].dropna()
@@ -209,14 +222,12 @@ def test_paired(data, before, after, alpha=0.05):
     rows = []
     # 양측·좌측단측·우측단측을 일괄 검정 (항상 after, before 순)
     for alt in ("two-sided", "less", "greater"):
-        # 정규성 충족 → 대응표본 t검정, 미충족 → Wilcoxon 부호순위 검정
-        if is_normal:
+        if is_normal:   # 정규성 충족 → 대응표본 t검정
             stat, p = ttest_rel(paired[after], paired[before], alternative=alt)
-        else:
+        else:           # 미충족 → Wilcoxon 부호순위 검정
             stat, p = wilcoxon(paired[after], paired[before], alternative=alt)
 
-        # p < alpha 이면 통계적으로 유의(귀무가설 기각)
-        significant = p < alpha
+        significant = p < alpha # p < alpha 이면 통계적으로 유의(귀무가설 기각)
 
         rows.append({
             "test": test_name,
@@ -227,14 +238,37 @@ def test_paired(data, before, after, alpha=0.05):
             "result": verdicts[alt] if significant else "차이 없음",
         })
 
-    # 세 방향 결과를 표로 정리하여 반환
-    return DataFrame(rows).set_index(["test", "alternative"])
+    # 세 방향 결과를 표로 정리하여 반환 --> 함수 맨 마지막에 return문 필요
+    result_df = DataFrame(rows).set_index(["test", "alternative"])
+
+    # 시각화 옵션이 True인 경우, 시각화 수행
+    if plot:
+        melt_df = melt(paired, value_vars=[before, after], var_name="group", value_name="value")
+
+        fig, ax = my_plot.init()
+        my_plot.boxplot(data=melt_df, x="group", y="value", hue="group", palette=palette, ax=ax)
+
+        # 독립표본 T검정 결과를 시각화에 추가
+        annotator = Annotator(data=melt_df,           # 데이터프레임
+                            x='group',                # x축 변수
+                            y='value',                # y축 변수
+                            pairs=[(before, after)],  # 비교할 그룹 쌍
+                            ax=ax)                    # 그래프 축
+                            
+        # 가설검정 알고리즘 종류
+        annotator.configure(test="t-test_paired" if is_normal else 'Wilcoxon')
+        annotator.apply_and_annotate()
+        my_plot.show()
+
+    return result_df
 
 
 # ===================================================================
 # 독립표본 T검정
 # ===================================================================
-def test_independent(data, group, value, alpha=0.05):
+def test_independent(data, group, value, alpha=0.05, 
+            plot=True, palette=None, title=None, xlabel=None, ylabel=None,
+            width=1280, height=640, save_path=None):
     """독립된 두 집단의 평균이 같은지 검정하는 함수 (long 형식)
 
     두 집단 모두 정규성 충족 시 등분산성에 따라 Student/Welch t검정,
@@ -246,6 +280,14 @@ def test_independent(data, group, value, alpha=0.05):
         group (str): 집단을 구분하는 범주형 컬럼명 (수준 2개)
         value (str): 비교할 연속형 측정값 컬럼명
         alpha (float): 유의수준 (기본값: 0.05)
+        plot (bool): 결과를 시각화할지 여부 (기본값: True)
+        palette (str or list): 색상 팔레트 (기본값: None)
+        title (str): 그래프 제목 (기본값: None)
+        xlabel (str): x축 라벨 (기본값: None)
+        ylabel (str): y축 라벨 (기본값: None)
+        width (int): 그래프 너비 (기본값: 1280)
+        height (int): 그래프 높이 (기본값: 640)
+        save_path (str): 그래프 저장 경로 (기본값: None)
 
     Returns:
         DataFrame: 대립가설(alternative)별 검정·통계량·p-value·유의성 결과표
@@ -312,4 +354,10 @@ def test_independent(data, group, value, alpha=0.05):
         })
 
     # 세 방향 결과를 표로 정리하여 반환
-    return DataFrame(rows).set_index(["test", "alternative"])
+    result_df = DataFrame(rows).set_index(["test", "alternative"])
+
+    # 시각화 옵션이 True인 경우, 시각화 수행
+    if plot:
+        pass
+
+    return result_df
