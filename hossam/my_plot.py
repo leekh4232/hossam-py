@@ -732,6 +732,7 @@ def boxplot(
     y: str | None = None,
     hue: str | None = None,
     orient: str = "v",
+    order: list | None = None,
     stat_test: str | None = None,
     stat_pairs: list[tuple] | None = None,
     stat_text_format: str = "star",
@@ -762,6 +763,7 @@ def boxplot(
         y (str|None): y축 값 컬럼명.
         hue (str|None): 범주 구분 컬럼명.
         orient (str): 'v' 또는 'h' 방향.
+        order (list|None): x축 범주 순서. None이면 데이터에 나타난 순서대로.
         stat_test (str|None): 통계 검정 방법. None이면 검정 안함. x과 y가 모두 지정되어야 함.
         stat_pairs (list[tuple]|None): 통계 검정할 그룹 쌍 목록.
         stat_text_format (str): 통계 결과 표시 형식.
