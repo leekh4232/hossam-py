@@ -1,6 +1,6 @@
 import numpy as np
+from IPython.display import display
 from pandas import to_datetime, DataFrame, ExcelWriter
-
 
 def set_type(data, as_int=[], as_float=[], as_string=[], 
              as_category=[], as_datetime=[]):
