@@ -1563,7 +1563,7 @@ def plot_hull(data: DataFrame,
     """
 
     # 데이터의 군집 종류 얻기
-    classes = list(data[hue].unique())
+    classes = sorted(list(data[hue].unique()))
     
     # 각 클래스에 대하여 반복 수행
     for i, v in enumerate(classes):
