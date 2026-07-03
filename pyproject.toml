@@ -68,6 +68,7 @@ hossam = "hossam._cli:main"
 
 [project.urls]
 Homepage = "https://github.com/leekh4232/hossam-py"
+Youtube = "https://www.youtube.com/@leekh4232"
 Repository = "https://github.com/leekh4232/hossam-py"
 
 [tool.setuptools]
