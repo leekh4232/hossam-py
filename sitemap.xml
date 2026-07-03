@@ -2,26 +2,42 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://py.hossam.kr/</loc>
-         <lastmod>2026-06-15</lastmod>
+         <lastmod>2026-07-03</lastmod>
+    </url>
+    <url>
+         <loc>https://py.hossam.kr/api/SUMMARY/</loc>
+         <lastmod>2026-07-03</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hossam/</loc>
-         <lastmod>2026-06-15</lastmod>
+         <lastmod>2026-07-03</lastmod>
     </url>
     <url>
-         <loc>https://py.hossam.kr/api/my_classroom/</loc>
-         <lastmod>2026-06-15</lastmod>
+         <loc>https://py.hossam.kr/api/my_gis/</loc>
+         <lastmod>2026-07-03</lastmod>
+    </url>
+    <url>
+         <loc>https://py.hossam.kr/api/my_pipeline/</loc>
+         <lastmod>2026-07-03</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/my_plot/</loc>
-         <lastmod>2026-06-15</lastmod>
+         <lastmod>2026-07-03</lastmod>
+    </url>
+    <url>
+         <loc>https://py.hossam.kr/api/my_prep/</loc>
+         <lastmod>2026-07-03</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/my_qtcheck/</loc>
-         <lastmod>2026-06-15</lastmod>
+         <lastmod>2026-07-03</lastmod>
+    </url>
+    <url>
+         <loc>https://py.hossam.kr/api/my_stats/</loc>
+         <lastmod>2026-07-03</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/my_util/</loc>
-         <lastmod>2026-06-15</lastmod>
+         <lastmod>2026-07-03</lastmod>
     </url>
 </urlset>
