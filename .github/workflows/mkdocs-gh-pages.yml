@@ -34,7 +34,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install mkdocs mkdocs-material "mkdocstrings[python]" \
-            pymdown-extensions mkdocs-autorefs black
+            pymdown-extensions mkdocs-autorefs mkdocs-gen-files mkdocs-literate-nav black
 
       - name: Copy README to docs/index.md
         run: cp -f README.md docs/index.md

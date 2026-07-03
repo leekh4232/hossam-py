@@ -29,6 +29,11 @@ extra_javascript:
 plugins:
   - search
   - autorefs
+  - gen-files:
+      scripts:
+        - docs/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
   - mkdocstrings:
       handlers:
         python:
@@ -73,9 +78,5 @@ markdown_extensions:
 
 nav:
   - Overview: index.md
-  - API Reference:
-      - Package: api/hossam.md
-      - my_util: api/my_util.md
-      - my_plot: api/my_plot.md
-      - my_classroom: api/my_classroom.md
-      - my_qtcheck: api/my_qtcheck.md
+  # API Reference 하위는 docs/gen_ref_pages.py 가 생성하는 api/SUMMARY.md 로 자동 구성됨
+  - API Reference: api/
