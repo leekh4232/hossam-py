@@ -25,26 +25,6 @@ pip install --upgrade hossam
 
 **요구사항**: Python 3.11 ~ 3.13
 
-## 🧩 모듈 구성
-
-`hossam` 패키지는 다음 4개 모듈로 구성됩니다. 모듈별 상세 함수 설명은 [API 문서](https://py.hossam.kr)를 참고하세요.
-
-| 모듈 | 설명 | 대표 기능 |
-| --- | --- | --- |
-| **`my_util`** | 데이터 로딩·유틸리티 | `load_data`(학습용 데이터셋 로드), `load_info`(데이터셋 설명), `make_normalize_data`(정규화), `pretty_table`(표 출력) |
-| **`my_plot`** | 시각화 (25+ 함수) | `histplot`·`boxplot`·`violinplot`·`scatterplot`·`lmplot`·`heatmap` 등 분포/관계 그래프, `ols_residplot`·`roc_curve_plot`·`confusion_matrix_plot`·`silhouette_plot`·`pca_plot` 등 분석 진단 그래프 |
-| **`my_qtcheck`** | 데이터 품질 점검 | `set_type`(자료형 변환), `check_duplicates`(중복), `check_missing_values`(결측), `numerical_summary`/`categorical_summary`(기술통계), `auto_qtcheck`(대화형 자동 점검) |
-| **`my_classroom`** | 수업 운영 도구 | `cluster_students`(수강생 그룹 편성), `group_summary`·`analyze_classroom`(그룹 분석 리포트) |
-
-```python
-from hossam import load_data
-from hossam import my_plot, my_qtcheck
-
-df = load_data("diamonds")        # 학습용 데이터셋 로드
-my_qtcheck.auto_qtcheck(df)       # 대화형 데이터 품질 점검
-my_plot.boxplot(data=df, x="price")
-```
-
 ## 📚 전체 문서
 
 **완전한 API 문서와 가이드는 [py.hossam.kr](https://py.hossam.kr)에서 확인하세요.**

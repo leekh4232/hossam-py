@@ -1068,20 +1068,25 @@ def chi2_goodness_of_fit(data, column, expected=None, order=None, alpha=0.05,
     return result_df
 
 
-def chi2_independence(data, row, col, kind, alpha=0.05, plot=True, palette=None, 
-                    title=None, xlabel=None, ylabel=None, width=1280, height=640, save_path=None):
-    """독립성 검정과 동질성 검정을 일괄처리 하는 함수
+def _chi2_crosstab(data, row, col, kind, alpha=0.05,
+                   plot=True, palette=None, orient='v', 
+                   title=None, xlabel=None, ylabel=None, 
+                   width=1280, height=640, save_path=None):
+    """독립성 검정의 공통 처리부 (가정확인 → 카이제곱/피셔 분기 → 크라메르 V)
+
     독립성 검정과 동질성 검정은 계산이 완전히 동일하므로 이 함수 하나로 처리하고,
-    kind 인자로 결과표의 검정 이름만 구분한다.
+    kind 인자로 결과표의 검정 이름만 구분한다. plot=True이면 행 범주별 열 범주의
+    구성비를 100% 누적 막대그래프로 시각화한다.
 
     Args:
         data (DataFrame): 원본 데이터프레임 (개별 관측치)
         row (str): 행 범주형 변수명
         col (str): 열 범주형 변수명
-        kind (str): 검정 종류 ("independence" 또는 "homogeneity")
+        kind (str): 검정 종류 (독립성 검정: "independence" / 동질성 검정: "homogeneity")
         alpha (float): 유의수준 (기본값: 0.05)
         plot (bool): 결과를 시각화할지 여부 (기본값: True)
         palette (str or list): 색상 팔레트 (기본값: None)
+        orient (str): 그래프 방향 ('v' 또는 'h', 기본값: 'v')
         title (str): 그래프 제목 (기본값: None)
         xlabel (str): x축 라벨 (기본값: None → x 변수명)
         ylabel (str): y축 라벨 (기본값: None → "비율(%)")
@@ -1091,6 +1096,7 @@ def chi2_independence(data, row, col, kind, alpha=0.05, plot=True, palette=None,
 
     Returns:
         DataFrame: (row, col)를 인덱스로 하는 단일 행 결과표
+            (test, chi2, dof, p-value, significant, effect(V), strength, min_expected, assumption)
     """
     # --- 1) 대상 데이터 전처리 ---
     # 두 범주형 변수로 교차표(관측빈도) 생성
@@ -1149,8 +1155,8 @@ def chi2_independence(data, row, col, kind, alpha=0.05, plot=True, palette=None,
     if plot:
         tmp = data[[row, col]].copy()
         tmp["_n"] = 1  # 빈도 집계용 보조 컬럼
-        my_plot.stackplot(data=tmp, x=row, y="_n", hue=col, aggfunc="sum",
-                          ratio=True, palette=palette, title=title,
+        my_plot.stackplot(data=tmp, x=row, y="_n", hue=col, orient=orient, 
+                          aggfunc="sum", ratio=True, palette=palette, title=title,
                           xlabel=xlabel if xlabel is not None else row,
                           ylabel=ylabel if ylabel is not None else "비율(%)",
                           width=width, height=height, save_path=save_path)
@@ -1159,8 +1165,9 @@ def chi2_independence(data, row, col, kind, alpha=0.05, plot=True, palette=None,
 
 
 def chi2_independence(data, x, y, alpha=0.05,
-                      plot=True, palette=None, title=None, xlabel=None,
-                      ylabel=None, width=1280, height=640, save_path=None):
+                      plot=True, palette=None, orient='v', 
+                      title=None, xlabel=None, ylabel=None, 
+                      width=1280, height=640, save_path=None):
     """독립성 검정을 가정확인부터 강도까지 일괄 수행하는 함수
 
     한 집단을 두 범주형 변수로 교차분류하여 두 변수의 관련성을 검정한다.
@@ -1187,13 +1194,15 @@ def chi2_independence(data, x, y, alpha=0.05,
             (test, chi2, dof, p-value, significant, effect(V), strength, min_expected, assumption)
     """
     return _chi2_crosstab(data, x, y, "independence", alpha,
-                          plot=plot, palette=palette, title=title, xlabel=xlabel,
-                          ylabel=ylabel, width=width, height=height, save_path=save_path)
+                          plot=plot, palette=palette, orient=orient,
+                          title=title, xlabel=xlabel, ylabel=ylabel, 
+                          width=width, height=height, save_path=save_path)
 
 
 def chi2_homogeneity(data, group, category, alpha=0.05,
-                     plot=True, palette=None, title=None, xlabel=None,
-                     ylabel=None, width=1280, height=640, save_path=None):
+                     plot=True, palette=None, orient='v',
+                     title=None, xlabel=None, ylabel=None,
+                     width=1280, height=640, save_path=None):
     """동질성 검정을 가정확인부터 강도까지 일괄 수행하는 함수
 
     여러 집단(group)의 범주(category) 분포가 동일한지 검정한다. 계산은 독립성
@@ -1220,5 +1229,6 @@ def chi2_homogeneity(data, group, category, alpha=0.05,
             (test, chi2, dof, p-value, significant, effect(V), strength, min_expected, assumption)
     """
     return _chi2_crosstab(data, group, category, "homogeneity", alpha,
-                          plot=plot, palette=palette, title=title, xlabel=xlabel,
-                          ylabel=ylabel, width=width, height=height, save_path=save_path)
+                          plot=plot, palette=palette, orient=orient,
+                          title=title, xlabel=xlabel, ylabel=ylabel,
+                          width=width, height=height, save_path=save_path)

@@ -15,8 +15,8 @@ def long2wide(df, hue, values, dropna=True):
         - wide format으로 변환된 데이터프레임
     """
     wide = pivot_table(data=df,
-                       index=df.groupby(hue).cumcount(),
-                       columns=hue, values=values, dropna=dropna)
+                       index=df.groupby(hue, observed=True).cumcount(),
+                       columns=hue, values=values, dropna=dropna, observed=True)
     wide.columns.name = None
     wide.index.name = None
     return wide
