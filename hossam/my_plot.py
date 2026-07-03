@@ -330,16 +330,24 @@ def boxplot(data=None, x=None, y=None, hue=None, orient=None, palette=None, orde
     if ax is None:
         fig, ax = init(width=width, height=height, title=title, xlabel=xlabel, ylabel=ylabel)
 
-    # hue 없이 palette만 지정하면 seaborn 0.14부터 경고/제거 예정이므로,
-    # 이 경우 범주축(x 또는 y)을 hue로 지정하고 범례는 숨겨 동일한 효과를 낸다.
+    # 범주축(세로형이면 x, 가로형이면 y)을 기준으로 hue 처리를 결정한다.
+    #  - hue 없이 palette만 지정: 범주축을 hue로 삼아 범주별 색상을 적용
+    #  - hue가 범주축과 동일(중복): 외부에서 hue=x 로 호출된 경우
+    # 두 경우 모두 hue가 범주축과 같으므로, 상자가 쪼개지지(dodge) 않게 끄고 범례도 숨긴다.
+    cat_axis = x if orient != "h" else y
+    dodge = "auto"
     legend = "auto"
     if hue is None and palette is not None:
-        hue = x if orient != "h" else y
+        hue = cat_axis
+        dodge = False
+        legend = False
+    elif hue is not None and hue == cat_axis:
+        dodge = False
         legend = False
 
     # 상자그림 그리기
     sb.boxplot(data=data, x=x, y=y, hue=hue, orient=orient, palette=palette,
-               order=order, legend=legend, ax=ax)
+               order=order, dodge=dodge, legend=legend, ax=ax)
 
     # 그래프 표시
     if fig is not None:
@@ -373,8 +381,22 @@ def violinplot(data=None, x=None, y=None, hue=None, orient=None,
     if ax is None:
         fig, ax = init(width=width, height=height, title=title, xlabel=xlabel, ylabel=ylabel)
 
+    # hue가 범주축(세로형=x, 가로형=y)과 같아지는 경우(palette만 지정 / 외부에서 hue=x 전달)
+    # 분포가 쪼개지지(dodge) 않도록 끄고 범례도 숨긴다.
+    cat_axis = x if orient != "h" else y
+    dodge = "auto"
+    legend = "auto"
+    if hue is None and palette is not None:
+        hue = cat_axis
+        dodge = False
+        legend = False
+    elif hue is not None and hue == cat_axis:
+        dodge = False
+        legend = False
+
     # 바이올린 플롯 그리기
-    sb.violinplot(data=data, x=x, y=y, hue=hue, orient=orient, palette=palette, ax=ax)
+    sb.violinplot(data=data, x=x, y=y, hue=hue, orient=orient, palette=palette,
+                  dodge=dodge, legend=legend, ax=ax)
 
     # 그래프 표시
     if fig is not None:
@@ -450,8 +472,22 @@ def barplot(data=None, x=None, y=None, hue=None, estimator=np.mean,
     if ax is None:
         fig, ax = init(width=width, height=height, title=title, xlabel=xlabel, ylabel=ylabel)
 
+    # hue가 범주축(x, 없으면 y)과 같아지는 경우(palette만 지정 / 외부에서 hue=x 전달)
+    # 막대가 쪼개지지(dodge) 않도록 끄고 범례도 숨긴다.
+    cat_axis = x if x is not None else y
+    dodge = "auto"
+    legend = "auto"
+    if hue is None and palette is not None:
+        hue = cat_axis
+        dodge = False
+        legend = False
+    elif hue is not None and hue == cat_axis:
+        dodge = False
+        legend = False
+
     # 막대그래프 그리기
-    sb.barplot(data=data, x=x, y=y, hue=hue, estimator=estimator, order=order, palette=palette, ax=ax)
+    sb.barplot(data=data, x=x, y=y, hue=hue, estimator=estimator, order=order,
+               palette=palette, dodge=dodge, legend=legend, ax=ax)
 
     # 그래프 표시
     if fig is not None:
@@ -487,8 +523,22 @@ def countplot(data=None, x=None, y=None, hue=None, order=None,
     if ax is None:
         fig, ax = init(width=width, height=height, title=title, xlabel=xlabel, ylabel=ylabel)
 
+    # hue가 범주축(x, 없으면 y)과 같아지는 경우(palette만 지정 / 외부에서 hue=x 전달)
+    # 막대가 쪼개지지(dodge) 않도록 끄고 범례도 숨긴다.
+    cat_axis = x if x is not None else y
+    dodge = "auto"
+    legend = "auto"
+    if hue is None and palette is not None:
+        hue = cat_axis
+        dodge = False
+        legend = False
+    elif hue is not None and hue == cat_axis:
+        dodge = False
+        legend = False
+
     # 빈도 그래프 그리기
-    sb.countplot(data=data, x=x, y=y, hue=hue, order=order, palette=palette, ax=ax)
+    sb.countplot(data=data, x=x, y=y, hue=hue, order=order, palette=palette,
+                 dodge=dodge, legend=legend, ax=ax)
 
     # 그래프 표시
     if fig is not None:
