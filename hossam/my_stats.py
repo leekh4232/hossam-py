@@ -131,10 +131,10 @@ def test_1sample(data, column, popmean=0, alpha=0.05):
 
     """
     # 대상 컬럼을 결측 제거하여 추출
-    sample = data[column].dropna()
+    sample = data[[column]].dropna()
 
     # test_assumptions로 정규성 검정 (단일 컬럼이라 등분산성은 수행되지 않음)
-    report = test_assumptions(data, columns=column, alpha=alpha)
+    report = test_assumptions(sample, columns=column, alpha=alpha)
 
     # 정규성 충족 여부 추출
     is_normal = bool(report.loc[column, "result"])
@@ -153,9 +153,9 @@ def test_1sample(data, column, popmean=0, alpha=0.05):
     # 양측·좌측단측·우측단측을 일괄 검정
     for alt in ("two-sided", "less", "greater"):
         if is_normal:   # 정규성 충족 → 일표본 t검정
-            stat, p = ttest_1samp(sample, popmean, alternative=alt)
+            stat, p = ttest_1samp(sample[column], popmean, alternative=alt)
         else:           # 미충족 → 차이값의 Wilcoxon 부호순위 검정
-            stat, p = wilcoxon(sample - popmean, alternative=alt)
+            stat, p = wilcoxon(sample[column] - popmean, alternative=alt)
 
         # p < alpha 이면 통계적으로 유의(귀무가설 기각)
         significant = p < alpha
