@@ -77,7 +77,7 @@ def lineplot(data=None, x=None, y=None, hue=None, title=None, xlabel=None, ylabe
             color=None, linewidth=2.0, linestyle="-", palette=None, 
             marker=None, markersize=None, markeredgewidth=None, 
             markeredgecolor=None, markerfacecolor=None, width=1280, height=640, 
-            save_path=None, ax=None):
+            save_path=None, ax=None, **params):
 
 
     # 그래프 초기화
@@ -90,7 +90,7 @@ def lineplot(data=None, x=None, y=None, hue=None, title=None, xlabel=None, ylabe
     sb.lineplot(data=data, x=x, y=y, hue=hue, palette=palette, 
                 color=color, linewidth=linewidth, linestyle=linestyle,
                 marker=marker, markersize=markersize, markeredgewidth=markeredgewidth, 
-                markeredgecolor=markeredgecolor, markerfacecolor=markerfacecolor, ax=ax)
+                markeredgecolor=markeredgecolor, markerfacecolor=markerfacecolor, ax=ax, **params)
     
     # 그래프 표시
     if fig is not None:
@@ -102,7 +102,7 @@ def pointplot(data=None, x=None, y=None, hue=None, order=None, hue_order=None,
               estimator="mean", errorbar="se", capsize=0.1, dodge=False,
               markers="o", linestyles="-", palette=None, color=None,
               title=None, xlabel=None, ylabel=None, legend_title=None,
-              width=1280, height=640, save_path=None, ax=None):
+              width=1280, height=640, save_path=None, ax=None, **params):
     """
     점 그래프(pointplot)를 그린다. 범주별 추정치(기본: 평균)와 오차범위를 점과 선으로 표현하므로
     분산분석의 상호작용 플롯(interaction plot) 등에 활용한다.
@@ -139,7 +139,7 @@ def pointplot(data=None, x=None, y=None, hue=None, order=None, hue_order=None,
     # 점 그래프 그리기
     sb.pointplot(data=data, x=x, y=y, hue=hue, order=order, hue_order=hue_order,
                  estimator=estimator, errorbar=errorbar, capsize=capsize, dodge=dodge,
-                 markers=markers, linestyles=linestyles, palette=palette, color=color, ax=ax)
+                 markers=markers, linestyles=linestyles, palette=palette, color=color, ax=ax, **params)
 
     # 범례 제목 설정 (hue가 있을 때)
     if hue is not None and legend_title is not None:
@@ -155,7 +155,7 @@ def pointplot(data=None, x=None, y=None, hue=None, order=None, hue_order=None,
 
 def kdeplot(data=None, x=None, hue=None, meanline=False, clevel=0,
             title=None, xlabel=None, ylabel=None, fill=False, linewidth=2.0, palette=None,
-            width=1280, height=640, save_path=None, ax=None):
+            width=1280, height=640, save_path=None, ax=None, **params):
     """
     단변량 커널 밀도 그래프를 그린다. hue가 지정된 경우 범주별 평균선을 함께 표시한다.
 
@@ -183,7 +183,7 @@ def kdeplot(data=None, x=None, hue=None, meanline=False, clevel=0,
         fig, ax = init(width=width, height=height, title=title, xlabel=xlabel, ylabel=ylabel)
 
     # 단변량 커널 밀도 그래프 그리기
-    sb.kdeplot(data=data, x=x, fill=fill, hue=hue, linewidth=linewidth, palette=palette, ax=ax)
+    sb.kdeplot(data=data, x=x, fill=fill, hue=hue, linewidth=linewidth, palette=palette, ax=ax, **params)
 
     # 신뢰구간 표시 (신뢰수준이 0이 아닌 경우에만)
     if clevel:
@@ -260,7 +260,7 @@ def _draw_ci(ax, interval, color, ymax):
 # -------------------------------------------------------------
 
 def histplot(data=None, x=None, bins="auto", hue=None, title=None, xlabel=None, ylabel=None, 
-            linewidth=1, palette=None, kde=False, width=1280, height=640, save_path=None, ax=None):
+            linewidth=1, palette=None, kde=False, width=1280, height=640, save_path=None, ax=None, **params):
     """
     히스토그램을 그린다.
 
@@ -295,7 +295,7 @@ def histplot(data=None, x=None, bins="auto", hue=None, title=None, xlabel=None, 
         ax.set_xticks(bins, bins)
     
     # 히스토그램 그리기
-    sb.histplot(data=data, x=x, hue=hue, linewidth=linewidth, palette=palette, kde=kde, bins=bins, ax=ax)
+    sb.histplot(data=data, x=x, hue=hue, linewidth=linewidth, palette=palette, kde=kde, bins=bins, ax=ax, **params)
     
     # 그래프 표시
     if fig is not None:
@@ -305,7 +305,7 @@ def histplot(data=None, x=None, bins="auto", hue=None, title=None, xlabel=None, 
 
 def boxplot(data=None, x=None, y=None, hue=None, orient=None, palette=None, order=None,
             title=None, xlabel=None, ylabel=None,
-            width=1280, height=640, save_path=None, ax=None):
+            width=1280, height=640, save_path=None, ax=None, **params):
     """
     상자그림(boxplot)을 그린다.
 
@@ -347,7 +347,7 @@ def boxplot(data=None, x=None, y=None, hue=None, orient=None, palette=None, orde
 
     # 상자그림 그리기
     sb.boxplot(data=data, x=x, y=y, hue=hue, orient=orient, palette=palette,
-               order=order, dodge=dodge, legend=legend, ax=ax)
+               order=order, dodge=dodge, legend=legend, ax=ax, **params)
 
     # 그래프 표시
     if fig is not None:
@@ -357,7 +357,7 @@ def boxplot(data=None, x=None, y=None, hue=None, orient=None, palette=None, orde
 
 def violinplot(data=None, x=None, y=None, hue=None, orient=None,      
                palette=None, title=None, xlabel=None, ylabel=None,
-               width=1280, height=640, save_path=None, ax=None):
+               width=1280, height=640, save_path=None, ax=None, **params):
     """
     바이올린 플롯을 그린다.
 
@@ -396,7 +396,7 @@ def violinplot(data=None, x=None, y=None, hue=None, orient=None,
 
     # 바이올린 플롯 그리기
     sb.violinplot(data=data, x=x, y=y, hue=hue, orient=orient, palette=palette,
-                  dodge=dodge, legend=legend, ax=ax)
+                  dodge=dodge, legend=legend, ax=ax, **params)
 
     # 그래프 표시
     if fig is not None:
@@ -407,7 +407,7 @@ def violinplot(data=None, x=None, y=None, hue=None, orient=None,
 
 def heatmap(data=None, annot=True, fmt="0.2f", linewidths=0.5,
             palette=None, title=None, xlabel=None, ylabel=None,
-            width=1280, height=640, save_path=None, ax=None):
+            width=1280, height=640, save_path=None, ax=None, **params):
     """
     히트맵을 그린다.
 
@@ -435,7 +435,7 @@ def heatmap(data=None, annot=True, fmt="0.2f", linewidths=0.5,
     ax.grid(False)
 
     # 히트맵 그리기
-    sb.heatmap(data=data, annot=annot, fmt=fmt, linewidths=linewidths, cmap=palette, ax=ax)
+    sb.heatmap(data=data, annot=annot, fmt=fmt, linewidths=linewidths, cmap=palette, ax=ax, **params)
 
     # 그래프 표시
     if fig is not None:
@@ -446,7 +446,7 @@ def heatmap(data=None, annot=True, fmt="0.2f", linewidths=0.5,
 
 def barplot(data=None, x=None, y=None, hue=None, estimator=np.mean,
             order=None, palette=None, title=None, xlabel=None, ylabel=None,
-            width=1280, height=640, save_path=None, ax=None):
+            width=1280, height=640, save_path=None, ax=None, **params):
     """
     막대그래프를 그린다
 
@@ -487,7 +487,7 @@ def barplot(data=None, x=None, y=None, hue=None, estimator=np.mean,
 
     # 막대그래프 그리기
     sb.barplot(data=data, x=x, y=y, hue=hue, estimator=estimator, order=order,
-               palette=palette, dodge=dodge, legend=legend, ax=ax)
+               palette=palette, dodge=dodge, legend=legend, ax=ax, **params)
 
     # 그래프 표시
     if fig is not None:
@@ -498,7 +498,7 @@ def barplot(data=None, x=None, y=None, hue=None, estimator=np.mean,
 
 def countplot(data=None, x=None, y=None, hue=None, order=None,
             palette=None, title=None, xlabel=None, ylabel=None,
-            width=1280, height=640, save_path=None, ax=None):
+            width=1280, height=640, save_path=None, ax=None, **params):
     """
     빈도 그래프를 그린다
 
@@ -538,7 +538,7 @@ def countplot(data=None, x=None, y=None, hue=None, order=None,
 
     # 빈도 그래프 그리기
     sb.countplot(data=data, x=x, y=y, hue=hue, order=order, palette=palette,
-                 dodge=dodge, legend=legend, ax=ax)
+                 dodge=dodge, legend=legend, ax=ax, **params)
 
     # 그래프 표시
     if fig is not None:
@@ -551,7 +551,7 @@ def pieplot(x, labels, autopct="%0.1f%%", startangle=90, counterclock=False,
             explode=None, donutchart=False, 
             wedge_width=0.7, wedge_color="#ffffff", wedge_linewidth=3,
             palette=None, title=None, xlabel=None, ylabel=None,
-            width=1280, height=640, save_path=None, ax=None):
+            width=1280, height=640, save_path=None, ax=None, **params):
     """
     파이 그래프 혹은 도넛 그래프를 그린다
 
@@ -594,7 +594,7 @@ def pieplot(x, labels, autopct="%0.1f%%", startangle=90, counterclock=False,
     # 파이 그래프 그리기
     ax.pie(x, labels=labels, autopct=autopct, startangle=startangle, 
           counterclock=counterclock, explode=explode, colors=color_list, 
-          wedgeprops=wedgeprops)
+          wedgeprops=wedgeprops, **params)
 
     # 그래프 표시
     if fig is not None:
@@ -704,7 +704,7 @@ def stackplot(data, x, y, hue, aggfunc=np.sum, orient='v', ratio=False,
 def scatterplot(data, x, y, hue=None, marker="o", color=None, size=100, edgecolor="#ffffff", 
                 linewidth=1.5, alpha=1, palette="tab10", outline=True,
                 title=None, xlabel=None, ylabel=None, 
-                width=1280, height=640, save_path=None, ax=None):
+                width=1280, height=640, save_path=None, ax=None, **params):
     """
     산점도를 그린다
 
@@ -753,7 +753,8 @@ def scatterplot(data, x, y, hue=None, marker="o", color=None, size=100, edgecolo
                    edgecolor=edgecolor, # 마커 테두리 색상
                    linewidth=linewidth, # 마커 테두리 두께
                    alpha=alpha,         # 마커 투명도
-                   ax=ax)               # 그래프를 그릴 Axes 객체
+                   ax=ax,               # 그래프를 그릴 Axes 객체
+                   **params)            # 추가 파라미터
 
     # 외곽선 그리기
     if outline and hue is not None:
@@ -807,7 +808,7 @@ def lmplot(data, x, y, hue=None, palette=None, col=None, row=None, markers="o",
     scatter_edgecolor="#ffffff", scatter_linewidths=1, scatter_size=50, 
     scatter_alpha= 0.8, linestyle="-", linecolor=None, linewidth= 2,
     title= None, xlabel= None, ylabel= None, width=1280, height=640,
-    save_path= None):
+    save_path= None, **params):
     """
     seaborn lmplot으로 산점도 그래프와 회귀선을 시각화 한다.
 
@@ -867,7 +868,8 @@ def lmplot(data, x, y, hue=None, palette=None, col=None, row=None, markers="o",
                         "linestyle": linestyle,
                         "color": linecolor,
                         "linewidth": linewidth
-                }
+                },
+                **params
     )
 
     # 3) 그래프 설정 및 표시
@@ -897,7 +899,7 @@ def lmplot(data, x, y, hue=None, palette=None, col=None, row=None, markers="o",
 def pairplot(data, x=None, y=None, hue=None, palette=None, diag_kind="kde", reg=False, 
              markers="o", scatter_size=20, scatter_alpha=0.8, 
              linecolor=None, linewidth=1.5, linestyle="-",
-             title=None, width=1280, height=640, save_path=None):
+             title=None, width=1280, height=640, save_path=None, **params):
     """
     산점도 행렬 시각화
 
@@ -939,7 +941,7 @@ def pairplot(data, x=None, y=None, hue=None, palette=None, diag_kind="kde", reg=
     # 2) pairplot 그리기
     g = sb.pairplot(data=data, hue=hue, markers=markers, palette=palette,
                     kind="reg" if reg else "scatter", 
-                    diag_kind=diag_kind, plot_kws=plot_kws)
+                    diag_kind=diag_kind, plot_kws=plot_kws, **params)
 
     g.fig.set_dpi(200)
     g.fig.set_figwidth(figsize[0])
