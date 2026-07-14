@@ -166,7 +166,6 @@ def numerical_summary(data, columns=None, save_path=None):
         columns = get_number_column_names(data)
 
     desc_df = data[columns].describe().T
-
     #-----------------------------------------------------
     # 2) 평균-중앙값의 상대 차이율을 계산하여 중심 수준 파악
     #-----------------------------------------------------

@@ -78,7 +78,31 @@ def lineplot(data=None, x=None, y=None, hue=None, title=None, xlabel=None, ylabe
             marker=None, markersize=None, markeredgewidth=None, 
             markeredgecolor=None, markerfacecolor=None, width=1280, height=640, 
             save_path=None, ax=None, **params):
+    """
+    선 그래프(lineplot)를 그린다.
 
+    Args:
+        data: 시각화할 데이터.
+        x: x축 값 컬럼명.
+        y: y축 값 컬럼명.
+        hue: 범주 구분 컬럼명.
+        title: 그래프 제목.
+        xlabel: x축 레이블.
+        ylabel: y축 레이블.
+        color: 선 색상 (hue가 없을 때 적용).
+        linewidth: 선 굵기.
+        linestyle: 선 스타일.
+        palette: 색상 팔레트 이름.
+        marker: 마커 모양.
+        markersize: 마커 크기.
+        markeredgewidth: 마커 테두리 두께.
+        markeredgecolor: 마커 테두리 색상.
+        markerfacecolor: 마커 내부 색상.
+        width: 캔버스 가로 픽셀.
+        height: 캔버스 세로 픽셀.
+        save_path: 이미지 저장 경로.
+        ax: 그래프를 그릴 Axes 객체. None이면 init 함수로 새로 생성.
+    """
 
     # 그래프 초기화
     fig = None
@@ -98,11 +122,10 @@ def lineplot(data=None, x=None, y=None, hue=None, title=None, xlabel=None, ylabe
 
 # -------------------------------------------------------------
 
-def pointplot(data=None, x=None, y=None, hue=None, order=None, hue_order=None,
-              estimator="mean", errorbar="se", capsize=0.1, dodge=False,
-              markers="o", linestyles="-", palette=None, color=None,
-              title=None, xlabel=None, ylabel=None, legend_title=None,
-              width=1280, height=640, save_path=None, ax=None, **params):
+def pointplot(data=None, x=None, y=None, hue=None, order=None, hue_order=None, 
+              estimator="mean", errorbar="se", capsize=0.1, dodge=False, markers="o", 
+              linestyles="-", palette=None, color=None, title=None, xlabel=None, ylabel=None, 
+              legend_title=None, width=1280, height=640, save_path=None, ax=None, **params):
     """
     점 그래프(pointplot)를 그린다. 범주별 추정치(기본: 평균)와 오차범위를 점과 선으로 표현하므로
     분산분석의 상호작용 플롯(interaction plot) 등에 활용한다.
@@ -606,7 +629,7 @@ def pieplot(x, labels, autopct="%0.1f%%", startangle=90, counterclock=False,
 def stackplot(data, x, y, hue, aggfunc=np.sum, orient='v', ratio=False,
               text=True, text_color="#ffffff", text_fontsize=12, text_format=None,
               palette=None, title=None, xlabel=None, ylabel=None,
-              width=1280, height=640, save_path=None, ax=None):
+              width=1280, height=640, save_path=None, ax=None, **params):
     """
     누적 막대그래프를 그린다
 
@@ -672,9 +695,9 @@ def stackplot(data, x, y, hue, aggfunc=np.sum, orient='v', ratio=False,
             color = color_list[i]
 
         if orient == 'v':
-            ax.bar(df.index, df[col], bottom=df.iloc[:, :i].sum(axis=1), color=color, label=col)
+            ax.bar(df.index, df[col], bottom=df.iloc[:, :i].sum(axis=1), color=color, label=col, **params)
         else:
-            ax.barh(df.index, df[col], left=df.iloc[:, :i].sum(axis=1), color=color, label=col)
+            ax.barh(df.index, df[col], left=df.iloc[:, :i].sum(axis=1), color=color, label=col, **params)
 
         # 누적값 텍스트 표시
         if text:
@@ -754,7 +777,7 @@ def scatterplot(data, x, y, hue=None, marker="o", color=None, size=100, edgecolo
                    linewidth=linewidth, # 마커 테두리 두께
                    alpha=alpha,         # 마커 투명도
                    ax=ax,               # 그래프를 그릴 Axes 객체
-                   **params)            # 추가 파라미터
+                   **params)
 
     # 외곽선 그리기
     if outline and hue is not None:

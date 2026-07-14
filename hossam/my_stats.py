@@ -534,36 +534,34 @@ def posthoc_oneway(data, y, between, alpha=0.05, plot=True, palette=None,
 # ===================================================================
 # 이원분산분석 (Two-way ANOVA)
 # ===================================================================
-def anova_twoway(data, y, between, alpha=0.05):
+def anova_twoway(data, y, between, alpha=0.05, order=None, plot=True, palette=None,
+                 title=None, ylabel=None, width=640, height=480, save_path=None):
     """이원분산분석 (Two-way ANOVA)
-
-    두 개의 명목형 독립변수(주효과)와 그 상호작용효과가 연속형 종속변수에
-    미치는 영향을 검정한다. 등분산성 가정 충족 여부에 따라 분석 방법을 분기한다.
         - 등분산 충족: 일반 이원분산분석(pingouin.anova)
-        - 등분산 미충족: 이원분산분석에는 Welch와 같은 적절한 대안이 없으므로,
-          등분산을 가정하지 않는 선형모형(statsmodels OLS + HC3 강건표준오차)
-          기반의 Type-II ANOVA로 전환한다.
+        - 등분산 미충족: Type-II ANOVA
 
     Args:
         data (DataFrame): 검정 대상 데이터프레임 (long 형식)
         y (str): 종속변수(연속형) 컬럼명
         between (list): 집단을 구분하는 두 개의 독립변수(명목형) 컬럼명 리스트
         alpha (float): 유의수준 (기본값: 0.05)
+        order (list): 두 독립변수의 수준 표시 순서를 담은 리스트의 리스트. (기본값: None)
+             예: [['low', 'med', 'high'], ['weekly', 'daily']]
+        plot (bool): 상호작용 플롯을 시각화할지 여부 (기본값: True)
+        palette (str or list): 색상 팔레트 (기본값: None)
+        title (str): 그래프 전체 제목 (기본값: None)
+        ylabel (str): y축 라벨 (기본값: None이면 "평균 {y}")
+        width (int): 서브플롯 한 칸의 너비 (기본값: 640)
+        height (int): 서브플롯 한 칸의 높이 (기본값: 480)
+        save_path (str): 그래프 저장 경로 (기본값: None)
 
     Returns:
-        DataFrame: 이원분산분석 결과표에 설명용 컬럼을 덧붙인 결과표.
-            - test: 사용한 검정 이름
-            - np2: 편에타제곱(partial eta-squared) 기준 효과크기
-            - effect_size: np2 기준 효과크기 해석 라벨(Large/Medium/Small/Negligible)
-            - significant: p값이 유의수준 미만인지 여부
+        DataFrame: 이원분산분석 결과표에 설명용 컬럼을 덧붙인 결과표
     """
-    # between은 두 개의 명목형 변수를 담은 리스트여야 한다.
-    if not isinstance(between, (list, tuple)) or len(between) != 2:
-        raise ValueError("between은 두 개의 명목형 변수명을 담은 리스트여야 합니다.")
-
-    # 분석에 사용할 컬럼만 추출하고 결측 행 제거
+    # --- 1) 분석에 사용할 컬럼만 추출하고 결측 행 제거 ---
     df = data[[y, between[0], between[1]]].dropna()
 
+    # --- 2) 등분산성 가정 검정 ---
     # 두 명목형 변수의 모든 조합(셀)별 값을 wide 형태로 모아 가정 검정에 전달
     cell = df.copy()
     cell["_cell"] = cell[between[0]].astype(str) + ", " + cell[between[1]].astype(str)
@@ -573,15 +571,16 @@ def anova_twoway(data, y, between, alpha=0.05):
     # 등분산성 충족 여부 추출
     equal_var = bool(assumption[assumption["test"] == "equal_var"]["result"].iloc[0])
 
-    # 등분산성 여부에 따라 분석 방법 분기
+    # --- 3) 등분산 여부에 따른 이원분산분석 수행 ---
     if equal_var:
         # [등분산 충족] 일반 이원분산분석
         test_name = "two-way ANOVA"
         aov = anova(data=df, dv=y, between=list(between))
-        # p값 컬럼명은 pingouin 버전에 따라 다를 수 있어 유연하게 선택
-        pcol = "p-unc" if "p-unc" in aov.columns else "p_unc"
+        # p값이 유의수준 미만이면 통계적으로 유의(귀무가설 기각)
+        aov["significant"] = aov["p_unc"] < alpha
     else:
-        test_name = "OLS (HC3) Type-II ANOVA"
+        # [등분산 미충족] 등분산을 가정하지 않는 선형모형(HC3) 기반 Type-II ANOVA
+        test_name = "Type-II ANOVA"
         # Q()로 컬럼명을 감싸 공백/특수문자가 있는 컬럼명도 안전하게 처리
         formula = "Q('{0}') ~ C(Q('{1}')) * C(Q('{2}'))".format(y, between[0], between[1])
         model = ols(formula, data=df).fit(cov_type="HC3")
@@ -600,12 +599,14 @@ def anova_twoway(data, y, between, alpha=0.05):
         aov["Source"] = (aov["Source"].str.replace("C(Q('", "", regex=False)
                                       .str.replace("'))", "", regex=False)
                                       .str.replace(":", " * ", regex=False))
-        pcol = "PR(>F)"
 
+        # p값이 유의수준 미만이면 통계적으로 유의(귀무가설 기각)
+        aov["significant"] = aov["PR(>F)"] < alpha
+
+    # --- 4) 결과표 가공 (검정명·효과크기 컬럼 추가) ---
     # 어떤 검정을 사용했는지 식별할 수 있도록 맨 앞에 test 컬럼 추가
     aov.insert(0, "test", test_name)
 
-    # --- 효과크기 해석 컬럼 추가 ---
     # 편에타제곱(np2)을 Cohen의 기준표로 해석한다.
     #   ≥ 0.14 → 큼, ≥ 0.06 → 중간, ≥ 0.01 → 작음, 그 미만 → 미미함
     conditions = [
@@ -618,8 +619,51 @@ def anova_twoway(data, y, between, alpha=0.05):
     # np2가 없는 행(잔차 등)은 효과크기 해석 대상이 아니므로 표시를 비운다.
     aov.loc[aov["np2"].isna(), "effect_size"] = "-"
 
-    # p값이 유의수준 미만이면 통계적으로 유의(귀무가설 기각)
-    aov["significant"] = aov[pcol] < alpha
+    # --- 5) 시각화 및 결과 반환 ---
+    if plot:
+        # 5-1) 각 요인의 수준 표시 순서 결정
+        # order가 없으면 Categorical 범주 순서를, 그것도 아니면 데이터 등장 순서를 따른다.
+        if order is None:
+            orders = []     # 두 요인 각각의 수준 순서를 담을 리스트
+
+            for c in between:
+                if hasattr(df[c], "cat"):
+                    # Categorical 타입이면 미리 지정된 범주 순서를 그대로 사용
+                    levels = list(df[c].cat.categories)
+                else:
+                    # 그 외에는 데이터에 등장한 순서를 사용
+                    levels = list(df[c].unique())
+
+                orders.append(levels)
+        else:
+            # order가 주어지면 그대로 사용 (between과 같은 순서로 대응)
+            orders = list(order)
+
+        if ylabel is None:
+            ylabel = "평균 {0}".format(y)
+
+        # 5-2) 두 요인의 역할(x축/선)을 서로 바꾼 두 개의 상호작용 플롯을 나란히 그린다.
+        # (title은 전체 제목(suptitle)이며, 지정하지 않으면 서브플롯별 제목만 표시된다.)
+        fig, ax = my_plot.init(title=title, width=width, height=height, rows=1, cols=2)
+
+        for i in range(2):
+            # 한 요인은 x축, 나머지 요인은 선(hue)으로 역할을 바꿔가며 그린다.
+            x_field, hue_field = between[i], between[1 - i]
+            x_order, hue_order = orders[i], orders[1 - i]
+
+            # 각 조합의 평균(점)과 표준오차(오차막대)를 선으로 이어 평균 프로파일을 그린다.
+            my_plot.pointplot(data=df, x=x_field, y=y, hue=hue_field,
+                              order=x_order, hue_order=hue_order,
+                              errorbar="se", capsize=0.1, palette=palette,
+                              legend_title=hue_field, ax=ax[i])
+
+            # ax를 직접 전달한 경우 my_plot이 제목과 축 라벨을 설정하지 않으므로 직접 지정한다.
+            ax[i].set_title("{0}에 따른 {1}별 평균 {2}".format(x_field, hue_field, y),
+                            fontsize=15, pad=10)
+            ax[i].set_xlabel(x_field, fontsize=12)
+            ax[i].set_ylabel(ylabel, fontsize=12)
+
+        my_plot.show(save_path=save_path)
 
     return aov
 
@@ -627,11 +671,10 @@ def anova_twoway(data, y, between, alpha=0.05):
 # ===================================================================
 # 이원분산분석 사후검정 (Post hoc)
 # ===================================================================
-def posthoc_twoway(data, y, between, alpha=0.05):
+def posthoc_twoway(data, y, between, alpha=0.05, plot=True, summary=True,
+                   palette=None, title=None, xlabel=None, ylabel=None,
+                   width=1280, height=640, save_path=None):
     """이원분산분석(Two-way ANOVA)의 사후검정을 수행하는 함수
-
-    두 명목형 변수를 결합한 조합(셀) 단위의 집단에 대해 모든 쌍을 비교한다.
-    등분산성 가정 충족 여부에 따라 사후검정 방법을 분기한다.
         - 등분산 충족: Tukey HSD
         - 등분산 미충족: Games-Howell
 
@@ -640,49 +683,54 @@ def posthoc_twoway(data, y, between, alpha=0.05):
         y (str): 종속변수(연속형) 컬럼명
         between (list): 집단을 구분하는 두 개의 독립변수(명목형) 컬럼명 리스트
         alpha (float): 유의수준 (기본값: 0.05)
+        plot (bool): 결과를 시각화할지 여부 (기본값: True)
+        summary (bool): 결과 요약(비교쌍 수, 유의한 쌍 수, 평균차가 가장 큰/작은 쌍,
+                        첫 번째 요인의 수준별 유의한 쌍)을 출력할지 여부 (기본값: True)
+        palette (str or list): 색상 팔레트 (기본값: None)
+        title (str): 그래프 제목 (기본값: None이면 "조합(셀)별 {y} 분포")
+        xlabel (str): x축 라벨 (기본값: None이면 "조합 ({between[0]}, {between[1]})")
+        ylabel (str): y축 라벨 (기본값: None이면 y)
+        width (int): 그래프 너비 (기본값: 1280)
+        height (int): 그래프 높이 (기본값: 640)
+        save_path (str): 그래프 저장 경로 (기본값: None)
 
     Returns:
         DataFrame: 조합(셀) 집단 쌍별 사후검정 결과표(Tukey HSD 또는 Games-Howell)
-            - test: 사용한 사후검정 이름
-            - significant: p값이 유의수준 미만인지 여부
-            - effect_size: |Hedges' g| 기준 효과크기 해석 라벨
     """
-    # between은 두 개의 명목형 변수를 담은 리스트여야 한다.
-    if not isinstance(between, (list, tuple)) or len(between) != 2:
-        raise ValueError("between은 두 개의 명목형 변수명을 담은 리스트여야 합니다.")
-
-    # 분석에 사용할 컬럼만 추출하고 결측 행 제거
+    # --- 1) 분석에 사용할 컬럼만 추출하고 결측 행 제거 ---
     df = data[[y, between[0], between[1]]].dropna().copy()
 
-    # 두 명목형 변수를 결합하여 조합(셀) 단위의 집단 컬럼 생성
+    # --- 2) 두 명목형 변수를 결합하여 조합(셀) 단위의 집단 컬럼 생성 ---
     group = "{0} * {1}".format(between[0], between[1])
     df[group] = df[between[0]].astype(str) + ", " + df[between[1]].astype(str)
 
+    # --- 3) 등분산성 가정 검정 ---
     # 조합별 종속변수 값을 wide 형태로 모아 등분산성 가정 검정에 전달
     wide = my_prep.long2wide(df, hue=group, values=y)
-    assumption = test_assumptions(wide, columns=list(wide.columns), alpha=alpha)
+    assump = test_assumptions(wide, columns=list(wide.columns), alpha=alpha)
 
     # 등분산성 충족 여부 추출
-    equal_var = bool(assumption[assumption["test"] == "equal_var"]["result"].iloc[0])
+    equal_var = bool(assump[assump["test"] == "equal_var"]["result"].iloc[0])
 
-    # 등분산성 여부에 따라 사후검정 방법 선택
+    # --- 4) 등분산 여부에 따른 사후검정 수행 ---
     if equal_var:
         posthoc_name = "Tukey HSD"
         result = pairwise_tukey(data=df, dv=y, between=group)
-        # pingouin 버전/패치에 따라 p값 컬럼명이 다를 수 있어 유연하게 선택
+        # p값 컬럼명을 검정 종류와 무관하게 'pval'로 통일
+        # (pingouin 버전/패치에 따라 'p-tukey' 또는 'p_tukey'로 나올 수 있다)
         pcol = "p-tukey" if "p-tukey" in result.columns else "p_tukey"
+        result.rename(columns={pcol: "pval"}, inplace=True)
     else:
         posthoc_name = "Games-Howell"
         result = pairwise_gameshowell(data=df, dv=y, between=group)
-        pcol = "pval"
 
+    # --- 5) 결과표 가공 (검정명·유의성·효과크기·정렬) ---
     # 어떤 사후검정을 사용했는지 식별할 수 있도록 맨 앞에 test 컬럼 추가
     result.insert(0, "test", posthoc_name)
     # p값이 유의수준 미만이면 통계적으로 유의(귀무가설 기각)
-    result["significant"] = result[pcol] < alpha
+    result["significant"] = result["pval"] < alpha
 
-    # --- 효과크기 해석 컬럼 추가 ---
-    # hedges(Hedges' g)는 두 집단 평균차에 대한 표준화 효과크기로,
+    # hedges는 두 집단 평균차에 대한 표준화 효과크기로,
     # Cohen의 d 기준표를 따라 절댓값으로 해석한다.
     #   ≥ 0.8 → 큼, ≥ 0.5 → 중간, ≥ 0.2 → 작음, 그 미만 → 미미함
     abs_hedges = result["hedges"].abs()
@@ -693,6 +741,61 @@ def posthoc_twoway(data, y, between, alpha=0.05):
     ]
     labels = ["Large", "Medium", "Small"]
     result["effect_size"] = np.select(conditions, labels, default="Negligible")
+
+    # --- 6) 비교쌍(A, B) 기준으로 정렬 ---
+    result.sort_values(["A", "B"], inplace=True)
+
+    # --- 7) 시각화 (조합별 상자그림) 및 결과 반환 ---
+    if plot:
+        # 평균이 큰 조합부터 왼쪽에 오도록 x축 순서를 정한다.
+        order = (df[[group, y]].groupby(group).mean()
+                 .sort_values(y, ascending=False).index.tolist())
+
+        if title is None:
+            title = "조합(셀)별 {0} 분포".format(y)
+
+        if xlabel is None:
+            xlabel = "조합 ({0}, {1})".format(between[0], between[1])
+
+        if ylabel is None:
+            ylabel = y
+
+        my_plot.boxplot(data=df, x=group, y=y, order=order, palette=palette,
+                        title=title, xlabel=xlabel, ylabel=ylabel,
+                        width=width, height=height, save_path=save_path)
+
+    # --- 8) 결과 요약 출력 ---
+    if summary:
+        # 조합 이름은 "{between[0]} 수준, {between[1]} 수준" 형태이므로
+        # 앞부분만 떼어내면 각 비교쌍이 어느 첫 번째 요인 수준에 속하는지 알 수 있다.
+        a_level = result["A"].str.split(", ").str[0]
+        b_level = result["B"].str.split(", ").str[0]
+        print("비교한 조합 쌍: {0}개".format(len(result)))
+        print("유의한 쌍: {0}개".format(int(result["significant"].sum())))
+
+        big = result.loc[result["diff"].abs().idxmax()]
+        print("평균 차이가 가장 큰 쌍: ({0}) vs ({1}) "
+              "→ 차이 {2:.3f}, 효과크기 {3}, p-value {4:.3f}".format(
+                  big["A"], big["B"], abs(big["diff"]), big["effect_size"], big["pval"]))
+
+        sm = result.loc[result["diff"].abs().idxmin()]
+        print("평균 차이가 가장 작은 쌍: ({0}) vs ({1}) "
+              "→ 차이 {2:.3f}, 효과크기 {3}, p-value {4:.3f}".format(
+                  sm["A"], sm["B"], abs(sm["diff"]), sm["effect_size"], sm["pval"]))
+
+        # 첫 번째 요인의 수준을 고정한 채 두 번째 요인끼리만 비교한 쌍을 따로 살핀다.
+        # (상호작용이 있는 경우, 수준마다 유의한 쌍의 수가 다르게 나타난다)
+        for lv in df[between[0]].unique():
+            sub = result[(a_level == str(lv)) & (b_level == str(lv))]
+            sig = sub[sub["significant"]]
+
+            print("\n[{0}] {1}쌍 중 유의한 쌍: {2}개".format(lv, len(sub), len(sig)))
+
+            if sig.empty:
+                # 이 수준에서는 두 번째 요인을 무엇으로 바꿔도 차이를 확인할 수 없다.
+                print("(유의한 쌍 없음)")
+            else:
+                print(sig[["A", "B", "diff", "pval", "significant"]].to_string(index=False))
 
     return result
 
@@ -950,8 +1053,14 @@ def compute_vif(df, columns=None):
     # 계산한 VIF 값들을 변수명과 함께 DataFrame 으로 정리
     vif = DataFrame({'VIF': vif_values}, index=X.columns)
 
-    # 상수항(const)은 분석 대상이 아니므로 제외하고 VIF 기준 내림차순 정렬해서 반환
-    return vif.drop('const').sort_values(by='VIF', ascending=False)
+    # 상수항(const)은 분석 대상이 아니므로 제외하고
+    # 인덱스 오름차순으로 먼저 정렬
+    # 그 후 VIF 기준 내림차순으로 정렬해서 반환
+    # 단, 동점일 경우 기존 순서를 유지하도록 kind="stable" 옵션 사용
+    vif = (vif.drop('const').sort_index()
+             .sort_values(by='VIF', ascending=False, kind="stable"))
+
+    return vif
 
 
 # ===================================================================
