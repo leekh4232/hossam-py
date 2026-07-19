@@ -142,7 +142,8 @@ def categorical_summary(data, columns=None, value_counts=True, save_path=None):
             # 저장될 파일 경로가 전달된 경우 value_counts 결과를 Excel 파일로 저장
             if save_path:
                 # 기존 파일에 이어 쓰기를 수행하기 위해 ExcelWriter를 사용하여 시트별로 저장
-                with ExcelWriter(save_path, mode='a') as excel_writer:
+                # xlsxwriter는 이어 쓰기(mode='a')를 지원하지 않으므로 openpyxl을 명시
+                with ExcelWriter(save_path, mode='a', engine='openpyxl') as excel_writer:
                     cdf.to_excel(excel_writer, sheet_name=col, index=True)
 
     return desc_df
