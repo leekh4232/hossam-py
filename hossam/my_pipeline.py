@@ -2,38 +2,64 @@
 
 두 개의 파이프라인을 제공한다.
 
-  1) qtcheck_pipeline : 원본 데이터를 받아 자료형 점검 → (체크박스로) 명목형
-     변수 선택·변환 → (버튼으로) 중복 처리 결정 → 결측치 점검 → 기술통계 →
+  1) qtcheck : 원본 데이터를 받아 자료형 점검 → (체크박스로) 명목형 변수
+     선택·변환 → (버튼으로) 중복 처리 결정 → 결측치 점검 → 기술통계 →
      인사이트(결론)까지 대화형으로 수행하는 품질검사 파이프라인.
-  2) eda_pipeline     : 품질검사가 끝난 데이터와 종속변수 이름을 받아 시각화·
-     추론통계·변수 선별표를 탭으로 종합하는 EDA 파이프라인.
+  2) eda     : 품질검사가 끝난 데이터와 종속변수 이름을 받아, 노트북의 EDA
+     분석 흐름(#01~#05)을 그대로 자동 수행하는 EDA 파이프라인.
 
-원본 데이터프레임과 종속변수 이름만 전달하면, 필요한 기술통계량을
-my_qtcheck 로 스스로 산출하고, my_stats 와 중복되지 않는 시각화를 일괄
-수행한 뒤, 추론통계 검정을 단계적으로 실행하여 최종 '변수 선별표'까지
-만들어내는 파이프라인을 제공한다.
+eda 는 노트북에서 손으로 진행하던 분석 흐름과 장(章) 구분을 1:1로 따른다.
+각 장이 하나의 탭이 되고, 장 안의 분석 단위(변수·변수쌍)가 드롭다운으로
+넘기는 페이지가 된다 (ipywidgets 미설치 시 순차 출력으로 자동 대체).
 
-산출물은 파이캐럿(PyCaret)처럼 처리 단계별 탭으로 구분되어 표시된다
-(ipywidgets 미설치 시 순차 출력으로 자동 대체).
+    #01 준비작업      변수 유형 분류 · 연속형/명목형 기술통계량 · EDA 범위 정리
+    #02 단변량 분석    종속변수 → 연속형 독립변수 → 명목형 독립변수
+    #03 이변량 분석    상관분석 → T검정 → ANOVA → 교차분석
+    #04 다변량 분석    독립변수 간 상관행렬·중복 집계 · 다중공선성(VIF)
+    #05 최종 변수 선택 변수 선별표
 
-    기술통계 → 종속변수 시각화 → 독립변수 시각화
-             → 연속×연속 / 연속×명목(2) / 연속×명목(3↑) / 명목×명목
-             → 변수 선별표
+노트북과 맞춘 점
 
-각 탭은 하나의 공개 함수로 분리되어 있어, 노트북에서 개별적으로 호출하여
-독립적으로 결과를 확인할 수 있다. eda_pipeline 은 이 개별 함수들을 호출해
-결과가 있는 경우에만 탭으로 종합한다.
+  - 컬럼 의미 딕셔너리(column_means)를 받아 그래프·페이지 제목에
+    `carat(중량)` 처럼 의미를 함께 표기한다.
+  - 품질점검 단계에서 미리 산출해 둔 기술통계량(num_desc / cat_desc)을 그대로
+    재사용한다 (전달하지 않으면 my_qtcheck 로 직접 산출).
+  - 종속변수 유형과 실제 변수 구성으로부터 'EDA 범위 정리' 표를 자동 생성해,
+    어떤 검정이 적용/미적용인지 근거와 함께 보여준다.
+  - 상관분석은 산점도를 먼저 그린 뒤 결과표를 표시하고, ANOVA 사후검정은
+    기본적으로 결과표만 표시한다(posthoc_plot=True 로 시각화 추가 가능).
+  - 서열척도(범주 순서)는 전달받은 데이터의 category 순서를 그대로 사용한다.
+  - 노트북에서 손으로 적던 '💡 인사이트' 표를 변수·변수쌍마다 자동 생성해
+    그래프·결과표 아래에 함께 붙인다. '관찰값'(측정치)과 '판정'(라벨)을 나눠,
+    어떤 수치를 보고 그렇게 판정했는지 되짚을 수 있게 한다.
 
-    show_descriptive   ── 기술통계
-    viz_dependent      ── 종속변수 시각화
-    viz_independent    ── 독립변수 시각화
-    infer_cont_cont    ── 연속 × 연속       (상관분석)
-    viz_cont_target_hue── (연속 × 종속) + 범주 (명목형을 색으로 얹은 산점도)
-    infer_cont_nom2    ── 연속 × 명목(2집단) (T검정)
-    infer_cont_nom3    ── 연속 × 명목(3집단↑)(분산분석)
-    infer_nom_nom      ── 명목 × 명목       (교차분석)
-    selection_table    ── 변수 선별표
-    eda_pipeline       ── 위 함수들을 탭으로 종합
+      단변량 연속형  분포 모양 · 봉우리 수 · 이상치 · 이산점(군집) · 판단·조치
+      단변량 명목형  범주 수 · 최빈 범주 · 최소 범주 · 균형 여부 · 판단·조치
+      상관분석      선형/비선형 · 단조성 · 산포 · 이상치 · 채택 여부
+      T검정         집단 차이 · 가정 점검 · 효과크기 · 채택 여부
+      분산분석      집단 차이 · 효과크기 · 사후검정 구분력 · 채택 여부
+      교차분석      연관성 · 효과크기 · 기대빈도 가정 · 채택 여부
+
+    변수 선정은 이 흐름을 따른다. 단변량에서 각 변수의 전처리 방침(판단·조치)을
+    정하고, 이변량에서 종속변수와의 관계로 1차 채택 여부를 가른 뒤, 다변량에서
+    공선성 그룹을 찾아 그룹마다 효과크기 1위 하나만 대표로 남기고 나머지를
+    후보로 돌린다. 최종 판정은 #05 변수 선별표에서 확정된다.
+
+각 장은 하나의 공개 함수로 분리되어 있어, 노트북에서 개별적으로 호출하여
+독립적으로 결과를 확인할 수 있다. eda 는 이 함수들의 페이지를 장 단위로 모아
+탭으로 종합한다.
+
+    show_descriptive   ── #01 준비작업 (변수 분류 · 기술통계량 · EDA 범위)
+    viz_dependent      ── #02 종속변수 단변량
+    viz_independent    ── #02 독립변수 단변량
+    infer_cont_cont    ── #03 상관분석   (연속 × 연속)
+    infer_cont_nom2    ── #03 T검정      (연속 × 명목(2집단))
+    infer_cont_nom3    ── #03 ANOVA     (연속 × 명목(3집단↑))
+    infer_nom_nom      ── #03 교차분석   (명목 × 명목)
+    viz_cont_target_hue── #03 보조: 명목형을 색으로 얹은 산점도(상호작용 후보)
+    corr_independent   ── #04 다변량 분석
+    selection_table    ── #05 최종 변수 선택
+    eda                ── 위 함수들을 장(章) 탭으로 종합
 
 검정 선택 규칙 (독립변수 유형 × 종속변수 유형)
 
@@ -49,7 +75,6 @@ import os
 import base64
 import html as _htmlmod
 import numpy as np
-from itertools import combinations
 from pandas import DataFrame
 from IPython.display import display, Markdown
 from IPython.utils.capture import capture_output
@@ -271,39 +296,149 @@ def _asymmetry_signal(desc, var):
     return f"{skew} / {log}"
 
 
-def _collinearity_map(data, feature_continuous, alpha, threshold):
+def _compute_corr_pairs(data, feature_continuous, alpha):
+    """연속형 독립변수들의 쌍별 상관분석 결과표를 한 번만 산출한다.
+
+    이 결과표는 '#04 다변량 분석'의 상관행렬·중복 집계와 변수 선별표의
+    공선성 신호에서 함께 사용되므로, 중복 계산을 피하기 위해 공유한다.
+    (multi_correlation 은 호출 즉시 상관행렬을 출력하므로 여기서는 출력을 억제한다.)
+    """
+    if len(feature_continuous) < 2:
+        return None
+    try:
+        with capture_output():
+            return my_stats.multi_correlation(data, columns=feature_continuous,
+                                              alpha=alpha, plot=False)
+    except Exception:
+        return None
+
+
+def _corr_matrix(corr_pairs, columns):
+    """쌍별 상관분석 결과표(corr_pairs)를 대칭 상관행렬로 재배치한다."""
+    matrix = DataFrame(1.0, index=columns, columns=columns)
+    for (a, b), coef in corr_pairs["coef"].items():
+        if a in matrix.index and b in matrix.columns:
+            matrix.loc[a, b] = coef
+            matrix.loc[b, a] = coef
+    return matrix
+
+
+def _collinearity_map(corr_pairs, feature_continuous, threshold):
     """연속형 독립변수 간 상관분석 결과로부터 공선성 신호 맵을 만든다.
 
     (이 단계에서는 VIF를 사용하지 않으며, 오직 독립변수 쌍의 상관분석 결과만
-    사용한다.) 각 변수에 대해 다른 연속형 독립변수와의 |상관계수|가 threshold
-    이상인 가장 강한 상대를 (상대변수, 계수)로 기록한다. 없으면 None.
+    사용한다.) 각 변수마다 |상관계수|가 threshold 이상인 상대를 계수가 큰 순서로
+    모두 기록해, 어떤 변수와 중복인지까지 근거로 남긴다.
 
     Returns:
-        dict: {변수명: (상대변수, 계수) 또는 None}
+        dict: {변수명: [(상대변수, 계수), ...]}  (중복 없으면 빈 리스트)
     """
-    strongest = {v: None for v in feature_continuous}
-    for a, b in combinations(feature_continuous, 2):
-        try:
-            res = my_stats.correlation(data, a, b, alpha=alpha, plot=False)
-        except Exception:
+    strong = {v: [] for v in feature_continuous}
+    if corr_pairs is None:
+        return strong
+
+    for (a, b), coef in corr_pairs["coef"].items():
+        if a not in strong or b not in strong:
             continue
-        coef = float(res.iloc[0]["coef"])
+        coef = float(coef)
         if abs(coef) >= threshold:
-            for v, other in ((a, b), (b, a)):
-                cur = strongest[v]
-                if cur is None or abs(coef) > abs(cur[1]):
-                    strongest[v] = (other, coef)
-    return strongest
+            strong[a].append((b, coef))
+            strong[b].append((a, coef))
+
+    # 가장 강하게 중복된 상대가 앞에 오도록 정렬
+    for v in strong:
+        strong[v].sort(key=lambda pair: abs(pair[1]), reverse=True)
+    return strong
 
 
-def _collinearity_signal(collin, var):
-    """공선성 신호를 색상 아이콘(O/X)으로 생성 (상관분석 결과 기반).
+def _collinearity_groups(collin):
+    """공선성 신호로 이어진 변수들을 하나의 그룹(연결 성분)으로 묶는다.
+
+    `carat–x`, `x–y` 처럼 사슬로 이어진 변수들은 결국 같은 정보를 담고 있으므로
+    하나의 그룹으로 본다. 그룹마다 대표변수 하나만 채택하면 된다.
+
+    Returns:
+        dict: {변수명: 그룹번호(1부터)}  (그룹에 속하지 않는 변수는 키가 없음)
+    """
+    # 공선성 신호가 있는 변수만 인접 목록으로 구성
+    adjacent = {v: [other for other, _ in partners]
+                for v, partners in collin.items() if partners}
+
+    seen, groups = set(), []
+    for start in adjacent:                       # dict 순서 = 변수 순서 → 결과가 항상 같다
+        if start in seen:
+            continue
+        # 너비/깊이 우선 탐색으로 사슬로 이어진 변수를 모두 모은다
+        stack, member = [start], []
+        while stack:
+            cur = stack.pop()
+            if cur in seen:
+                continue
+            seen.add(cur)
+            member.append(cur)
+            stack.extend(o for o in adjacent.get(cur, []) if o not in seen)
+        groups.append(member)
+
+    return {var: i + 1 for i, member in enumerate(groups) for var in member}
+
+
+# 공선성 신호에 함께 표기할 중복 상대 변수의 최대 개수
+_MAX_COLLIN_DETAIL = 3
+
+
+def _collinearity_signal(collin, var, groups=None):
+    """공선성 신호를 아이콘 + 그룹번호 + 중복 상대로 생성 (상관분석 결과 기반).
 
     🅾️ = 공선성 신호 있음(다른 연속형 독립변수와 강한 상관), ❎ = 없음.
+    신호가 있으면 어느 그룹에 속하고 어떤 변수와 얼마나 중복인지
+    `🅾️ G1 (x 0.996 / y 0.996)` 로 덧붙인다.
     """
-    if not collin or var not in collin or collin[var] is None:
+    if not collin or not collin.get(var):
         return "❎"      # X (공선성 신호 없음)
-    return "🅾️"          # O (공선성 신호 있음)
+    detail = " / ".join(f"{other} {coef:.3f}"
+                        for other, coef in collin[var][:_MAX_COLLIN_DETAIL])
+    gid = (groups or {}).get(var)
+    return f"🅾️ G{gid} ({detail})" if gid else f"🅾️ ({detail})"
+
+
+def _select_group_representative(rows, groups):
+    """공선성 그룹마다 대표변수 하나만 채택으로 남기고 나머지는 후보로 내린다.
+
+    같은 그룹의 변수들은 사실상 같은 정보이므로 하나만 모델에 넣으면 된다.
+    대표는 **종속변수에 대한 효과크기가 가장 큰 변수**가 가져간다.
+    (효과크기가 같으면 p값이 작은 변수 → 변수명 순으로 결정한다.)
+
+    1·2위 격차(Δ)가 아무리 작아도 순위대로 대표를 정하되, 얼마나 근소한 차이로
+    갈렸는지 판단할 수 있도록 Δ를 근거에 함께 남긴다. Δ가 매우 작다면 통계적으로는
+    동률이므로, 최종 선택은 도메인 지식으로 다시 확인하는 것이 좋다.
+    """
+    # 그룹별 구성원 모으기 (이미 제외된 변수는 대표 후보가 될 수 없다)
+    member_of = {}
+    for row in rows:
+        gid = groups.get(row["변수"])
+        if gid is not None and row["채택여부"] != "❌ 제외":
+            member_of.setdefault(gid, []).append(row)
+
+    for gid, members in member_of.items():
+        # 효과크기 내림차순 → p값 오름차순 → 변수명 순 (항상 같은 결과가 나오도록)
+        members.sort(key=lambda r: (-r["_effect"], r["_p"], r["변수"]))
+        names = ", ".join(m["변수"] for m in members)
+
+        rep, rest = members[0], members[1:]
+        if not rest:                       # 그룹에 살아남은 변수가 하나뿐이면 그대로 채택
+            continue
+
+        # 대표는 자신이 받은 판정을 그대로 유지한다. 1위라고 해서 효과크기가
+        # 기준에 못 미치는 변수를 채택으로 올리지는 않는다.
+        gap = rep["_effect"] - rest[0]["_effect"]
+        verdict = "대표 채택" if rep["채택여부"] == "✅ 채택" else "그룹 대표"
+        rep["근거"] = (f"{rep['근거']} · 공선성 그룹 G{gid}({names}) 중 효과크기 1위 "
+                      f"→ {verdict} (2위 {rest[0]['변수']}와 Δ={gap:.4f})")
+
+        for m in rest:
+            m["채택여부"] = "🟡 후보"
+            m["근거"] = (f"{m['근거']} · 공선성 그룹 G{gid} 대표를 {rep['변수']}에 양보 "
+                        f"(Δ={rep['_effect'] - m['_effect']:.4f})")
 
 
 def _decide(family, significant, alpha, corr_threshold,
@@ -343,11 +478,13 @@ def _decide(family, significant, alpha, corr_threshold,
 # ===================================================================
 # 저수준 검정 실행 (독립변수 1개 → (결과행 dict, 결과표 DataFrame))
 # ===================================================================
-def _run_correlation(data, feature, target, alpha, corr_threshold, plot, palette):
-    """연속형 ↔ 연속형 : 상관분석"""
-    res = my_stats.correlation(data, x=feature, y=target, alpha=alpha,
-                               plot=plot, palette=palette,
-                               title=f"{feature} ↔ {target}")
+def _run_correlation(data, feature, target, alpha, corr_threshold):
+    """연속형 ↔ 연속형 : 상관분석
+
+    시각화(산점도)는 노트북 흐름과 동일하게 호출부에서 별도로 그리므로
+    여기서는 검정만 수행한다.
+    """
+    res = my_stats.correlation(data, x=feature, y=target, alpha=alpha, plot=False)
     row = res.iloc[0]
     coef = float(row["coef"])
     p = float(row["p-value"])
@@ -526,7 +663,43 @@ def _pages_display(sections):
             fn()
 
 
-def _emit_sections(items, work, verbose, as_widget=False):
+def _emit(sections, mode):
+    """페이지 섹션 목록을 mode 에 맞는 형태로 내보낸다.
+
+    모든 탭 함수가 공유하는 출력 규약이다.
+
+    Args:
+        sections (list): (페이지 제목, 렌더함수) 목록
+        mode (str): "sections" → 목록 그대로 (장 단위로 합칠 때)
+                    "widget"   → 페이지 위젯 (섹션이 없으면 None)
+                    그 외       → 그 자리에서 표시
+
+    Returns:
+        mode 에 따라 섹션 목록 / 위젯 / 표시 여부(bool)
+    """
+    if mode == "sections":
+        return sections
+    if mode == "widget":
+        return _pages_widget(sections)
+    _pages_display(sections)
+    return bool(sections)
+
+
+def _emit_with_rows(rows, sections, mode):
+    """검정 결과행을 함께 돌려주는 _emit (추론통계 탭 전용).
+
+    결과행은 섹션이 렌더링될 때 채워지므로, 호출부는 위젯·섹션을 만든 뒤에
+    rows 를 읽어야 한다.
+    """
+    if mode == "sections":
+        return rows, sections
+    if mode == "widget":
+        return rows, _pages_widget(sections)
+    _pages_display(sections)
+    return rows
+
+
+def _emit_sections(items, work, verbose, mode="display"):
     """검정 항목들을 실행해 결과행을 모으고, 표시 방식은 인자로 제어한다.
 
     Args:
@@ -534,20 +707,24 @@ def _emit_sections(items, work, verbose, as_widget=False):
         work (callable): work(arg, plot) → 결과행 dict 또는 None.
             plot=True 면 결과표·그래프를 직접 출력한다.
         verbose (bool): True 면 페이지로 렌더링, False 면 조용히 수집만.
-        as_widget (bool): True 면 렌더링 대신 (rows, 위젯) 을 반환(파이프라인용).
+        mode (str): 결과 형태
+            - "display" : 그 자리에서 표시하고 결과행만 반환 (단독 호출용)
+            - "widget"  : (결과행, 페이지 위젯) 반환
+            - "sections": (결과행, [(제목, 렌더함수)]) 반환. 여러 검정의 페이지를
+              하나의 탭으로 합칠 때 사용하며, 결과행은 렌더 시점에 채워진다.
 
     Returns:
-        list[dict] 또는 (list[dict], widget): 수집된 결과행 (as_widget 이면 위젯 동반)
+        list[dict] 또는 (list[dict], widget|sections)
     """
     rows = []
 
-    # 조용히 수집만 (변수 선별표 조립용)
+    # 조용히 수집만 (변수 선별표 조립용) — 표시할 페이지가 없다
     if not verbose:
         for _, arg in items:
             row = work(arg, plot=False)
             if row is not None:
                 rows.append(row)
-        return (rows, None) if as_widget else rows
+        return _emit_with_rows(rows, [], mode)
 
     # 페이지별 렌더 함수 구성 (렌더 중 결과행을 함께 수집)
     sections = []
@@ -558,241 +735,764 @@ def _emit_sections(items, work, verbose, as_widget=False):
                 rows.append(row)
         sections.append((title, render))
 
-    # 파이프라인용: 위젯을 만들어 반환(상위 Tab 자식으로 직접 사용)
-    if as_widget:
-        return rows, _pages_widget(sections)
-
-    # 단독 호출용: 그 자리에서 표시
-    _pages_display(sections)
-    return rows
+    return _emit_with_rows(rows, sections, mode)
 
 
 # ===================================================================
-# 탭 ① 기술통계
-# ===================================================================
-def show_descriptive(data, target, task="regression", _as_widget=False):
-    """기술통계 탭: 페이지(기본정보 · 연속형 기술통계량 · 명목형 기술통계량)로 구분해 출력한다.
-
-    노트북에서 단독 호출 시 드롭다운으로 페이지를 넘길 수 있다.
-    (다중공선성 VIF 는 '독립변수 상관분석' 탭으로 옮겨졌다.)
-    _as_widget=True 면 표시 대신 위젯을 반환한다(파이프라인용).
-    """
-    is_clf = _resolve_task(task)
-    number_cols, category_cols, feat_cont, feat_nom = _classify(data, target)
-
-    # ── 기본정보: 종속변수·모델링 유형·변수 분류 ──
-    def basic():
-        display(Markdown(f"**종속변수** : `{target}`  |  **모델링 유형** : "
-                         f"{'분류(범주형)' if is_clf else '예측(연속형)'}"))
-        display(Markdown(f"- 연속형 독립변수 : {feat_cont}"))
-        display(Markdown(f"- 명목형 독립변수 : {feat_nom}"))
-
-    # ── 연속형 기술통계량 ──
-    def numeric():
-        display(my_qtcheck.numerical_summary(data, columns=number_cols))
-
-    # ── 명목형 기술통계량 ──
-    def category():
-        display(my_qtcheck.categorical_summary(data, columns=category_cols, value_counts=False))
-
-    sections = [("기본정보", basic)]
-    if number_cols:
-        sections.append(("연속형 기술통계량", numeric))
-    if category_cols:
-        sections.append(("명목형 기술통계량", category))
-
-    if _as_widget:
-        return _pages_widget(sections)
-    _pages_display(sections)
-
-
-# ===================================================================
-# 단변량 시각화 아래에 표시할 변수별 기술통계량 표
-# ===================================================================
-def _var_stats(data, var, continuous):
-    """단변량 그래프 아래에 해당 변수의 기술통계량을 표로 표시한다.
-
-    - 연속형: numerical_summary 를 전치(변수 1개 → 세로 표)해서 표시
-    - 명목형: 범주별 빈도·비율 표시
-    """
-    display(Markdown("**기술통계량**"))
-    if continuous:
-        display(my_qtcheck.numerical_summary(data, columns=[var]).T)
-    else:
-        vc = data[var].value_counts().sort_index()
-        freq = vc.rename("빈도").to_frame()
-        freq["비율(%)"] = (vc / vc.sum() * 100).round(2)
-        display(freq)
-
-
-# ===================================================================
-# 탭 ② 종속변수 시각화 (my_stats 와 중복되지 않는 단변량 분포)
-# ===================================================================
-def viz_dependent(data, target, task="regression", palette=None, _as_widget=False):
-    """종속변수 시각화 탭: 종속변수의 단변량 분포 + 기술통계량 표를 표시한다.
-
-    - 연속형: 히스토그램 + 상자그림
-    - 범주형: 빈도 막대그래프
-
-    _as_widget=True 면 표시 대신 위젯을 반환한다(파이프라인용).
-    """
-    is_clf = _resolve_task(task)
-
-    def render():
-        display(Markdown(f"#### 종속변수 `{target}` 분포"))
-        if is_clf:
-            my_plot.countplot(data=data, x=target, palette=palette,
-                              title=f"종속변수 {target} 분포", width=800, height=500)
-        else:
-            fig, ax = my_plot.init(rows=1, cols=2, title=f"종속변수 {target} 분포",
-                                   width=800, height=500)
-            my_plot.histplot(data=data, x=target, kde=True, ax=ax[0])
-            my_plot.boxplot(data=data, x=target, ax=ax[1])
-            my_plot.show()
-        # 그래프 아래에 기술통계량 표 함께 표시
-        _var_stats(data, target, continuous=not is_clf)
-
-    if _as_widget:
-        return _pages_widget([("종속변수 분포", render)])
-    render()
-
-
-# ===================================================================
-# 탭 ③ 독립변수 시각화 (my_stats 와 중복되지 않는 단변량 분포)
-# ===================================================================
-def viz_independent(data, target, task="regression", palette=None, _as_widget=False):
-    """독립변수 시각화 탭: 독립변수별 페이지로 단변량 분포를 그린다.
-
-    - 연속형: 히스토그램 + 상자그림
-    - 명목형: 빈도 막대그래프
-
-    _as_widget=True 면 위젯(없으면 None)을 반환하고, 아니면 그 자리에서 표시하고
-    표시할 내용이 있었는지 여부(bool)를 반환한다.
-    """
-    _, _, feat_cont, feat_nom = _classify(data, target)
-
-    # 독립변수별로 페이지 구성 (연속형: 히스토그램+상자그림 / 명목형: 빈도)
-    # 각 그래프 아래에 해당 변수의 기술통계량 표를 함께 표시한다.
-    def _cont(f):
-        def render():
-            fig, ax = my_plot.init(rows=1, cols=2, title=f"독립변수 {f} 분포",
-                                   width=800, height=500)
-            my_plot.histplot(data=data, x=f, kde=True, ax=ax[0])
-            my_plot.boxplot(data=data, x=f, ax=ax[1])
-            my_plot.show()
-            _var_stats(data, f, continuous=True)
-        return render
-
-    def _nom(n):
-        def render():
-            my_plot.countplot(data=data, x=n, palette=palette,
-                              title=f"독립변수 {n} 분포", width=800, height=500)
-            _var_stats(data, n, continuous=False)
-        return render
-
-    sections = [(f, _cont(f)) for f in feat_cont] + [(n, _nom(n)) for n in feat_nom]
-
-    if _as_widget:
-        return _pages_widget(sections)
-    _pages_display(sections)
-    return bool(sections)
-
-
-# ===================================================================
-# 탭 ④ 추론통계 - 연속 × 연속 (상관분석)
-# ===================================================================
-def infer_cont_cont(data, target, task="regression", alpha=0.05,
-                    corr_threshold=0.3, verbose=True, palette=None, _as_widget=False):
-    """연속 × 연속 상관분석 탭 (변수 쌍별 페이지).
-
-    연속형 종속변수(예측)일 때만 수행되며, 각 연속형 독립변수와 종속변수의
-    상관분석을 실행한다. 대상이 없으면 빈 리스트를 반환한다.
-
-    Args:
-        verbose (bool): True 면 결과표·산점도를 표시, False 면 결과만 수집.
-        _as_widget (bool): True 면 (rows, 위젯) 을 반환한다(파이프라인용).
-
-    Returns:
-        list[dict]: 변수 선별표에 사용할 결과행 리스트
-    """
-    if _resolve_task(task):
-        return ([], None) if _as_widget else []   # 연속형 종속변수 아님 → 대상 없음
-    _, _, feat_cont, _ = _classify(data, target)
-
-    def work(f, plot):
-        row, res = _run_correlation(data, f, target, alpha, corr_threshold,
-                                    plot=plot, palette=palette)
-        if plot and row is not None:
-            display(res)
-        return row
-
-    items = [(f"{f} ↔ {target}", f) for f in feat_cont]
-    return _emit_sections(items, work, verbose, as_widget=_as_widget)
-
-
-# ===================================================================
-# 탭 ④-보조 (연속 × 종속) + 범주 : 범주형 변수를 hue(색)로 적용한 산점도
+# 인사이트 판정표
 # -------------------------------------------------------------------
-# '연속 × 종속' 탭의 이변량 산점도에 명목형 변수를 색으로 얹어, 범주에 따른
-# 관계 차이(상호작용·교란 후보)를 눈으로 확인한다. 연속형 종속변수(예측)이고
-# 연속형 독립변수와 명목형 변수가 모두 있을 때만 대상이 된다.
+# 노트북에서 사람이 손으로 적던 '💡 인사이트' 표를 데이터로부터 자동 생성한다.
+# '관찰값'(측정치)과 '판정'(라벨)을 따로 두어, 어떤 수치를 보고 그렇게 판정했는지
+# 학습자가 되짚을 수 있게 한다. 판정 기준은 아래 상수만 고치면 일괄로 바뀐다.
 # ===================================================================
+_INSIGHT_COLUMNS = ["점검 항목", "관찰값", "판정"]
+
+# 이상치 비율 판정 경계 (미만 기준) — 초과 시 "많음"
+_OUTLIER_BOUNDS = [(0.01, "적음"), (0.03, "소수"), (0.05, "다소 많음")]
+
+# 범주 균형 판정 경계: 최빈 범주 ÷ 최소 범주 배수 (미만 기준) — 초과 시 "불균형"
+_BALANCE_BOUNDS = [(2, "균형"), (5, "비교적 균형"), (15, "다소 불균형")]
+
+# 사후검정 구분력 판정 경계: '실질 구분 쌍'의 비율 (미만 기준) — 초과 시 "높음"
+#   실질 구분 쌍 = 유의하면서 효과크기가 Negligible 이 아닌 쌍.
+#   표본이 크면 거의 모든 쌍이 유의해지므로(대표본 포화), 유의성만으로는 변별되지
+#   않는다. 효과크기를 함께 봐야 '어느 등급쌍이 실제로 갈리는지'가 드러난다.
+_POSTHOC_BOUNDS = [(0.3, "낮음"), (0.6, "보통")]
+
+# 단조 관계가 이보다 약하면 산포(등분산) 판정은 해석 의미가 낮다고 본다
+_WEAK_MONOTONE = 0.1
+
+# 봉우리 탐지 설정
+#   정수 격자처럼 값이 촘촘히 반복되는 변수는 KDE 대역폭이 지나치게 좁아져
+#   격자마다 봉우리가 잡힌다. 대역폭을 넓혀 분포의 '큰 모양'만 남긴다.
+_PEAK_BW_MULT = 2.0        # KDE 대역폭 배수
+_PEAK_PROMINENCE = 0.05    # 봉우리로 인정할 최소 융기 (최대 밀도 대비 비율)
+_PEAK_GRID = 512           # 밀도 곡선을 평가할 격자 수
+_PEAK_MAX_SAMPLE = 20000   # 이보다 크면 표본추출 (결과 고정을 위해 시드 지정)
+
+# 이산점(군집) 판정 기준
+_INTEGER_RATIO = 0.9       # 정수 비율이 이 이상이면 '정수 격자형'
+_SPARSE_RATIO = 0.01       # 고유값/행수가 이 이하이면 '값이 성김'
+
+
+def _grade(value, bounds, over):
+    """구간 목록으로 라벨을 정한다. bounds=[(상한, 라벨), ...] (미만 기준)"""
+    for limit, label in bounds:
+        if value < limit:
+            return label
+    return over
+
+
+def _insight_frame(rows):
+    """(점검 항목, 관찰값, 판정) 목록을 판정표로 만든다."""
+    return DataFrame(rows, columns=_INSIGHT_COLUMNS)
+
+
+def _show_insight(frame):
+    """판정표를 표시한다 (결론 행인 '판단·조치'/'채택 여부'를 강조)."""
+    display(Markdown("**💡 인사이트 (자동 판정)**"))
+
+    def _mark(r):
+        conclusion = str(r["점검 항목"]) in ("판단·조치", "채택 여부")
+        return [f"background-color: {'#e3f2fd' if conclusion else ''}"] * len(r)
+
+    display(frame.style.apply(_mark, axis=1).hide(axis="index"))
+
+
+# -------------------------------------------------------------------
+# 단변량 : 연속형
+# -------------------------------------------------------------------
+def _skew_label(skew, interpret):
+    """왜도를 '강도 + 방향' 라벨로 변환한다 (|왜도| 0.5 / 1 / 2 를 경계로 사용)."""
+    if abs(skew) < 0.5:
+        return "거의 대칭"
+    level = "중간" if abs(skew) < 1.0 else ("강한" if abs(skew) < 2.0 else "매우 강한")
+    side = {"right tail": "우편향", "left tail": "좌편향"}.get(interpret, "대칭")
+    return f"{level} {side}"
+
+
+def _count_peaks(series):
+    """분포 곡선(KDE)의 봉우리 수를 세어 (개수, 위치목록) 을 반환한다.
+
+    산출할 수 없으면 (None, []) 을 반환한다.
+    """
+    try:
+        from scipy.stats import gaussian_kde
+        from scipy.signal import find_peaks
+    except Exception:
+        return None, []
+
+    values = series.dropna().to_numpy(dtype=float)
+    if len(values) < 3 or np.ptp(values) == 0:
+        return None, []
+    if len(values) > _PEAK_MAX_SAMPLE:
+        values = np.random.default_rng(0).choice(values, _PEAK_MAX_SAMPLE, replace=False)
+
+    try:
+        kde = gaussian_kde(values)
+        kde.set_bandwidth(kde.factor * _PEAK_BW_MULT)
+        grid = np.linspace(values.min(), values.max(), _PEAK_GRID)
+        density = kde(grid)
+        peaks, _ = find_peaks(density, prominence=_PEAK_PROMINENCE * density.max())
+    except Exception:
+        return None, []
+    return len(peaks), [float(grid[i]) for i in peaks]
+
+
+def _insight_continuous(data, var, desc=None):
+    """연속형 변수의 단변량 판정표.
+
+    노트북의 '분포 모양 · 봉우리 수 · 이상치 · 이산점(군집) · 판단·조치' 를 그대로 따른다.
+    """
+    stat = _desc_of(data, var, desc).loc[var]
+    values = data[var].dropna()
+    total = len(values)
+    rows = []
+
+    # ── 분포 모양: 왜도(치우침) + 첨도(뾰족함) ──
+    skew = float(stat["skew"])
+    kurt_label = {"leptokurtic": "뾰족함", "platykurtic": "완만함"}.get(
+        stat["kurt_interpret"], "정규에 가까움")
+    rows.append(("분포 모양",
+                 f"왜도 {skew:+.3f} · 첨도 {float(stat['kurt']):+.3f}",
+                 f"{_skew_label(skew, stat['skew_interpret'])} · {kurt_label}"))
+
+    # ── 봉우리 수: 단봉이면 하나의 집단, 다봉이면 이질적인 집단이 섞여 있다는 신호 ──
+    n_peaks, positions = _count_peaks(values)
+    if n_peaks is None:
+        rows.append(("봉우리 수", "산출 불가", "-"))
+    else:
+        shown = ", ".join(f"{p:,.2f}" for p in positions[:5])
+        rows.append(("봉우리 수", f"{n_peaks}개" + (f" ({shown})" if shown else ""),
+                     "단봉" if n_peaks <= 1 else "다봉"))
+
+    # ── 이상치: IQR 울타리 기준 상·하단 건수와 비율 ──
+    ratio = float(stat["outliers_ratio"])
+    rows.append(("이상치",
+                 f"상단 {int(stat['upper_outliers']):,}건 / "
+                 f"하단 {int(stat['lower_outliers']):,}건 ({ratio:.1%})",
+                 _grade(ratio, _OUTLIER_BOUNDS, "많음")))
+
+    # ── 이산점(군집): 값이 특정 지점에 몰려 있는지 (정수 격자 · 성긴 고유값 · 0값) ──
+    unique = int(values.nunique())
+    integer_ratio = float((values == values.round()).mean()) if total else 0.0
+    zeros = int((values == 0).sum())
+    top_value, top_ratio = (None, 0.0)
+    if total:
+        counts = values.value_counts(normalize=True)
+        top_value, top_ratio = counts.index[0], float(counts.iloc[0])
+
+    observed = (f"고유값 {unique:,}종({unique / total:.1%}) · "
+                f"최빈 {top_value:,.2f}({top_ratio:.1%}) · "
+                f"정수 {integer_ratio:.0%} · 0값 {zeros:,}건")
+    if zeros:
+        cluster = f"0값 {zeros:,}건 — 확인 필요"
+    elif integer_ratio >= _INTEGER_RATIO:
+        cluster = "정수 격자형(사실상 이산)"
+    elif unique / total <= _SPARSE_RATIO:
+        cluster = "값이 성김(이산적)"
+    else:
+        cluster = "연속적"
+    rows.append(("이산점(군집)", observed, cluster))
+
+    # ── 판단·조치: 위 신호를 모아 전처리 방침을 제시 ──
+    actions = []
+    if zeros:
+        actions.append(f"0값 {zeros:,}건 결측 처리 검토")
+    log_need = str(stat["log_need"])
+    if log_need == "log1p":
+        actions.append("로그 변환(log1p) 검토")
+    elif log_need == "reverse_log1p":
+        actions.append("reverse_log1p 검토")
+    if ratio >= _OUTLIER_BOUNDS[-1][0]:
+        actions.append("이상치 처리 검토")
+    rows.append(("판단·조치",
+                 f"log_need={log_need} · 이상치 {ratio:.1%}",
+                 " · ".join(actions) if actions else "변환 불필요 — 그대로 투입"))
+
+    return _insight_frame(rows)
+
+
+# -------------------------------------------------------------------
+# 단변량 : 명목형
+# -------------------------------------------------------------------
+def _insight_nominal(data, var, is_target=False, is_clf=False):
+    """명목형 변수의 단변량 판정표.
+
+    노트북의 '범주 수 · 최빈 범주 · 최소 범주 · 균형 여부 · 판단·조치' 를 그대로 따른다.
+    """
+    counts = data[var].value_counts()
+    counts = counts[counts > 0]              # 사용되지 않는 범주는 제외
+    total = int(counts.sum())
+    levels = int(len(counts))
+    rows = []
+
+    # ── 범주 수: 어떤 검정을 쓸지 결정하는 값 ──
+    rows.append(("범주 수", f"{levels}개",
+                 "2집단" if levels == 2 else ("3집단 이상" if levels >= 3 else "단일 범주")))
+
+    # ── 최빈·최소 범주 ──
+    top, bottom = counts.index[0], counts.index[-1]
+    top_n, bottom_n = int(counts.iloc[0]), int(counts.iloc[-1])
+    top_ratio, bottom_ratio = top_n / total, bottom_n / total
+    rows.append(("최빈 범주", f"{top} {top_n:,}건 ({top_ratio:.1%})", "-"))
+    rows.append(("최소 범주", f"{bottom} {bottom_n:,}건 ({bottom_ratio:.1%})",
+                 "희소 범주" if bottom_ratio < 0.01 else "-"))
+
+    # ── 균형 여부: 최빈 ÷ 최소 배수로 판정 ──
+    fold = (top_n / bottom_n) if bottom_n else float("inf")
+    rows.append(("균형 여부", f"최빈/최소 = {fold:.1f}배",
+                 _grade(fold, _BALANCE_BOUNDS, "불균형")))
+
+    # ── 판단·조치: 이 변수로 수행할 검정 + 희소 범주 처리 ──
+    actions = []
+    if is_target:
+        actions.append("종속변수(분류)")
+        if fold >= _BALANCE_BOUNDS[-1][0]:
+            actions.append("클래스 불균형 → 가중치·리샘플링 검토")
+    elif is_clf:
+        actions.append("교차분석 대상")
+    else:
+        actions.append("T검정 대상" if levels == 2 else
+                       ("ANOVA 대상" if levels >= 3 else "검정 불가(단일 범주)"))
+    if bottom_ratio < 0.01:
+        actions.append(f"희소 범주 '{bottom}' 병합 검토")
+    rows.append(("판단·조치", f"범주 {levels}개 · 최소 {bottom_ratio:.1%}", " · ".join(actions)))
+
+    return _insight_frame(rows)
+
+
+# -------------------------------------------------------------------
+# 이변량 : 공통 (채택 여부 행)
+# -------------------------------------------------------------------
+def _verdict_row(row):
+    """검정 결과행에서 '채택 여부' 판정 행을 만든다.
+
+    공선성 그룹의 대표변수 선정은 모든 검정이 끝난 뒤 #05 에서 확정되므로,
+    여기서의 판정은 1차 판정임을 함께 표기한다.
+    """
+    return ("채택 여부", f"{row['근거']} (1차 판정)", row["채택여부"])
+
+
+def _hetero_signal(data, x, y, alpha):
+    """Breusch-Pagan 검정으로 잔차의 등분산 여부를 판정한다."""
+    try:
+        import statsmodels.api as sm
+        pair = data[[x, y]].dropna()
+        exog = sm.add_constant(pair[x].astype(float))
+        resid = sm.OLS(pair[y].astype(float), exog).fit().resid
+        p = float(het_breuschpagan(resid, exog)[1])
+        return f"Breusch-Pagan p={_fmt_p(p)}", ("이분산" if p < alpha else "등분산")
+    except Exception:
+        return "산출 불가", "-"
+
+
+# -------------------------------------------------------------------
+# 이변량 : 상관분석
+# -------------------------------------------------------------------
+def _insight_correlation(data, x, y, res, row, alpha):
+    """상관분석 판정표 (선형/비선형 · 단조성 · 산포 · 이상치 · 채택 여부)"""
+    from scipy.stats import pearsonr, spearmanr
+
+    result = res.iloc[0]
+    pair = data[[x, y]].dropna()
+    rows = []
+
+    # ── 선형/비선형: 피어슨(직선)과 스피어만(단조)의 차이로 곡선 관계를 드러낸다 ──
+    try:
+        r = float(pearsonr(pair[x], pair[y])[0])
+        rho = float(spearmanr(pair[x], pair[y])[0])
+        observed = f"Pearson r={r:+.3f} / Spearman ρ={rho:+.3f}"
+        if result["linearity"]:
+            shape = "선형"
+        else:
+            shape = "비선형(단조)" if abs(rho) - abs(r) >= 0.02 else "비선형"
+    except Exception:
+        rho, observed, shape = float(result["coef"]), "산출 불가", "-"
+    rows.append(("선형/비선형", f"{observed} · RESET 선형성 "
+                 f"{'충족' if result['linearity'] else '위배'}", shape))
+
+    # ── 단조성: 한 방향으로 꾸준히 오르내리는지 ──
+    size = abs(rho)
+    level = ("강한" if size > 0.7 else "중간" if size > 0.3 else
+             "약한" if size > 0.1 else "거의 없는")
+    direction = "양의 단조 증가" if rho > 0 else "음의 단조 감소"
+    rows.append(("단조성", f"ρ={rho:+.3f}",
+                 "단조성 없음" if level == "거의 없는" else f"{level} {direction}"))
+
+    # ── 산포: 잔차의 퍼짐이 일정한지(등분산) ──
+    # 관계 자체가 없는 변수는 등분산 여부를 따질 실익이 없으므로 그 사실을 함께 적는다.
+    observed_scatter, verdict_scatter = _hetero_signal(data, x, y, alpha)
+    if abs(rho) < _WEAK_MONOTONE and verdict_scatter != "-":
+        verdict_scatter = f"{verdict_scatter} (관계 미약 — 해석 의미 낮음)"
+    rows.append(("산포", observed_scatter, verdict_scatter))
+
+    # ── 이상치: 상관계수를 왜곡하는 영향점인지 ──
+    rows.append(("이상치", f"IQR 제외 시 r 변화 "
+                 f"{'≥0.1' if result['influential_outlier'] else '<0.1'}",
+                 "영향점 있음(계수 왜곡)" if result["influential_outlier"] else "영향점 없음"))
+
+    rows.append(_verdict_row(row))
+    return _insight_frame(rows)
+
+
+# -------------------------------------------------------------------
+# 이변량 : T검정
+# -------------------------------------------------------------------
+def _insight_ttest(res, row, alpha):
+    """T검정 판정표 (집단 차이 · 가정 점검 · 효과크기 · 채택 여부)"""
+    two = res.xs("two-sided", level="alternative")
+    test_name = two.index[0]
+    p = float(two["p-value"].iloc[0])
+
+    rows = [
+        ("집단 차이", f"{test_name} · p={_fmt_p(p)}",
+         "유의" if p < alpha else "유의하지 않음"),
+        ("가정 점검", row["가정점검"],
+         "모수 검정" if "Mann-Whitney" not in test_name else "비모수 검정"),
+        # 효과크기를 제공하지 않으므로 공선성 그룹의 대표 선정 근거로는 쓸 수 없다
+        ("효과크기", "미제공", "유의성으로만 판정"),
+        _verdict_row(row),
+    ]
+    return _insight_frame(rows)
+
+
+# -------------------------------------------------------------------
+# 이변량 : 분산분석
+# -------------------------------------------------------------------
+def _insight_anova(aov, posthoc, cat, row, alpha):
+    """분산분석 판정표 (집단 차이 · 효과크기 · 사후검정 구분력 · 채택 여부)"""
+    frow = aov[aov["Source"] == cat].iloc[0]
+    pcol = "p-unc" if "p-unc" in aov.columns else "p_unc"
+    p = float(frow[pcol])
+    np2 = float(frow["np2"])
+
+    rows = [
+        ("집단 차이", f"{row['검정방법']} · p={_fmt_p(p)}",
+         "유의" if p < alpha else "유의하지 않음"),
+        ("효과크기", f"η²={np2:.3f}", _kr(frow["effect_size"])),
+    ]
+
+    # ── 사후검정 구분력: 몇 쌍이나 '실질적으로' 구분되는지 ──
+    # 유의성만 보면 대표본에서 거의 모든 쌍이 유의해져 변별되지 않으므로,
+    # 효과크기가 Negligible 이 아닌 쌍(=실질 구분 쌍)의 비율로 판정한다.
+    if posthoc is not None and "significant" in posthoc.columns and len(posthoc):
+        total = int(len(posthoc))
+        hit = int(posthoc["significant"].sum())
+        real = int((posthoc["significant"] &
+                    (posthoc["effect_size"] != "Negligible")).sum()) \
+            if "effect_size" in posthoc.columns else hit
+        rows.append(("사후검정 구분력",
+                     f"유의 쌍 {hit}/{total}({hit / total:.0%}) · "
+                     f"실질 구분 쌍 {real}/{total}({real / total:.0%})",
+                     _grade(real / total, _POSTHOC_BOUNDS, "높음")))
+    else:
+        rows.append(("사후검정 구분력", "산출 불가", "-"))
+
+    rows.append(_verdict_row(row))
+    return _insight_frame(rows)
+
+
+# -------------------------------------------------------------------
+# 이변량 : 교차분석
+# -------------------------------------------------------------------
+def _insight_chi2(res, row, alpha):
+    """교차분석 판정표 (연관성 · 효과크기 · 기대빈도 가정 · 채택 여부)"""
+    result = res.iloc[0]
+    p = float(result["p-value"])
+
+    rows = [
+        ("연관성", f"{result['test']} · p={_fmt_p(p)}",
+         "유의" if p < alpha else "유의하지 않음"),
+        ("효과크기", f"Cramér's V={float(result['effect(V)']):.3f}",
+         _kr(result["strength"])),
+        ("기대빈도 가정", f"최소 기대빈도 {float(result['min_expected']):.1f}",
+         "충족" if result["assumption"] else "위배(해석 주의)"),
+        _verdict_row(row),
+    ]
+    return _insight_frame(rows)
+
+
+# ===================================================================
+# 노트북 흐름(#01~#05)에서 공통으로 쓰는 헬퍼
+# ===================================================================
+# 단변량·이변량 그래프 기본 크기 (노트북 실습 코드와 동일)
+_FIG_WIDTH = 1280
+_FIG_HEIGHT = 640
+
+# 명목형 단변량 빈도 그래프 기본 팔레트 (노트북 실습 코드와 동일)
+_NOMINAL_PALETTE = "Set2"
+
 # hue 범례가 읽힐 수 있는 명목형 변수의 최대 범주 수 (초과 시 색 구분이 무의미)
 _MAX_HUE_LEVELS = 10
 
 
-def viz_cont_target_hue(data, target, task="regression", palette=None, _as_widget=False):
-    """(연속 × 종속) + 범주 시각화 탭 (연속독립 × 명목 조합별 페이지).
+def _label(col, column_means=None):
+    """변수명에 컬럼의 의미를 덧붙인 표시용 이름을 만든다 (예: `carat(중량)`).
+
+    노트북 #01-5 의 `column_means` 딕셔너리를 그대로 전달받아 사용하며,
+    딕셔너리에 없는 변수는 변수명만 반환한다.
+    """
+    if column_means and col in column_means:
+        return f"{col}({column_means[col]})"
+    return col
+
+
+def _num_desc(data, columns, precomputed=None):
+    """연속형 기술통계량 표를 얻는다.
+
+    노트북처럼 품질점검 단계에서 미리 산출해 둔 표를 전달하면 다시 계산하지 않고
+    그대로 사용한다. 대상 컬럼이 없으면 None.
+    """
+    if precomputed is not None:
+        return precomputed
+    return my_qtcheck.numerical_summary(data, columns=columns) if columns else None
+
+
+def _cat_desc(data, columns, precomputed=None):
+    """명목형 기술통계량 표를 얻는다 (미리 산출한 표가 있으면 재사용)."""
+    if precomputed is not None:
+        return precomputed
+    if not columns:
+        return None
+    return my_qtcheck.categorical_summary(data, columns=columns, value_counts=False)
+
+
+# ===================================================================
+# 탭 ① #01 준비작업 (변수 분류 · 기술통계량 · EDA 범위)
+# ===================================================================
+# 노트북 #01-7 'EDA 범위 정리' 표의 행 정의
+# (종속변수 유형, 독립변수 유형, 분석 유형)
+_SCOPE_ROWS = [
+    ("연속형",        "연속형",        "상관분석"),
+    ("연속형",        "명목형(2집단)",  "T검정"),
+    ("연속형",        "명목형(3집단↑)", "ANOVA"),
+    ("명목형(2집단)",  "연속형",        "T검정"),
+    ("명목형(2집단)",  "명목형(2집단)",  "교차분석"),
+    ("명목형(2집단)",  "명목형(3집단↑)", "교차분석"),
+    ("명목형(3집단↑)", "연속형",        "ANOVA"),
+    ("명목형(3집단↑)", "명목형(2집단)",  "교차분석"),
+    ("명목형(3집단↑)", "명목형(3집단↑)", "교차분석"),
+]
+
+
+def _dependent_kind(data, target, is_clf):
+    """종속변수의 유형 라벨을 EDA 범위 표의 표기법으로 반환한다."""
+    if not is_clf:
+        return "연속형"
+    return "명목형(2집단)" if _nlevels(data, target) == 2 else "명목형(3집단↑)"
+
+
+def _feature_group(data, kind, feat_cont, feat_nom):
+    """독립변수 유형 라벨에 해당하는 실제 변수 목록을 반환한다."""
+    if kind == "연속형":
+        return list(feat_cont)
+    if kind == "명목형(2집단)":
+        return [n for n in feat_nom if _nlevels(data, n) == 2]
+    return [n for n in feat_nom if _nlevels(data, n) >= 3]
+
+
+def _scope_frame(data, target, is_clf, feat_cont, feat_nom, column_means=None):
+    """노트북 #01-7 의 'EDA 범위 정리' 표를 데이터로부터 자동 생성한다.
+
+    종속변수의 유형이 일치하는 행만 후보가 되고, 그 중 해당 유형의 독립변수가
+    실제로 존재하는 행만 '✅ 적용' 이 된다.
+    """
+    dep_kind = _dependent_kind(data, target, is_clf)
+
+    rows = []
+    for dep, indep, method in _SCOPE_ROWS:
+        if dep != dep_kind:                  # 종속변수 유형이 다르면 후보조차 아니다
+            cols, applied, note = [], "❌ 미적용", f"종속변수 유형이 {dep_kind}"
+        else:
+            cols = _feature_group(data, indep, feat_cont, feat_nom)
+            applied = "✅ 적용" if cols else "❌ 미적용"
+            note = f"{indep} 독립변수 {len(cols)}종" if cols else f"{indep} 독립변수 없음"
+
+        rows.append({
+            "종속유형": dep, "독립유형": indep, "분석 유형": method,
+            "대상 변수": ", ".join(_label(c, column_means) for c in cols) or "—",
+            "적용 여부": applied, "비고": note,
+        })
+    return DataFrame(rows)
+
+
+def show_descriptive(data, target, task="regression", column_means=None,
+                     num_desc=None, cat_desc=None, _mode="display"):
+    """#01 준비작업 탭: 변수 분류 · 기술통계량 · EDA 범위를 페이지로 구분해 출력한다.
+
+    노트북의 #01(준비작업) 단계에 대응한다. 기술통계량은 품질점검 단계에서 미리
+    산출해 둔 표(num_desc / cat_desc)를 전달하면 그대로 재사용하고, 전달하지
+    않으면 my_qtcheck 로 직접 산출한다.
+    (다중공선성 VIF 는 '#04 다변량 분석' 탭으로 옮겨졌다.)
+    """
+    is_clf = _resolve_task(task)
+    number_cols, category_cols, feat_cont, feat_nom = _classify(data, target)
+    ndesc = _num_desc(data, number_cols, num_desc)
+    cdesc = _cat_desc(data, category_cols, cat_desc)
+
+    # ── 변수 분류: 종속변수·모델링 유형·독립변수 목록(의미 포함) ──
+    def basic():
+        display(Markdown("#### 변수 유형 분류"))
+        display(Markdown(f"- **종속변수** : `{_label(target, column_means)}`"))
+        display(Markdown(f"- **종속변수 유형** : "
+                         f"{'명목형(분류)' if is_clf else '연속형(예측)'}"))
+        display(Markdown("- **연속형 독립변수** : "
+                         + (", ".join(f"`{_label(c, column_means)}`" for c in feat_cont) or "없음")))
+        display(Markdown("- **명목형 독립변수** : "
+                         + (", ".join(f"`{_label(c, column_means)}`" for c in feat_nom) or "없음")))
+
+    # ── 연속형 기술통계량 ──
+    def numeric():
+        display(Markdown("#### 연속형 기술통계량"))
+        display(ndesc)
+
+    # ── 명목형 기술통계량 ──
+    def category():
+        display(Markdown("#### 명목형 기술통계량"))
+        display(cdesc)
+
+    # ── EDA 범위 정리 (노트북 #01-7) ──
+    def scope():
+        display(Markdown("#### EDA 범위 정리"))
+        _blank()
+        display(Markdown(
+            f"종속변수 `{target}` 가 **{_dependent_kind(data, target, is_clf)}** 이므로 "
+            "해당 종속유형의 행만 후보가 되고, 그 중 독립변수가 실제로 존재하는 "
+            "행만 적용된다."))
+        _blank()
+        frame = _scope_frame(data, target, is_clf, feat_cont, feat_nom, column_means)
+
+        def _mark(r):
+            color = "#e8f5e9" if r["적용 여부"] == "✅ 적용" else ""
+            return [f"background-color: {color}"] * len(r)
+
+        display(frame.style.apply(_mark, axis=1).hide(axis="index"))
+
+    sections = [("변수 분류", basic)]
+    if ndesc is not None:
+        sections.append(("연속형 기술통계량", numeric))
+    if cdesc is not None:
+        sections.append(("명목형 기술통계량", category))
+    sections.append(("EDA 범위", scope))
+
+    return _emit(sections, _mode)
+
+
+# ===================================================================
+# #02 단변량 분석 - 그래프 아래에 표시할 변수별 기술통계량
+# ===================================================================
+def _desc_of(data, var, num_desc=None):
+    """해당 변수가 담긴 연속형 기술통계량 표를 얻는다.
+
+    미리 산출해 둔 표(num_desc)에 그 변수가 있으면 그대로 쓰고, 없으면 그 변수만
+    새로 산출한다. 기술통계량 표시와 판정표가 같은 표를 보도록 한 곳에 모았다.
+    """
+    if num_desc is not None and var in num_desc.index:
+        return num_desc
+    return my_qtcheck.numerical_summary(data, columns=[var])
+
+
+def _var_stats(data, var, continuous, num_desc=None, cat_desc=None):
+    """단변량 그래프 아래에 해당 변수의 기술통계량을 표로 표시한다.
+
+    - 연속형: 연속형 기술통계량에서 해당 변수 행만 뽑아 전치(세로 표)해 표시
+    - 명목형: 명목형 기술통계량 + 범주별 빈도·비율 표시 (노트북 #02-3 과 동일)
+    """
+    display(Markdown("**기술통계량**"))
+    if continuous:
+        desc = _desc_of(data, var, num_desc)
+        display(desc[desc.index == var].T)
+        return
+
+    if cat_desc is not None and var in cat_desc.columns:
+        display(cat_desc[[var]].T)
+
+    # 빈도표 (빈도 + 전체 대비 비율) — 한 번 센 결과를 나눠 비율까지 만든다
+    counts = data[var].value_counts()
+    freq = counts.rename("빈도").to_frame()
+    freq["비율"] = counts / counts.sum()
+    display(freq)
+
+
+def _univariate_plot(data, var, title, continuous, palette=None):
+    """단변량 분포 그래프를 그린다.
+
+    - 연속형: 히스토그램 + 상자그림 (1행 2열)
+    - 명목형: 범주별 빈도 막대그래프
+    """
+    if continuous:
+        fig, ax = my_plot.init(rows=1, cols=2, title=title,
+                               width=_FIG_WIDTH, height=_FIG_HEIGHT)
+        my_plot.histplot(data=data, x=var, kde=True, ax=ax[0])
+        my_plot.boxplot(data=data, x=var, ax=ax[1])
+        my_plot.show()
+    else:
+        my_plot.countplot(data=data, x=var, hue=var,
+                          palette=palette or _NOMINAL_PALETTE,
+                          title=title, width=_FIG_WIDTH, height=_FIG_HEIGHT)
+
+
+def _univariate_page(data, var, title, continuous, palette=None,
+                     num_desc=None, cat_desc=None, is_target=False, is_clf=False):
+    """단변량 분석 페이지 렌더함수를 만든다 (종속·독립변수 공용).
+
+    한 페이지는 '분포 그래프 → 기술통계량 → 인사이트 판정표' 순서로 구성된다.
+    """
+    def render():
+        _univariate_plot(data, var, title, continuous, palette)
+        _var_stats(data, var, continuous, num_desc=num_desc, cat_desc=cat_desc)
+        _blank()
+        _show_insight(_insight_continuous(data, var, num_desc) if continuous
+                      else _insight_nominal(data, var, is_target=is_target, is_clf=is_clf))
+    return render
+
+
+# ===================================================================
+# 탭 ② #02 단변량 분석 - 종속변수
+# ===================================================================
+def viz_dependent(data, target, task="regression", palette=None, column_means=None,
+                  num_desc=None, cat_desc=None, _mode="display"):
+    """#02-1 종속변수 단변량 분석: 분포 그래프 + 기술통계량 표.
+
+    - 연속형: 히스토그램 + 상자그림
+    - 명목형: 빈도 막대그래프
+    """
+    is_clf = _resolve_task(task)
+    name = _label(target, column_means)
+
+    sections = [(f"종속 · {name}",
+                 _univariate_page(data, target, f"종속변수 {name} 분포",
+                                  continuous=not is_clf, palette=palette,
+                                  num_desc=num_desc, cat_desc=cat_desc,
+                                  is_target=True, is_clf=is_clf))]
+    return _emit(sections, _mode)
+
+
+# ===================================================================
+# 탭 ③ #02 단변량 분석 - 독립변수
+# ===================================================================
+def viz_independent(data, target, task="regression", palette=None, column_means=None,
+                    num_desc=None, cat_desc=None, _mode="display"):
+    """#02-2·3 독립변수 단변량 분석: 독립변수별 페이지로 분포를 그린다.
+
+    - 연속형: 히스토그램 + 상자그림 + 기술통계량
+    - 명목형: 빈도 막대그래프 + 기술통계량 + 빈도·비율표
+    """
+    is_clf = _resolve_task(task)
+    _, _, feat_cont, feat_nom = _classify(data, target)
+
+    def page(var, continuous):
+        name = _label(var, column_means)
+        prefix = "연속" if continuous else "명목"
+        return (f"{prefix} · {name}",
+                _univariate_page(data, var, f"독립변수 {name} 분포",
+                                 continuous=continuous, palette=palette,
+                                 num_desc=num_desc, cat_desc=cat_desc, is_clf=is_clf))
+
+    sections = ([page(f, True) for f in feat_cont]
+                + [page(n, False) for n in feat_nom])
+
+    return _emit(sections, _mode)
+
+
+# ===================================================================
+# 탭 ④ #03 이변량 분석 - 연속 × 연속 (상관분석)
+# ===================================================================
+def infer_cont_cont(data, target, task="regression", alpha=0.05,
+                    corr_threshold=0.3, verbose=True, palette=None,
+                    column_means=None, _mode="display"):
+    """#03-1 상관분석 (x: 연속형 독립변수 → y: 연속형 종속변수).
+
+    연속형 종속변수(예측)일 때만 수행된다. 노트북과 동일하게 산점도를 먼저 그리고
+    상관분석 결과표를 이어서 표시한다.
+
+    Args:
+        verbose (bool): True 면 산점도·결과표를 표시, False 면 결과만 수집.
+        _mode (str): "display"(그 자리 표시) / "widget" / "sections"
+
+    Returns:
+        list[dict]: 변수 선별표에 사용할 결과행 리스트
+                    (_mode 가 "widget"/"sections" 이면 (rows, 위젯|섹션) 튜플)
+    """
+    if _resolve_task(task):
+        return _emit_with_rows([], [], _mode)      # 연속형 종속변수 아님 → 대상 없음
+    _, _, feat_cont, _ = _classify(data, target)
+
+    def work(f, plot):
+        row, res = _run_correlation(data, f, target, alpha, corr_threshold)
+        if plot and row is not None:
+            display(Markdown(f"#### ▶︎ {_label(f, column_means)} → {target}"))
+            # 데이터 밀도에 따라 외곽선 굵기와 점 크기를 줄여 겹침을 완화한다.
+            my_plot.scatterplot(data=data, x=f, y=target, outline=False,
+                                linewidth=0.2, size=30, palette=palette or "tab10",
+                                title=f"{_label(f, column_means)} ↔ {target}",
+                                width=_FIG_WIDTH, height=_FIG_HEIGHT)
+            display(res)
+            _blank()
+            _show_insight(_insight_correlation(data, f, target, res, row, alpha))
+        return row
+
+    items = [(f"상관 · {_label(f, column_means)} ↔ {target}", f) for f in feat_cont]
+    return _emit_sections(items, work, verbose, mode=_mode)
+
+
+# ===================================================================
+# 탭 ④-보조 #03 이변량 분석 - (연속 × 종속) + 범주
+# -------------------------------------------------------------------
+# 이변량 산점도에 명목형 변수를 색으로 얹어, 범주에 따른 관계 차이(상호작용·교란
+# 후보)를 눈으로 확인한다. 노트북 기본 흐름에는 없는 보조 단계이므로 eda() 에서는
+# interaction=True 일 때만 포함된다.
+# ===================================================================
+def viz_cont_target_hue(data, target, task="regression", palette=None,
+                        column_means=None, _mode="display"):
+    """(연속 × 종속) + 범주 시각화 (연속독립 × 명목 조합별 페이지).
 
     연속형 독립변수(x)와 연속형 종속변수(y)의 산점도에 명목형 변수를 hue(색)로
-    적용해, 범주에 따라 관계가 어떻게 갈리는지(상호작용·교란 후보)를 보여준다.
-    연속형 종속변수(예측)일 때만 수행되며, 대상 조합이 없으면 아무것도 그리지 않는다.
-
-    _as_widget=True 면 위젯(없으면 None)을 반환하고, 아니면 그 자리에서 표시하고
-    표시할 내용이 있었는지 여부(bool)를 반환한다.
+    적용해, 범주에 따라 관계가 어떻게 갈리는지 보여준다.
     """
-    # 범주형 종속변수(분류)에는 '연속 × 종속' 산점도 자체가 없으므로 대상 아님
+    # 명목형 종속변수(분류)에는 '연속 × 종속' 산점도 자체가 없으므로 대상 아님
     if _resolve_task(task):
-        return None if _as_widget else False
+        return _emit([], _mode)
     _, _, feat_cont, feat_nom = _classify(data, target)
 
     # hue 로 쓸 만한 명목형 변수만 추림 (2 ≤ 범주 수 ≤ 상한)
     hue_vars = [c for c in feat_nom if 2 <= _nlevels(data, c) <= _MAX_HUE_LEVELS]
     if not feat_cont or not hue_vars:
-        return None if _as_widget else False
+        return _emit([], _mode)
 
     def _page(f, c):
         def render():
             my_plot.scatterplot(data=data, x=f, y=target, hue=c,
                                 palette=palette or "tab10", outline=False,
-                                title=f"{f} ↔ {target} · 색: {c}",
-                                xlabel=f, ylabel=target, width=800, height=500)
+                                linewidth=0.2, size=30,
+                                title=f"{_label(f, column_means)} ↔ {target} · 색: {c}",
+                                xlabel=f, ylabel=target,
+                                width=_FIG_WIDTH, height=_FIG_HEIGHT)
             display(Markdown(
-                f"색은 명목형 변수 **`{c}`** 의 범주를 구분한다. 범주마다 점의 "
-                "기울기·위치가 다르면 **상호작용·교란 후보**로 볼 수 있다."))
+                f"색은 명목형 변수 **`{_label(c, column_means)}`** 의 범주를 구분한다. "
+                "범주마다 점의 기울기·위치가 다르면 **상호작용·교란 후보**로 볼 수 있다."))
         return render
 
     # 연속형 독립변수(바깥) × 명목형 변수(안쪽) 조합별 페이지
-    sections = [(f"{f} ↔ {target} · {c}", _page(f, c))
+    sections = [(f"상호작용 · {f} ↔ {target} · {c}", _page(f, c))
                 for f in feat_cont for c in hue_vars]
 
-    if _as_widget:
-        return _pages_widget(sections)
-    _pages_display(sections)
-    return bool(sections)
+    return _emit(sections, _mode)
 
 
 # ===================================================================
-# 탭 ⑤ 추론통계 - 연속 × 명목(2집단) (T검정)
+# 탭 ⑤ #03 이변량 분석 - 연속 × 명목(2집단) (T검정)
 # ===================================================================
 def infer_cont_nom2(data, target, task="regression", alpha=0.05,
-                    corr_threshold=0.3, verbose=True, palette=None, _as_widget=False):
-    """연속 × 명목(2집단) 독립표본 T검정 탭 (변수 쌍별 페이지).
+                    corr_threshold=0.3, verbose=True, palette=None,
+                    column_means=None, _mode="display"):
+    """#03-2 T검정 (x: 2집단 명목형 독립변수 → y: 종속변수).
 
     - 예측: 2수준 명목형 독립변수 ↔ 연속형 종속변수
     - 분류: 연속형 독립변수 ↔ 2범주 종속변수
 
-    _as_widget=True 면 (rows, 위젯) 을 반환한다(파이프라인용).
+    2개의 고유값만 존재하는 명목형이 없으면 결과가 없을 수 있다.
 
     Returns:
         list[dict]: 변수 선별표에 사용할 결과행 리스트 (대상 없으면 빈 리스트)
@@ -803,34 +1503,42 @@ def infer_cont_nom2(data, target, task="regression", alpha=0.05,
     # (cat, cont, 표시명) 쌍 구성
     if is_clf:
         if _nlevels(data, target) != 2:
-            return ([], None) if _as_widget else []
+            return _emit_with_rows([], [], _mode)
         pairs = [(target, f, f) for f in feat_cont]
     else:
         pairs = [(n, target, n) for n in feat_nom if _nlevels(data, n) == 2]
 
     def work(pair, plot):
         cat, cont, name = pair
+        label = _label(name, column_means)
         row, res = _run_ttest(data, cat, cont, name, alpha, corr_threshold,
-                              plot=plot, palette=palette, title=f"{name} ↔ {target}")
+                              plot=plot, palette=palette, title=f"{label} ↔ {target}")
         if plot and row is not None:
+            display(Markdown(f"#### ▶︎ {label} → {target}"))
             display(res)
+            _blank()
+            _show_insight(_insight_ttest(res, row, alpha))
         return row
 
-    items = [(f"{name} ↔ {target}", (cat, cont, name)) for cat, cont, name in pairs]
-    return _emit_sections(items, work, verbose, as_widget=_as_widget)
+    items = [(f"T검정 · {_label(name, column_means)} ↔ {target}", (cat, cont, name))
+             for cat, cont, name in pairs]
+    return _emit_sections(items, work, verbose, mode=_mode)
 
 
 # ===================================================================
-# 탭 ⑥ 추론통계 - 연속 × 명목(3집단↑) (분산분석)
+# 탭 ⑥ #03 이변량 분석 - 연속 × 명목(3집단↑) (분산분석)
 # ===================================================================
 def infer_cont_nom3(data, target, task="regression", alpha=0.05,
-                    corr_threshold=0.3, verbose=True, palette=None, _as_widget=False):
-    """연속 × 명목(3집단↑) 일원분산분석 + 사후검정 탭 (변수 쌍별 페이지).
+                    corr_threshold=0.3, verbose=True, palette=None,
+                    column_means=None, posthoc_plot=False, _mode="display"):
+    """#03-3 ANOVA + 사후검정 (x: 3집단↑ 명목형 독립변수 → y: 종속변수).
 
     - 예측: 3수준 이상 명목형 독립변수 ↔ 연속형 종속변수
     - 분류: 연속형 독립변수 ↔ 3범주 이상 종속변수
 
-    _as_widget=True 면 (rows, 위젯) 을 반환한다(파이프라인용).
+    Args:
+        posthoc_plot (bool): 사후검정 시각화 수행 여부. 노트북과 동일하게 기본은
+            False(결과표만 표시)이며, 보고서에 그래프가 필요할 때만 True 로 둔다.
 
     Returns:
         list[dict]: 변수 선별표에 사용할 결과행 리스트 (대상 없으면 빈 리스트)
@@ -840,97 +1548,106 @@ def infer_cont_nom3(data, target, task="regression", alpha=0.05,
 
     if is_clf:
         if _nlevels(data, target) < 3:
-            return ([], None) if _as_widget else []
+            return _emit_with_rows([], [], _mode)
         pairs = [(target, f, f) for f in feat_cont]
     else:
         pairs = [(n, target, n) for n in feat_nom if _nlevels(data, n) >= 3]
 
     def work(pair, plot):
         cat, cont, name = pair
+        label = _label(name, column_means)
         row, aov = _run_anova(data, cat, cont, name, alpha, corr_threshold)
         if plot and row is not None:
+            display(Markdown(f"#### ▶︎ {label} → {target}"))
             display(aov)
-            # 사후검정(그룹 쌍별 비교)을 시각화와 함께 표시.
-            # 집단 수가 많으면 유의성 주석 막대가 세로로 쌓여 답답해지므로,
-            # 집단 수에 맞춰 그래프 높이를 동적으로 키운다.
-            ph = my_stats.posthoc_oneway(data, y=cont, between=cat, alpha=alpha,
-                                         plot=True, palette=palette,
-                                         title=f"{name} 사후검정",
-                                         height=_posthoc_height(_nlevels(data, cat)))
+            # 사후검정(그룹 쌍별 비교). 시각화는 선택 사항이며, 그릴 경우 집단 수가
+            # 많으면 유의성 주석 막대가 세로로 쌓이므로 높이를 동적으로 키운다.
+            ph = my_stats.posthoc_oneway(
+                data, y=cont, between=cat, alpha=alpha,
+                plot=posthoc_plot, palette=palette,
+                title=f"{label} 사후검정",
+                height=_posthoc_height(_nlevels(data, cat)))
             display(ph)
+            _blank()
+            _show_insight(_insight_anova(aov, ph, cat, row, alpha))
         return row
 
-    items = [(f"{name} ↔ {target}", (cat, cont, name)) for cat, cont, name in pairs]
-    return _emit_sections(items, work, verbose, as_widget=_as_widget)
+    items = [(f"ANOVA · {_label(name, column_means)} ↔ {target}", (cat, cont, name))
+             for cat, cont, name in pairs]
+    return _emit_sections(items, work, verbose, mode=_mode)
 
 
 # ===================================================================
-# 탭 ⑦ 추론통계 - 명목 × 명목 (교차분석)
+# 탭 ⑦ #03 이변량 분석 - 명목 × 명목 (교차분석)
 # ===================================================================
 def infer_nom_nom(data, target, task="regression", alpha=0.05,
-                  corr_threshold=0.3, verbose=True, palette=None, _as_widget=False):
-    """명목 × 명목 교차분석(카이제곱/피셔) 탭 (변수 쌍별 페이지).
+                  corr_threshold=0.3, verbose=True, palette=None,
+                  column_means=None, _mode="display"):
+    """#03-4 교차분석 (x: 명목형 독립변수 → y: 명목형 종속변수).
 
-    범주형 종속변수(분류)일 때만 수행되며, 각 명목형 독립변수와 종속변수의
-    독립성 검정을 실행한다. 대상이 없으면 빈 리스트를 반환한다.
-
-    _as_widget=True 면 (rows, 위젯) 을 반환한다(파이프라인용).
+    명목형 종속변수(분류)일 때만 수행되며, 각 명목형 독립변수와 종속변수의
+    독립성 검정(카이제곱/피셔)을 실행한다.
 
     Returns:
         list[dict]: 변수 선별표에 사용할 결과행 리스트
     """
     if not _resolve_task(task):
-        return ([], None) if _as_widget else []   # 범주형 종속변수 아님 → 대상 없음
+        return _emit_with_rows([], [], _mode)      # 명목형 종속변수 아님 → 대상 없음
     _, _, _, feat_nom = _classify(data, target)
 
     def work(n, plot):
         row, res = _run_chi2(data, n, target, alpha, corr_threshold,
                              plot=plot, palette=palette)
         if plot and row is not None:
+            display(Markdown(f"#### ▶︎ {_label(n, column_means)} → {target}"))
             display(res)
+            _blank()
+            _show_insight(_insight_chi2(res, row, alpha))
         return row
 
-    items = [(f"{n} ↔ {target}", n) for n in feat_nom]
-    return _emit_sections(items, work, verbose, as_widget=_as_widget)
+    items = [(f"교차 · {_label(n, column_means)} ↔ {target}", n) for n in feat_nom]
+    return _emit_sections(items, work, verbose, mode=_mode)
 
 
 # ===================================================================
-# 탭 ⑧ 독립변수 간 상관분석 (공선성 신호의 근거)
+# 탭 ⑧ #04 다변량 분석 - 독립변수 간 상관 (공선성 신호의 근거)
 # ===================================================================
 def corr_independent(data, target, alpha=0.05, collinearity_threshold=0.7,
-                     palette=None, _as_widget=False):
-    """독립변수 간 상관분석 탭.
+                     palette=None, corr_pairs=None, _mode="display"):
+    """#04-1 독립변수 간 상관분석 + 다중공선성.
 
-    연속형 독립변수들 사이의 상관행렬과 강한 상관 쌍(공선성 후보)을 산출한다.
+    연속형 독립변수들 사이의 상관행렬과 변수별 중복(공선성) 집계표를 산출한다.
     이는 변수 선별표의 공선성 신호(🅾️/❎)의 근거가 된다. 연속형 독립변수가
-    2개 미만이면 대상이 없으므로 위젯 모드에서는 None 을 반환한다.
+    2개 미만이면 대상이 없다.
 
-    _as_widget=True 면 위젯(없으면 None)을 반환하고, 아니면 그 자리에서 표시한다.
+    Args:
+        corr_pairs (DataFrame): 이미 산출한 쌍별 상관분석 결과표(있으면 재계산 생략)
     """
     _, _, feat_cont, _ = _classify(data, target)
     if len(feat_cont) < 2:
-        return None if _as_widget else None
+        return _emit([], _mode)
 
-    # ── 상관행렬 · 강한 상관 쌍 ──
+    pairs = corr_pairs if corr_pairs is not None else \
+        _compute_corr_pairs(data, feat_cont, alpha)
+    if pairs is None:
+        return _emit([], _mode)
+
+    # ── 상관행렬 · 변수별 중복 집계 ──
     def corr_page():
         display(Markdown("#### 연속형 독립변수 간 상관행렬"))
         _blank()
         display(Markdown("색이 진할수록 강한 상관 → 서로 중복(공선성) 후보"))
         _blank()
-        # multi_correlation: 스타일된 상관행렬을 표시하고 쌍별 결과표를 반환
-        corr_df = my_stats.multi_correlation(data, columns=feat_cont,
-                                             plot=False, palette=palette)
+        display(_corr_matrix(pairs, feat_cont).style
+                .background_gradient(cmap="coolwarm", vmin=-1, vmax=1)
+                .format("{:.3f}"))
         _blank()
-        # 강한 상관 쌍(공선성 신호로 이어지는 쌍)을 강조해 표시
-        display(Markdown(f"**강한 상관 쌍 (|coef|≥{collinearity_threshold} → 공선성 🅾️)**"))
+        # 변수별로 '가장 강한 상대'와 '중복 쌍의 수'를 집계 (노트북 #04-1 과 동일)
+        display(Markdown(f"**변수별 중복(공선성) 집계 — |coef|≥{collinearity_threshold} 인 쌍**"))
         _blank()
-        strong = corr_df[corr_df["coef"].abs() >= collinearity_threshold]
-        if len(strong):
-            display(strong.sort_values("coef", key=abs, ascending=False))
-        else:
-            display(Markdown("> 강한 상관 쌍 없음 (모든 독립변수 공선성 ❎)"))
+        display(my_stats.correlation_summary(pairs))
 
-    # ── 다중공선성(VIF): 기술통계 탭에서 이동해 옴 (독립변수 간 관계로 묶음) ──
+    # ── 다중공선성(VIF) ──
     def vif_page():
         display(Markdown("#### 다중공선성(VIF)"))
         _blank()
@@ -941,36 +1658,38 @@ def corr_independent(data, target, alpha=0.05, collinearity_threshold=0.7,
             display(Markdown("> VIF 를 계산할 수 없습니다."))
 
     sections = [("독립변수 상관", corr_page), ("다중공선성(VIF)", vif_page)]
-    if _as_widget:
-        return _pages_widget(sections)
-    _pages_display(sections)
+    return _emit(sections, _mode)
 
 
 # ===================================================================
-# 탭 ⑨ 변수 선별표
+# 탭 ⑨ #05 최종 변수 선택 (변수 선별표)
 # ===================================================================
+# 노트북 #05 '최종 변수 선택' 표의 컬럼 순서
 _SELECT_COLUMNS = ["채택여부", "변수", "검정방법", "유의수준 (p)", "효과크기",
-                   "가정점검", "비대칭신호", "공선성신호", "근거"]
+                   "비대칭신호", "공선성신호", "근거", "가정점검"]
 
 
 def _build_selection_frame(rows, desc, collin):
     """결과행 리스트에 비대칭·공선성 신호를 결합하고 정렬하여 표로 만든다.
 
     공선성 신호는 VIF가 아니라 연속형 독립변수 간 상관분석 결과(collin)로만 산출한다.
+    공선성으로 이어진 변수들은 그룹으로 묶어, 그 중 효과크기 1위만 대표로 채택하고
+    나머지는 후보로 내린다.
     """
     if not rows:
         return DataFrame(columns=_SELECT_COLUMNS)
 
+    # 공선성으로 이어진 변수들을 그룹(연결 성분)으로 묶는다
+    groups = _collinearity_groups(collin) if collin else {}
+
     for row in rows:
         var = row["변수"]
         row["비대칭신호"] = _asymmetry_signal(desc, var)
-        sig = _collinearity_signal(collin, var)
-        row["공선성신호"] = sig
-        # 공선성 신호(🅾️)가 있는 채택 변수는 바로 채택하지 않고 '후보'로 분류한다.
-        # (공선성 그룹 중 대표변수를 이후 단계에서 선택해야 하므로)
-        if sig == "🅾️" and row["채택여부"] == "✅ 채택":
-            row["채택여부"] = "🟡 후보"
-            row["근거"] = f"{row['근거']} · 공선성 존재 → 후보(대표변수 선택 필요)"
+        row["공선성신호"] = _collinearity_signal(collin, var, groups)
+
+    # 그룹마다 대표변수 하나만 채택으로 남기고 나머지는 후보로 내린다
+    if groups:
+        _select_group_representative(rows, groups)
 
     table = DataFrame(rows)
     # 정렬: 채택(0)→후보(1)→제외(2), 그 안에서 효과크기↓ · p값↑
@@ -983,11 +1702,14 @@ def _build_selection_frame(rows, desc, collin):
 
 def _display_selection(table, alpha, corr_threshold, collinearity_threshold):
     """변수 선별표를 채택여부별 배경색과 함께 출력한다."""
-    display(Markdown("### 📋 변수 선별표"))
+    display(Markdown("### 📋 최종 변수 선택"))
     display(Markdown(f"기준 : 유의수준 α={alpha}, 상관 채택 |coef|≥{corr_threshold}, "
                      f"공선성 신호 |r|≥{collinearity_threshold} (상관분석 기반 · VIF 미적용)  ·  "
-                     f"공선성 🅾️=있음 / ❎=없음  ·  "
-                     f"분류 ✅ 채택 / 🟡 후보 / ❌ 제외 (공선성 있는 채택 변수는 후보로 분류)"))
+                     f"공선성 🅾️ G*=그룹번호 / ❎=없음  ·  "
+                     f"분류 ✅ 채택 / 🟡 후보 / ❌ 제외"))
+    display(Markdown("같은 공선성 그룹(G*)의 변수는 사실상 같은 정보이므로 **효과크기 1위 하나만 "
+                     "대표로 채택**하고 나머지는 후보로 둔다. 근거의 **Δ**(1위와의 효과크기 격차)가 "
+                     "매우 작다면 통계적으로는 동률이므로, 대표 선택은 도메인 지식으로 다시 확인한다."))
     if not len(table):
         display(Markdown("> 검정 가능한 독립변수가 없습니다."))
         return
@@ -1001,172 +1723,191 @@ def _display_selection(table, alpha, corr_threshold, collinearity_threshold):
 
 
 def selection_table(data, target, task="regression", alpha=0.05,
-                    corr_threshold=0.3, collinearity_threshold=0.7, palette=None):
-    """변수 선별표 탭: 4종 추론통계를 조용히 수행하여 최종 선별표를 출력한다.
+                    corr_threshold=0.3, collinearity_threshold=0.7,
+                    palette=None, column_means=None, num_desc=None):
+    """#05 최종 변수 선택: 4종 추론통계를 조용히 수행하여 선별표만 출력한다.
 
     노트북에서 단독 호출하면 개별 검정 과정 출력 없이 선별표만 확인할 수 있다.
     공선성 신호는 연속형 독립변수 간 상관분석 결과로만 산출한다(VIF 미적용).
     """
     number_cols, _, feat_cont, _ = _classify(data, target)
-    desc = my_qtcheck.numerical_summary(data, columns=number_cols) if number_cols else None
-    collin = _collinearity_map(data, feat_cont, alpha, collinearity_threshold)
+    desc = _num_desc(data, number_cols, num_desc)
+    pairs = _compute_corr_pairs(data, feat_cont, alpha)
+    collin = _collinearity_map(pairs, feat_cont, collinearity_threshold)
 
     rows = []
-    for fn in (infer_cont_cont, infer_cont_nom2, infer_cont_nom3, infer_nom_nom):
+    for fn in _INFER_FUNCS:
         rows.extend(fn(data, target, task=task, alpha=alpha,
-                       corr_threshold=corr_threshold, verbose=False, palette=palette))
+                       corr_threshold=corr_threshold, verbose=False,
+                       palette=palette, column_means=column_means))
 
     table = _build_selection_frame(rows, desc, collin)
     _display_selection(table, alpha, corr_threshold, collinearity_threshold)
 
 
 # ===================================================================
-# 파이프라인 본체 (개별 탭 함수를 호출해 결과가 있는 것만 탭으로 종합)
+# 파이프라인 본체 (노트북 #01~#05 흐름을 그대로 탭으로 구성)
 # ===================================================================
-# (함수, 예측(연속형 종속) 탭 제목, 분류(범주형 종속) 탭 제목)
-# 탭 제목은 "독립변수 유형 × 종속" 형태이며, 같은 검정이라도 task 에 따라
-# 독립변수 유형이 달라지므로(예: T검정은 예측에선 명목독립, 분류에선 연속독립)
-# task 에 맞는 제목을 사용한다.
-_INFER_DEFS = [
-    (infer_cont_cont, "연속 × 종속", "연속 × 종속"),
-    (infer_cont_nom2, "명목 × 종속(2집단)", "연속 × 종속(2집단)"),
-    (infer_cont_nom3, "명목 × 종속(3집단↑)", "연속 × 종속(3집단↑)"),
-    (infer_nom_nom, "명목 × 명목", "명목 × 종속"),
-]
+# #03 이변량 분석 탭을 구성하는 검정 함수들 (나열된 순서가 곧 페이지 순서).
+# 페이지 제목의 기법 접두어("상관 · ", "ANOVA · " 등)는 각 함수가 직접 붙인다.
+_INFER_FUNCS = [infer_cont_cont, infer_cont_nom2, infer_cont_nom3, infer_nom_nom]
 
 
 def eda(data, target, task="regression", alpha=0.05,
-        corr_threshold=0.3, collinearity_threshold=0.7, palette=None):
-    """추론통계 기반 EDA 를 단계별 탭으로 종합 실행하는 파이프라인.
+        corr_threshold=0.3, collinearity_threshold=0.7, palette=None,
+        column_means=None, num_desc=None, cat_desc=None,
+        interaction=False, posthoc_plot=False):
+    """추론통계 기반 EDA 를 노트북의 분석 흐름 그대로 탭으로 실행하는 파이프라인.
 
-    원본 데이터프레임과 종속변수 이름만 전달하면, 기술통계량은 my_qtcheck 로
-    스스로 산출하고, 개별 탭 함수를 차례로 호출하여 결과가 있는 탭만 모아
-    파이캐럿처럼 탭으로 표시한다. 별도의 반환값은 없다.
+    구성 탭 (노트북의 장 구분과 1:1 대응)
 
-    구성 탭:
-        기술통계 · 종속변수 시각화 · 독립변수 시각화 ·
-        (연속×연속 / (연속×종속)+범주 / 연속×명목(2) / 연속×명목(3↑) / 명목×명목
-         중 수행된 것만) · 변수 선별표
-        ※ '(연속×종속)+범주' 는 예측(연속형 종속) + 명목형 변수가 있을 때만
-          '연속 × 종속' 탭 다음에 추가되며, 산점도에 명목형 변수를 색으로 얹는다.
+        #01 준비작업      변수 분류 · 연속형/명목형 기술통계량 · EDA 범위 정리
+        #02 단변량 분석    종속변수 → 연속형 독립변수 → 명목형 독립변수
+        #03 이변량 분석    상관분석 → T검정 → ANOVA → 교차분석
+                          (interaction=True 면 '상호작용' 산점도 페이지 추가)
+        #04 다변량 분석    독립변수 간 상관행렬·중복 집계 · 다중공선성(VIF)
+        #05 최종 변수 선택 변수 선별표
+
+    각 탭 안의 분석 단위는 드롭다운으로 넘기는 페이지로 구분된다.
+    (ipywidgets 미설치 시 장 제목을 붙인 순차 출력으로 자동 대체된다.)
 
     Args:
-        data (DataFrame): 품질점검·타입변환이 완료된 원본 데이터프레임
+        data (DataFrame): 품질점검·타입변환(서열척도 포함)이 완료된 데이터프레임
             (명목형은 category 타입으로 지정되어 있어야 자동 분류된다.)
         target (str): 종속변수(목표변수) 컬럼명
         task (str): 모델링 유형. 'regression'/'예측'/'연속형'(기본) 또는
-            'classification'/'분류'/'범주형'
+            'classification'/'분류'/'명목형'
         alpha (float): 유의수준 (기본값: 0.05)
         corr_threshold (float): 상관계수 채택 기준 |coef| (기본값: 0.3)
         collinearity_threshold (float): 공선성 신호 기준 |r| (연속형 독립변수 간
             상관분석 기반, 기본값: 0.7). 이 단계에서 VIF는 사용하지 않는다.
         palette (str or list): 시각화 색상 팔레트 (기본값: None)
+        column_means (dict): {컬럼명: 의미} 딕셔너리. 그래프·페이지 제목에
+            `carat(중량)` 처럼 의미를 함께 표기한다. (기본값: None)
+        num_desc (DataFrame): 미리 산출해 둔 연속형 기술통계량
+            (품질점검 단계 산출물을 재사용할 때 전달. 기본값: None → 직접 산출)
+        cat_desc (DataFrame): 미리 산출해 둔 명목형 기술통계량 (기본값: None)
+        interaction (bool): #03 에 '(연속 × 종속) + 범주' 산점도 페이지를 추가할지
+            여부 (기본값: False)
+        posthoc_plot (bool): ANOVA 사후검정 시각화 여부 (기본값: False → 결과표만)
     """
-    # 변수 선별표에 필요한 기술통계량/공선성 신호는 한 번만 계산해 재사용
-    # (공선성 신호는 VIF가 아니라 연속형 독립변수 간 상관분석 결과로만 산출)
     is_clf = _resolve_task(task)
-    _, _, feat_cont, feat_nom = _classify(data, target)
-    number_cols = my_qtcheck.get_number_column_names(data)
-    desc = my_qtcheck.numerical_summary(data, columns=number_cols) if number_cols else None
-    collin = _collinearity_map(data, feat_cont, alpha, collinearity_threshold)
+    number_cols, category_cols, feat_cont, feat_nom = _classify(data, target)
+
+    # 변수 선별표에 필요한 기술통계량·공선성 신호는 한 번만 계산해 재사용한다.
+    # (공선성 신호는 VIF가 아니라 연속형 독립변수 간 상관분석 결과로만 산출)
+    desc = _num_desc(data, number_cols, num_desc)
+    cdesc = _cat_desc(data, category_cols, cat_desc)
+    corr_pairs = _compute_corr_pairs(data, feat_cont, alpha)
+    collin = _collinearity_map(corr_pairs, feat_cont, collinearity_threshold)
+
+    # 각 단계로 넘길 공통 인자
+    common = dict(task=task, palette=palette, column_means=column_means)
+    infer_common = dict(task=task, alpha=alpha, corr_threshold=corr_threshold,
+                        palette=palette, column_means=column_means)
+
+    def _infer_kwargs(fn):
+        """검정 함수별 추가 인자 (ANOVA 만 사후검정 시각화 옵션을 받는다)"""
+        return {"posthoc_plot": posthoc_plot} if fn is infer_cont_nom3 else {}
 
     # -----------------------------------------------------------------
-    # 폴백: ipywidgets 가 없으면 탭 없이 순차 출력
+    # 폴백: ipywidgets 가 없으면 탭 없이 장 제목을 붙여 순차 출력
     # -----------------------------------------------------------------
     if not _HAS_WIDGETS:
-        display(Markdown("## 기술통계"))
-        show_descriptive(data, target, task)
-        display(Markdown("## 종속변수 시각화"))
-        viz_dependent(data, target, task, palette=palette)
-        display(Markdown("## 독립변수 시각화"))
-        viz_independent(data, target, task, palette=palette)
+        display(Markdown("## #01. 준비작업"))
+        show_descriptive(data, target, task, column_means=column_means,
+                         num_desc=desc, cat_desc=cdesc)
 
+        display(Markdown("## #02. 단변량 분석"))
+        viz_dependent(data, target, num_desc=desc, cat_desc=cdesc, **common)
+        viz_independent(data, target, num_desc=desc, cat_desc=cdesc, **common)
+
+        display(Markdown("## #03. 이변량 분석"))
         all_rows = []
-        for fn, reg_title, clf_title in _INFER_DEFS:
-            rows = fn(data, target, task=task, alpha=alpha,
-                      corr_threshold=corr_threshold, verbose=True, palette=palette)
-            if rows:
-                display(Markdown(f"## {clf_title if is_clf else reg_title}"))
-                all_rows.extend(rows)
-                # '연속 × 종속' 다음에 범주(hue) 시각화 탭을 이어서 표시
-                if fn is infer_cont_cont and not is_clf and feat_nom:
-                    display(Markdown("## (연속 × 종속) + 범주"))
-                    viz_cont_target_hue(data, target, task=task, palette=palette)
+        for fn in _INFER_FUNCS:
+            rows = fn(data, target, verbose=True, **infer_common, **_infer_kwargs(fn))
+            all_rows.extend(rows)
+            # 상관분석 다음에 범주(hue) 산점도를 이어서 표시 (요청 시에만)
+            if fn is infer_cont_cont and interaction:
+                viz_cont_target_hue(data, target, **common)
 
-        if len(feat_cont) >= 2:
-            display(Markdown("## 독립변수 상관분석"))
+        if corr_pairs is not None:
+            display(Markdown("## #04. 다변량 분석"))
             corr_independent(data, target, alpha=alpha,
-                             collinearity_threshold=collinearity_threshold, palette=palette)
+                             collinearity_threshold=collinearity_threshold,
+                             palette=palette, corr_pairs=corr_pairs)
 
-        display(Markdown("## 변수 선별표"))
+        display(Markdown("## #05. 최종 변수 선택"))
         table = _build_selection_frame(all_rows, desc, collin)
         _display_selection(table, alpha, corr_threshold, collinearity_threshold)
         return
 
     # -----------------------------------------------------------------
-    # 위젯 모드: 각 탭 위젯을 '직접' 구성해 상위 Tab 의 자식으로 넣는다.
-    # (Output 안에서 컨테이너 위젯을 display 하는 중첩을 피해야 정상 렌더링됨)
+    # 위젯 모드: 장(章)별로 페이지 섹션을 모아 하나의 탭으로 만든다.
     #
     # 각 탭의 그래프 렌더링이 오래 걸리므로, 빌드 단계를 순서대로 나열한 뒤
     # 프로그래스바로 전체 진행 상황을 보여준다. 각 단계 함수는 실제 렌더링(느린
     # 작업)을 수행하고 (탭제목, 위젯) 또는 None(탭 없음) 을 돌려준다.
     # -----------------------------------------------------------------
-    all_rows = []   # 변수 선별표 조립용 (각 추론통계 단계가 채운다)
+    all_rows = []   # 변수 선별표 조립용 (#03 단계가 채운다)
 
-    def _step_descriptive():
-        return ("기술통계", show_descriptive(data, target, task, _as_widget=True))
+    def _tab(title, sections):
+        """페이지 섹션 목록을 하나의 탭으로 만든다 (비어 있으면 탭 없음)."""
+        if not sections:
+            return None
+        widget = _pages_widget(sections)
+        return (title, widget) if widget is not None else None
 
-    def _step_dependent():
-        return ("종속변수 시각화",
-                viz_dependent(data, target, task, palette=palette, _as_widget=True))
+    def _step_prepare():
+        return _tab("#01 준비작업",
+                    show_descriptive(data, target, task, column_means=column_means,
+                                     num_desc=desc, cat_desc=cdesc, _mode="sections"))
 
-    def _step_independent():
-        w = viz_independent(data, target, task, palette=palette, _as_widget=True)
-        return ("독립변수 시각화", w) if w is not None else None
+    def _step_univariate():
+        sections = viz_dependent(data, target, num_desc=desc, cat_desc=cdesc,
+                                 _mode="sections", **common)
+        sections += viz_independent(data, target, num_desc=desc, cat_desc=cdesc,
+                                    _mode="sections", **common)
+        return _tab("#02 단변량 분석", sections)
 
-    def _make_infer_step(fn, reg_title, clf_title):
-        def run():
-            rows, w = fn(data, target, task=task, alpha=alpha,
-                         corr_threshold=corr_threshold, verbose=True,
-                         palette=palette, _as_widget=True)
-            if not rows:
-                return None
-            all_rows.extend(rows)
-            return (clf_title if is_clf else reg_title, w)
-        return run
+    def _step_bivariate():
+        sections = []
+        for fn in _INFER_FUNCS:
+            rows, secs = fn(data, target, verbose=True, _mode="sections",
+                            **infer_common, **_infer_kwargs(fn))
+            # 결과행은 섹션이 렌더링될 때 채워지므로, 지금은 목록만 붙잡아 두고
+            # 실제 값은 위젯 생성이 끝난 뒤(#05 단계)에 읽는다.
+            all_rows.append(rows)
+            sections += secs
+            # 상관분석 다음에 범주(hue) 산점도 페이지를 이어 배치 (요청 시에만)
+            if fn is infer_cont_cont and interaction:
+                sections += viz_cont_target_hue(data, target, _mode="sections", **common)
+        return _tab("#03 이변량 분석", sections)
 
-    def _step_hue():
-        hue_w = viz_cont_target_hue(data, target, task=task,
-                                    palette=palette, _as_widget=True)
-        return ("(연속 × 종속) + 범주", hue_w) if hue_w is not None else None
-
-    def _step_corr_independent():
-        w = corr_independent(data, target, alpha=alpha,
-                             collinearity_threshold=collinearity_threshold,
-                             palette=palette, _as_widget=True)
-        return ("독립변수 상관분석", w) if w is not None else None
+    def _step_multivariate():
+        return _tab("#04 다변량 분석",
+                    corr_independent(data, target, alpha=alpha,
+                                     collinearity_threshold=collinearity_threshold,
+                                     palette=palette, corr_pairs=corr_pairs,
+                                     _mode="sections"))
 
     def _step_selection():
-        table = _build_selection_frame(all_rows, desc, collin)
+        # #03 단계에서 각 검정이 채운 결과행을 모아 선별표를 만든다.
+        rows = [r for bucket in all_rows for r in bucket]
+        table = _build_selection_frame(rows, desc, collin)
         sel_widget = _capture_to_html(
-            lambda: _display_selection(table, alpha, corr_threshold, collinearity_threshold))
-        return ("변수 선별표", sel_widget)
+            lambda: _display_selection(table, alpha, corr_threshold,
+                                       collinearity_threshold))
+        return ("#05 최종 변수 선택", sel_widget)
 
     # 빌드 단계 조립: (진행 라벨, 실행함수) — 나열된 순서가 곧 탭 순서
     steps = [
-        ("기술통계", _step_descriptive),
-        ("종속변수 시각화", _step_dependent),
-        ("독립변수 시각화", _step_independent),
+        ("#01 준비작업", _step_prepare),
+        ("#02 단변량 분석", _step_univariate),
+        ("#03 이변량 분석", _step_bivariate),
+        ("#04 다변량 분석", _step_multivariate),
+        ("#05 최종 변수 선택", _step_selection),
     ]
-    for fn, reg_title, clf_title in _INFER_DEFS:
-        title = clf_title if is_clf else reg_title
-        steps.append((title, _make_infer_step(fn, reg_title, clf_title)))
-        # '연속 × 종속' 단계 바로 다음에 범주(hue) 시각화 단계를 이어 배치
-        # (예측 + 명목형 변수가 있을 때만)
-        if fn is infer_cont_cont and not is_clf and feat_nom:
-            steps.append(("(연속 × 종속) + 범주", _step_hue))
-    steps.append(("독립변수 상관분석", _step_corr_independent))
-    steps.append(("변수 선별표", _step_selection))
 
     # 프로그래스바 표시 (전체 진행 상황)
     total = len(steps)

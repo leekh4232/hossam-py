@@ -716,7 +716,7 @@ def auto_ols(data, y, summary=False, report=True,
         pvalues = report_vars["유의확률"] if homoscedasticity else report_vars["유의확률(HC3)"]
 
         # 독립변수가 하나뿐이거나 모두 유의하면 종료
-        if len(pvalues) <= 1 or pvalues.max() <= alpha:
+        if len(pvalues) <= 1 or pvalues.max() < alpha:
             break
 
         # 유의확률이 가장 큰(=가장 유의하지 않은) 독립변수를 하나만 제거한다.

@@ -17,6 +17,8 @@ from . import my_qtcheck
 from . import my_plot
 from . import my_stats
 from . import my_prep
+from . import my_ols
+from . import my_logit
 from . import my_pipeline
 from . import my_util
 from .my_util import load_info

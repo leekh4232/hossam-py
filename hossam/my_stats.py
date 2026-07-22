@@ -443,8 +443,8 @@ def anova_oneway(data, y, between, alpha=0.05):
 # ===================================================================
 # 일원분산분석 사후검정 (Post hoc)
 # ===================================================================
-def posthoc_oneway(data, y, between, alpha=0.05, plot=True, palette=None,
-                   title=None, xlabel=None, ylabel=None, width=1280, height=640, save_path=None):
+def posthoc_oneway(data, y, between, alpha=0.05, plot=True, summary=True, palette=None,
+            title=None, xlabel=None, ylabel=None, width=1280, height=640, save_path=None):
     """일원분산분석(One-way ANOVA)의 사후검정을 수행하는 함수
 
     Args:
@@ -453,6 +453,8 @@ def posthoc_oneway(data, y, between, alpha=0.05, plot=True, palette=None,
         between (str): 집단을 구분하는 독립변수(명목형) 컬럼명
         alpha (float): 유의수준 (기본값: 0.05)
         plot (bool): 결과를 시각화할지 여부 (기본값: True)
+        summary (bool): 결과 요약(비교쌍 수, 유의한 쌍 수, 평균차가 가장 큰/작은 쌍)을
+                        출력할지 여부 (기본값: True)
         palette (str or list): 색상 팔레트 (기본값: None)
         title (str): 그래프 제목 (기본값: None)
         xlabel (str): x축 라벨 (기본값: None)
@@ -464,6 +466,7 @@ def posthoc_oneway(data, y, between, alpha=0.05, plot=True, palette=None,
     Returns:
         DataFrame: 그룹 쌍별 사후검정 결과표(Tukey HSD 또는 Games-Howell)
     """
+    # --- 1) 등분산성 검정 ---
     # 분석에 사용할 두 컬럼만 추출하고 결측 행 제거
     df = data[[y, between]].dropna()
 
@@ -474,30 +477,23 @@ def posthoc_oneway(data, y, between, alpha=0.05, plot=True, palette=None,
     # 등분산성 충족 여부 추출
     equal_var = bool(assumption[assumption["test"] == "equal_var"]["result"].iloc[0])
 
-    # 등분산성 여부에 따라 사후검정 방법 선택
+    # --- 2) 등분산성 여부에 따라 사후검정 방법 선택 ---
     if equal_var:
         posthoc_name = "Tukey HSD"
         result = pairwise_tukey(data=df, dv=y, between=between)
-        # pingouin 버전/패치에 따라 p값 컬럼명이 다를 수 있어 유연하게 선택
-        pcol = "p-tukey" if "p-tukey" in result.columns else "p_tukey"
+        # p값 컬럼명 수정
+        result.rename(columns={"p_tukey": "pval"}, inplace=True)
     else:
         posthoc_name = "Games-Howell"
         result = pairwise_gameshowell(data=df, dv=y, between=between)
-        pcol = "pval"
 
-    # 그래프의 x축 순서(그룹 순서)
-    order = sorted(df[between].unique())
-
-    # 비교 대상 그룹 쌍과 그에 대응하는 p값 추출
-    pairs = list(zip(result["A"], result["B"]))
-    pvalues = list(result[pcol])
-
+    # --- 3) 검정 결과 가공 ---
     # 어떤 사후검정을 사용했는지 식별할 수 있도록 맨 앞에 test 컬럼 추가
     result.insert(0, "test", posthoc_name)
     # p값이 유의수준 미만이면 통계적으로 유의(귀무가설 기각)
-    result["significant"] = result[pcol] < alpha
+    result["significant"] = result["pval"] < alpha
 
-    # --- 효과크기 해석 컬럼 추가 ---
+    # --- 4) 효과크기 해석 컬럼 추가 ---
     # hedges(Hedges' g)는 두 집단 평균차에 대한 표준화 효과크기로,
     # Cohen의 d 기준표를 따라 절댓값으로 해석한다.
     #   ≥ 0.8 → 큼, ≥ 0.5 → 중간, ≥ 0.2 → 작음, 그 미만 → 미미함
@@ -511,8 +507,15 @@ def posthoc_oneway(data, y, between, alpha=0.05, plot=True, palette=None,
     labels = ["Large", "Medium", "Small"]
     result["effect_size"] = np.select(conditions, labels, default="Negligible")
 
-    # 시각화 옵션이 True인 경우, 시각화 수행
+    # --- 5) 시각화 옵션이 True인 경우, 시각화 수행 ---
     if plot:
+        # 그래프의 x축 순서(그룹 순서)
+        order = sorted(df[between].unique())
+
+        # 비교 대상 그룹 쌍과 그에 대응하는 p값 추출
+        pairs = list(zip(result["A"], result["B"]))
+        pvalues = list(result["pval"])
+
         fig, ax = my_plot.init(title=title, width=width, height=height, xlabel=xlabel, ylabel=ylabel)
         my_plot.boxplot(data=df, x=between, y=y, hue=between, palette=palette, order=order, ax=ax)
 
@@ -527,6 +530,21 @@ def posthoc_oneway(data, y, between, alpha=0.05, plot=True, palette=None,
         annotator.set_pvalues(pvalues)
         annotator.annotate()
         my_plot.show()
+
+    # --- 6) 결과 요약 출력 및 결과 반환 ---
+    if summary:
+        print("비교한 조합 쌍: {0}개".format(len(result)))
+        print("유의한 쌍: {0}개".format(int(result["significant"].sum())))
+
+        big = result.loc[result["diff"].abs().idxmax()]
+        print("평균 차이가 가장 큰 쌍: ({0}) vs ({1}) "
+              "→ 차이 {2:.3f}, 효과크기 {3}, p-value {4:.3f}".format(
+                  big["A"], big["B"], abs(big["diff"]), big["effect_size"], big["pval"]))
+
+        sm = result.loc[result["diff"].abs().idxmin()]
+        print("평균 차이가 가장 작은 쌍: ({0}) vs ({1}) "
+              "→ 차이 {2:.3f}, 효과크기 {3}, p-value {4:.3f}".format(
+                  sm["A"], sm["B"], abs(sm["diff"]), sm["effect_size"], sm["pval"]))
 
     return result
 
@@ -1008,6 +1026,67 @@ def multi_correlation(data, columns=None, alpha=0.05, plot=True, palette=None,
 
     # --- 5) 결과 반환 ---
     return corr_df
+
+# ===================================================================
+# 상관분석 결과표를 변수별 중복 신호로 집계
+# ===================================================================
+def correlation_summary(corr_df, strength="Strong"):
+    """multi_correlation()의 결과표를 변수별 중복(다중공선성) 신호로 집계하는 함수
+
+    Args:
+        corr_df (DataFrame): multi_correlation()이 리턴한 변수 쌍별 상관분석 결과표
+        strength (str or list): 중복으로 간주할 상관 강도 라벨
+                                (기본값: "Strong" → |coef|≥0.7 인 쌍만 중복으로 집계)
+
+    Returns:
+        DataFrame: 변수별 집계표 (중복이 심한 변수부터 정렬)
+            - index: 변수명
+            - max-y: 상관계수 절대값이 가장 큰 상대 변수명
+            - max-coef: 그 때의 상관계수
+            - count: 중복으로 집계된 쌍의 개수 (없으면 0)
+            - columns: 중복으로 집계된 상대 변수명을 쉼표로 연결한 문자열 (없으면 "-")
+    """
+    # --- 1) 결과표를 양방향으로 만들기 ---
+    # corr_df는 각 쌍이 한 번만 등장하므로(CRIM-NOX만 있고 NOX-CRIM은 없음)
+    # x, y를 뒤집은 결과표를 덧붙여야 변수별 집계가 가능하다.
+    pairs = corr_df.reset_index()
+    pairs = concat([pairs, pairs.rename(columns={"x": "y", "y": "x"})])
+
+    # 상관계수의 절대값이 큰 순으로 정렬
+    pairs.sort_values(by="coef", key=abs, ascending=False, inplace=True)
+
+    # --- 2) 변수별 최강 상대 ---
+    # 절대값이 큰 순으로 정렬했으므로 그룹별 첫 번째 항목이 곧 최강 상대가 된다.
+    # 강한 쌍이 없는 변수도 "중복 없음"이라는 근거로 남아야 하므로 여기서는 강도로 거르지 않는다.
+    summary = pairs.groupby("x").first()
+    summary.rename(columns={"y": "max-y", "coef": "max-coef"}, inplace=True)
+
+    # --- 3) 변수별 중복 쌍의 개수와 목록 ---
+    # 하나의 강도가 문자열로 전달된 경우 리스트로 감싸준다
+    # -> 함수 호출 시 ['String' ,'Moderate'] 같이 여러 강도를 지정할 수도 있도록 하기 위함
+    if type(strength) == str:
+        strength = [strength]
+
+    # 강도로 걸러야 변수마다 개수가 달라져 중복의 정도를 구분할 수 있다.
+    group_pairs = (pairs[pairs["strength"].isin(strength)]
+                        .groupby("x")["y"].agg(["count", ", ".join]))
+
+    # --- 4) 두 결과를 병합 ---
+    # 중복 쌍이 없는 변수는 병합 결과가 결측이 되므로 0과 "-"로 채운다.
+    corr_table = summary[["max-y", "max-coef"]].merge(
+        group_pairs, left_index=True, right_index=True, how="left")
+    corr_table.fillna({"count": 0, "join": "-"}, inplace=True)
+    corr_table = corr_table.astype({"count": int})
+
+    # --- 5) 중복이 심한 변수부터 정렬 ---
+    # 중복 쌍의 개수가 같으면 최강 상관계수가 큰 변수를 앞에 둔다.
+    corr_table.sort_values(by=["count", "max-coef"], key=abs,
+                           ascending=False, inplace=True)
+    corr_table.rename(columns={"join": "columns"}, inplace=True)
+
+    # --- 6) 결과표 반환 ---
+    return corr_table
+
 
 # ===================================================================
 # 다중 공선성(VIF) 계산
