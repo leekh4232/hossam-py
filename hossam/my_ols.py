@@ -1,15 +1,19 @@
+import os
 import numpy as np
 import seaborn as sb
 from IPython.display import display, Markdown
-from pandas import DataFrame
+from pandas import DataFrame, concat
 from statsmodels.api import add_constant, OLS
 from statsmodels.stats.diagnostic import linear_reset
 from statsmodels.stats.api import het_breuschpagan
 from statsmodels.stats.stattools import durbin_watson
 from scipy.stats import zscore, probplot, shapiro, kstest
+from sklearn.metrics import r2_score, root_mean_squared_error, mean_absolute_error
 
 from . import my_plot
 from . import my_stats
+from . import my_prep
+from . import my_qtcheck
 
 
 def fit_model(data, y, summary = False):
@@ -324,7 +328,8 @@ def test_independent(fit):
     display(result_df)  # 결과표 출력
 
 
-def report_fitness(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=None):
+def report_fitness(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=None,
+                   reflect_y=False, reflect_x=None):
     """적합된 회귀모델의 모형 적합도(model fit)를 학술 보고 형식의 문장으로 생성해 반환한다.
 
     summary() 결과표의 문자열을 파싱하지 않고, `fit` 객체가 이미 갖고 있는 속성에서
@@ -340,14 +345,17 @@ def report_fitness(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=None):
         log_x (list | None): log 변환을 적용한 독립변수 이름 리스트 (기본값: None).
         log1p_y (bool): 종속변수에 log1p(=ln(1+y)) 변환을 적용했는지 여부 (기본값: False).
         log1p_x (list | None): log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).
+        reflect_y (bool): 종속변수에 반사 후 log1p 변환을 적용했는지 여부 (기본값: False).
+        reflect_x (list | None): 반사 후 log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).
 
     Returns:
         str: 모형 적합도 보고 문장. `IPython.display.Markdown`으로 감싸 출력하면 좋다.
     """
     # --- 1) 변수 라벨 구성 ---
-    # log_x, log1p_x는 정확한 독립변수 이름 리스트로 전달된다고 가정한다.
+    # log_x, log1p_x, reflect_x는 정확한 독립변수 이름 리스트로 전달된다고 가정한다.
     log_x = log_x or []
     log1p_x = log1p_x or []
+    reflect_x = reflect_x or []
 
     # 상수항(const)을 제외한 독립변수 이름 (위치가 아니라 이름으로 걸러낸다)
     xnames = []
@@ -356,14 +364,17 @@ def report_fitness(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=None):
             xnames.append(name)
 
     # 변환이 적용된 변수는 문장에 log(...)/log1p(...)로 표기한다.
+    # 반사 변환은 log1p 와 식이 다르므로(대소가 뒤집힌다) 라벨도 구분해 적는다.
     yname = fit.model.endog_names
-    if log1p_y:     ylabel = f"log1p({yname})"
+    if reflect_y:   ylabel = f"log1p(max-{yname})"
+    elif log1p_y:   ylabel = f"log1p({yname})"
     elif log_y:     ylabel = f"log({yname})"
     else:           ylabel = yname
 
     xlabels = []   # 독립변수별 표기 라벨
     for x in xnames:
-        if x in log1p_x:    xlabels.append(f"log1p({x})")
+        if x in reflect_x:  xlabels.append(f"log1p(max-{x})")
+        elif x in log1p_x:  xlabels.append(f"log1p({x})")
         elif x in log_x:    xlabels.append(f"log({x})")
         else:               xlabels.append(x)
 
@@ -525,8 +536,15 @@ def report_variables(fit, data, hc3=False):
     return vdf
 
 
-def report_variables_text(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=None, hc3=False):
+def report_variables_text(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=None,
+                          reflect_y=False, reflect_x=None, hc3=False):
     """독립변수별 회귀계수 해석 문장을 markdown 불릿 리스트로 생성해 반환한다.
+
+    좌측 꼬리 변수에 적용하는 반사 변환(log(1+max-x))은 두 가지가 달라진다.
+    첫째, % 해석의 기준이 변수 자체가 아니라 **반사값 (1+max-변수)** 이다.
+    둘째, 반사값은 원 변수와 대소 관계가 뒤집혀 있으므로 회귀계수의 부호를
+    원 변수 기준으로 읽으면 반대가 된다(x·y 둘 다 반사면 두 번 뒤집혀 원래대로 돌아온다).
+    효과 크기 계산식 자체는 반사값 기준에서 log1p와 같으므로 그대로 사용한다.
 
     Args:
         fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
@@ -534,22 +552,26 @@ def report_variables_text(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=N
         log_x (list | None): log 변환을 적용한 독립변수 이름 리스트 (기본값: None).
         log1p_y (bool): 종속변수에 log1p(=ln(1+y)) 변환을 적용했는지 여부 (기본값: False).
         log1p_x (list | None): log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).
+        reflect_y (bool): 종속변수에 반사 후 log1p 변환을 적용했는지 여부 (기본값: False).
+        reflect_x (list | None): 반사 후 log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).
         hc3 (bool): True이면 HC3 로버스트 표준오차를 사용한다. Defaults to False.
 
     Returns:
         str: 독립변수별 해석 문장 불릿 리스트. `IPython.display.Markdown`으로 감싸 출력하면 좋다.
     """
     # --- 1) 해석 대상 결정 ---
-    # log_x, log1p_x는 정확한 독립변수 이름 리스트로 전달된다고 가정한다.
+    # log_x, log1p_x, reflect_x는 정확한 독립변수 이름 리스트로 전달된다고 가정한다.
     log_x = log_x or []
     log1p_x = log1p_x or []
+    reflect_x = reflect_x or []
 
-    # 종속변수의 변환 종류 판별
-    if log1p_y:     y_kind = "log1p"
+    # 종속변수의 변환 종류 판별 (반사 변환이 가장 구체적이므로 먼저 확인한다)
+    if reflect_y:   y_kind = "reflect"
+    elif log1p_y:   y_kind = "log1p"
     elif log_y:     y_kind = "log"
     else:           y_kind = "none"
-    
-    y_pct = y_kind in ("log", "log1p")   # 종속변수가 비율(%) 해석 대상인가
+
+    y_pct = y_kind in ("log", "log1p", "reflect")   # 종속변수가 비율(%) 해석 대상인가
 
     yname = fit.model.endog_names       # 종속변수 이름
     # 상수항(const)을 제외한 독립변수 이름 (위치가 아니라 이름으로 걸러낸다)
@@ -559,9 +581,10 @@ def report_variables_text(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=N
             xnames.append(name)
     df_resid = int(fit.df_resid)        # t분포 자유도(잔차 자유도)
 
-    # 종속변수 쪽 % 해석의 대상: log1p는 (1+y), 그 외는 y
-    if y_kind == "log1p":   y_target = f"**(1+{yname})**"
-    else:                   y_target = yname
+    # 종속변수 쪽 % 해석의 대상: 반사는 반사값 (1+max-y), log1p는 (1+y), 그 외는 y
+    if y_kind == "reflect":  y_target = f"**반사값(1+max-{yname})**"
+    elif y_kind == "log1p":  y_target = f"**(1+{yname})**"
+    else:                    y_target = yname
 
     # --- (신규) hc3=True인 경우 로버스트 표준오차 기반 t·유의확률로 교체 ---
     # 회귀계수(B)는 그대로이고, 표준오차만 이분산에 강건한 HC3로 바뀐다.
@@ -577,17 +600,21 @@ def report_variables_text(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=N
         "- **{x}**의 회귀계수는 **B = {B}**으로 나타났으며, "
         "이는 **{y}**에 {sig} 요인임을 의미한다. "
         "(**t({df}) = {t}**, **{p}**) "
-        "즉, {effect} 것으로 해석된다."
+        "즉, {effect} 것으로 해석된다.{note}"
     )
     effect_template = "{x_change} {y_target}는 평균적으로 {approx}**{mag}{unit} {direction}**하는"
+    # 반사 변환이 끼면 위 문장은 반사값 기준이므로, 원 변수 기준의 방향을 따로 덧붙인다
+    note_template = " (원 변수 기준으로는 **{x}가 클수록 {y}는 {orig_direction}**하는 관계다.)"
 
     # --- 3) 독립변수별 해석 문장 생성 ---
     lines = []   # 독립변수별 문장(불릿)을 저장할 빈 리스트
     for x in xnames:
         # 이 독립변수의 변환 여부 (정확한 이름 리스트라고 가정)
+        x_is_reflect = x in reflect_x
         x_is_log1p = x in log1p_x
         x_is_log = x in log_x
-        x_pct = x_is_log or x_is_log1p   # 독립변수가 비율(%) 증가 기준인가
+        # 반사 변환도 로그 척도이므로 % 해석 대상이다 (기준이 반사값일 뿐)
+        x_pct = x_is_log or x_is_log1p or x_is_reflect
         B = fit.params[x]               # 비표준화 회귀계수(B, 로버스트 여부와 무관하게 동일)
 
         if hc3:
@@ -608,13 +635,31 @@ def report_variables_text(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=N
         else:           p_text = f"p = {p:.3f}".replace("0.", ".")
 
         # 계수 부호로 증가/감소 방향 결정
+        # (문장의 주어가 반사값이면 이 방향은 반사값 기준의 방향이다)
         if B > 0:       direction = "증가"
         else:           direction = "감소"
 
-        # 독립변수 변화 표현: log1p는 (1+x)가 1% 증가, log는 x가 1% 증가, 원본은 x가 1 증가
-        if x_is_log1p:  x_change = f"**(1+{x})가 1% 증가**할 때"
-        elif x_is_log:  x_change = f"{x}가 **1% 증가**할 때"
-        else:           x_change = f"{x}가 **1 증가**할 때"
+        # 독립변수 변화 표현: 반사는 반사값 (1+max-x)가 1% 증가(= x는 그만큼 감소),
+        # log1p는 (1+x)가 1% 증가, log는 x가 1% 증가, 원본은 x가 1 증가
+        if x_is_reflect:
+            x_change = f"**반사값(1+max-{x})가 1% 증가**(= {x}가 그만큼 **감소**)할 때"
+        elif x_is_log1p:    x_change = f"**(1+{x})가 1% 증가**할 때"
+        elif x_is_log:      x_change = f"{x}가 **1% 증가**할 때"
+        else:               x_change = f"{x}가 **1 증가**할 때"
+
+        # 반사 변환은 대소 관계를 뒤집으므로, 원 변수 기준의 방향은 반사 횟수만큼 뒤집힌다.
+        # (x만 반사 또는 y만 반사면 한 번 뒤집히고, 둘 다 반사면 두 번 뒤집혀 원래대로 돌아온다)
+        flip = x_is_reflect != (y_kind == "reflect")
+
+        if not (x_is_reflect or y_kind == "reflect"):
+            note = ""       # 반사 변환이 없으면 문장을 그대로 읽으면 된다
+        else:
+            # 문장에 쓴 방향(반사값 기준)을 원 변수 기준으로 되돌려 괄호로 덧붙인다
+            if flip and direction == "증가":     orig_direction = "감소"
+            elif flip:                           orig_direction = "증가"
+            else:                                orig_direction = direction
+
+            note = note_template.format(x=x, y=yname, orig_direction=orig_direction)
 
         # 효과 크기: x·y가 각각 비율(%) 기준인지에 따라 값·단위가 정해진다
         if not x_pct and not y_pct:      # 원본 → 절대량 그대로
@@ -634,7 +679,7 @@ def report_variables_text(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=N
         # 하나의 독립변수 → 하나의 불릿 문장
         lines.append(line_template.format(
             x=x, B=round(B, 2), y=yname, sig=sig_word,
-            df=df_resid, t=round(t, 2), p=p_text, effect=effect,
+            df=df_resid, t=round(t, 2), p=p_text, effect=effect, note=note,
         ))
 
     # --- 4) 로버스트 표준오차·log1p 사용 시 해석 주의 각주 첨부 ---
@@ -655,11 +700,22 @@ def report_variables_text(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=N
             "이 구간에서는 부호·유의성 중심으로 해석하거나 예측값을 expm1로 원 척도에서 비교한다."
         )
 
+    uses_reflect = (y_kind == "reflect") or bool(reflect_x)
+    if uses_reflect:
+        report += (
+            "\n\n> ※ **반사 후 log1p**(=ln(1+max-·))로 변환한 변수는 값의 대소가 뒤집혀 있다. "
+            "위 %·증감은 변수 자체가 아니라 **반사값(1+max-변수)** 기준이므로, "
+            "원 변수 기준의 방향은 각 문장 끝 괄호에 따로 표시했다(회귀계수 B의 부호를 "
+            "그대로 원 변수에 적용하면 방향이 반대가 된다). "
+            "원 척도 값이 필요하면 **max-(exp(변환값)-1)** 로 역변환해 비교한다."
+        )
+
     return report
 
 
 def auto_ols(data, y, summary=False, report=True,
              log_y=False, log_x=None, log1p_y=False, log1p_x=None,
+             reflect_y=False, reflect_x=None,
              test=True, plot=False, width=1280, height=640,
              backward=False, alpha=0.05):
     """회귀모델 적합부터 보고서 출력·가정 검정까지 한 번에 수행한다.
@@ -673,6 +729,8 @@ def auto_ols(data, y, summary=False, report=True,
         log_x (list | None): log 변환을 적용한 독립변수 이름 리스트 (기본값: None).
         log1p_y (bool): 종속변수에 log1p 변환을 적용했는지 여부 (기본값: False).
         log1p_x (list | None): log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).
+        reflect_y (bool): 종속변수에 반사 후 log1p 변환을 적용했는지 여부 (기본값: False).
+        reflect_x (list | None): 반사 후 log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).
         test (bool): 회귀모형 가정 검정 수행 여부 (기본값: True).
         plot (bool): 가정 검정 시 그래프를 함께 그릴지 여부 (기본값: False).
         width (int): 그래프 너비 (기본값: 1280).
@@ -682,7 +740,8 @@ def auto_ols(data, y, summary=False, report=True,
         alpha (float): 후진소거법의 변수 제거 기준 유의수준 (기본값: 0.05).
 
     Returns:
-        적합이 완료된 회귀분석 결과 객체.
+        적합이 완료된 회귀분석 결과 객체. 등분산 위배 여부를 `use_hc3_`(bool) 속성으로
+        함께 붙여 반환하므로, 보고 함수의 `hc3` 인자에 그대로 넘겨 쓸 수 있다.
     """
     # # --- 1) 회귀모델 적합 ---
     # fit = fit_model(data, y, summary=summary)
@@ -725,6 +784,11 @@ def auto_ols(data, y, summary=False, report=True,
         print(f"유의하지 않은 독립변수 제거 → {worst} (p = {pvalues.max():.4f})")
         data = data.drop(columns=[worst])
 
+    # 등분산 위배 여부를 결과 객체에 붙여 둔다.
+    # 이미 위에서 판단한 값이므로, 보고 함수의 hc3 인자에 그대로 넘겨 쓰면
+    # 같은 검정을 밖에서 다시 할 필요가 없다
+    fit.use_hc3_ = not homoscedasticity
+
     # 최종 모델의 요약 통계량 출력
     if summary:
         print(fit.summary())
@@ -734,7 +798,8 @@ def auto_ols(data, y, summary=False, report=True,
         # 회귀계수 보고 표(hc3는 등분산 충족 아닐 시 True로 설정)
         display(report_variables(fit, data, hc3=not homoscedasticity))
         display(Markdown(report_fitness(fit, log_y=log_y, log_x=log_x,
-                                        log1p_y=log1p_y, log1p_x=log1p_x)))
+                                        log1p_y=log1p_y, log1p_x=log1p_x,
+                                        reflect_y=reflect_y, reflect_x=reflect_x)))
 
     # --- 3) 회귀모형 가정 검정 ---
     # 보고서와 가정 검정이 모두 출력되는 경우, 구분을 위해 수평선 추가
@@ -809,3 +874,548 @@ def plot_beta(fit, data, palette=None, title=None, xlabel=None, ylabel=None,
 
     # --- 5) 그래프 표시 (외부 ax를 받은 경우 표시는 호출자에게 맡긴다) ---
     my_plot.show(save_path=save_path)
+
+# =====================================================================
+# 전처리 파이프라인 — 플래그대로 전처리한 뒤 회귀모델을 적합한다
+# =====================================================================
+def fit_pipeline(data, y, nominal_cols=None, *,
+                 # --- 1) 명목형 라벨링 (문자열 -> 정수) ---
+                 labeling=True,
+                 # --- 2) 더미변수 인코딩 ---
+                 encode=True,
+                 # --- 3) 로그 변환 (우측꼬리 log1p / 좌측꼬리 반사 후 log1p) ---
+                 log=False,
+                 log_target=True,
+                 log_columns=None,
+                 reflect_columns=None,
+                 # --- 4) 이상치 대체 (IQR 경계값, 행 삭제 없음) ---
+                 outlier=False,
+                 # --- 5) 다중공선성 제거 (VIF) ---
+                 vif=False,
+                 vif_threshold=10.0,
+                 # --- 6) 정규화 ---
+                 scale=False,
+                 scale_method='standard',
+                 # --- 7) 모델 적합 ---
+                 backward=True,
+                 alpha=0.05,
+                 # --- 기타 ---
+                 name=None,
+                 save_path=None,
+                 verbose=False):
+    """플래그로 지정한 전처리를 수행한 뒤 회귀모델을 적합한다.
+
+    파라미터의 나열 순서가 곧 처리 순서이며, 강의 분석 흐름도의 단계 순서와 같다.
+    결측치는 없다고 전제한다.
+
+        라벨링 -> 더미 인코딩 -> 로그변환 -> 이상치 대체
+        -> 다중공선성 제거 -> 정규화 -> 모델 적합
+
+    각 단계는 대상 컬럼을 명시해서 넘긴다(연속형/명목형). 두 목록이 겹치지 않으므로
+    더미 인코딩과 로그·이상치·정규화는 서로의 대상을 건드리지 않는다.
+
+    Args:
+        data (DataFrame): 독립변수와 종속변수를 모두 포함하는 데이터프레임.
+        y (str): 종속변수로 사용할 컬럼명.
+        nominal_cols (list): 명목형 컬럼명 리스트. None이면 타입 자동 선택 (기본값: None).
+        labeling (bool): 명목형 라벨링(문자열 -> 정수) 수행 여부 (기본값: True).
+        encode (bool): 더미변수 인코딩 수행 여부 (기본값: True).
+        log (bool): 로그 변환 수행 여부 (기본값: False).
+        log_target (bool): 로그 변환 대상에 종속변수를 포함할지 여부 (기본값: True).
+        log_columns (list): 우측 꼬리(log1p) 변환 대상. None이면 자동 선정 (기본값: None).
+        reflect_columns (list): 좌측 꼬리(반사 후 log1p) 변환 대상 (기본값: None).
+        outlier (bool): 이상치를 IQR 경계값으로 대체할지 여부 (기본값: False).
+        vif (bool): 다중공선성 제거 수행 여부 (기본값: False).
+        vif_threshold (float): VIF 임계값 (기본값: 10.0).
+        scale (bool): 정규화 수행 여부 (기본값: False).
+        scale_method (str): 사용할 스케일러 이름 (기본값: 'standard').
+        backward (bool): 후진소거법 수행 여부 (기본값: True).
+        alpha (float): 후진소거법의 변수 제거 기준 유의수준 (기본값: 0.05).
+        name (str): 모델을 구분할 이름. 결과 객체의 `name_` 속성이 된다 (기본값: None).
+        save_path (str): 전처리 완료 데이터의 저장 경로 (.xlsx/.xls/.csv) (기본값: None).
+        verbose (bool): 단계별 전처리 내역 출력 여부 (기본값: False).
+
+    Returns:
+        적합이 완료된 회귀분석 결과 객체. 보고에 필요한 정보를 아래 속성으로 함께 붙여
+        반환하므로, 보고 함수에 그대로 넘겨 쓸 수 있다.
+            - `log1p_y_` (bool) / `log1p_x_` (list): 로그 변환 정보
+            - `reflect_y_` (bool) / `reflect_x_` (list): 반사 후 로그 변환 정보
+            - `reflect_y_max_` (float | None): 종속변수를 반사할 때 사용한 최댓값 (역변환용)
+            - `data_` (DataFrame): 전처리가 끝난 데이터 (β·VIF 계산용)
+            - `use_hc3_` (bool): 등분산 위배 여부. `auto_ols`가 붙여 준다
+
+    Raises:
+        KeyError: 종속변수나 `nominal_cols`의 컬럼이 `data`에 없는 경우.
+        ValueError: 숫자가 아닌 컬럼이나 결측치가 남아 있는 경우,
+            또는 `save_path`의 확장자가 지원 형식이 아닌 경우.
+    """
+    # --- 0) 입력 검증 및 컬럼 역할 정리 ---
+    if y not in data.columns:
+        raise KeyError(f"종속변수 '{y}'가 데이터프레임의 컬럼에 존재하지 않습니다.")
+
+    df = data.copy()    # 원본을 보존하기 위해 복사본으로 작업
+
+    # 명목형 컬럼: 지정이 없으면 category/object 타입을 자동으로 선택한다
+    if nominal_cols is None:
+        nominal_cols = list(df.select_dtypes(include=['category', 'object']).columns)
+    else:
+        missing = []
+        for c in nominal_cols:
+            if c not in df.columns:
+                missing.append(c)
+
+        if missing:
+            raise KeyError(f'df 에 존재하지 않는 컬럼입니다: {missing}')
+
+    # 종속변수는 명목형 목록에서 제외한다 (회귀의 종속변수는 연속형이어야 한다)
+    nominals = []
+    for c in nominal_cols:
+        if c != y:
+            nominals.append(c)
+
+    nominal_cols = nominals
+
+    # 연속형 독립변수: 수치형 중에서 종속변수와 명목형을 뺀 나머지
+    # 로그변환·이상치대체·다중공선성·정규화의 대상이 되며, 단계마다 갱신된다
+    continuous = []
+    for c in df.select_dtypes(include='number').columns:
+        if c != y and c not in nominal_cols:
+            continuous.append(c)
+
+    # 로그 변환 정보 (반환되는 fit 객체에 붙여 계수 해석에 사용한다)
+    log1p_y = False
+    log1p_x = []
+
+    # 반사(좌측 꼬리) 변환 정보. 해석의 기준·방향이 log1p 와 다르므로 따로 관리한다.
+    # 종속변수를 반사한 경우 원 척도로 되돌리려면 변환 당시의 최댓값이 반드시 필요하다
+    reflect_y = False
+    reflect_x = []
+    reflect_y_max = None
+
+    if verbose:
+        print(f'대상: {df.shape[0]}행 x {df.shape[1]}열 | 종속변수: {y}')
+        print(f'명목형: {nominal_cols}')
+        print(f'연속형: {continuous}')
+
+    # --- 1) 명목형 라벨링 ---
+    if labeling and nominal_cols:
+        if verbose:
+            print(f'\n[1] 명목형 라벨링')
+
+        df = my_prep.labeling(df, columns=nominal_cols, verbose=verbose)
+
+    # --- 2) 더미변수 인코딩 ---
+    if encode and nominal_cols:
+        if verbose:
+            print(f'\n[2] 더미변수 인코딩')
+
+        df = my_prep.dummies(df, columns=nominal_cols, drop_first=True, verbose=verbose)
+
+    # --- 3) 로그 변환 ---
+    if log:
+        # 종속변수의 포함 여부는 log_target 이 결정한다
+        scope = list(continuous)
+
+        if log_target:
+            scope.append(y)
+
+        # 변환 대상을 지정하지 않았다면 왜도·첨도를 근거로 자동 선정한다
+        if log_columns is None:
+            desc = my_qtcheck.numerical_summary(df, columns=scope)
+            log_columns = desc.index[desc['log_need'] == 'log1p'].tolist()
+
+            if reflect_columns is None:
+                reflect_columns = desc.index[desc['log_need'] == 'reverse_log1p'].tolist()
+
+        if reflect_columns is None:
+            reflect_columns = []
+
+        if verbose:
+            print(f'\n[3] 로그 변환')
+
+        # 종속변수를 반사하는 경우, 변환 전 최댓값을 남겨 두어야 나중에 원 척도로 되돌릴 수 있다
+        if y in reflect_columns:
+            reflect_y_max = float(df[y].max())
+
+        df = my_prep.log_transform(df, log_columns=log_columns,
+                                   reflect_columns=reflect_columns, verbose=verbose)
+
+        # 반사 변환(reflect)한 컬럼은 대소 관계가 뒤집혀 해석 방식이 다르므로
+        # log1p 목록과 섞지 않고 reflect 목록으로 따로 넘긴다
+        log1p_y = y in log_columns
+        reflect_y = y in reflect_columns
+
+        for c in log_columns:
+            if c != y:
+                log1p_x.append(c)
+
+        for c in reflect_columns:
+            if c != y:
+                reflect_x.append(c)
+
+    # --- 4) 이상치 대체 ---
+    # 연속형 독립변수만 대상으로 한다 (종속변수를 자르면 예측 대상 자체가 왜곡된다)
+    if outlier and continuous:
+        if verbose:
+            print(f'\n[4] 이상치 대체')
+
+        df = my_prep.replace_outlier(df, columns=continuous, verbose=verbose)
+
+    # --- 5) 다중공선성 제거 ---
+    if vif and continuous:
+        if verbose:
+            print(f'\n[5] 다중공선성 제거 (VIF >= {vif_threshold})')
+
+        df = my_prep.reduce_vif(df, columns=continuous,
+                                threshold=vif_threshold, verbose=verbose)
+
+        # 제거된 변수를 반영해야 이후 정규화 단계에서 없는 컬럼을 찾지 않는다
+        survived = []
+        for c in continuous:
+            if c in df.columns:
+                survived.append(c)
+
+        continuous = survived
+
+    # --- 6) 정규화 ---
+    if scale and continuous:
+        if verbose:
+            print(f'\n[6] 정규화')
+
+        df = my_prep.scaling(df, columns=continuous,
+                             method=scale_method, verbose=verbose)
+
+    # --- 7) 전처리 완료 데이터 저장 (선택) ---
+    if save_path:
+        folder = os.path.dirname(save_path)
+        if folder:
+            # 경로에 없는 폴더가 있으면 만들어 준다
+            os.makedirs(folder, exist_ok=True)
+
+        ext = os.path.splitext(save_path)[1].lower()
+
+        if ext in ('.xlsx', '.xls'):
+            df.to_excel(save_path, index=False)
+        elif ext == '.csv':
+            # 엑셀에서 한글이 깨지지 않도록 BOM 을 포함해 저장한다
+            df.to_csv(save_path, index=False, encoding='utf-8-sig')
+        else:
+            raise ValueError(f"지원하지 않는 저장 형식입니다: '{ext}' "
+                             f"(사용 가능: .xlsx, .xls, .csv)")
+
+        if verbose:
+            print(f'\n전처리 데이터 저장: {save_path} '
+                  f'({df.shape[0]}행 x {df.shape[1]}열)')
+
+    # --- 8) 모델 적합 ---
+    # 숫자로 바뀌지 않은 컬럼이 남아 있으면 OLS 가 알 수 없는 오류를 내므로 먼저 확인한다
+    remain = []
+    for c in df.columns:
+        if c not in df.select_dtypes(include='number').columns:
+            remain.append(c)
+
+    if remain:
+        raise ValueError(f'숫자로 변환되지 않은 컬럼이 남아 있습니다: {remain}\n'
+                         f'명목형 컬럼은 모델에 넣기 전에 반드시 변환해야 합니다. '
+                         f'labeling=True 또는 encode=True 로 설정하세요.')
+
+    # 결측치가 남아 있으면 OLS 가 MissingDataError 를 내므로 원인을 알려주고 중단한다
+    na_cols = df.columns[df.isna().any()].tolist()
+
+    if na_cols:
+        raise ValueError(f'결측치가 있는 컬럼이 있습니다: {na_cols}\n'
+                         f'이 함수는 결측치가 없는 데이터를 전제로 합니다. '
+                         f'데이터 품질 점검 단계에서 먼저 처리하세요.')
+
+    fit = auto_ols(df, y, backward=backward, alpha=alpha,
+                   log1p_y=log1p_y, log1p_x=log1p_x,
+                   reflect_y=reflect_y, reflect_x=reflect_x,
+                   report=False, test=False)
+
+    # --- 9) 보고에 필요한 정보를 결과 객체에 붙여 반환 ---
+    # 로그 변환 정보는 report_fitness(), report_variables_text() 에 그대로 넘겨 쓴다
+    fit.log1p_y_ = log1p_y
+    fit.log1p_x_ = log1p_x
+
+    # 반사 변환 정보. 최댓값은 compare_models() 가 예측값을 원 척도로 되돌릴 때 쓴다
+    fit.reflect_y_ = reflect_y
+    fit.reflect_x_ = reflect_x
+    fit.reflect_y_max_ = reflect_y_max
+
+    # 전처리가 끝난 데이터. report_variables(), plot_beta() 가 β·VIF 계산에 쓴다.
+    # 원본 데이터를 넘기면 척도가 달라 값이 조용히 틀리므로 이 데이터를 써야 한다
+    fit.data_ = df
+
+    # 모델을 구분할 이름 (compare_models 가 딕셔너리 키로 채워 주기도 한다)
+    fit.name_ = name
+
+    return fit
+
+
+# =====================================================================
+# 모델 성능 비교 — 여러 모델의 지표를 한 표로 모아 성능순으로 정렬한다
+# =====================================================================
+# 지표별로 '성능이 좋은 방향' (True = 값이 클수록 좋음)
+def compare_models(fits, metric='RMSE', sub_metric='변수수', tolerance=0.05,
+                   digits=4, report=True):
+    """여러 회귀모델의 성능지표를 한 표로 정리해 성능이 좋은 순으로 정렬하고, 최고 모델을 반환한다.
+
+    주 지표 1위와의 격차가 tolerance 이내인 모델들은 '근소 격차 그룹'으로 묶어
+    그룹 안에서는 보조 지표로 순서를 정한다. 주 지표가 사실상 비슷하다면 더 간명한
+    모델을 택한다는 뜻이다. 지표마다 좋은 방향이 다르므로(RMSE 는 작을수록,
+    R² 는 클수록) 정렬 방향은 지표에 따라 자동으로 결정된다.
+
+    종속변수에 log1p 나 반사 후 log1p 를 적용한 모델은 예측값을 원본 척도로 되돌려
+    RMSE·MAE·R²(원본척도)를 계산하므로 모델 간 비교가 가능하다.
+
+    Args:
+        fits (dict): {모델이름: 적합된 회귀분석 결과 객체} 형태의 딕셔너리.
+        metric (str): 정렬 기준이 되는 주 성능평가지표 (기본값: 'RMSE').
+        sub_metric (str): 근소 격차 그룹 안에서 적용할 보조 지표. None이면 미사용 (기본값: '변수수').
+        tolerance (float): 근소 격차로 판단할 주 지표의 상대격차. 0이면 순수 크기 비교 (기본값: 0.05).
+        digits (int): 표에 표시할 소수점 자릿수 (기본값: 4).
+        report (bool): 성능 비교표를 화면에 출력할지 여부 (기본값: True).
+
+    Returns:
+        성능이 가장 좋은 모델의 회귀분석 결과 객체(표의 첫 행). 아래 속성이 함께 붙는다.
+            - `name_` (str): 모델 이름. `fits` 의 키에서 채워진다
+            - `score_table_` (DataFrame): 모델명을 인덱스로 하는 성능 비교표.
+              성능이 좋은 모델이 위에 오며, 맨 끝에 1위 대비 상대격차인 `Gap(%)` 컬럼이 붙는다
+
+    Raises:
+        TypeError: `fits` 가 딕셔너리가 아니거나 값이 회귀분석 결과 객체가 아닌 경우.
+        ValueError: `fits` 가 비었거나 지표 이름·tolerance 가 유효하지 않은 경우.
+    """
+    # --- 1) 지표별 '성능이 좋은 방향' 정의 (True = 값이 클수록 좋음) ---
+    metrics = {
+        '변수수': False,          # 같은 성능이라면 변수가 적은 모델이 간명하다
+        'R2(모델척도)': True,
+        'Adj.R2': True,
+        'AIC': False,
+        'BIC': False,
+        'R2(원본척도)': True,
+        'RMSE': False,
+        'MAE': False,
+    }
+
+    # 종속변수의 척도가 다르면 비교할 수 없는 지표
+    # (모델에 들어간 값 그대로 계산되므로 로그 변환 여부가 다르면 값의 단위 자체가 다르다)
+    scale_sensitive = ['R2(모델척도)', 'Adj.R2', 'AIC', 'BIC']
+
+    # --- 2) 입력 검증 ---
+    if not isinstance(fits, dict):
+        raise TypeError(f'fits 는 딕셔너리여야 합니다: {type(fits).__name__}')
+
+    if not fits:
+        raise ValueError('비교할 모델이 없습니다.')
+
+    for name, fit in fits.items():
+        if not hasattr(fit, 'fittedvalues'):
+            raise TypeError(f"'{name}' 의 값이 회귀분석 결과 객체가 아닙니다: "
+                            f'{type(fit).__name__}')
+
+    for m in [metric, sub_metric]:
+        if m is not None and m not in metrics:
+            raise ValueError(f"지원하지 않는 지표입니다: '{m}' "
+                             f'(사용 가능: {list(metrics.keys())})')
+
+    if tolerance < 0:
+        raise ValueError(f'tolerance 는 0 이상이어야 합니다: {tolerance}')
+
+    # --- 3) 모델별 성능지표 계산 ---
+    result = []
+    log_flags = []    # 종속변수의 척도가 섞여 있는지 확인하기 위해 기록
+
+    for name, fit in fits.items():
+        # fit_pipeline() 이 붙여 둔 로그 변환 정보. 없으면 변환하지 않은 것으로 본다
+        log_y = getattr(fit, 'log1p_y_', False)
+        # 종속변수를 반사 변환(좌측 꼬리)한 경우와 그때 사용한 최댓값
+        reflect_y = getattr(fit, 'reflect_y_', False)
+        reflect_max = getattr(fit, 'reflect_y_max_', None)
+
+        # 종속변수의 척도가 바뀐 모델인지 기록 (log1p 든 반사든 원 척도가 아니다)
+        log_flags.append(bool(log_y or reflect_y))
+
+        # 실제값과 예측값을 원본 척도로 되돌린다.
+        # 이렇게 해야 로그 변환 여부가 다른 모델끼리도 오차를 비교할 수 있다
+        y_true = fit.model.endog
+        y_pred = fit.fittedvalues
+
+        if log_y:
+            y_true = np.expm1(y_true)
+            y_pred = np.expm1(y_pred)
+        elif reflect_y:
+            if reflect_max is None:
+                # 최댓값을 모르면 되돌릴 수 없으므로, 조용히 틀린 값을 내지 않고 알린다
+                raise ValueError(
+                    f"'{name}' 은 종속변수를 반사 변환했지만 역변환에 필요한 최댓값"
+                    f"(reflect_y_max_)이 없어 원 척도로 되돌릴 수 없습니다.")
+
+            # 반사 변환의 역변환: max - (exp(y)-1)
+            y_true = reflect_max - np.expm1(y_true)
+            y_pred = reflect_max - np.expm1(y_pred)
+
+        result.append({
+            '모델': name,
+            '변수수': int(fit.df_model),        # 상수항을 제외한 독립변수 개수
+            'R2(모델척도)': fit.rsquared,       # 종속변수 척도가 같을 때만 비교 가능
+            'Adj.R2': fit.rsquared_adj,
+            'AIC': fit.aic,
+            'BIC': fit.bic,
+            'R2(원본척도)': r2_score(y_true, y_pred),
+            'RMSE': root_mean_squared_error(y_true, y_pred),
+            'MAE': mean_absolute_error(y_true, y_pred),
+        })
+
+    rdf = DataFrame(result).set_index('모델')
+
+    # --- 4) 종속변수의 척도가 섞였는데 척도 의존 지표로 정렬하려는 경우 경고 ---
+    if len(set(log_flags)) > 1 and metric in scale_sensitive:
+        applied = sum(log_flags)
+        print(f'⚠ 종속변수의 척도가 서로 다른 모델이 섞여 있습니다'
+              f'(로그·반사 변환 적용: {applied}개 / 미적용: {len(log_flags) - applied}개).\n'
+              f"  '{metric}' 지표는 같은 척도끼리만 비교할 수 있습니다. "
+              f"'RMSE' 또는 'MAE' 를 사용하세요.")
+
+    # --- 5) 1위 대비 주 지표의 상대격차 계산 ---
+    # 지표마다 좋은 방향이 다르므로 metrics 에 기록해 둔 방향으로 최적값을 찾는다
+    higher_is_better = metrics[metric]
+
+    if higher_is_better:
+        best = rdf[metric].max()
+        diff = best - rdf[metric]      # 클수록 좋은 지표는 1위보다 작을수록 나쁘다
+    else:
+        best = rdf[metric].min()
+        diff = rdf[metric] - best      # 작을수록 좋은 지표는 1위보다 클수록 나쁘다
+
+    # AIC 처럼 값이 음수인 지표도 있으므로 최적값의 절댓값을 분모로 삼는다.
+    # 최적값이 0 이면 나눌 수 없으므로 격차를 값의 차이 그대로 본다
+    if best != 0:
+        denominator = abs(best)
+    else:
+        denominator = 1.0
+
+    rdf['Gap(%)'] = (diff / denominator * 100).round(2)    # 양수일수록 1위보다 나쁨
+
+    # --- 6) 근소 격차 그룹을 먼저 정렬하고 나머지를 뒤에 붙인다 ---
+    # 주 지표가 사실상 비슷한(격차가 tolerance 이내인) 모델끼리는 보조 지표로 순서를 정한다
+    close = rdf['Gap(%)'] <= tolerance * 100
+
+    by = [metric]
+    ascending = [not higher_is_better]
+
+    if sub_metric:
+        # 보조 지표를 앞에 두어야 근소 격차 그룹 안에서 우선 적용된다
+        by.insert(0, sub_metric)
+        ascending.insert(0, not metrics[sub_metric])
+
+    front = rdf[close].sort_values(by=by, ascending=ascending)
+    back = rdf[~close].sort_values(by=[metric], ascending=[not higher_is_better])
+
+    score_table = concat([front, back]).round(digits)
+
+    # --- 7) 성능표 출력 ---
+    if report:
+        display(score_table)
+
+    # 각 모델에 딕셔너리 키를 이름으로 새겨 둔다 (직접 지정한 name_ 이 없을 때만)
+    for model_name, fit in fits.items():
+        if getattr(fit, 'name_', None) is None:
+            fit.name_ = model_name
+
+    # --- 8) 최고 성능 모델을 반환한다 ---
+    # 표는 성능순으로 정렬되어 있으므로 첫 행이 곧 최고 모델이다
+    best = fits[score_table.index[0]]
+    best.score_table_ = score_table
+
+    return best
+
+
+# =====================================================================
+# 최종 모델 종합 보고 — 성능 보고와 가정 검정을 한 번에 수행한다
+# =====================================================================
+def report_model(fit, title=True, plot=True):
+    """적합된 회귀모델의 성능 보고와 가정 검정을 한 번에 출력한다.
+
+    `fit_pipeline`·`auto_ols` 가 결과 객체에 붙여 둔 정보(`log1p_y_`·`log1p_x_`·
+    `use_hc3_`·`data_`)를 사용하므로, 이 값들을 따로 준비해 넘길 필요가 없다.
+
+    출력 구성 (마크다운 제목 포함):
+        ### ▶︎ 성능 보고
+            #### 1) 모형 적합도  2) 회귀계수 보고표  3) 영향력 순위 시각화  4) 회귀계수 해석 문장
+        ---
+        ### ▶︎ 회귀모형 가정 검정
+            #### 1) 선형성  2) 정규성  3) 등분산성  4) 독립성
+
+    Args:
+        fit: `fit_pipeline` 또는 `auto_ols` 로 적합된 회귀분석 결과 객체.
+            `log1p_y_`·`log1p_x_`·`use_hc3_`·`data_` 속성이 붙어 있어야 한다.
+        title (bool): 모델 이름(`name_`)이 있으면 맨 위에 2수준 제목으로 출력할지 여부 (기본값: True).
+
+    Raises:
+        AttributeError: 보고에 필요한 속성이 결과 객체에 없는 경우.
+    """
+    # --- 0) 필요한 속성 확인 (fit_pipeline/auto_ols 산출물이 아니면 안내) ---
+    need = ['log1p_y_', 'log1p_x_', 'use_hc3_', 'data_']
+    missing = []
+    for attr in need:
+        if not hasattr(fit, attr):
+            missing.append(attr)
+
+    if missing:
+        raise AttributeError(
+            f'보고에 필요한 속성이 없습니다: {missing}\n'
+            f'report_model 은 fit_pipeline() 또는 auto_ols() 로 적합한 모델에 사용하세요.')
+
+    data = fit.data_
+    log1p_y = fit.log1p_y_
+    log1p_x = fit.log1p_x_
+    hc3 = fit.use_hc3_
+
+    # 반사(좌측 꼬리) 변환 정보. 이 속성이 없는 예전 결과 객체도 그대로 동작하도록 기본값을 둔다
+    reflect_y = getattr(fit, 'reflect_y_', False)
+    reflect_x = getattr(fit, 'reflect_x_', [])
+
+    # 제목은 수준에 상관없이 앞에 빈 줄을 하나 두어 위 내용과 간격을 준다
+    def heading(text):
+        print()
+        display(Markdown(text))
+
+    # --- 0-1) 모델 이름 제목 (선택) ---
+    if title and getattr(fit, 'name_', None) is not None:
+        heading(f"## 최종 모델: {fit.name_}")
+
+    # --- 1) 성능 보고 ---
+    heading("### ▶︎ 성능 보고")
+
+    heading("#### 1) 모형 적합도")
+    display(Markdown(report_fitness(fit, log1p_y=log1p_y, log1p_x=log1p_x,
+                                    reflect_y=reflect_y, reflect_x=reflect_x)))
+
+    heading("#### 2) 회귀계수 보고표")
+    display(report_variables(fit, data, hc3=hc3))
+
+    heading("#### 3) 영향력 순위 시각화 (표준화 계수 β)")
+    plot_beta(fit, data, title="최종 모델의 표준화 회귀계수(β) — 영향력 순위")
+
+    heading("#### 4) 회귀계수 해석 문장")
+    display(Markdown(report_variables_text(fit, log1p_y=log1p_y, log1p_x=log1p_x,
+                                           reflect_y=reflect_y, reflect_x=reflect_x, hc3=hc3)))
+
+    # --- 2) 성능 보고와 가정 검정 사이 구분선 ---
+    display(Markdown("---"))
+
+    # --- 3) 회귀모형 가정 검정 ---
+    heading("### ▶︎ 회귀모형 가정 검정")
+
+    heading("#### 1) 선형성 검정")
+    test_linear(fit, plot=plot, title="적합값 대비 잔차 (lowess 추세선)")
+
+    heading("#### 2) 정규성 검정")
+    test_normal(fit, plot=plot)
+
+    heading("#### 3) 등분산성 검정")
+    test_equalvar(fit)
+
+    heading("#### 4) 독립성 검정")
+    test_independent(fit)

@@ -1063,7 +1063,7 @@ def correlation_summary(corr_df, strength="Strong"):
 
     # --- 3) 변수별 중복 쌍의 개수와 목록 ---
     # 하나의 강도가 문자열로 전달된 경우 리스트로 감싸준다
-    # -> 함수 호출 시 ['String' ,'Moderate'] 같이 여러 강도를 지정할 수도 있도록 하기 위함
+    # -> 함수 호출 시 ['Strong' ,'Moderate'] 같이 여러 강도를 지정할 수도 있도록 하기 위함
     if type(strength) == str:
         strength = [strength]
 
