@@ -1152,9 +1152,7 @@
 
     <div class="doc doc-contents ">
 
-        <p>statsmodels의 OLS를 이용해 선형회귀 모델을 적합한다.</p>
-<p>종속변수 <code>y</code>를 제외한 나머지 모든 컬럼을 독립변수로 사용하며,
-절편(상수항)을 자동으로 추가한 뒤 최소자승법으로 회귀계수를 추정한다.</p>
+        <p>종속변수를 제외한 모든 컬럼을 독립변수로 삼아 OLS 회귀모델을 적합한다(절편 자동 추가).</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1191,7 +1189,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>종속변수로 사용할 컬럼명. <code>data</code>에 반드시 존재해야 한다.</p>
+                <p>종속변수로 사용할 컬럼명.</p>
               </div>
             </td>
             <td>
@@ -1203,11 +1201,11 @@
                 <code>summary</code>
             </td>
             <td>
+                  <code><span title="bool">bool</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>True로 설정하면 적합된 모델의 요약 통계량을 출력한다. 
-      Defaults to False.</p>
+                <p>적합 모델의 요약 통계량 출력 여부 (기본값: False).</p>
               </div>
             </td>
             <td>
@@ -1265,21 +1263,13 @@
 <span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fit_model</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">summary</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;statsmodels의 OLS를 이용해 선형회귀 모델을 적합한다.</span>
-
-<span class="sd">    종속변수 `y`를 제외한 나머지 모든 컬럼을 독립변수로 사용하며,</span>
-<span class="sd">    절편(상수항)을 자동으로 추가한 뒤 최소자승법으로 회귀계수를 추정한다.</span>
+<span class="normal">42</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fit_model</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">summary</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;종속변수를 제외한 모든 컬럼을 독립변수로 삼아 OLS 회귀모델을 적합한다(절편 자동 추가).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        data: 독립변수와 종속변수를 모두 포함하는 데이터프레임.</span>
-<span class="sd">        y: 종속변수로 사용할 컬럼명. `data`에 반드시 존재해야 한다.</span>
-<span class="sd">        summary: True로 설정하면 적합된 모델의 요약 통계량을 출력한다. </span>
-<span class="sd">                  Defaults to False.</span>
+<span class="sd">        y: 종속변수로 사용할 컬럼명.</span>
+<span class="sd">        summary (bool): 적합 모델의 요약 통계량 출력 여부 (기본값: False).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        적합이 완료된 회귀분석 결과 객체.</span>
@@ -1378,8 +1368,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>새로운 데이터에 대한 예측값을 포함하는 데이터프레임.
-컬럼명은 'pred'로 설정된다.</p>
+                <p>예측값을 담은 데이터프레임 (컬럼명 'pred').</p>
               </div>
             </td>
           </tr>
@@ -1389,7 +1378,11 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_ols.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">49</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span>
 <span class="normal">52</span>
@@ -1402,12 +1395,7 @@
 <span class="normal">59</span>
 <span class="normal">60</span>
 <span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">new_data</span><span class="p">):</span>
+<span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">new_data</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;적합된 회귀모델을 이용해 새로운 데이터에 대한 예측값을 계산한다.</span>
 
 <span class="sd">    Args:</span>
@@ -1415,8 +1403,7 @@
 <span class="sd">        new_data: 예측에 사용할 새로운 데이터프레임. 독립변수 컬럼만 포함해야 한다.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        DataFrame: 새로운 데이터에 대한 예측값을 포함하는 데이터프레임.</span>
-<span class="sd">            컬럼명은 &#39;pred&#39;로 설정된다.</span>
+<span class="sd">        DataFrame: 예측값을 담은 데이터프레임 (컬럼명 &#39;pred&#39;).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># 새로운 데이터에 절편(상수항) 추가</span>
     <span class="n">new_data_with_const</span> <span class="o">=</span> <span class="n">add_constant</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span>
@@ -1456,10 +1443,8 @@
 
     <div class="doc doc-contents ">
 
-        <p>잔차의 선형성(모형 설정 오류)을 검정한다.</p>
-<p>Ramsey RESET Test(power=2)를 수행하여 적합된 선형모형에 고차항을 추가했을 때
-유의미한 설명력이 남는지를 확인한다. 고차항이 유의하면(=p &lt; alpha) 직선으로는
-잡아내지 못한 곡선 관계가 남아 있다는 뜻이므로 선형성 가정이 위배된다.</p>
+        <p>Ramsey RESET(power=2)으로 잔차의 선형성(모형 설정 오류)을 검정한다.</p>
+<p>고차항이 유의하면(p &lt; alpha) 직선으로 잡지 못한 곡선 관계가 남아 있다는 뜻이다.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1638,7 +1623,12 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_ols.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 70</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
 <span class="normal"> 71</span>
 <span class="normal"> 72</span>
 <span class="normal"> 73</span>
@@ -1693,20 +1683,11 @@
 <span class="normal">122</span>
 <span class="normal">123</span>
 <span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span>
-<span class="normal">132</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_linear</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="normal">125</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_linear</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;잔차의 선형성(모형 설정 오류)을 검정한다.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ramsey RESET(power=2)으로 잔차의 선형성(모형 설정 오류)을 검정한다.</span>
 
-<span class="sd">    Ramsey RESET Test(power=2)를 수행하여 적합된 선형모형에 고차항을 추가했을 때</span>
-<span class="sd">    유의미한 설명력이 남는지를 확인한다. 고차항이 유의하면(=p &lt; alpha) 직선으로는</span>
-<span class="sd">    잡아내지 못한 곡선 관계가 남아 있다는 뜻이므로 선형성 가정이 위배된다.</span>
+<span class="sd">    고차항이 유의하면(p &lt; alpha) 직선으로 잡지 못한 곡선 관계가 남아 있다는 뜻이다.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.</span>
@@ -1859,8 +1840,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>그래프 색상에 사용할 팔레트 이름. None이면 기본색을
-사용한다 (기본값: None).</p>
+                <p>그래프 색상에 사용할 팔레트 이름. None이면 기본색 (기본값: None).</p>
               </div>
             </td>
             <td>
@@ -1905,7 +1885,14 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_ols.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">135</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
 <span class="normal">136</span>
 <span class="normal">137</span>
 <span class="normal">138</span>
@@ -2023,23 +2010,14 @@
 <span class="normal">250</span>
 <span class="normal">251</span>
 <span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_normal</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">640</span><span class="p">):</span>
+<span class="normal">253</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_normal</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">640</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;잔차의 정규성을 두 가지 방법으로 검정하고 진단 결과를 순서대로 출력한다.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.</span>
 <span class="sd">        alpha (float): 유의수준 (기본값: 0.05).</span>
 <span class="sd">        plot (bool): Q-Q 플롯과 √MSE 잔차도를 함께 그릴지 여부 (기본값: True).</span>
-<span class="sd">        palette (str): 그래프 색상에 사용할 팔레트 이름. None이면 기본색을</span>
-<span class="sd">            사용한다 (기본값: None).</span>
+<span class="sd">        palette (str): 그래프 색상에 사용할 팔레트 이름. None이면 기본색 (기본값: None).</span>
 <span class="sd">        width (int): 그래프 너비 (기본값: 1280).</span>
 <span class="sd">        height (int): 그래프 높이 (기본값: 640).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -2228,7 +2206,15 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_ols.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">264</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
 <span class="normal">265</span>
 <span class="normal">266</span>
 <span class="normal">267</span>
@@ -2248,15 +2234,7 @@
 <span class="normal">281</span>
 <span class="normal">282</span>
 <span class="normal">283</span>
-<span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
-<span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_equalvar</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+<span class="normal">284</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_equalvar</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;잔차의 등분산성을 검정하고 결과표를 출력한다.</span>
 
 <span class="sd">    Args:</span>
@@ -2304,10 +2282,8 @@
 
     <div class="doc doc-contents ">
 
-        <p>잔차의 독립성을 검정한다.</p>
-<p>Durbin-Watson 검정은 본래 시계열 데이터 전용이므로, 시간 순서가 없는
-데이터에서 독립성이 위배되더라도 무시해도 되는 경우가 많다.</p>
-<p>시각화가 필요하지 않은 검정이므로 plot 파라미터를 제공하지 않는다.</p>
+        <p>Durbin-Watson으로 잔차의 독립성을 검정한다.</p>
+<p>본래 시계열 전용 검정이므로, 시간 순서가 없는 데이터에서는 위배되어도 무시해도 되는 경우가 많다.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2342,7 +2318,15 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_ols.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">295</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
 <span class="normal">296</span>
 <span class="normal">297</span>
 <span class="normal">298</span>
@@ -2364,24 +2348,10 @@
 <span class="normal">314</span>
 <span class="normal">315</span>
 <span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span>
-<span class="normal">319</span>
-<span class="normal">320</span>
-<span class="normal">321</span>
-<span class="normal">322</span>
-<span class="normal">323</span>
-<span class="normal">324</span>
-<span class="normal">325</span>
-<span class="normal">326</span>
-<span class="normal">327</span>
-<span class="normal">328</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_independent</span><span class="p">(</span><span class="n">fit</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;잔차의 독립성을 검정한다.</span>
+<span class="normal">317</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">test_independent</span><span class="p">(</span><span class="n">fit</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Durbin-Watson으로 잔차의 독립성을 검정한다.</span>
 
-<span class="sd">    Durbin-Watson 검정은 본래 시계열 데이터 전용이므로, 시간 순서가 없는</span>
-<span class="sd">    데이터에서 독립성이 위배되더라도 무시해도 되는 경우가 많다.</span>
-
-<span class="sd">    시각화가 필요하지 않은 검정이므로 plot 파라미터를 제공하지 않는다.</span>
+<span class="sd">    본래 시계열 전용 검정이므로, 시간 순서가 없는 데이터에서는 위배되어도 무시해도 되는 경우가 많다.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.</span>
@@ -2436,12 +2406,8 @@
 
     <div class="doc doc-contents ">
 
-        <p>적합된 회귀모델의 모형 적합도(model fit)를 학술 보고 형식의 문장으로 생성해 반환한다.</p>
-<p>summary() 결과표의 문자열을 파싱하지 않고, <code>fit</code> 객체가 이미 갖고 있는 속성에서
-지표를 직접 읽어와 문장을 구성한다. 표에 보이는 값은 반올림된 표시값이지만
-<code>fit</code>은 완전한 정밀도의 실수값을 갖고 있으므로 보고 형식에 맞춰 round()로 자리수만 맞춘다.</p>
-<p>변환이 적용된 변수는 문장에 log(...)/log1p(...)로 표기하여 실제 적합한 모형을
-그대로 드러낸다. (로그 척도에서는 R²도 변환된 종속변수의 분산 설명 비율을 뜻한다.)</p>
+        <p>적합된 회귀모델의 모형 적합도를 학술 보고 형식의 문장으로 생성해 반환한다.</p>
+<p>변환한 변수는 log(...)/log1p(...)/log1p(max-...)로 표기해 실제 적합한 모형을 그대로 드러낸다.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2511,7 +2477,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>종속변수에 log1p(=ln(1+y)) 변환을 적용했는지 여부 (기본값: False).</p>
+                <p>종속변수에 log1p 변환을 적용했는지 여부 (기본값: False).</p>
               </div>
             </td>
             <td>
@@ -2523,7 +2489,7 @@
                 <code>log1p_x</code>
             </td>
             <td>
-                  <code><span title="list">list</span> | None</code>
+                  <code><span title="list">list</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2555,7 +2521,7 @@
                 <code>reflect_x</code>
             </td>
             <td>
-                  <code><span title="list">list</span> | None</code>
+                  <code><span title="list">list</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2584,7 +2550,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>모형 적합도 보고 문장. <code>IPython.display.Markdown</code>으로 감싸 출력하면 좋다.</p>
+                <p>모형 적합도 보고 문장.</p>
               </div>
             </td>
           </tr>
@@ -2594,7 +2560,18 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_ols.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">331</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
 <span class="normal">332</span>
 <span class="normal">333</span>
 <span class="normal">334</span>
@@ -2683,44 +2660,23 @@
 <span class="normal">417</span>
 <span class="normal">418</span>
 <span class="normal">419</span>
-<span class="normal">420</span>
-<span class="normal">421</span>
-<span class="normal">422</span>
-<span class="normal">423</span>
-<span class="normal">424</span>
-<span class="normal">425</span>
-<span class="normal">426</span>
-<span class="normal">427</span>
-<span class="normal">428</span>
-<span class="normal">429</span>
-<span class="normal">430</span>
-<span class="normal">431</span>
-<span class="normal">432</span>
-<span class="normal">433</span>
-<span class="normal">434</span>
-<span class="normal">435</span>
-<span class="normal">436</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_fitness</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">log_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log1p_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log1p_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="normal">420</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_fitness</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">log_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log1p_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log1p_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">reflect_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reflect_x</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;적합된 회귀모델의 모형 적합도(model fit)를 학술 보고 형식의 문장으로 생성해 반환한다.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;적합된 회귀모델의 모형 적합도를 학술 보고 형식의 문장으로 생성해 반환한다.</span>
 
-<span class="sd">    summary() 결과표의 문자열을 파싱하지 않고, `fit` 객체가 이미 갖고 있는 속성에서</span>
-<span class="sd">    지표를 직접 읽어와 문장을 구성한다. 표에 보이는 값은 반올림된 표시값이지만</span>
-<span class="sd">    `fit`은 완전한 정밀도의 실수값을 갖고 있으므로 보고 형식에 맞춰 round()로 자리수만 맞춘다.</span>
-
-<span class="sd">    변환이 적용된 변수는 문장에 log(...)/log1p(...)로 표기하여 실제 적합한 모형을</span>
-<span class="sd">    그대로 드러낸다. (로그 척도에서는 R²도 변환된 종속변수의 분산 설명 비율을 뜻한다.)</span>
+<span class="sd">    변환한 변수는 log(...)/log1p(...)/log1p(max-...)로 표기해 실제 적합한 모형을 그대로 드러낸다.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.</span>
 <span class="sd">        log_y (bool): 종속변수에 로그변환(log)을 적용했는지 여부 (기본값: False).</span>
 <span class="sd">        log_x (list | None): log 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
-<span class="sd">        log1p_y (bool): 종속변수에 log1p(=ln(1+y)) 변환을 적용했는지 여부 (기본값: False).</span>
-<span class="sd">        log1p_x (list | None): log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
+<span class="sd">        log1p_y (bool): 종속변수에 log1p 변환을 적용했는지 여부 (기본값: False).</span>
+<span class="sd">        log1p_x (list): log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
 <span class="sd">        reflect_y (bool): 종속변수에 반사 후 log1p 변환을 적용했는지 여부 (기본값: False).</span>
-<span class="sd">        reflect_x (list | None): 반사 후 log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
+<span class="sd">        reflect_x (list): 반사 후 log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        str: 모형 적합도 보고 문장. `IPython.display.Markdown`으로 감싸 출력하면 좋다.</span>
+<span class="sd">        str: 모형 적합도 보고 문장.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># --- 1) 변수 라벨 구성 ---</span>
     <span class="c1"># log_x, log1p_x, reflect_x는 정확한 독립변수 이름 리스트로 전달된다고 가정한다.</span>
@@ -2825,13 +2781,7 @@
     <div class="doc doc-contents ">
 
         <p>적합된 회귀모델의 독립변수별 회귀계수 보고표를 데이터프레임으로 생성해 반환한다.</p>
-<p>계수 관련 수치는 summary() 표의 반올림된 표시값을 파싱하는 대신 <code>fit</code> 객체에서
-완전한 정밀도의 실수값으로 직접 가져온다. 표준화 회귀계수(β)와 공차·VIF 계산에는
-원본 데이터의 표준편차가 필요하므로 <code>data</code>를 함께 받는다.</p>
-<p><code>cov_type</code>을 지정하면 일반 OLS의 표준오차·t·유의확률은 그대로 둔 채, 이분산에 강건한
-표준오차(예: 'HC3')로 계산한 <code>표준오차(cov_type)</code>·<code>t(cov_type)</code>·<code>유의확률(cov_type)</code>
-컬럼을 세트로 추가해 두 방식을 나란히 비교할 수 있게 한다(B 공유). t는 정의상 계수/표준오차
-이므로 표준오차가 로버스트로 바뀌면 t·유의확률도 함께 바뀐다. 계수(B)·β·공차·VIF는 그대로다.</p>
+<p>β·공차·VIF 계산에 원본 데이터의 표준편차가 필요하므로 <code>data</code>를 함께 받는다.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2880,10 +2830,11 @@
                 <code>hc3</code>
             </td>
             <td>
+                  <code><span title="bool">bool</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>True이면 HC3 로버스트 표준오차를 사용한다. Defaults to False.</p>
+                <p>True이면 HC3 로버스트 표준오차를 사용한다 (기본값: False).</p>
               </div>
             </td>
             <td>
@@ -2908,9 +2859,8 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>독립변수별 보고표. 기본은 종속변수·독립변수·B·표준오차·β·t·유의확률·공차·VIF
-컬럼을 가진다. hc3가 True일 경우 B 다음에 일반(표준오차·t·유의확률)과
-로버스트(표준오차·t·유의확률(cov_type))가 대칭으로 배치되고 β·공차·VIF가 뒤따른다.</p>
+                <p>종속변수·독립변수·B·표준오차·β·t·유의확률·공차·VIF 컬럼의 보고표.
+hc3가 True이면 일반 OLS와 로버스트(HC3)의 표준오차·t·유의확률이 나란히 배치된다.</p>
               </div>
             </td>
           </tr>
@@ -2920,7 +2870,23 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_ols.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">439</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
 <span class="normal">440</span>
 <span class="normal">441</span>
 <span class="normal">442</span>
@@ -2993,51 +2959,19 @@
 <span class="normal">509</span>
 <span class="normal">510</span>
 <span class="normal">511</span>
-<span class="normal">512</span>
-<span class="normal">513</span>
-<span class="normal">514</span>
-<span class="normal">515</span>
-<span class="normal">516</span>
-<span class="normal">517</span>
-<span class="normal">518</span>
-<span class="normal">519</span>
-<span class="normal">520</span>
-<span class="normal">521</span>
-<span class="normal">522</span>
-<span class="normal">523</span>
-<span class="normal">524</span>
-<span class="normal">525</span>
-<span class="normal">526</span>
-<span class="normal">527</span>
-<span class="normal">528</span>
-<span class="normal">529</span>
-<span class="normal">530</span>
-<span class="normal">531</span>
-<span class="normal">532</span>
-<span class="normal">533</span>
-<span class="normal">534</span>
-<span class="normal">535</span>
-<span class="normal">536</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_variables</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">hc3</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="normal">512</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_variables</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">hc3</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;적합된 회귀모델의 독립변수별 회귀계수 보고표를 데이터프레임으로 생성해 반환한다.</span>
 
-<span class="sd">    계수 관련 수치는 summary() 표의 반올림된 표시값을 파싱하는 대신 `fit` 객체에서</span>
-<span class="sd">    완전한 정밀도의 실수값으로 직접 가져온다. 표준화 회귀계수(β)와 공차·VIF 계산에는</span>
-<span class="sd">    원본 데이터의 표준편차가 필요하므로 `data`를 함께 받는다.</span>
-
-<span class="sd">    `cov_type`을 지정하면 일반 OLS의 표준오차·t·유의확률은 그대로 둔 채, 이분산에 강건한</span>
-<span class="sd">    표준오차(예: &#39;HC3&#39;)로 계산한 `표준오차(cov_type)`·`t(cov_type)`·`유의확률(cov_type)`</span>
-<span class="sd">    컬럼을 세트로 추가해 두 방식을 나란히 비교할 수 있게 한다(B 공유). t는 정의상 계수/표준오차</span>
-<span class="sd">    이므로 표준오차가 로버스트로 바뀌면 t·유의확률도 함께 바뀐다. 계수(B)·β·공차·VIF는 그대로다.</span>
+<span class="sd">    β·공차·VIF 계산에 원본 데이터의 표준편차가 필요하므로 `data`를 함께 받는다.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.</span>
 <span class="sd">        data: 회귀분석에 사용한 원본 데이터프레임. 독립변수와 종속변수를 모두 포함해야 한다.</span>
-<span class="sd">        hc3: True이면 HC3 로버스트 표준오차를 사용한다. Defaults to False.</span>
+<span class="sd">        hc3 (bool): True이면 HC3 로버스트 표준오차를 사용한다 (기본값: False).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        DataFrame: 독립변수별 보고표. 기본은 종속변수·독립변수·B·표준오차·β·t·유의확률·공차·VIF</span>
-<span class="sd">            컬럼을 가진다. hc3가 True일 경우 B 다음에 일반(표준오차·t·유의확률)과</span>
-<span class="sd">            로버스트(표준오차·t·유의확률(cov_type))가 대칭으로 배치되고 β·공차·VIF가 뒤따른다.</span>
+<span class="sd">        DataFrame: 종속변수·독립변수·B·표준오차·β·t·유의확률·공차·VIF 컬럼의 보고표.</span>
+<span class="sd">            hc3가 True이면 일반 OLS와 로버스트(HC3)의 표준오차·t·유의확률이 나란히 배치된다.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># --- 1) 대상 변수 확인 및 VIF 계산 ---</span>
     <span class="n">yname</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog_names</span>       <span class="c1"># 종속변수 이름</span>
@@ -3144,11 +3078,8 @@
     <div class="doc doc-contents ">
 
         <p>독립변수별 회귀계수 해석 문장을 markdown 불릿 리스트로 생성해 반환한다.</p>
-<p>좌측 꼬리 변수에 적용하는 반사 변환(log(1+max-x))은 두 가지가 달라진다.
-첫째, % 해석의 기준이 변수 자체가 아니라 <strong>반사값 (1+max-변수)</strong> 이다.
-둘째, 반사값은 원 변수와 대소 관계가 뒤집혀 있으므로 회귀계수의 부호를
-원 변수 기준으로 읽으면 반대가 된다(x·y 둘 다 반사면 두 번 뒤집혀 원래대로 돌아온다).
-효과 크기 계산식 자체는 반사값 기준에서 log1p와 같으므로 그대로 사용한다.</p>
+<p>반사 변환(log(1+max-x))은 % 해석의 기준이 반사값 (1+max-변수)이고, 반사한 변수가
+홀수 개면 원 변수 기준 방향이 반대가 된다. 효과 크기 계산식은 log1p와 같다.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3186,7 +3117,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>종속변수에 로그변환(log)을 적용했는지 여부 (기본값: False).</p>
+                <p>종속변수에 log 변환을 적용했는지 여부 (기본값: False).</p>
               </div>
             </td>
             <td>
@@ -3198,7 +3129,7 @@
                 <code>log_x</code>
             </td>
             <td>
-                  <code><span title="list">list</span> | None</code>
+                  <code><span title="list">list</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3218,7 +3149,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>종속변수에 log1p(=ln(1+y)) 변환을 적용했는지 여부 (기본값: False).</p>
+                <p>종속변수에 log1p 변환을 적용했는지 여부 (기본값: False).</p>
               </div>
             </td>
             <td>
@@ -3230,7 +3161,7 @@
                 <code>log1p_x</code>
             </td>
             <td>
-                  <code><span title="list">list</span> | None</code>
+                  <code><span title="list">list</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3262,7 +3193,7 @@
                 <code>reflect_x</code>
             </td>
             <td>
-                  <code><span title="list">list</span> | None</code>
+                  <code><span title="list">list</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3282,7 +3213,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>True이면 HC3 로버스트 표준오차를 사용한다. Defaults to False.</p>
+                <p>True이면 HC3 로버스트 표준오차를 사용한다 (기본값: False).</p>
               </div>
             </td>
             <td>
@@ -3307,7 +3238,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>독립변수별 해석 문장 불릿 리스트. <code>IPython.display.Markdown</code>으로 감싸 출력하면 좋다.</p>
+                <p>독립변수별 해석 문장 불릿 리스트.</p>
               </div>
             </td>
           </tr>
@@ -3317,7 +3248,31 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_ols.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">539</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">515</span>
+<span class="normal">516</span>
+<span class="normal">517</span>
+<span class="normal">518</span>
+<span class="normal">519</span>
+<span class="normal">520</span>
+<span class="normal">521</span>
+<span class="normal">522</span>
+<span class="normal">523</span>
+<span class="normal">524</span>
+<span class="normal">525</span>
+<span class="normal">526</span>
+<span class="normal">527</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span>
+<span class="normal">531</span>
+<span class="normal">532</span>
+<span class="normal">533</span>
+<span class="normal">534</span>
+<span class="normal">535</span>
+<span class="normal">536</span>
+<span class="normal">537</span>
+<span class="normal">538</span>
+<span class="normal">539</span>
 <span class="normal">540</span>
 <span class="normal">541</span>
 <span class="normal">542</span>
@@ -3471,78 +3426,66 @@
 <span class="normal">690</span>
 <span class="normal">691</span>
 <span class="normal">692</span>
-<span class="normal">693</span>
-<span class="normal">694</span>
-<span class="normal">695</span>
-<span class="normal">696</span>
-<span class="normal">697</span>
-<span class="normal">698</span>
-<span class="normal">699</span>
-<span class="normal">700</span>
-<span class="normal">701</span>
-<span class="normal">702</span>
-<span class="normal">703</span>
-<span class="normal">704</span>
-<span class="normal">705</span>
-<span class="normal">706</span>
-<span class="normal">707</span>
-<span class="normal">708</span>
-<span class="normal">709</span>
-<span class="normal">710</span>
-<span class="normal">711</span>
-<span class="normal">712</span>
-<span class="normal">713</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_variables_text</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">log_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log1p_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log1p_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="normal">693</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_variables_text</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">log_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log1p_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log1p_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                           <span class="n">reflect_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reflect_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hc3</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;독립변수별 회귀계수 해석 문장을 markdown 불릿 리스트로 생성해 반환한다.</span>
 
-<span class="sd">    좌측 꼬리 변수에 적용하는 반사 변환(log(1+max-x))은 두 가지가 달라진다.</span>
-<span class="sd">    첫째, % 해석의 기준이 변수 자체가 아니라 **반사값 (1+max-변수)** 이다.</span>
-<span class="sd">    둘째, 반사값은 원 변수와 대소 관계가 뒤집혀 있으므로 회귀계수의 부호를</span>
-<span class="sd">    원 변수 기준으로 읽으면 반대가 된다(x·y 둘 다 반사면 두 번 뒤집혀 원래대로 돌아온다).</span>
-<span class="sd">    효과 크기 계산식 자체는 반사값 기준에서 log1p와 같으므로 그대로 사용한다.</span>
+<span class="sd">    반사 변환(log(1+max-x))은 % 해석의 기준이 반사값 (1+max-변수)이고, 반사한 변수가</span>
+<span class="sd">    홀수 개면 원 변수 기준 방향이 반대가 된다. 효과 크기 계산식은 log1p와 같다.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.</span>
-<span class="sd">        log_y (bool): 종속변수에 로그변환(log)을 적용했는지 여부 (기본값: False).</span>
-<span class="sd">        log_x (list | None): log 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
-<span class="sd">        log1p_y (bool): 종속변수에 log1p(=ln(1+y)) 변환을 적용했는지 여부 (기본값: False).</span>
-<span class="sd">        log1p_x (list | None): log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
+<span class="sd">        log_y (bool): 종속변수에 log 변환을 적용했는지 여부 (기본값: False).</span>
+<span class="sd">        log_x (list): log 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
+<span class="sd">        log1p_y (bool): 종속변수에 log1p 변환을 적용했는지 여부 (기본값: False).</span>
+<span class="sd">        log1p_x (list): log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
 <span class="sd">        reflect_y (bool): 종속변수에 반사 후 log1p 변환을 적용했는지 여부 (기본값: False).</span>
-<span class="sd">        reflect_x (list | None): 반사 후 log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
-<span class="sd">        hc3 (bool): True이면 HC3 로버스트 표준오차를 사용한다. Defaults to False.</span>
+<span class="sd">        reflect_x (list): 반사 후 log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
+<span class="sd">        hc3 (bool): True이면 HC3 로버스트 표준오차를 사용한다 (기본값: False).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        str: 독립변수별 해석 문장 불릿 리스트. `IPython.display.Markdown`으로 감싸 출력하면 좋다.</span>
+<span class="sd">        str: 독립변수별 해석 문장 불릿 리스트.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># --- 1) 해석 대상 결정 ---</span>
-    <span class="c1"># log_x, log1p_x, reflect_x는 정확한 독립변수 이름 리스트로 전달된다고 가정한다.</span>
-    <span class="n">log_x</span> <span class="o">=</span> <span class="n">log_x</span> <span class="ow">or</span> <span class="p">[]</span>
-    <span class="n">log1p_x</span> <span class="o">=</span> <span class="n">log1p_x</span> <span class="ow">or</span> <span class="p">[]</span>
-    <span class="n">reflect_x</span> <span class="o">=</span> <span class="n">reflect_x</span> <span class="ow">or</span> <span class="p">[]</span>
+    <span class="c1"># --- 1) 종속변수 정보 ---</span>
+    <span class="n">yname</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog_names</span>       <span class="c1"># 종속변수 이름</span>
 
-    <span class="c1"># 종속변수의 변환 종류 판별 (반사 변환이 가장 구체적이므로 먼저 확인한다)</span>
+    <span class="c1"># 종속변수의 변환 종류 (구체적인 변환부터 확인한다)</span>
     <span class="k">if</span> <span class="n">reflect_y</span><span class="p">:</span>   <span class="n">y_kind</span> <span class="o">=</span> <span class="s2">&quot;reflect&quot;</span>
     <span class="k">elif</span> <span class="n">log1p_y</span><span class="p">:</span>   <span class="n">y_kind</span> <span class="o">=</span> <span class="s2">&quot;log1p&quot;</span>
     <span class="k">elif</span> <span class="n">log_y</span><span class="p">:</span>     <span class="n">y_kind</span> <span class="o">=</span> <span class="s2">&quot;log&quot;</span>
     <span class="k">else</span><span class="p">:</span>           <span class="n">y_kind</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span>
 
-    <span class="n">y_pct</span> <span class="o">=</span> <span class="n">y_kind</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;log1p&quot;</span><span class="p">,</span> <span class="s2">&quot;reflect&quot;</span><span class="p">)</span>   <span class="c1"># 종속변수가 비율(%) 해석 대상인가</span>
+    <span class="n">y_pct</span> <span class="o">=</span> <span class="n">y_kind</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span>   <span class="c1"># 로그 계열이면 비율(%) 해석 대상이다</span>
 
-    <span class="n">yname</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog_names</span>       <span class="c1"># 종속변수 이름</span>
+    <span class="c1"># % 해석의 대상: 반사는 (1+max-y), log1p는 (1+y), 그 외는 y</span>
+    <span class="k">if</span> <span class="n">y_kind</span> <span class="o">==</span> <span class="s2">&quot;reflect&quot;</span><span class="p">:</span>  <span class="n">y_target</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;**(1+max-</span><span class="si">{</span><span class="n">yname</span><span class="si">}</span><span class="s2">)**&quot;</span>
+    <span class="k">elif</span> <span class="n">y_kind</span> <span class="o">==</span> <span class="s2">&quot;log1p&quot;</span><span class="p">:</span>  <span class="n">y_target</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;**(1+</span><span class="si">{</span><span class="n">yname</span><span class="si">}</span><span class="s2">)**&quot;</span>
+    <span class="k">else</span><span class="p">:</span>                    <span class="n">y_target</span> <span class="o">=</span> <span class="n">yname</span>
+
+    <span class="c1"># --- 2) 독립변수 정보 ---</span>
+    <span class="c1"># log_x, log1p_x, reflect_x는 정확한 독립변수 이름 리스트로 전달된다고 가정한다.</span>
+    <span class="n">log_x</span> <span class="o">=</span> <span class="n">log_x</span> <span class="ow">or</span> <span class="p">[]</span>
+    <span class="n">log1p_x</span> <span class="o">=</span> <span class="n">log1p_x</span> <span class="ow">or</span> <span class="p">[]</span>
+    <span class="n">reflect_x</span> <span class="o">=</span> <span class="n">reflect_x</span> <span class="ow">or</span> <span class="p">[]</span>
+
     <span class="c1"># 상수항(const)을 제외한 독립변수 이름 (위치가 아니라 이름으로 걸러낸다)</span>
     <span class="n">xnames</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">fit</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">exog_names</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;const&quot;</span><span class="p">:</span>
             <span class="n">xnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="c1"># 독립변수의 변환 종류를 하나의 값으로 판별한다 (종속변수와 같은 순서로 확인한다)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">kind_of</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">reflect_x</span><span class="p">:</span>   <span class="k">return</span> <span class="s2">&quot;reflect&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">log1p_x</span><span class="p">:</span>     <span class="k">return</span> <span class="s2">&quot;log1p&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">log_x</span><span class="p">:</span>       <span class="k">return</span> <span class="s2">&quot;log&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;none&quot;</span>
+
+    <span class="c1"># --- 3) 그 밖의 정보 (자유도·로버스트 통계량) ---</span>
     <span class="n">df_resid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fit</span><span class="o">.</span><span class="n">df_resid</span><span class="p">)</span>        <span class="c1"># t분포 자유도(잔차 자유도)</span>
 
-    <span class="c1"># 종속변수 쪽 % 해석의 대상: 반사는 반사값 (1+max-y), log1p는 (1+y), 그 외는 y</span>
-    <span class="k">if</span> <span class="n">y_kind</span> <span class="o">==</span> <span class="s2">&quot;reflect&quot;</span><span class="p">:</span>  <span class="n">y_target</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;**반사값(1+max-</span><span class="si">{</span><span class="n">yname</span><span class="si">}</span><span class="s2">)**&quot;</span>
-    <span class="k">elif</span> <span class="n">y_kind</span> <span class="o">==</span> <span class="s2">&quot;log1p&quot;</span><span class="p">:</span>  <span class="n">y_target</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;**(1+</span><span class="si">{</span><span class="n">yname</span><span class="si">}</span><span class="s2">)**&quot;</span>
-    <span class="k">else</span><span class="p">:</span>                    <span class="n">y_target</span> <span class="o">=</span> <span class="n">yname</span>
-
-    <span class="c1"># --- (신규) hc3=True인 경우 로버스트 표준오차 기반 t·유의확률로 교체 ---</span>
-    <span class="c1"># 회귀계수(B)는 그대로이고, 표준오차만 이분산에 강건한 HC3로 바뀐다.</span>
+    <span class="c1"># hc3=True이면 로버스트 표준오차 기반 t·유의확률로 교체한다.</span>
+    <span class="c1"># 회귀계수(B)는 그대로이고 표준오차만 이분산에 강건한 HC3로 바뀌는데,</span>
     <span class="c1"># t = B / 로버스트 SE 이므로 t와 유의확률도 한 세트로 함께 바뀐다.</span>
     <span class="c1"># 로버스트 결과 객체는 이름 없는 배열을 반환하므로 위치 인덱스로 접근한다.</span>
     <span class="k">if</span> <span class="n">hc3</span><span class="p">:</span>
@@ -3550,26 +3493,23 @@
         <span class="n">rob_tvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">robust</span><span class="o">.</span><span class="n">tvalues</span><span class="p">)</span>
         <span class="n">rob_pvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">robust</span><span class="o">.</span><span class="n">pvalues</span><span class="p">)</span>
 
-    <span class="c1"># --- 2) 문장 템플릿 구성 (독립변수마다 반복 적용) ---</span>
+    <span class="c1"># --- 4) 문장 템플릿 구성 (독립변수마다 반복 적용) ---</span>
     <span class="n">line_template</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;- **</span><span class="si">{x}</span><span class="s2">**의 회귀계수는 **B = </span><span class="si">{B}</span><span class="s2">**으로 나타났으며, &quot;</span>
         <span class="s2">&quot;이는 **</span><span class="si">{y}</span><span class="s2">**에 </span><span class="si">{sig}</span><span class="s2"> 요인임을 의미한다. &quot;</span>
-        <span class="s2">&quot;(**t(</span><span class="si">{df}</span><span class="s2">) = </span><span class="si">{t}</span><span class="s2">**, **</span><span class="si">{p}</span><span class="s2">**) &quot;</span>
+        <span class="s2">&quot;(**t(</span><span class="si">{df}</span><span class="s2">) = </span><span class="si">{t}</span><span class="s2">**, **</span><span class="si">{p}</span><span class="s2">**)      </span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="s2">&quot;즉, </span><span class="si">{effect}</span><span class="s2"> 것으로 해석된다.</span><span class="si">{note}</span><span class="s2">&quot;</span>
     <span class="p">)</span>
     <span class="n">effect_template</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{x_change}</span><span class="s2"> </span><span class="si">{y_target}</span><span class="s2">는 평균적으로 </span><span class="si">{approx}</span><span class="s2">**</span><span class="si">{mag}{unit}</span><span class="s2"> </span><span class="si">{direction}</span><span class="s2">**하는&quot;</span>
-    <span class="c1"># 반사 변환이 끼면 위 문장은 반사값 기준이므로, 원 변수 기준의 방향을 따로 덧붙인다</span>
-    <span class="n">note_template</span> <span class="o">=</span> <span class="s2">&quot; (원 변수 기준으로는 **</span><span class="si">{x}</span><span class="s2">가 클수록 </span><span class="si">{y}</span><span class="s2">는 </span><span class="si">{orig_direction}</span><span class="s2">**하는 관계다.)&quot;</span>
+    <span class="c1"># 반사 변환이 끼면 위 문장은 반사값 기준이므로, 원 변수 기준의 방향을 짧게 덧붙인다</span>
+    <span class="n">note_template</span> <span class="o">=</span> <span class="s2">&quot; (원 변수 기준: **</span><span class="si">{x}</span><span class="s2">가 클수록 </span><span class="si">{y}</span><span class="s2"> </span><span class="si">{orig_direction}</span><span class="s2">**)&quot;</span>
+    <span class="n">opposite</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;증가&quot;</span><span class="p">:</span> <span class="s2">&quot;감소&quot;</span><span class="p">,</span> <span class="s2">&quot;감소&quot;</span><span class="p">:</span> <span class="s2">&quot;증가&quot;</span><span class="p">}</span>   <span class="c1"># 반사로 뒤집힌 방향을 되돌릴 때 쓴다</span>
 
-    <span class="c1"># --- 3) 독립변수별 해석 문장 생성 ---</span>
+    <span class="c1"># --- 5) 독립변수별 해석 문장 생성 ---</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>   <span class="c1"># 독립변수별 문장(불릿)을 저장할 빈 리스트</span>
     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xnames</span><span class="p">:</span>
-        <span class="c1"># 이 독립변수의 변환 여부 (정확한 이름 리스트라고 가정)</span>
-        <span class="n">x_is_reflect</span> <span class="o">=</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">reflect_x</span>
-        <span class="n">x_is_log1p</span> <span class="o">=</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">log1p_x</span>
-        <span class="n">x_is_log</span> <span class="o">=</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">log_x</span>
-        <span class="c1"># 반사 변환도 로그 척도이므로 % 해석 대상이다 (기준이 반사값일 뿐)</span>
-        <span class="n">x_pct</span> <span class="o">=</span> <span class="n">x_is_log</span> <span class="ow">or</span> <span class="n">x_is_log1p</span> <span class="ow">or</span> <span class="n">x_is_reflect</span>
+        <span class="n">x_kind</span> <span class="o">=</span> <span class="n">kind_of</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>             <span class="c1"># none / log / log1p / reflect</span>
+        <span class="n">x_pct</span> <span class="o">=</span> <span class="n">x_kind</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span>        <span class="c1"># 반사도 로그 척도이므로 % 해석 대상이다</span>
         <span class="n">B</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>               <span class="c1"># 비표준화 회귀계수(B, 로버스트 여부와 무관하게 동일)</span>
 
         <span class="k">if</span> <span class="n">hc3</span><span class="p">:</span>
@@ -3594,25 +3534,22 @@
         <span class="k">if</span> <span class="n">B</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>       <span class="n">direction</span> <span class="o">=</span> <span class="s2">&quot;증가&quot;</span>
         <span class="k">else</span><span class="p">:</span>           <span class="n">direction</span> <span class="o">=</span> <span class="s2">&quot;감소&quot;</span>
 
-        <span class="c1"># 독립변수 변화 표현: 반사는 반사값 (1+max-x)가 1% 증가(= x는 그만큼 감소),</span>
-        <span class="c1"># log1p는 (1+x)가 1% 증가, log는 x가 1% 증가, 원본은 x가 1 증가</span>
-        <span class="k">if</span> <span class="n">x_is_reflect</span><span class="p">:</span>
-            <span class="n">x_change</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;**반사값(1+max-</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)가 1% 증가**(= </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">가 그만큼 **감소**)할 때&quot;</span>
-        <span class="k">elif</span> <span class="n">x_is_log1p</span><span class="p">:</span>    <span class="n">x_change</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;**(1+</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)가 1% 증가**할 때&quot;</span>
-        <span class="k">elif</span> <span class="n">x_is_log</span><span class="p">:</span>      <span class="n">x_change</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">가 **1% 증가**할 때&quot;</span>
-        <span class="k">else</span><span class="p">:</span>               <span class="n">x_change</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">가 **1 증가**할 때&quot;</span>
+        <span class="c1"># 변환 종류별 독립변수 변화 표현 (% 해석의 기준이 되는 값이 무엇인지가 핵심이다)</span>
+        <span class="n">x_change</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;reflect&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;**(1+max-</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)가 1% 증가**할 때&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;log1p&quot;</span><span class="p">:</span>   <span class="sa">f</span><span class="s2">&quot;**(1+</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)가 1% 증가**할 때&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;log&quot;</span><span class="p">:</span>     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">가 **1% 증가**할 때&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;none&quot;</span><span class="p">:</span>    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">가 **1 증가**할 때&quot;</span><span class="p">,</span>
+        <span class="p">}[</span><span class="n">x_kind</span><span class="p">]</span>
 
-        <span class="c1"># 반사 변환은 대소 관계를 뒤집으므로, 원 변수 기준의 방향은 반사 횟수만큼 뒤집힌다.</span>
-        <span class="c1"># (x만 반사 또는 y만 반사면 한 번 뒤집히고, 둘 다 반사면 두 번 뒤집혀 원래대로 돌아온다)</span>
-        <span class="n">flip</span> <span class="o">=</span> <span class="n">x_is_reflect</span> <span class="o">!=</span> <span class="p">(</span><span class="n">y_kind</span> <span class="o">==</span> <span class="s2">&quot;reflect&quot;</span><span class="p">)</span>
+        <span class="c1"># 반사 변환은 대소 관계를 뒤집으므로, 반사한 변수가 홀수 개면 원 변수 기준 방향이 반대다.</span>
+        <span class="c1"># (x·y 둘 다 반사면 두 번 뒤집혀 원래대로 돌아온다)</span>
+        <span class="n">reflected</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_kind</span> <span class="o">==</span> <span class="s2">&quot;reflect&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">y_kind</span> <span class="o">==</span> <span class="s2">&quot;reflect&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">x_is_reflect</span> <span class="ow">or</span> <span class="n">y_kind</span> <span class="o">==</span> <span class="s2">&quot;reflect&quot;</span><span class="p">):</span>
-            <span class="n">note</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>       <span class="c1"># 반사 변환이 없으면 문장을 그대로 읽으면 된다</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">reflected</span><span class="p">:</span>   <span class="n">note</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>   <span class="c1"># 반사가 없으면 문장을 그대로 읽으면 된다</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># 문장에 쓴 방향(반사값 기준)을 원 변수 기준으로 되돌려 괄호로 덧붙인다</span>
-            <span class="k">if</span> <span class="n">flip</span> <span class="ow">and</span> <span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;증가&quot;</span><span class="p">:</span>     <span class="n">orig_direction</span> <span class="o">=</span> <span class="s2">&quot;감소&quot;</span>
-            <span class="k">elif</span> <span class="n">flip</span><span class="p">:</span>                           <span class="n">orig_direction</span> <span class="o">=</span> <span class="s2">&quot;증가&quot;</span>
-            <span class="k">else</span><span class="p">:</span>                                <span class="n">orig_direction</span> <span class="o">=</span> <span class="n">direction</span>
+            <span class="k">if</span> <span class="n">reflected</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>   <span class="n">orig_direction</span> <span class="o">=</span> <span class="n">opposite</span><span class="p">[</span><span class="n">direction</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>               <span class="n">orig_direction</span> <span class="o">=</span> <span class="n">direction</span>
 
             <span class="n">note</span> <span class="o">=</span> <span class="n">note_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">yname</span><span class="p">,</span> <span class="n">orig_direction</span><span class="o">=</span><span class="n">orig_direction</span><span class="p">)</span>
 
@@ -3637,32 +3574,34 @@
             <span class="n">df</span><span class="o">=</span><span class="n">df_resid</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">p</span><span class="o">=</span><span class="n">p_text</span><span class="p">,</span> <span class="n">effect</span><span class="o">=</span><span class="n">effect</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="n">note</span><span class="p">,</span>
         <span class="p">))</span>
 
-    <span class="c1"># --- 4) 로버스트 표준오차·log1p 사용 시 해석 주의 각주 첨부 ---</span>
-    <span class="n">report</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>   <span class="c1"># 불릿 문장을 하나의 markdown 리스트로 합친다</span>
 
-    <span class="k">if</span> <span class="n">hc3</span><span class="p">:</span>
-        <span class="n">report</span> <span class="o">+=</span> <span class="p">(</span>
-            <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&gt; ※ 위 **t**와 **유의확률**은 등분산 가정이 충족되지 않은 경우를 대비해 &quot;</span>
-            <span class="s2">&quot;**HC3 로버스트 표준오차**로 계산한 값이다. 회귀계수(B)와 효과 크기 해석은 &quot;</span>
-            <span class="s2">&quot;일반 OLS와 동일하며, 표준오차만 이분산에 강건하게 보정되어 유의성 판정이 달라질 수 있다.&quot;</span>
-        <span class="p">)</span>
-
+    <span class="c1"># --- 6) 로그·반사 변환 사용 시 주의 각주 ---</span>
     <span class="n">uses_log1p</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_kind</span> <span class="o">==</span> <span class="s2">&quot;log1p&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">bool</span><span class="p">(</span><span class="n">log1p_x</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">uses_log1p</span><span class="p">:</span>
         <span class="n">report</span> <span class="o">+=</span> <span class="p">(</span>
             <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&gt; ※ **log1p**(=ln(1+·))의 % 해석은 변수 자체가 아니라 **(1+변수)** 기준이며, &quot;</span>
-            <span class="s2">&quot;값이 클 때만 위 근사가 성립한다(0·작은 값 구간에서는 원본처럼 동작해 부정확). &quot;</span>
+            <span class="s2">&quot;값이 클 때만 위 근사가 성립한다.      </span><span class="se">\n</span><span class="s2">(0·작은 값 구간에서는 원본처럼 동작해 부정확)      </span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="s2">&quot;이 구간에서는 부호·유의성 중심으로 해석하거나 예측값을 expm1로 원 척도에서 비교한다.&quot;</span>
         <span class="p">)</span>
 
     <span class="n">uses_reflect</span> <span class="o">=</span> <span class="p">(</span><span class="n">y_kind</span> <span class="o">==</span> <span class="s2">&quot;reflect&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">bool</span><span class="p">(</span><span class="n">reflect_x</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">uses_reflect</span><span class="p">:</span>
         <span class="n">report</span> <span class="o">+=</span> <span class="p">(</span>
-            <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&gt; ※ **반사 후 log1p**(=ln(1+max-·))로 변환한 변수는 값의 대소가 뒤집혀 있다. &quot;</span>
-            <span class="s2">&quot;위 %·증감은 변수 자체가 아니라 **반사값(1+max-변수)** 기준이므로, &quot;</span>
-            <span class="s2">&quot;원 변수 기준의 방향은 각 문장 끝 괄호에 따로 표시했다(회귀계수 B의 부호를 &quot;</span>
-            <span class="s2">&quot;그대로 원 변수에 적용하면 방향이 반대가 된다). &quot;</span>
-            <span class="s2">&quot;원 척도 값이 필요하면 **max-(exp(변환값)-1)** 로 역변환해 비교한다.&quot;</span>
+            <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&gt; ※ **반사 후 log1p**(=ln(1+max-·))는 값의 대소가 뒤집힌 변환이다. &quot;</span>
+            <span class="s2">&quot;위 %·증감은 **(1+max-변수)** 기준이고,     </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;원 변수 기준 방향은 각 문장 끝 괄호에 적었다.      </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;변수가 **최댓값에 가까운 구간**에서는 위 근사가 부정확하므로 부호·유의성 중심으로 읽고,      </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;원 척도 값은 **max-(exp(변환값)-1)** 로 되돌려 비교한다.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># --- 7) 로버스트 표준오차 사용 시 주의 각주 ---</span>
+    <span class="k">if</span> <span class="n">hc3</span><span class="p">:</span>
+        <span class="n">report</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&gt; ※ 위 **t**와 **유의확률**은 등분산 가정이 충족되지 않은 경우를 대비해 &quot;</span>
+            <span class="s2">&quot;**HC3 로버스트 표준오차**로 계산한 값이다.     </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;회귀계수(B)와 효과 크기 해석은 일반 OLS와 동일하며,     </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;표준오차만 이분산에 강건하게 보정되어 유의성 판정이 달라질 수 있다.&quot;</span>
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">report</span>
@@ -3683,7 +3622,6 @@
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">auto_ols</span><span class="p">(</span>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">y</span><span class="p">,</span>
-    <span class="n">summary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">report</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">log_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">log_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -3748,22 +3686,6 @@
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>summary</code>
-            </td>
-            <td>
-                  <code><span title="bool">bool</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>적합 모델의 statsmodels 요약 통계량 출력 여부 (기본값: False).</p>
-              </div>
-            </td>
-            <td>
-                  <code>False</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
                 <code>report</code>
             </td>
             <td>
@@ -3799,7 +3721,7 @@
                 <code>log_x</code>
             </td>
             <td>
-                  <code><span title="list">list</span> | None</code>
+                  <code><span title="list">list</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3831,7 +3753,7 @@
                 <code>log1p_x</code>
             </td>
             <td>
-                  <code><span title="list">list</span> | None</code>
+                  <code><span title="list">list</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3863,7 +3785,7 @@
                 <code>reflect_x</code>
             </td>
             <td>
-                  <code><span title="list">list</span> | None</code>
+                  <code><span title="list">list</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3947,8 +3869,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>True이면 후진소거법으로 유의하지 않은 독립변수를 제거한 뒤
-최종 모델을 적합한다 (기본값: False).</p>
+                <p>후진소거법으로 유의하지 않은 독립변수를 제거할지 여부 (기본값: False).</p>
               </div>
             </td>
             <td>
@@ -3989,16 +3910,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>적합이 완료된 회귀분석 결과 객체. 등분산 위배 여부를 <code>use_hc3_</code>(bool) 속성으로</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>함께 붙여 반환하므로, 보고 함수의 <code>hc3</code> 인자에 그대로 넘겨 쓸 수 있다.</p>
+                <p>적합이 완료된 회귀분석 결과 객체. 등분산 위배 여부가 <code>use_hc3_</code>(bool) 속성으로 붙는다.</p>
               </div>
             </td>
           </tr>
@@ -4008,7 +3920,27 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_ols.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">716</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">696</span>
+<span class="normal">697</span>
+<span class="normal">698</span>
+<span class="normal">699</span>
+<span class="normal">700</span>
+<span class="normal">701</span>
+<span class="normal">702</span>
+<span class="normal">703</span>
+<span class="normal">704</span>
+<span class="normal">705</span>
+<span class="normal">706</span>
+<span class="normal">707</span>
+<span class="normal">708</span>
+<span class="normal">709</span>
+<span class="normal">710</span>
+<span class="normal">711</span>
+<span class="normal">712</span>
+<span class="normal">713</span>
+<span class="normal">714</span>
+<span class="normal">715</span>
+<span class="normal">716</span>
 <span class="normal">717</span>
 <span class="normal">718</span>
 <span class="normal">719</span>
@@ -4085,36 +4017,7 @@
 <span class="normal">790</span>
 <span class="normal">791</span>
 <span class="normal">792</span>
-<span class="normal">793</span>
-<span class="normal">794</span>
-<span class="normal">795</span>
-<span class="normal">796</span>
-<span class="normal">797</span>
-<span class="normal">798</span>
-<span class="normal">799</span>
-<span class="normal">800</span>
-<span class="normal">801</span>
-<span class="normal">802</span>
-<span class="normal">803</span>
-<span class="normal">804</span>
-<span class="normal">805</span>
-<span class="normal">806</span>
-<span class="normal">807</span>
-<span class="normal">808</span>
-<span class="normal">809</span>
-<span class="normal">810</span>
-<span class="normal">811</span>
-<span class="normal">812</span>
-<span class="normal">813</span>
-<span class="normal">814</span>
-<span class="normal">815</span>
-<span class="normal">816</span>
-<span class="normal">817</span>
-<span class="normal">818</span>
-<span class="normal">819</span>
-<span class="normal">820</span>
-<span class="normal">821</span>
-<span class="normal">822</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">auto_ols</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">summary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="normal">793</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">auto_ols</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
              <span class="n">log_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log1p_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log1p_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="n">reflect_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reflect_x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="n">test</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span>
@@ -4124,43 +4027,36 @@
 <span class="sd">    Args:</span>
 <span class="sd">        data: 독립변수와 종속변수를 모두 포함하는 데이터프레임.</span>
 <span class="sd">        y: 종속변수로 사용할 컬럼명.</span>
-<span class="sd">        summary (bool): 적합 모델의 statsmodels 요약 통계량 출력 여부 (기본값: False).</span>
 <span class="sd">        report (bool): 모형 적합도 보고서(회귀계수표·해설) 출력 여부 (기본값: True).</span>
 <span class="sd">        log_y (bool): 종속변수에 log 변환을 적용했는지 여부 (기본값: False).</span>
-<span class="sd">        log_x (list | None): log 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
+<span class="sd">        log_x (list): log 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
 <span class="sd">        log1p_y (bool): 종속변수에 log1p 변환을 적용했는지 여부 (기본값: False).</span>
-<span class="sd">        log1p_x (list | None): log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
+<span class="sd">        log1p_x (list): log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
 <span class="sd">        reflect_y (bool): 종속변수에 반사 후 log1p 변환을 적용했는지 여부 (기본값: False).</span>
-<span class="sd">        reflect_x (list | None): 반사 후 log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
+<span class="sd">        reflect_x (list): 반사 후 log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).</span>
 <span class="sd">        test (bool): 회귀모형 가정 검정 수행 여부 (기본값: True).</span>
 <span class="sd">        plot (bool): 가정 검정 시 그래프를 함께 그릴지 여부 (기본값: False).</span>
 <span class="sd">        width (int): 그래프 너비 (기본값: 1280).</span>
 <span class="sd">        height (int): 그래프 높이 (기본값: 640).</span>
-<span class="sd">        backward (bool): True이면 후진소거법으로 유의하지 않은 독립변수를 제거한 뒤</span>
-<span class="sd">            최종 모델을 적합한다 (기본값: False).</span>
+<span class="sd">        backward (bool): 후진소거법으로 유의하지 않은 독립변수를 제거할지 여부 (기본값: False).</span>
 <span class="sd">        alpha (float): 후진소거법의 변수 제거 기준 유의수준 (기본값: 0.05).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        적합이 완료된 회귀분석 결과 객체. 등분산 위배 여부를 `use_hc3_`(bool) 속성으로</span>
-<span class="sd">        함께 붙여 반환하므로, 보고 함수의 `hc3` 인자에 그대로 넘겨 쓸 수 있다.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        적합이 완료된 회귀분석 결과 객체. 등분산 위배 여부가 `use_hc3_`(bool) 속성으로 붙는다.</span>
+<span class="sd">    &quot;&quot;&quot;</span> 
+    <span class="c1"># 빈 줄 출력 (출력 결과의 여백을 위함)</span>
+    <span class="nb">print</span><span class="p">()</span>
+
     <span class="c1"># # --- 1) 회귀모델 적합 ---</span>
-    <span class="c1"># fit = fit_model(data, y, summary=summary)</span>
+    <span class="c1"># fit = fit_model(data, y)</span>
 
-    <span class="c1"># # 빈 줄 출력 (출력 결과의 여백을 위함)</span>
-    <span class="c1"># print()</span>
-
-    <span class="c1"># # --- 2) 회귀모형 적합도 보고서 출력 ---</span>
-    <span class="c1"># # 등분산성 가정 확인</span>
+    <span class="c1"># # --- 2) 등분산성 가정 확인 ---</span>
     <span class="c1"># lm_stat, lm_p, f_stat, f_p = het_breuschpagan(fit.resid, fit.model.exog)</span>
     <span class="c1"># # 등분산 충족시 True, 위배시 False (유의수준 0.05 기준)</span>
     <span class="c1"># homoscedasticity = bool(float(f_p) &gt;= 0.05)</span>
 
-    <span class="c1"># 빈 줄 출력 (출력 결과의 여백을 위함)</span>
-    <span class="nb">print</span><span class="p">()</span>
-
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="c1"># --- 1) 회귀모델 적합 (summary는 최종 모델에서만 출력한다) ---</span>
+        <span class="c1"># --- 1) 회귀모델 적합 ---</span>
         <span class="n">fit</span> <span class="o">=</span> <span class="n">fit_model</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
         <span class="c1"># --- 2) 등분산성 가정 확인 ---</span>
@@ -4190,10 +4086,8 @@
     <span class="c1"># 같은 검정을 밖에서 다시 할 필요가 없다</span>
     <span class="n">fit</span><span class="o">.</span><span class="n">use_hc3_</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">homoscedasticity</span>
 
-    <span class="c1"># 최종 모델의 요약 통계량 출력</span>
-    <span class="k">if</span> <span class="n">summary</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">fit</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
 
+    <span class="c1"># --- 3) 모형 적합도 출력 ---</span>
     <span class="k">if</span> <span class="n">report</span><span class="p">:</span>
         <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">&quot;#### ▶︎ 모형 적합도&quot;</span><span class="p">))</span>
         <span class="c1"># 회귀계수 보고 표(hc3는 등분산 충족 아닐 시 True로 설정)</span>
@@ -4202,7 +4096,7 @@
                                         <span class="n">log1p_y</span><span class="o">=</span><span class="n">log1p_y</span><span class="p">,</span> <span class="n">log1p_x</span><span class="o">=</span><span class="n">log1p_x</span><span class="p">,</span>
                                         <span class="n">reflect_y</span><span class="o">=</span><span class="n">reflect_y</span><span class="p">,</span> <span class="n">reflect_x</span><span class="o">=</span><span class="n">reflect_x</span><span class="p">)))</span>
 
-    <span class="c1"># --- 3) 회귀모형 가정 검정 ---</span>
+    <span class="c1"># --- 4) 회귀모형 가정 검정 ---</span>
     <span class="c1"># 보고서와 가정 검정이 모두 출력되는 경우, 구분을 위해 수평선 추가</span>
     <span class="k">if</span> <span class="n">report</span> <span class="ow">and</span> <span class="n">test</span><span class="p">:</span>
         <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">))</span>
@@ -4219,7 +4113,7 @@
         <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="s2">&quot;##### 4) 독립성 검정&quot;</span><span class="p">))</span>
         <span class="n">test_independent</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
 
-    <span class="c1"># --- 4) 최종 적합 모델 객체 반환 ---</span>
+    <span class="c1"># --- 5) 최종 적합 모델 객체 반환 ---</span>
     <span class="k">return</span> <span class="n">fit</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -4251,9 +4145,7 @@
     <div class="doc doc-contents ">
 
         <p>표준화 회귀계수(β)를 가로 막대그래프로 시각화해 독립변수의 영향력 순위를 보여준다.</p>
-<p>β의 절대값 순위는 종속변수에 미치는 영향력의 순위를 의미한다(영향력의 절대적 크기는 아니다).
-막대는 <code>report_variables</code>가 정렬해 둔 |β| 내림차순 그대로 위에서 아래로 배치되며,
-계수의 부호에 따라 색을 달리하고 막대 끝에 β 값을 표기한다.</p>
+<p>|β| 내림차순으로 배치하며, β의 순위는 영향력의 순위일 뿐 절대적 크기는 아니다.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4415,7 +4307,36 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_ols.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">826</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">797</span>
+<span class="normal">798</span>
+<span class="normal">799</span>
+<span class="normal">800</span>
+<span class="normal">801</span>
+<span class="normal">802</span>
+<span class="normal">803</span>
+<span class="normal">804</span>
+<span class="normal">805</span>
+<span class="normal">806</span>
+<span class="normal">807</span>
+<span class="normal">808</span>
+<span class="normal">809</span>
+<span class="normal">810</span>
+<span class="normal">811</span>
+<span class="normal">812</span>
+<span class="normal">813</span>
+<span class="normal">814</span>
+<span class="normal">815</span>
+<span class="normal">816</span>
+<span class="normal">817</span>
+<span class="normal">818</span>
+<span class="normal">819</span>
+<span class="normal">820</span>
+<span class="normal">821</span>
+<span class="normal">822</span>
+<span class="normal">823</span>
+<span class="normal">824</span>
+<span class="normal">825</span>
+<span class="normal">826</span>
 <span class="normal">827</span>
 <span class="normal">828</span>
 <span class="normal">829</span>
@@ -4434,44 +4355,11 @@
 <span class="normal">842</span>
 <span class="normal">843</span>
 <span class="normal">844</span>
-<span class="normal">845</span>
-<span class="normal">846</span>
-<span class="normal">847</span>
-<span class="normal">848</span>
-<span class="normal">849</span>
-<span class="normal">850</span>
-<span class="normal">851</span>
-<span class="normal">852</span>
-<span class="normal">853</span>
-<span class="normal">854</span>
-<span class="normal">855</span>
-<span class="normal">856</span>
-<span class="normal">857</span>
-<span class="normal">858</span>
-<span class="normal">859</span>
-<span class="normal">860</span>
-<span class="normal">861</span>
-<span class="normal">862</span>
-<span class="normal">863</span>
-<span class="normal">864</span>
-<span class="normal">865</span>
-<span class="normal">866</span>
-<span class="normal">867</span>
-<span class="normal">868</span>
-<span class="normal">869</span>
-<span class="normal">870</span>
-<span class="normal">871</span>
-<span class="normal">872</span>
-<span class="normal">873</span>
-<span class="normal">874</span>
-<span class="normal">875</span>
-<span class="normal">876</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">plot_beta</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="normal">845</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">plot_beta</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
               <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;표준화 회귀계수(β)를 가로 막대그래프로 시각화해 독립변수의 영향력 순위를 보여준다.</span>
 
-<span class="sd">    β의 절대값 순위는 종속변수에 미치는 영향력의 순위를 의미한다(영향력의 절대적 크기는 아니다).</span>
-<span class="sd">    막대는 `report_variables`가 정렬해 둔 |β| 내림차순 그대로 위에서 아래로 배치되며,</span>
-<span class="sd">    계수의 부호에 따라 색을 달리하고 막대 끝에 β 값을 표기한다.</span>
+<span class="sd">    |β| 내림차순으로 배치하며, β의 순위는 영향력의 순위일 뿐 절대적 크기는 아니다.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.</span>
@@ -4538,9 +4426,6 @@
     <span class="n">labeling</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">encode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">log_target</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">log_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">reflect_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">outlier</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">vif</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">vif_threshold</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
@@ -4550,20 +4435,13 @@
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
     <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>플래그로 지정한 전처리를 수행한 뒤 회귀모델을 적합한다.</p>
-<p>파라미터의 나열 순서가 곧 처리 순서이며, 강의 분석 흐름도의 단계 순서와 같다.
-결측치는 없다고 전제한다.</p>
-<div class="highlight"><pre><span></span><code>라벨링 -&gt; 더미 인코딩 -&gt; 로그변환 -&gt; 이상치 대체
--&gt; 다중공선성 제거 -&gt; 정규화 -&gt; 모델 적합
-</code></pre></div>
-<p>각 단계는 대상 컬럼을 명시해서 넘긴다(연속형/명목형). 두 목록이 겹치지 않으므로
-더미 인코딩과 로그·이상치·정규화는 서로의 대상을 건드리지 않는다.</p>
+        <p>플래그로 지정한 전처리를 수행한 뒤 회귀모델을 적합한다. 결측치는 없다고 전제한다.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4666,59 +4544,11 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>로그 변환 수행 여부 (기본값: False).</p>
+                <p>로그 변환 수행 여부. 대상은 왜도·첨도로 자동 선정한다 (기본값: False).</p>
               </div>
             </td>
             <td>
                   <code>False</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>log_target</code>
-            </td>
-            <td>
-                  <code><span title="bool">bool</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>로그 변환 대상에 종속변수를 포함할지 여부 (기본값: True).</p>
-              </div>
-            </td>
-            <td>
-                  <code>True</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>log_columns</code>
-            </td>
-            <td>
-                  <code><span title="list">list</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>우측 꼬리(log1p) 변환 대상. None이면 자동 선정 (기본값: None).</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>reflect_columns</code>
-            </td>
-            <td>
-                  <code><span title="list">list</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>좌측 꼬리(반사 후 log1p) 변환 대상 (기본값: None).</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -4878,7 +4708,7 @@
               </div>
             </td>
             <td>
-                  <code>False</code>
+                  <code>True</code>
             </td>
           </tr>
       </tbody>
@@ -4899,55 +4729,13 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>적합이 완료된 회귀분석 결과 객체. 보고에 필요한 정보를 아래 속성으로 함께 붙여</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>반환하므로, 보고 함수에 그대로 넘겨 쓸 수 있다.
-- <code>log1p_y_</code> (bool) / <code>log1p_x_</code> (list): 로그 변환 정보
+                <p>적합이 완료된 회귀분석 결과 객체. 보고에 필요한 정보가 아래 속성으로 함께 붙는다.
+- <code>log_y_</code> (bool) / <code>log_x_</code> (list): 순수 log 변환 정보
+- <code>log1p_y_</code> (bool) / <code>log1p_x_</code> (list): log1p 변환 정보
 - <code>reflect_y_</code> (bool) / <code>reflect_x_</code> (list): 반사 후 로그 변환 정보
-- <code>reflect_y_max_</code> (float | None): 종속변수를 반사할 때 사용한 최댓값 (역변환용)
+- <code>reflect_y_max_</code> (float): 종속변수를 반사할 때 쓴 최댓값 (역변환용)
 - <code>data_</code> (DataFrame): 전처리가 끝난 데이터 (β·VIF 계산용)
-- <code>use_hc3_</code> (bool): 등분산 위배 여부. <code>auto_ols</code>가 붙여 준다</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="KeyError">KeyError</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>종속변수나 <code>nominal_cols</code>의 컬럼이 <code>data</code>에 없는 경우.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="ValueError">ValueError</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>숫자가 아닌 컬럼이나 결측치가 남아 있는 경우,
-또는 <code>save_path</code>의 확장자가 지원 형식이 아닌 경우.</p>
+- <code>use_hc3_</code> (bool): 등분산 위배 여부 (<code>auto_ols</code>가 붙인다)</p>
               </div>
             </td>
           </tr>
@@ -4957,7 +4745,38 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_ols.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 881</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 850</span>
+<span class="normal"> 851</span>
+<span class="normal"> 852</span>
+<span class="normal"> 853</span>
+<span class="normal"> 854</span>
+<span class="normal"> 855</span>
+<span class="normal"> 856</span>
+<span class="normal"> 857</span>
+<span class="normal"> 858</span>
+<span class="normal"> 859</span>
+<span class="normal"> 860</span>
+<span class="normal"> 861</span>
+<span class="normal"> 862</span>
+<span class="normal"> 863</span>
+<span class="normal"> 864</span>
+<span class="normal"> 865</span>
+<span class="normal"> 866</span>
+<span class="normal"> 867</span>
+<span class="normal"> 868</span>
+<span class="normal"> 869</span>
+<span class="normal"> 870</span>
+<span class="normal"> 871</span>
+<span class="normal"> 872</span>
+<span class="normal"> 873</span>
+<span class="normal"> 874</span>
+<span class="normal"> 875</span>
+<span class="normal"> 876</span>
+<span class="normal"> 877</span>
+<span class="normal"> 878</span>
+<span class="normal"> 879</span>
+<span class="normal"> 880</span>
+<span class="normal"> 881</span>
 <span class="normal"> 882</span>
 <span class="normal"> 883</span>
 <span class="normal"> 884</span>
@@ -5196,73 +5015,29 @@
 <span class="normal">1117</span>
 <span class="normal">1118</span>
 <span class="normal">1119</span>
-<span class="normal">1120</span>
-<span class="normal">1121</span>
-<span class="normal">1122</span>
-<span class="normal">1123</span>
-<span class="normal">1124</span>
-<span class="normal">1125</span>
-<span class="normal">1126</span>
-<span class="normal">1127</span>
-<span class="normal">1128</span>
-<span class="normal">1129</span>
-<span class="normal">1130</span>
-<span class="normal">1131</span>
-<span class="normal">1132</span>
-<span class="normal">1133</span>
-<span class="normal">1134</span>
-<span class="normal">1135</span>
-<span class="normal">1136</span>
-<span class="normal">1137</span>
-<span class="normal">1138</span>
-<span class="normal">1139</span>
-<span class="normal">1140</span>
-<span class="normal">1141</span>
-<span class="normal">1142</span>
-<span class="normal">1143</span>
-<span class="normal">1144</span>
-<span class="normal">1145</span>
-<span class="normal">1146</span>
-<span class="normal">1147</span>
-<span class="normal">1148</span>
-<span class="normal">1149</span>
-<span class="normal">1150</span>
-<span class="normal">1151</span>
-<span class="normal">1152</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fit_pipeline</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">nominal_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>
+<span class="normal">1120</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fit_pipeline</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">nominal_cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>
                  <span class="c1"># --- 1) 명목형 라벨링 (문자열 -&gt; 정수) ---</span>
-                 <span class="n">labeling</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">labeling</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>             <span class="c1"># 명목형 라벨링 수행 여부</span>
                  <span class="c1"># --- 2) 더미변수 인코딩 ---</span>
-                 <span class="n">encode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                 <span class="c1"># --- 3) 로그 변환 (우측꼬리 log1p / 좌측꼬리 반사 후 log1p) ---</span>
-                 <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">log_target</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                 <span class="n">log_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">reflect_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">encode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>               <span class="c1"># 더미변수 인코딩 수행 여부</span>
+                 <span class="c1"># --- 3) 로그 변환 (대상은 왜도·첨도로 자동 선정) ---</span>
+                 <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>                 <span class="c1"># 로그 변환 수행 여부</span>
                  <span class="c1"># --- 4) 이상치 대체 (IQR 경계값, 행 삭제 없음) ---</span>
-                 <span class="n">outlier</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">outlier</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>             <span class="c1"># 이상치 대체 수행 여부</span>
                  <span class="c1"># --- 5) 다중공선성 제거 (VIF) ---</span>
-                 <span class="n">vif</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">vif_threshold</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+                 <span class="n">vif</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>                 <span class="c1"># 다중공선성 제거 수행 여부</span>
+                 <span class="n">vif_threshold</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>        <span class="c1"># VIF 임계값</span>
                  <span class="c1"># --- 6) 정규화 ---</span>
-                 <span class="n">scale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">scale_method</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">,</span>
+                 <span class="n">scale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>               <span class="c1"># 정규화 수행 여부</span>
+                 <span class="n">scale_method</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">,</span>   <span class="c1"># 사용할 스케일러 이름 (standard / minmax / robust)</span>
                  <span class="c1"># --- 7) 모델 적합 ---</span>
-                 <span class="n">backward</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                 <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+                 <span class="n">backward</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>             <span class="c1"># 후진소거법 수행 여부</span>
+                 <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>                <span class="c1"># 후진소거법의 변수 제거 기준 유의수준</span>
                  <span class="c1"># --- 기타 ---</span>
-                 <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;플래그로 지정한 전처리를 수행한 뒤 회귀모델을 적합한다.</span>
-
-<span class="sd">    파라미터의 나열 순서가 곧 처리 순서이며, 강의 분석 흐름도의 단계 순서와 같다.</span>
-<span class="sd">    결측치는 없다고 전제한다.</span>
-
-<span class="sd">        라벨링 -&gt; 더미 인코딩 -&gt; 로그변환 -&gt; 이상치 대체</span>
-<span class="sd">        -&gt; 다중공선성 제거 -&gt; 정규화 -&gt; 모델 적합</span>
-
-<span class="sd">    각 단계는 대상 컬럼을 명시해서 넘긴다(연속형/명목형). 두 목록이 겹치지 않으므로</span>
-<span class="sd">    더미 인코딩과 로그·이상치·정규화는 서로의 대상을 건드리지 않는다.</span>
+                 <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                 <span class="c1"># 모델을 구분할 이름. 결과 객체의 `name_` 속성이 된다</span>
+                 <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>            <span class="c1"># 전처리 완료 데이터의 저장 경로 (.xlsx/.xls/.csv)</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>             <span class="c1"># 단계별 전처리 내역 출력 여부</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;플래그로 지정한 전처리를 수행한 뒤 회귀모델을 적합한다. 결측치는 없다고 전제한다.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        data (DataFrame): 독립변수와 종속변수를 모두 포함하는 데이터프레임.</span>
@@ -5270,10 +5045,7 @@
 <span class="sd">        nominal_cols (list): 명목형 컬럼명 리스트. None이면 타입 자동 선택 (기본값: None).</span>
 <span class="sd">        labeling (bool): 명목형 라벨링(문자열 -&gt; 정수) 수행 여부 (기본값: True).</span>
 <span class="sd">        encode (bool): 더미변수 인코딩 수행 여부 (기본값: True).</span>
-<span class="sd">        log (bool): 로그 변환 수행 여부 (기본값: False).</span>
-<span class="sd">        log_target (bool): 로그 변환 대상에 종속변수를 포함할지 여부 (기본값: True).</span>
-<span class="sd">        log_columns (list): 우측 꼬리(log1p) 변환 대상. None이면 자동 선정 (기본값: None).</span>
-<span class="sd">        reflect_columns (list): 좌측 꼬리(반사 후 log1p) 변환 대상 (기본값: None).</span>
+<span class="sd">        log (bool): 로그 변환 수행 여부. 대상은 왜도·첨도로 자동 선정한다 (기본값: False).</span>
 <span class="sd">        outlier (bool): 이상치를 IQR 경계값으로 대체할지 여부 (기본값: False).</span>
 <span class="sd">        vif (bool): 다중공선성 제거 수행 여부 (기본값: False).</span>
 <span class="sd">        vif_threshold (float): VIF 임계값 (기본값: 10.0).</span>
@@ -5286,26 +5058,22 @@
 <span class="sd">        verbose (bool): 단계별 전처리 내역 출력 여부 (기본값: False).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        적합이 완료된 회귀분석 결과 객체. 보고에 필요한 정보를 아래 속성으로 함께 붙여</span>
-<span class="sd">        반환하므로, 보고 함수에 그대로 넘겨 쓸 수 있다.</span>
-<span class="sd">            - `log1p_y_` (bool) / `log1p_x_` (list): 로그 변환 정보</span>
+<span class="sd">        적합이 완료된 회귀분석 결과 객체. 보고에 필요한 정보가 아래 속성으로 함께 붙는다.</span>
+<span class="sd">            - `log_y_` (bool) / `log_x_` (list): 순수 log 변환 정보</span>
+<span class="sd">            - `log1p_y_` (bool) / `log1p_x_` (list): log1p 변환 정보</span>
 <span class="sd">            - `reflect_y_` (bool) / `reflect_x_` (list): 반사 후 로그 변환 정보</span>
-<span class="sd">            - `reflect_y_max_` (float | None): 종속변수를 반사할 때 사용한 최댓값 (역변환용)</span>
+<span class="sd">            - `reflect_y_max_` (float): 종속변수를 반사할 때 쓴 최댓값 (역변환용)</span>
 <span class="sd">            - `data_` (DataFrame): 전처리가 끝난 데이터 (β·VIF 계산용)</span>
-<span class="sd">            - `use_hc3_` (bool): 등분산 위배 여부. `auto_ols`가 붙여 준다</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        KeyError: 종속변수나 `nominal_cols`의 컬럼이 `data`에 없는 경우.</span>
-<span class="sd">        ValueError: 숫자가 아닌 컬럼이나 결측치가 남아 있는 경우,</span>
-<span class="sd">            또는 `save_path`의 확장자가 지원 형식이 아닌 경우.</span>
+<span class="sd">            - `use_hc3_` (bool): 등분산 위배 여부 (`auto_ols`가 붙인다)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># --- 0) 입력 검증 및 컬럼 역할 정리 ---</span>
+    <span class="c1"># --- 1) 종속변수 확인 및 작업본 준비 ---</span>
     <span class="k">if</span> <span class="n">y</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;종속변수 &#39;</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">&#39;가 데이터프레임의 컬럼에 존재하지 않습니다.&quot;</span><span class="p">)</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>    <span class="c1"># 원본을 보존하기 위해 복사본으로 작업</span>
 
-    <span class="c1"># 명목형 컬럼: 지정이 없으면 category/object 타입을 자동으로 선택한다</span>
+    <span class="c1"># --- 2) 명목형 컬럼 확정 ---</span>
+    <span class="c1"># 지정이 없으면 category/object 타입을 자동으로 선택한다</span>
     <span class="k">if</span> <span class="n">nominal_cols</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">nominal_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;object&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -5325,14 +5093,19 @@
 
     <span class="n">nominal_cols</span> <span class="o">=</span> <span class="n">nominals</span>
 
-    <span class="c1"># 연속형 독립변수: 수치형 중에서 종속변수와 명목형을 뺀 나머지</span>
+    <span class="c1"># --- 3) 연속형 독립변수 확정 ---</span>
+    <span class="c1"># 수치형 중에서 종속변수와 명목형을 뺀 나머지.</span>
     <span class="c1"># 로그변환·이상치대체·다중공선성·정규화의 대상이 되며, 단계마다 갱신된다</span>
     <span class="n">continuous</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s1">&#39;number&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="n">y</span> <span class="ow">and</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">nominal_cols</span><span class="p">:</span>
             <span class="n">continuous</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 
-    <span class="c1"># 로그 변환 정보 (반환되는 fit 객체에 붙여 계수 해석에 사용한다)</span>
+    <span class="c1"># --- 4) 변환 정보 초기화 ---</span>
+    <span class="c1"># 로그 변환 정보 (반환되는 fit 객체에 붙여 계수 해석에 사용한다).</span>
+    <span class="c1"># 순수 log 와 log1p 는 % 해석의 기준이 다르므로(전자는 변수, 후자는 1+변수) 따로 관리한다</span>
+    <span class="n">log_y</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">log_x</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">log1p_y</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">log1p_x</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -5342,79 +5115,94 @@
     <span class="n">reflect_x</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">reflect_y_max</span> <span class="o">=</span> <span class="kc">None</span>
 
+    <span class="c1"># --- 5) 대상 요약 출력 ---</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;대상: </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">행 x </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">열 | 종속변수: </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;명목형: </span><span class="si">{</span><span class="n">nominal_cols</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;연속형: </span><span class="si">{</span><span class="n">continuous</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-    <span class="c1"># --- 1) 명목형 라벨링 ---</span>
+    <span class="c1"># --- 6) 명목형 라벨링 ---</span>
     <span class="k">if</span> <span class="n">labeling</span> <span class="ow">and</span> <span class="n">nominal_cols</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">[1] 명목형 라벨링&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">명목형 라벨링&#39;</span><span class="p">)</span>
 
         <span class="n">df</span> <span class="o">=</span> <span class="n">my_prep</span><span class="o">.</span><span class="n">labeling</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">nominal_cols</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
-    <span class="c1"># --- 2) 더미변수 인코딩 ---</span>
+    <span class="c1"># --- 7) 더미변수 인코딩 ---</span>
     <span class="k">if</span> <span class="n">encode</span> <span class="ow">and</span> <span class="n">nominal_cols</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">[2] 더미변수 인코딩&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">더미변수 인코딩&#39;</span><span class="p">)</span>
 
         <span class="n">df</span> <span class="o">=</span> <span class="n">my_prep</span><span class="o">.</span><span class="n">dummies</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">nominal_cols</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
-    <span class="c1"># --- 3) 로그 변환 ---</span>
+    <span class="c1"># --- 8) 로그 변환 ---</span>
     <span class="k">if</span> <span class="n">log</span><span class="p">:</span>
-        <span class="c1"># 종속변수의 포함 여부는 log_target 이 결정한다</span>
-        <span class="n">scope</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">continuous</span><span class="p">)</span>
+        <span class="c1"># 8-1) 변환 후보 추리기</span>
+        <span class="c1"># 연속형 독립변수와 종속변수가 후보다 (실제로 무엇을 변환할지는 통계량이 정한다)</span>
+        <span class="n">scope</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">continuous</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">y</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">log_target</span><span class="p">:</span>
-            <span class="n">scope</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="c1"># 값이 두 종류뿐인 이진 변수(0/1 플래그 등)는 후보에서 뺀다.</span>
+        <span class="c1"># &#39;1% 증가&#39; 라는 해석 자체가 성립하지 않고, 로그를 씌워도 분포가 대칭이 되지 않는다</span>
+        <span class="n">binary_cols</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="c1"># 변환 대상을 지정하지 않았다면 왜도·첨도를 근거로 자동 선정한다</span>
-        <span class="k">if</span> <span class="n">log_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">scope</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">df</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>    <span class="n">binary_cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>                                <span class="n">targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+        <span class="n">scope</span> <span class="o">=</span> <span class="n">targets</span>
+
+        <span class="c1"># 8-2) 왜도·첨도로 변환 대상 자동 선정</span>
+        <span class="c1"># 우측 꼬리는 값의 위치에 따라 log 와 log1p 로 갈리고, 좌측 꼬리는 반사 후 log1p로 구분</span>
+        <span class="n">log_columns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">log1p_columns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">reflect_columns</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">scope</span><span class="p">:</span>
             <span class="n">desc</span> <span class="o">=</span> <span class="n">my_qtcheck</span><span class="o">.</span><span class="n">numerical_summary</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
-            <span class="n">log_columns</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">desc</span><span class="p">[</span><span class="s1">&#39;log_need&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;log1p&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-
-            <span class="k">if</span> <span class="n">reflect_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">reflect_columns</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">desc</span><span class="p">[</span><span class="s1">&#39;log_need&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;reverse_log1p&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="n">reflect_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">reflect_columns</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">log_columns</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">desc</span><span class="p">[</span><span class="s1">&#39;log_need&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">log1p_columns</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">desc</span><span class="p">[</span><span class="s1">&#39;log_need&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;log1p&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">reflect_columns</span> <span class="o">=</span> <span class="n">desc</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">desc</span><span class="p">[</span><span class="s1">&#39;log_need&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;reverse_log1p&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">[3] 로그 변환&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">로그 변환&#39;</span><span class="p">)</span>
 
-        <span class="c1"># 종속변수를 반사하는 경우, 변환 전 최댓값을 남겨 두어야 나중에 원 척도로 되돌릴 수 있다</span>
+            <span class="k">if</span> <span class="n">binary_cols</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;이진 변수는 자동 선정에서 제외: </span><span class="si">{</span><span class="n">binary_cols</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># 8-3) 변환 실행 (종속변수를 반사하면 역변환용 최댓값을 먼저 남겨 둔다)</span>
         <span class="k">if</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">reflect_columns</span><span class="p">:</span>
             <span class="n">reflect_y_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
 
         <span class="n">df</span> <span class="o">=</span> <span class="n">my_prep</span><span class="o">.</span><span class="n">log_transform</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">log_columns</span><span class="o">=</span><span class="n">log_columns</span><span class="p">,</span>
+                                   <span class="n">log1p_columns</span><span class="o">=</span><span class="n">log1p_columns</span><span class="p">,</span>
                                    <span class="n">reflect_columns</span><span class="o">=</span><span class="n">reflect_columns</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
-        <span class="c1"># 반사 변환(reflect)한 컬럼은 대소 관계가 뒤집혀 해석 방식이 다르므로</span>
-        <span class="c1"># log1p 목록과 섞지 않고 reflect 목록으로 따로 넘긴다</span>
-        <span class="n">log1p_y</span> <span class="o">=</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">log_columns</span>
+        <span class="c1"># 8-4) 계수 해석에 쓸 변환 정보 기록</span>
+        <span class="c1"># 세 변환은 % 해석의 기준이 서로 다르므로(변수 / 1+변수 / 1+max-변수) 목록을 섞지 않는다</span>
+        <span class="n">log_y</span> <span class="o">=</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">log_columns</span>
+        <span class="n">log1p_y</span> <span class="o">=</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">log1p_columns</span>
         <span class="n">reflect_y</span> <span class="o">=</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">reflect_columns</span>
 
-        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">log_columns</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="n">y</span><span class="p">:</span>
-                <span class="n">log1p_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">column_list</span><span class="p">,</span> <span class="n">name_list</span> <span class="ow">in</span> <span class="p">((</span><span class="n">log_columns</span><span class="p">,</span> <span class="n">log_x</span><span class="p">),</span>
+                                       <span class="p">(</span><span class="n">log1p_columns</span><span class="p">,</span> <span class="n">log1p_x</span><span class="p">),</span>
+                                       <span class="p">(</span><span class="n">reflect_columns</span><span class="p">,</span> <span class="n">reflect_x</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">column_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="n">y</span><span class="p">:</span>
+                    <span class="n">name_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">reflect_columns</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="n">y</span><span class="p">:</span>
-                <span class="n">reflect_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-
-    <span class="c1"># --- 4) 이상치 대체 ---</span>
+    <span class="c1"># --- 9) 이상치 대체 ---</span>
     <span class="c1"># 연속형 독립변수만 대상으로 한다 (종속변수를 자르면 예측 대상 자체가 왜곡된다)</span>
     <span class="k">if</span> <span class="n">outlier</span> <span class="ow">and</span> <span class="n">continuous</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">[4] 이상치 대체&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">이상치 대체&#39;</span><span class="p">)</span>
 
         <span class="n">df</span> <span class="o">=</span> <span class="n">my_prep</span><span class="o">.</span><span class="n">replace_outlier</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">continuous</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
-    <span class="c1"># --- 5) 다중공선성 제거 ---</span>
+    <span class="c1"># --- 10) 다중공선성 제거 ---</span>
     <span class="k">if</span> <span class="n">vif</span> <span class="ow">and</span> <span class="n">continuous</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">[5] 다중공선성 제거 (VIF &gt;= </span><span class="si">{</span><span class="n">vif_threshold</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">다중공선성 제거 (VIF &gt;= </span><span class="si">{</span><span class="n">vif_threshold</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
 
         <span class="n">df</span> <span class="o">=</span> <span class="n">my_prep</span><span class="o">.</span><span class="n">reduce_vif</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">continuous</span><span class="p">,</span>
                                 <span class="n">threshold</span><span class="o">=</span><span class="n">vif_threshold</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
@@ -5427,38 +5215,35 @@
 
         <span class="n">continuous</span> <span class="o">=</span> <span class="n">survived</span>
 
-    <span class="c1"># --- 6) 정규화 ---</span>
+    <span class="c1"># --- 11) 정규화 ---</span>
     <span class="k">if</span> <span class="n">scale</span> <span class="ow">and</span> <span class="n">continuous</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">[6] 정규화&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">정규화&#39;</span><span class="p">)</span>
 
         <span class="n">df</span> <span class="o">=</span> <span class="n">my_prep</span><span class="o">.</span><span class="n">scaling</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">continuous</span><span class="p">,</span>
                              <span class="n">method</span><span class="o">=</span><span class="n">scale_method</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
-    <span class="c1"># --- 7) 전처리 완료 데이터 저장 (선택) ---</span>
+    <span class="c1"># --- 12) 전처리 완료 데이터 저장 (선택) ---</span>
     <span class="k">if</span> <span class="n">save_path</span><span class="p">:</span>
+        <span class="c1"># 저장 폴더 준비 (경로에 없는 폴더가 있으면 만들어 준다)</span>
         <span class="n">folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">folder</span><span class="p">:</span>
-            <span class="c1"># 경로에 없는 폴더가 있으면 만들어 준다</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+        <span class="c1"># 확장자에 추출</span>
         <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">save_path</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;.xlsx&#39;</span><span class="p">,</span> <span class="s1">&#39;.xls&#39;</span><span class="p">):</span>
-            <span class="n">df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s1">&#39;.csv&#39;</span><span class="p">:</span>
-            <span class="c1"># 엑셀에서 한글이 깨지지 않도록 BOM 을 포함해 저장한다</span>
-            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8-sig&#39;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;지원하지 않는 저장 형식입니다: &#39;</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&#39; &quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;(사용 가능: .xlsx, .xls, .csv)&quot;</span><span class="p">)</span>
+        <span class="c1"># 확장자에 따른 데이터 저장</span>
+        <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;.xlsx&#39;</span><span class="p">,</span> <span class="s1">&#39;.xls&#39;</span><span class="p">):</span>    <span class="n">df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s1">&#39;.csv&#39;</span><span class="p">:</span>             <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8-sig&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>                           <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">(은)는 지원하지 않는 저장 형식입니다&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">전처리 데이터 저장: </span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s1"> &#39;</span>
                   <span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">행 x </span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">열)&#39;</span><span class="p">)</span>
 
-    <span class="c1"># --- 8) 모델 적합 ---</span>
-    <span class="c1"># 숫자로 바뀌지 않은 컬럼이 남아 있으면 OLS 가 알 수 없는 오류를 내므로 먼저 확인한다</span>
+    <span class="c1"># --- 13) 모델 적합 전 데이터에 이상이 없는지 판단 ---</span>
+    <span class="c1"># 13-1) 숫자로 바뀌지 않은 컬럼 확인 (남아 있으면 OLS 가 알 수 없는 오류를 낸다)</span>
     <span class="n">remain</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s1">&#39;number&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
@@ -5466,24 +5251,26 @@
 
     <span class="k">if</span> <span class="n">remain</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;숫자로 변환되지 않은 컬럼이 남아 있습니다: </span><span class="si">{</span><span class="n">remain</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;명목형 컬럼은 모델에 넣기 전에 반드시 변환해야 합니다. &#39;</span>
                          <span class="sa">f</span><span class="s1">&#39;labeling=True 또는 encode=True 로 설정하세요.&#39;</span><span class="p">)</span>
 
-    <span class="c1"># 결측치가 남아 있으면 OLS 가 MissingDataError 를 내므로 원인을 알려주고 중단한다</span>
+    <span class="c1"># 13-2) 결측치 확인 (남아 있으면 OLS 가 MissingDataError 를 낸다)</span>
     <span class="n">na_cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">()]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">na_cols</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;결측치가 있는 컬럼이 있습니다: </span><span class="si">{</span><span class="n">na_cols</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;이 함수는 결측치가 없는 데이터를 전제로 합니다. &#39;</span>
                          <span class="sa">f</span><span class="s1">&#39;데이터 품질 점검 단계에서 먼저 처리하세요.&#39;</span><span class="p">)</span>
 
+    <span class="c1"># --- 14) 모델 적합 ---</span>
     <span class="n">fit</span> <span class="o">=</span> <span class="n">auto_ols</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">backward</span><span class="o">=</span><span class="n">backward</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+                   <span class="n">log_y</span><span class="o">=</span><span class="n">log_y</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="n">log_x</span><span class="p">,</span>
                    <span class="n">log1p_y</span><span class="o">=</span><span class="n">log1p_y</span><span class="p">,</span> <span class="n">log1p_x</span><span class="o">=</span><span class="n">log1p_x</span><span class="p">,</span>
                    <span class="n">reflect_y</span><span class="o">=</span><span class="n">reflect_y</span><span class="p">,</span> <span class="n">reflect_x</span><span class="o">=</span><span class="n">reflect_x</span><span class="p">,</span>
                    <span class="n">report</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="c1"># --- 9) 보고에 필요한 정보를 결과 객체에 붙여 반환 ---</span>
+    <span class="c1"># --- 15) 보고에 필요한 정보를 결과 객체에 붙여 반환 ---</span>
     <span class="c1"># 로그 변환 정보는 report_fitness(), report_variables_text() 에 그대로 넘겨 쓴다</span>
+    <span class="n">fit</span><span class="o">.</span><span class="n">log_y_</span> <span class="o">=</span> <span class="n">log_y</span>
+    <span class="n">fit</span><span class="o">.</span><span class="n">log_x_</span> <span class="o">=</span> <span class="n">log_x</span>
     <span class="n">fit</span><span class="o">.</span><span class="n">log1p_y_</span> <span class="o">=</span> <span class="n">log1p_y</span>
     <span class="n">fit</span><span class="o">.</span><span class="n">log1p_x_</span> <span class="o">=</span> <span class="n">log1p_x</span>
 
@@ -5492,8 +5279,7 @@
     <span class="n">fit</span><span class="o">.</span><span class="n">reflect_x_</span> <span class="o">=</span> <span class="n">reflect_x</span>
     <span class="n">fit</span><span class="o">.</span><span class="n">reflect_y_max_</span> <span class="o">=</span> <span class="n">reflect_y_max</span>
 
-    <span class="c1"># 전처리가 끝난 데이터. report_variables(), plot_beta() 가 β·VIF 계산에 쓴다.</span>
-    <span class="c1"># 원본 데이터를 넘기면 척도가 달라 값이 조용히 틀리므로 이 데이터를 써야 한다</span>
+    <span class="c1"># 전처리가 끝난 데이터. report_variables(), plot_beta() 가 β·VIF 계산에 사용해야 한다.</span>
     <span class="n">fit</span><span class="o">.</span><span class="n">data_</span> <span class="o">=</span> <span class="n">df</span>
 
     <span class="c1"># 모델을 구분할 이름 (compare_models 가 딕셔너리 키로 채워 주기도 한다)</span>
@@ -5527,12 +5313,8 @@
     <div class="doc doc-contents ">
 
         <p>여러 회귀모델의 성능지표를 한 표로 정리해 성능이 좋은 순으로 정렬하고, 최고 모델을 반환한다.</p>
-<p>주 지표 1위와의 격차가 tolerance 이내인 모델들은 '근소 격차 그룹'으로 묶어
-그룹 안에서는 보조 지표로 순서를 정한다. 주 지표가 사실상 비슷하다면 더 간명한
-모델을 택한다는 뜻이다. 지표마다 좋은 방향이 다르므로(RMSE 는 작을수록,
-R² 는 클수록) 정렬 방향은 지표에 따라 자동으로 결정된다.</p>
-<p>종속변수에 log1p 나 반사 후 log1p 를 적용한 모델은 예측값을 원본 척도로 되돌려
-RMSE·MAE·R²(원본척도)를 계산하므로 모델 간 비교가 가능하다.</p>
+<p>주 지표 1위와의 격차가 tolerance 이내면 '근소 격차 그룹'으로 묶어 보조 지표로 순서를 정한다.
+종속변수를 log1p·반사 변환한 모델은 예측값을 원본 척도로 되돌려 RMSE·MAE·R²를 계산한다.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5706,7 +5488,39 @@ RMSE·MAE·R²(원본척도)를 계산하므로 모델 간 비교가 가능하�
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_ols.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1159</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1127</span>
+<span class="normal">1128</span>
+<span class="normal">1129</span>
+<span class="normal">1130</span>
+<span class="normal">1131</span>
+<span class="normal">1132</span>
+<span class="normal">1133</span>
+<span class="normal">1134</span>
+<span class="normal">1135</span>
+<span class="normal">1136</span>
+<span class="normal">1137</span>
+<span class="normal">1138</span>
+<span class="normal">1139</span>
+<span class="normal">1140</span>
+<span class="normal">1141</span>
+<span class="normal">1142</span>
+<span class="normal">1143</span>
+<span class="normal">1144</span>
+<span class="normal">1145</span>
+<span class="normal">1146</span>
+<span class="normal">1147</span>
+<span class="normal">1148</span>
+<span class="normal">1149</span>
+<span class="normal">1150</span>
+<span class="normal">1151</span>
+<span class="normal">1152</span>
+<span class="normal">1153</span>
+<span class="normal">1154</span>
+<span class="normal">1155</span>
+<span class="normal">1156</span>
+<span class="normal">1157</span>
+<span class="normal">1158</span>
+<span class="normal">1159</span>
 <span class="normal">1160</span>
 <span class="normal">1161</span>
 <span class="normal">1162</span>
@@ -5843,52 +5657,12 @@ RMSE·MAE·R²(원본척도)를 계산하므로 모델 간 비교가 가능하�
 <span class="normal">1293</span>
 <span class="normal">1294</span>
 <span class="normal">1295</span>
-<span class="normal">1296</span>
-<span class="normal">1297</span>
-<span class="normal">1298</span>
-<span class="normal">1299</span>
-<span class="normal">1300</span>
-<span class="normal">1301</span>
-<span class="normal">1302</span>
-<span class="normal">1303</span>
-<span class="normal">1304</span>
-<span class="normal">1305</span>
-<span class="normal">1306</span>
-<span class="normal">1307</span>
-<span class="normal">1308</span>
-<span class="normal">1309</span>
-<span class="normal">1310</span>
-<span class="normal">1311</span>
-<span class="normal">1312</span>
-<span class="normal">1313</span>
-<span class="normal">1314</span>
-<span class="normal">1315</span>
-<span class="normal">1316</span>
-<span class="normal">1317</span>
-<span class="normal">1318</span>
-<span class="normal">1319</span>
-<span class="normal">1320</span>
-<span class="normal">1321</span>
-<span class="normal">1322</span>
-<span class="normal">1323</span>
-<span class="normal">1324</span>
-<span class="normal">1325</span>
-<span class="normal">1326</span>
-<span class="normal">1327</span>
-<span class="normal">1328</span>
-<span class="normal">1329</span>
-<span class="normal">1330</span>
-<span class="normal">1331</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compare_models</span><span class="p">(</span><span class="n">fits</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;RMSE&#39;</span><span class="p">,</span> <span class="n">sub_metric</span><span class="o">=</span><span class="s1">&#39;변수수&#39;</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+<span class="normal">1296</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compare_models</span><span class="p">(</span><span class="n">fits</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;RMSE&#39;</span><span class="p">,</span> <span class="n">sub_metric</span><span class="o">=</span><span class="s1">&#39;변수수&#39;</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
                    <span class="n">digits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;여러 회귀모델의 성능지표를 한 표로 정리해 성능이 좋은 순으로 정렬하고, 최고 모델을 반환한다.</span>
 
-<span class="sd">    주 지표 1위와의 격차가 tolerance 이내인 모델들은 &#39;근소 격차 그룹&#39;으로 묶어</span>
-<span class="sd">    그룹 안에서는 보조 지표로 순서를 정한다. 주 지표가 사실상 비슷하다면 더 간명한</span>
-<span class="sd">    모델을 택한다는 뜻이다. 지표마다 좋은 방향이 다르므로(RMSE 는 작을수록,</span>
-<span class="sd">    R² 는 클수록) 정렬 방향은 지표에 따라 자동으로 결정된다.</span>
-
-<span class="sd">    종속변수에 log1p 나 반사 후 log1p 를 적용한 모델은 예측값을 원본 척도로 되돌려</span>
-<span class="sd">    RMSE·MAE·R²(원본척도)를 계산하므로 모델 간 비교가 가능하다.</span>
+<span class="sd">    주 지표 1위와의 격차가 tolerance 이내면 &#39;근소 격차 그룹&#39;으로 묶어 보조 지표로 순서를 정한다.</span>
+<span class="sd">    종속변수를 log1p·반사 변환한 모델은 예측값을 원본 척도로 되돌려 RMSE·MAE·R²를 계산한다.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fits (dict): {모델이름: 적합된 회귀분석 결과 객체} 형태의 딕셔너리.</span>
@@ -5950,29 +5724,31 @@ RMSE·MAE·R²(원본척도)를 계산하므로 모델 간 비교가 가능하�
 
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">fit</span> <span class="ow">in</span> <span class="n">fits</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="c1"># fit_pipeline() 이 붙여 둔 로그 변환 정보. 없으면 변환하지 않은 것으로 본다</span>
-        <span class="n">log_y</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="s1">&#39;log1p_y_&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">plain_log_y</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="s1">&#39;log_y_&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>     <span class="c1"># 순수 log</span>
+        <span class="n">log1p_y</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="s1">&#39;log1p_y_&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>       <span class="c1"># log1p</span>
         <span class="c1"># 종속변수를 반사 변환(좌측 꼬리)한 경우와 그때 사용한 최댓값</span>
         <span class="n">reflect_y</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="s1">&#39;reflect_y_&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="n">reflect_max</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="s1">&#39;reflect_y_max_&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="c1"># 종속변수의 척도가 바뀐 모델인지 기록 (log1p 든 반사든 원 척도가 아니다)</span>
-        <span class="n">log_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">log_y</span> <span class="ow">or</span> <span class="n">reflect_y</span><span class="p">))</span>
+        <span class="c1"># 종속변수의 척도가 바뀐 모델인지 기록 (셋 중 무엇이든 원 척도가 아니다)</span>
+        <span class="n">log_flags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">plain_log_y</span> <span class="ow">or</span> <span class="n">log1p_y</span> <span class="ow">or</span> <span class="n">reflect_y</span><span class="p">))</span>
 
         <span class="c1"># 실제값과 예측값을 원본 척도로 되돌린다.</span>
         <span class="c1"># 이렇게 해야 로그 변환 여부가 다른 모델끼리도 오차를 비교할 수 있다</span>
         <span class="n">y_true</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span>
         <span class="n">y_pred</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">fittedvalues</span>
 
-        <span class="k">if</span> <span class="n">log_y</span><span class="p">:</span>
-            <span class="n">y_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expm1</span><span class="p">(</span><span class="n">y_true</span><span class="p">)</span>
-            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expm1</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">reflect_y</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">reflect_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="c1"># 최댓값을 모르면 되돌릴 수 없으므로, 조용히 틀린 값을 내지 않고 알린다</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; 은 종속변수를 반사 변환했지만 역변환에 필요한 최댓값&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;(reflect_y_max_)이 없어 원 척도로 되돌릴 수 없습니다.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">reflect_y</span> <span class="ow">and</span> <span class="n">reflect_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># 최댓값을 모르면 되돌릴 수 없으므로, 조용히 틀린 값을 내지 않고 알린다</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; 은 종속변수를 반사 변환했지만 역변환에 필요한 &quot;</span>
+                             <span class="sa">f</span><span class="s1">&#39;최댓값(reflect_y_max_)이 없습니다.&#39;</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">plain_log_y</span><span class="p">:</span>
+            <span class="c1"># log(y) 의 역변환: exp(y)</span>
+            <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">y_true</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">log1p_y</span><span class="p">:</span>
+            <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expm1</span><span class="p">(</span><span class="n">y_true</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">expm1</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">reflect_y</span><span class="p">:</span>
             <span class="c1"># 반사 변환의 역변환: max - (exp(y)-1)</span>
             <span class="n">y_true</span> <span class="o">=</span> <span class="n">reflect_max</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">expm1</span><span class="p">(</span><span class="n">y_true</span><span class="p">)</span>
             <span class="n">y_pred</span> <span class="o">=</span> <span class="n">reflect_max</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">expm1</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span>
@@ -6153,7 +5929,42 @@ RMSE·MAE·R²(원본척도)를 계산하므로 모델 간 비교가 가능하�
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_ols.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1337</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1302</span>
+<span class="normal">1303</span>
+<span class="normal">1304</span>
+<span class="normal">1305</span>
+<span class="normal">1306</span>
+<span class="normal">1307</span>
+<span class="normal">1308</span>
+<span class="normal">1309</span>
+<span class="normal">1310</span>
+<span class="normal">1311</span>
+<span class="normal">1312</span>
+<span class="normal">1313</span>
+<span class="normal">1314</span>
+<span class="normal">1315</span>
+<span class="normal">1316</span>
+<span class="normal">1317</span>
+<span class="normal">1318</span>
+<span class="normal">1319</span>
+<span class="normal">1320</span>
+<span class="normal">1321</span>
+<span class="normal">1322</span>
+<span class="normal">1323</span>
+<span class="normal">1324</span>
+<span class="normal">1325</span>
+<span class="normal">1326</span>
+<span class="normal">1327</span>
+<span class="normal">1328</span>
+<span class="normal">1329</span>
+<span class="normal">1330</span>
+<span class="normal">1331</span>
+<span class="normal">1332</span>
+<span class="normal">1333</span>
+<span class="normal">1334</span>
+<span class="normal">1335</span>
+<span class="normal">1336</span>
+<span class="normal">1337</span>
 <span class="normal">1338</span>
 <span class="normal">1339</span>
 <span class="normal">1340</span>
@@ -6206,38 +6017,7 @@ RMSE·MAE·R²(원본척도)를 계산하므로 모델 간 비교가 가능하�
 <span class="normal">1387</span>
 <span class="normal">1388</span>
 <span class="normal">1389</span>
-<span class="normal">1390</span>
-<span class="normal">1391</span>
-<span class="normal">1392</span>
-<span class="normal">1393</span>
-<span class="normal">1394</span>
-<span class="normal">1395</span>
-<span class="normal">1396</span>
-<span class="normal">1397</span>
-<span class="normal">1398</span>
-<span class="normal">1399</span>
-<span class="normal">1400</span>
-<span class="normal">1401</span>
-<span class="normal">1402</span>
-<span class="normal">1403</span>
-<span class="normal">1404</span>
-<span class="normal">1405</span>
-<span class="normal">1406</span>
-<span class="normal">1407</span>
-<span class="normal">1408</span>
-<span class="normal">1409</span>
-<span class="normal">1410</span>
-<span class="normal">1411</span>
-<span class="normal">1412</span>
-<span class="normal">1413</span>
-<span class="normal">1414</span>
-<span class="normal">1415</span>
-<span class="normal">1416</span>
-<span class="normal">1417</span>
-<span class="normal">1418</span>
-<span class="normal">1419</span>
-<span class="normal">1420</span>
-<span class="normal">1421</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_model</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="normal">1390</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">report_model</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;적합된 회귀모델의 성능 보고와 가정 검정을 한 번에 출력한다.</span>
 
 <span class="sd">    `fit_pipeline`·`auto_ols` 가 결과 객체에 붙여 둔 정보(`log1p_y_`·`log1p_x_`·</span>
@@ -6275,7 +6055,9 @@ RMSE·MAE·R²(원본척도)를 계산하므로 모델 간 비교가 가능하�
     <span class="n">log1p_x</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">log1p_x_</span>
     <span class="n">hc3</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">use_hc3_</span>
 
-    <span class="c1"># 반사(좌측 꼬리) 변환 정보. 이 속성이 없는 예전 결과 객체도 그대로 동작하도록 기본값을 둔다</span>
+    <span class="c1"># 순수 log 와 반사 변환 정보. 이 속성이 없는 예전 결과 객체도 그대로 동작하도록 기본값을 둔다</span>
+    <span class="n">log_y</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="s1">&#39;log_y_&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">log_x</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="s1">&#39;log_x_&#39;</span><span class="p">,</span> <span class="p">[])</span>
     <span class="n">reflect_y</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="s1">&#39;reflect_y_&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="n">reflect_x</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="s1">&#39;reflect_x_&#39;</span><span class="p">,</span> <span class="p">[])</span>
 
@@ -6292,7 +6074,8 @@ RMSE·MAE·R²(원본척도)를 계산하므로 모델 간 비교가 가능하�
     <span class="n">heading</span><span class="p">(</span><span class="s2">&quot;### ▶︎ 성능 보고&quot;</span><span class="p">)</span>
 
     <span class="n">heading</span><span class="p">(</span><span class="s2">&quot;#### 1) 모형 적합도&quot;</span><span class="p">)</span>
-    <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">report_fitness</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">log1p_y</span><span class="o">=</span><span class="n">log1p_y</span><span class="p">,</span> <span class="n">log1p_x</span><span class="o">=</span><span class="n">log1p_x</span><span class="p">,</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">report_fitness</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">log_y</span><span class="o">=</span><span class="n">log_y</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="n">log_x</span><span class="p">,</span>
+                                    <span class="n">log1p_y</span><span class="o">=</span><span class="n">log1p_y</span><span class="p">,</span> <span class="n">log1p_x</span><span class="o">=</span><span class="n">log1p_x</span><span class="p">,</span>
                                     <span class="n">reflect_y</span><span class="o">=</span><span class="n">reflect_y</span><span class="p">,</span> <span class="n">reflect_x</span><span class="o">=</span><span class="n">reflect_x</span><span class="p">)))</span>
 
     <span class="n">heading</span><span class="p">(</span><span class="s2">&quot;#### 2) 회귀계수 보고표&quot;</span><span class="p">)</span>
@@ -6302,7 +6085,8 @@ RMSE·MAE·R²(원본척도)를 계산하므로 모델 간 비교가 가능하�
     <span class="n">plot_beta</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;최종 모델의 표준화 회귀계수(β) — 영향력 순위&quot;</span><span class="p">)</span>
 
     <span class="n">heading</span><span class="p">(</span><span class="s2">&quot;#### 4) 회귀계수 해석 문장&quot;</span><span class="p">)</span>
-    <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">report_variables_text</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">log1p_y</span><span class="o">=</span><span class="n">log1p_y</span><span class="p">,</span> <span class="n">log1p_x</span><span class="o">=</span><span class="n">log1p_x</span><span class="p">,</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="n">report_variables_text</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">log_y</span><span class="o">=</span><span class="n">log_y</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="n">log_x</span><span class="p">,</span>
+                                           <span class="n">log1p_y</span><span class="o">=</span><span class="n">log1p_y</span><span class="p">,</span> <span class="n">log1p_x</span><span class="o">=</span><span class="n">log1p_x</span><span class="p">,</span>
                                            <span class="n">reflect_y</span><span class="o">=</span><span class="n">reflect_y</span><span class="p">,</span> <span class="n">reflect_x</span><span class="o">=</span><span class="n">reflect_x</span><span class="p">,</span> <span class="n">hc3</span><span class="o">=</span><span class="n">hc3</span><span class="p">)))</span>
 
     <span class="c1"># --- 2) 성능 보고와 가정 검정 사이 구분선 ---</span>

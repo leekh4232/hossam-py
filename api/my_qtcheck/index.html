@@ -2098,7 +2098,11 @@
 <span class="normal">274</span>
 <span class="normal">275</span>
 <span class="normal">276</span>
-<span class="normal">277</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">numerical_summary</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">numerical_summary</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    데이터프레임의 숫자형 컬럼에 대한 요약 통계를 반환하는 함수</span>
 
@@ -2197,11 +2201,14 @@
     <span class="c1">#-----------------------------------------------------</span>
     <span class="c1"># 10) 로그 변환 필요성 판단 함수 정의 (inner function)</span>
     <span class="c1">#-----------------------------------------------------</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">judge_log_transform</span><span class="p">(</span><span class="n">skew</span><span class="p">,</span> <span class="n">kurt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">judge_log_transform</span><span class="p">(</span><span class="n">skew</span><span class="p">,</span> <span class="n">kurt</span><span class="p">,</span> <span class="n">min_value</span><span class="p">,</span> <span class="n">median</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">skew</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>                        <span class="c1"># 강한 우측 꼬리 분포</span>
-            <span class="k">return</span> <span class="s2">&quot;log1p&quot;</span>
+            <span class="c1"># 0이 없고 값이 작은 쪽에 몰려 있다면 순수 log 를 써야 한다.</span>
+            <span class="k">if</span> <span class="n">min_value</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">median</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>    <span class="k">return</span> <span class="s2">&quot;log&quot;</span>
+            <span class="k">else</span><span class="p">:</span>                               <span class="k">return</span> <span class="s2">&quot;log1p&quot;</span>
         <span class="k">elif</span> <span class="n">skew</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="ow">and</span> <span class="n">kurt</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>       <span class="c1"># 우측 꼬리 분포이면서 첨도가 높은 경우</span>
-            <span class="k">return</span> <span class="s2">&quot;log1p&quot;</span>
+            <span class="k">if</span> <span class="n">min_value</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">median</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>    <span class="k">return</span> <span class="s2">&quot;log&quot;</span>
+            <span class="k">else</span><span class="p">:</span>                               <span class="k">return</span> <span class="s2">&quot;log1p&quot;</span>
         <span class="k">elif</span> <span class="n">skew</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>                    <span class="c1"># 강한 좌측 꼬리 분포</span>
             <span class="k">return</span> <span class="s2">&quot;reverse_log1p&quot;</span>
         <span class="k">elif</span> <span class="n">skew</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.5</span> <span class="ow">and</span> <span class="n">kurt</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>      <span class="c1"># 좌측 꼬리 분포이면서 첨도가 높은 경우</span>
@@ -2212,7 +2219,8 @@
     <span class="c1">#-----------------------------------------------------</span>
     <span class="c1"># 11) 로그 변환 필요성 판정</span>
     <span class="c1">#-----------------------------------------------------</span>
-    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;log_need&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">judge_log_transform</span><span class="p">(</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;skew&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;kurt&#39;</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">desc_df</span><span class="p">[</span><span class="s1">&#39;log_need&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">judge_log_transform</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;skew&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;kurt&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;50%&#39;</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="c1">#-----------------------------------------------------</span>
     <span class="c1"># 12) 기술 통계량 표 저장</span>
