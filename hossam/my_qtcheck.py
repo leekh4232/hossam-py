@@ -247,11 +247,14 @@ def numerical_summary(data, columns=None, save_path=None):
     #-----------------------------------------------------
     # 10) 로그 변환 필요성 판단 함수 정의 (inner function)
     #-----------------------------------------------------
-    def judge_log_transform(skew, kurt):
+    def judge_log_transform(skew, kurt, min_value, median):
         if skew >= 1:                        # 강한 우측 꼬리 분포
-            return "log1p"
+            # 0이 없고 값이 작은 쪽에 몰려 있다면 순수 log 를 써야 한다.
+            if min_value > 0 and median < 1:    return "log"
+            else:                               return "log1p"
         elif skew > 0.5 and kurt > 0:       # 우측 꼬리 분포이면서 첨도가 높은 경우
-            return "log1p"
+            if min_value > 0 and median < 1:    return "log"
+            else:                               return "log1p"
         elif skew <= -1:                    # 강한 좌측 꼬리 분포
             return "reverse_log1p"
         elif skew < -0.5 and kurt > 0:      # 좌측 꼬리 분포이면서 첨도가 높은 경우
@@ -262,7 +265,8 @@ def numerical_summary(data, columns=None, save_path=None):
     #-----------------------------------------------------
     # 11) 로그 변환 필요성 판정
     #-----------------------------------------------------
-    desc_df['log_need'] = desc_df.apply(lambda row: judge_log_transform( row['skew'], row['kurt']), axis=1)
+    desc_df['log_need'] = desc_df.apply(
+        lambda row: judge_log_transform(row['skew'], row['kurt'], row['min'], row['50%']), axis=1)
 
     #-----------------------------------------------------
     # 12) 기술 통계량 표 저장
