@@ -594,6 +594,7 @@ def report_variables_text(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=N
     # --- 5) 독립변수별 해석 문장 생성 ---
     lines = []   # 독립변수별 문장(불릿)을 저장할 빈 리스트
     for x in xnames:
+        # 5-1) 계수와 검정 통계량 추출
         x_kind = kind_of(x)             # none / log / log1p / reflect
         x_pct = x_kind != "none"        # 반사도 로그 척도이므로 % 해석 대상이다
         B = fit.params[x]               # 비표준화 회귀계수(B, 로버스트 여부와 무관하게 동일)
@@ -607,6 +608,7 @@ def report_variables_text(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=N
             t = fit.tvalues[x]          # 일반 OLS t-통계량
             p = fit.pvalues[x]          # 일반 OLS 계수 유의확률
 
+        # 5-2) 유의성·방향 판정
         # 유의성 판정 (유의수준 0.05 기준)
         if p < 0.05:    sig_word = "유의한"
         else:           sig_word = "유의하지 않은"
@@ -620,6 +622,7 @@ def report_variables_text(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=N
         if B > 0:       direction = "증가"
         else:           direction = "감소"
 
+        # 5-3) 변화 표현과 원 변수 기준 방향
         # 변환 종류별 독립변수 변화 표현 (% 해석의 기준이 되는 값이 무엇인지가 핵심이다)
         x_change = {
             "reflect": f"**(1+max-{x})가 1% 증가**할 때",
@@ -639,6 +642,7 @@ def report_variables_text(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=N
 
             note = note_template.format(x=x, y=yname, orig_direction=orig_direction)
 
+        # 5-4) 효과 크기 계산
         # 효과 크기: x·y가 각각 비율(%) 기준인지에 따라 값·단위가 정해진다
         if not x_pct and not y_pct:      # 원본 → 절대량 그대로
             mag, unit, approx = f"{abs(B):.2f}", "", ""
@@ -695,8 +699,8 @@ def report_variables_text(fit, log_y=False, log_x=None, log1p_y=False, log1p_x=N
 
 def auto_ols(data, y, report=True,
              log_y=False, log_x=None, log1p_y=False, log1p_x=None,
-             reflect_y=False, reflect_x=None,
-             test=True, plot=False, width=1280, height=640,
+             reflect_y=False, reflect_x=None, test=True, 
+             plot=False, width=1280, height=640,
              backward=False, alpha=0.05):
     """회귀모델 적합부터 보고서 출력·가정 검정까지 한 번에 수행한다.
 

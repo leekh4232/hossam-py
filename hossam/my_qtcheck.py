@@ -149,8 +149,7 @@ def categorical_summary(data, columns=None, value_counts=True, save_path=None):
     return desc_df
 
 def numerical_summary(data, columns=None, save_path=None):
-    """
-    데이터프레임의 숫자형 컬럼에 대한 요약 통계를 반환하는 함수
+    """데이터프레임의 숫자형 컬럼에 대한 요약 통계를 반환하는 함수
 
     Args:
         data (DataFrame): 숫자형 컬럼의 요약 통계를 출력할 데이터프레임
@@ -247,26 +246,23 @@ def numerical_summary(data, columns=None, save_path=None):
     #-----------------------------------------------------
     # 10) 로그 변환 필요성 판단 함수 정의 (inner function)
     #-----------------------------------------------------
-    def judge_log_transform(skew, kurt, min_value, median):
-        if skew >= 1:                        # 강한 우측 꼬리 분포
-            # 0이 없고 값이 작은 쪽에 몰려 있다면 순수 log 를 써야 한다.
-            if min_value > 0 and median < 1:    return "log"
-            else:                               return "log1p"
-        elif skew > 0.5 and kurt > 0:       # 우측 꼬리 분포이면서 첨도가 높은 경우
-            if min_value > 0 and median < 1:    return "log"
-            else:                               return "log1p"
-        elif skew <= -1:                    # 강한 좌측 꼬리 분포
-            return "reverse_log1p"
-        elif skew < -0.5 and kurt > 0:      # 좌측 꼬리 분포이면서 첨도가 높은 경우
-            return "reverse_log1p"
-        else:                               # 대칭 분포
-            return "none"
+    def judge_log_transform(skew, kurt, min_value):
+        right = skew >= 1 or (skew > 0.5 and kurt > 0)    # 우측 꼬리
+        left = skew <= -1 or (skew < -0.5 and kurt > 0)   # 좌측 꼬리
+
+        if right:
+            if min_value > 0:   return "log"        # 0이 없으면 순수 log 가 정의된다
+            if min_value == 0:  return "log1p"      # 0을 피하려고 +1 한다
+            return "none"                           # 음수가 섞이면 로그 계열을 쓸 수 없다
+        if left:
+            return "reverse_log1p"                  # max-x >= 0 이라 항상 안전하다
+        return "none"
 
     #-----------------------------------------------------
     # 11) 로그 변환 필요성 판정
     #-----------------------------------------------------
     desc_df['log_need'] = desc_df.apply(
-        lambda row: judge_log_transform(row['skew'], row['kurt'], row['min'], row['50%']), axis=1)
+        lambda row: judge_log_transform(row['skew'], row['kurt'], row['min']), axis=1)
 
     #-----------------------------------------------------
     # 12) 기술 통계량 표 저장

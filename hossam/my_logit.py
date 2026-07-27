@@ -131,23 +131,44 @@ def plot_sigmoid(fit, data, x, threshold=0.5, palette=None, title=None,
     my_plot.show(save_path=save_path)
 
 
-
-def report_fitness(fit):
+def report_fitness(fit, log_x=None, log1p_x=None, reflect_x=None):
     """적합된 로지스틱 모델의 모형 적합도(model fit) 보고 문장을 생성해 반환한다.
 
     summary() 결과표의 문자열을 파싱하지 않고, `fit` 객체가 이미 갖고 있는 속성에서
     지표를 직접 읽어와 문장을 구성한다.
+    로그변환한 독립변수는 log(...)/log1p(...)/log1p(max-...)로 표기해 실제 적합한 모형을 그대로 드러낸다.
+
+    ※ 로지스틱 회귀의 종속변수는 0/1 이분형이므로 변환 대상이 아니다.
+      따라서 my_ols의 동명 함수와 달리 log_y·log1p_y·reflect_y 인수를 받지 않는다.
 
     Args:
         fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+        log_x (list): log 변환을 적용한 독립변수 이름 리스트 (기본값: None).
+        log1p_x (list): log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).
+        reflect_x (list): 반사 후 log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).
 
     Returns:
         str: 모형 적합도 보고 문장. `IPython.display.Markdown`으로 감싸 출력하면 좋다.
     """
     # --- 1) 변수 라벨 구성 (상수항 제외) ---
+    # log_x, log1p_x, reflect_x는 정확한 독립변수 이름 리스트로 전달된다고 가정한다.
+    log_x = log_x or []
+    log1p_x = log1p_x or []
+    reflect_x = reflect_x or []
+
     yname = fit.model.endog_names
     xnames = [name for name in fit.model.exog_names if name != "const"]
-    xlabel = ", ".join(xnames)
+
+    # 변환이 적용된 변수는 문장에 log(...)/log1p(...)로 표기한다.
+    # 반사 변환은 log1p 와 식이 다르므로(대소가 뒤집힌다) 라벨도 구분해 적는다.
+    xlabels = []   # 독립변수별 표기 라벨
+    for x in xnames:
+        if x in reflect_x:  xlabels.append(f"log1p(max-{x})")
+        elif x in log1p_x:  xlabels.append(f"log1p({x})")
+        elif x in log_x:    xlabels.append(f"log({x})")
+        else:               xlabels.append(x)
+
+    xlabel = ", ".join(xlabels)
 
     # --- 2) 유의확률 구간 표기 변환 ---
     p = fit.llr_pvalue
@@ -265,36 +286,64 @@ def report_variables(fit, data):
     return vdf
 
 
-def report_variables_text(fit, data=None, alpha=0.05):
+def report_variables_text(fit, data=None, alpha=0.05,
+                          log_x=None, log1p_x=None, reflect_x=None):
     """독립변수별 오즈비 해석 문장을 markdown 불릿 리스트로 생성해 반환한다.
 
     각 독립변수에 대해 계수(B)·오즈비(OR)·z·유의확률을 문장으로 풀어 쓰고,
     오즈비를 백분율 변화로 환산하여 "오즈가 약 몇 % 증가/감소" 형태로 해석한다.
     `data`가 주어지면 이분형(더미) 변수와 연속형 변수를 구분해 해석 표현을 달리한다.
 
+    로그변환한 변수는 '1 증가'가 원래 단위의 1이 아니므로(예: log(Age)가 1 증가 = 나이가 약 2.72배)
+    "1% 증가할 때"를 기준으로 해석을 바꾼다. 이때의 오즈비는 exp(B) 가 아니라 **1.01^B** 이다.
+    반사 변환(log1p(max-x))은 % 해석의 기준이 반사값 (1+max-x)이고 대소가 뒤집히므로,
+    원 변수 기준의 방향을 문장 끝에 따로 덧붙인다.
+
+    ※ 로지스틱 회귀의 종속변수는 0/1 이분형이므로 변환 대상이 아니다.
+      따라서 my_ols의 동명 함수와 달리 log_y·log1p_y·reflect_y 인수를 받지 않는다.
+
     Args:
         fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
         data: 원본 데이터프레임 (기본값: None). 주어지면 이분형/연속형을 구분해 표현한다.
         alpha (float): 유의성 판정에 사용할 유의수준 (기본값: 0.05).
+        log_x (list): log 변환을 적용한 독립변수 이름 리스트 (기본값: None).
+        log1p_x (list): log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).
+        reflect_x (list): 반사 후 log1p 변환을 적용한 독립변수 이름 리스트 (기본값: None).
 
     Returns:
         str: 독립변수별 해석 문장 불릿 리스트. `IPython.display.Markdown`으로 감싸 출력하면 좋다.
     """
     # --- 1) 해석 대상 결정 (상수항 제외) ---
+    # log_x, log1p_x, reflect_x는 정확한 독립변수 이름 리스트로 전달된다고 가정한다.
+    log_x = log_x or []
+    log1p_x = log1p_x or []
+    reflect_x = reflect_x or []
+
     yname = fit.model.endog_names
     xnames = [name for name in fit.model.exog_names if name != "const"]
+
+    # 독립변수의 변환 종류를 하나의 값으로 판별한다 (구체적인 변환부터 확인한다)
+    def kind_of(name):
+        if name in reflect_x:   return "reflect"
+        if name in log1p_x:     return "log1p"
+        if name in log_x:       return "log"
+        return "none"
 
     # --- 2) 문장 템플릿 구성 (독립변수마다 반복 적용) ---
     line_template = (
         "- **{x}**의 회귀계수는 **B = {B}**, 오즈비는 **OR = {OR}**로 나타났으며, "
         "이는 **{y}**에 {sig} 요인임을 의미한다. "
         "(**z = {z}**, **{p}**) "
-        "즉, {change} {y}가 1(사건 발생)이 될 오즈는 평균적으로 약 **{pct}% {direction}**하는 것으로 해석된다."
+        "즉, {change} {y}가 1(사건 발생)이 될 오즈는 평균적으로 약 **{pct}% {direction}**하는 것으로 해석된다.{note}"
     )
+    # 반사 변환이 끼면 위 문장은 반사값 기준이므로, 원 변수 기준의 방향을 짧게 덧붙인다
+    note_template = " (원 변수 기준: **{x}가 클수록 오즈 {orig_direction}**)"
+    opposite = {"증가": "감소", "감소": "증가"}   # 반사로 뒤집힌 방향을 되돌릴 때 쓴다
 
     # --- 3) 독립변수별 해석 문장 생성 ---
     lines = []   # 독립변수별 문장(불릿)을 저장할 빈 리스트
     for x in xnames:
+        x_kind = kind_of(x)             # none / log / log1p / reflect
         B = fit.params[x]               # 비표준화 회귀계수(B)
         z = fit.tvalues[x]              # z-통계량
         p = fit.pvalues[x]              # 계수 유의확률
@@ -307,20 +356,37 @@ def report_variables_text(fit, data=None, alpha=0.05):
         if p < 0.001:   p_text = "p < .001"
         else:           p_text = f"p = {p:.3f}".replace("0.", ".")
 
-        # 오즈비를 백분율 변화로 환산 (OR>1 증가, OR<1 감소)
-        pct = abs((OR - 1) * 100)
+        # 계수 부호로 증가/감소 방향 결정
+        # (문장의 주어가 반사값이면 이 방향은 반사값 기준의 방향이다)
         direction = "증가" if B > 0 else "감소"
 
-        # 변화 표현: 이분형(더미)이면 '기준 범주 대비 해당 범주', 연속형이면 '1 증가'
-        is_binary = data is not None and data[x].nunique() <= 2
+        # 변화 표현: 로그 계열은 % 해석의 기준이 되는 값이 무엇인지가 핵심이다.
+        # 변환하지 않은 변수만 이분형(더미)/연속형을 구분한다.
+        is_binary = x_kind == "none" and data is not None and data[x].nunique() <= 2
         if is_binary:   change = f"**{x}**에 해당하는 경우(기준 범주 대비)"
-        else:           change = f"**{x}**가 1 증가할 때"
+        else:
+            change = {
+                "reflect": f"**(1+max-{x})가 1% 증가**할 때",
+                "log1p":   f"**(1+{x})가 1% 증가**할 때",
+                "log":     f"**{x}가 1% 증가**할 때",
+                "none":    f"**{x}**가 1 증가할 때",
+            }[x_kind]
+
+        # 오즈의 백분율 변화 환산
+        # 변환 안 함: 1 증가당 오즈비 = exp(B) / 로그 계열: 1% 증가당 오즈비 = 1.01^B
+        # 1% 증가는 변화폭이 작아 소수점 첫째 자리에서 0이 되어버리므로 자리수를 더 남긴다
+        if x_kind == "none":    pct = round(abs((OR - 1) * 100), 1)
+        else:                   pct = round(abs((1.01 ** B - 1) * 100), 3)
+
+        # 반사 변환은 대소 관계를 뒤집으므로 원 변수 기준의 방향은 반대가 된다
+        if x_kind != "reflect":     note = ""
+        else:                       note = note_template.format(x=x, orig_direction=opposite[direction])
 
         # 하나의 독립변수 → 하나의 불릿 문장
         lines.append(line_template.format(
             x=x, B=round(B, 4), OR=round(OR, 4), y=yname, sig=sig_word,
             z=round(z, 2), p=p_text, change=change,
-            pct=round(pct, 1), direction=direction,
+            pct=pct, direction=direction, note=note,
         ))
 
     # --- 4) 해석 주의 각주 첨부 ---
@@ -330,6 +396,31 @@ def report_variables_text(fit, data=None, alpha=0.05):
         "유의확률이 유의수준보다 큰(=유의하지 않은) 변수는 효과가 통계적으로 확인되지 않았으므로 "
         "오즈비 해석에 주의한다. 더미변수의 오즈비는 '기준(drop_first로 제외된) 범주' 대비 값이다."
     )
+
+    # --- 5) 로그·반사 변환 사용 시 주의 각주 ---
+    if log_x or log1p_x or reflect_x:
+        report += (
+            "\n\n> ※ **로그변환한 변수**는 '1 증가'가 원래 단위의 1이 아니라 "
+            "**변수가 약 2.72배(e배)가 되는 것**을 뜻한다.      \n"
+            "그래서 위 문장은 **1% 증가** 기준으로 적었고, 이때의 오즈비는 표의 OR(=exp(B))이 아니라 "
+            "**1.01^B**다. (변수가 2배가 되면 오즈는 **2^B배**)      \n"
+            "즉 **표의 OR은 로그값이 1 증가했을 때의 값**이므로 원 단위로 그대로 읽으면 안 된다."
+        )
+
+    if log1p_x:
+        report += (
+            "\n\n> ※ **log1p**(=ln(1+·))의 % 해석은 변수 자체가 아니라 **(1+변수)** 기준이며, "
+            "값이 클 때만 위 근사가 성립한다.      \n(0·작은 값 구간에서는 원본처럼 동작해 부정확)      \n"
+            "이 구간에서는 부호·유의성 중심으로 해석한다."
+        )
+
+    if reflect_x:
+        report += (
+            "\n\n> ※ **반사 후 log1p**(=ln(1+max-·))는 값의 대소가 뒤집힌 변환이다. "
+            "위 %·증감은 **(1+max-변수)** 기준이고,      \n"
+            "원 변수 기준 방향은 각 문장 끝 괄호에 적었다.      \n"
+            "변수가 **최댓값에 가까운 구간**에서는 위 근사가 부정확하므로 부호·유의성 중심으로 읽는다."
+        )
 
     return report
 
