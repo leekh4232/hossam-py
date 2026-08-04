@@ -1,0 +1,1115 @@
+import numpy as np
+import seaborn as sb
+from IPython.display import display, Markdown
+from pandas import DataFrame, Series, qcut
+from statsmodels.api import add_constant, Logit
+from statsmodels.stats.stattools import durbin_watson
+from scipy.stats import chi2
+from sklearn.metrics import (
+    confusion_matrix, roc_curve, roc_auc_score,
+    accuracy_score, recall_score, precision_score, f1_score,
+)
+
+from . import my_plot
+from . import my_stats
+
+
+def fit_model(data, y, summary=False):
+    """statsmodels의 Logit을 이용해 로지스틱 회귀 모델을 적합한다.
+
+    종속변수 `y`를 제외한 나머지 모든 컬럼을 독립변수로 사용하며,
+    절편(상수항)을 자동으로 추가한 뒤 최대우도추정(MLE)으로 회귀계수를 추정한다.
+    종속변수는 0/1의 두 값만 가지는 이분형이어야 한다.
+
+    Args:
+        data: 독립변수와 종속변수를 모두 포함하는 데이터프레임.
+        y: 종속변수로 사용할 컬럼명. `data`에 반드시 존재해야 하며 0/1의 이분형이어야 한다.
+        summary: True로 설정하면 적합된 모델의 요약 통계량을 출력한다.
+                  Defaults to False.
+
+    Returns:
+        적합이 완료된 로지스틱 회귀분석 결과 객체.
+    """
+    x = data.drop(columns=[y])          # 독립변수 데이터프레임 생성
+    y_series = data[y]                  # 종속변수 시리즈 생성
+    x_input = add_constant(x)           # 독립변수에 절편(상수항) 추가
+    model = Logit(y_series, x_input)    # Logit 모델 객체 생성
+    fit = model.fit(disp=0)             # 모델 적합. disp=0 -> 수렴 메시지 출력 안함
+
+    if summary:
+        print(fit.summary())            # 적합된 모델의 요약 통계량 출력 여부 확인
+
+    return fit                          # 적합된 모델 객체(분석 결과) 반환
+
+
+def predict(fit, new_data, threshold=0.5):
+    """적합된 로지스틱 모델로 새로운 데이터의 예측 확률과 예측 범주를 계산한다.
+
+    다중 로지스틱 회귀에서도 안전하게 동작하도록, 모델이 학습한 독립변수만
+    **학습 당시의 순서 그대로** 골라 사용한다. 필요 없는 컬럼이 섞여 있으면 무시하고,
+    학습에 사용된 독립변수가 빠져 있으면 어떤 변수가 없는지 알려 준다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+        new_data: 예측에 사용할 새로운 데이터. 데이터프레임, 한 건짜리 Series 또는 dict.
+        threshold (float): 확률을 0/1로 분류하는 임계값 (기본값: 0.5).
+
+    Returns:
+        DataFrame: 예측 확률('proba')과 예측값('pred')을 담은 데이터프레임.
+
+    Raises:
+        ValueError: 모델이 학습한 독립변수가 `new_data`에 없는 경우.
+    """
+    # --- 1) 한 건만 예측하는 경우도 데이터프레임으로 통일 ---
+    if isinstance(new_data, dict):
+        new_data = DataFrame([new_data])
+    elif isinstance(new_data, Series):
+        new_data = new_data.to_frame().T
+
+    # --- 2) 모델이 학습한 독립변수 확인 (상수항 제외, 학습 당시의 순서 유지) ---
+    xnames = [name for name in fit.model.exog_names if name != "const"]
+
+    # 학습에 사용된 독립변수가 빠져 있으면 예측 자체가 불가능하다
+    missing = [name for name in xnames if name not in new_data.columns]
+    if missing:
+        raise ValueError(
+            f"모델이 학습한 독립변수가 new_data에 없습니다: {missing}\n"
+            f"필요한 독립변수: {xnames}"
+        )
+
+    # 학습 때와 동일한 순서로 컬럼을 맞춘다. (모델에 없는 컬럼은 자동으로 제외)
+    # 컬럼 순서가 어긋나면 오류 없이 '조용히 틀린 확률'이 나오므로 반드시 정렬해야 한다.
+    x = new_data[xnames].astype(float)
+
+    # --- 3) 절편(상수항) 추가 ---
+    # has_constant="add" -> 값이 일정한 컬럼이 있어도 상수항을 빠뜨리지 않는다
+    x_input = add_constant(x, has_constant="add")
+
+    # --- 4) 사건 발생(=1) 확률 예측 ---
+    proba = fit.predict(x_input)
+
+    # 예측 확률과 임계값 기준 예측 범주를 DataFrame으로 반환
+    return DataFrame({
+        "proba": proba,                             # 1이 될 확률
+        "pred": (proba > threshold).astype(int),    # 예측값
+    })
+
+
+def plot_sigmoid(fit, data, x, threshold=0.5, palette=None, title=None,
+                 xlabel=None, ylabel=None, width=1280, height=640, save_path=None):
+    """독립변수에 따른 사건 발생 확률의 S자 곡선(시그모이드)을 그린다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+        data: 회귀분석에 사용한 원본 데이터프레임. (독립변수와 종속변수를 모두 포함)
+        x (str): 곡선의 x축으로 사용할 독립변수명.
+        threshold (float): 확률을 0/1로 분류하는 임계값 (기본값: 0.5).
+        palette (str): 그래프 색상에 사용할 팔레트 이름. (기본값: None).
+        title (str): 그래프 제목 (기본값: None).
+        xlabel (str): x축 레이블 (기본값: None → 독립변수명).
+        ylabel (str): y축 레이블 (기본값: None → "P(종속변수=1)").
+        width (int): 캔버스 가로 픽셀 (기본값: 1280).
+        height (int): 캔버스 세로 픽셀 (기본값: 640).
+        save_path (str): 이미지 저장 경로 (기본값: None).
+    """
+    # --- 1) 그릴 종속변수 결정 ---
+    yname = fit.model.endog_names
+
+    # --- 2) 곡선을 그릴 x값 격자 생성 ---
+    # 관측된 x의 최솟값~최댓값을 200등분해 촘촘한 곡선을 만든다
+    grid = np.linspace(data[x].min(), data[x].max(), 200)
+
+    # 곡선 계산용 입력 데이터
+    curve_input = DataFrame({x: grid})
+
+    # 예측에 사용할 수 있도록 상수항을 추가한 뒤 사건 발생(=1) 확률 계산
+    proba = fit.predict(add_constant(curve_input))
+
+    # --- 3) 그래프 초기화 ---
+    # 팔레트가 지정되었다면 첫 번째 색상을 선 색상으로 사용하고, 지정되지 않았다면 기본 파랑색을 사용한다
+    line_color = sb.color_palette(palette)[0] if palette else "#328CC1"
+
+    # 그래프 초기화 및 축 레이블 설정
+    fig, ax = my_plot.init(width=width, height=height, title=title,
+                           xlabel=xlabel if xlabel else x,
+                           ylabel=ylabel if ylabel else f"P({yname}=1)")
+
+    # --- 4) 실제 관측치(0/1) 산점도 ---
+    # 같은 높이(0 또는 1)에 점이 겹쳐 보이므로 반투명하게 처리한다
+    my_plot.scatterplot(data=data, x=x, y=yname, color="#888888",
+                        alpha=0.4, palette=None, ax=ax)
+
+    # --- 5) 예측 확률의 S자 곡선 ---
+    my_plot.lineplot(x=grid, y=proba, color=line_color, ax=ax)
+
+    # --- 6) 임계값 가로선과 분류 경계 세로선 ---
+    a = fit.params[x]           # 독립변수 x에 대한 기울기
+    b = fit.params['const']     # 절편
+    boundary = -b / a           # 분류 경계 = -절편/기울기
+
+    # 분류 경계에 대한 세로 선과 텍스트
+    ax.axvline(x=boundary, color="red", linestyle="--", alpha=0.7)
+    ax.text(x=boundary, y=threshold, s=f" 분류 경계: {boundary:.2f}",
+        color="red", va="bottom", ha="left")
+
+    # 임계값에 대한 가로 선
+    ax.axhline(y=threshold, color="red", linestyle="--", alpha=0.7)
+        
+    # 확률은 0~1 범위이므로 여백을 조금 두고 축을 고정한다
+    ax.set_ylim(-0.1, 1.1)
+
+    # --- 7) 그래프 표시 ---
+    my_plot.show(save_path=save_path)
+
+
+def report_fitness(fit):
+    """적합된 로지스틱 모델의 모형 적합도(model fit) 보고 문장을 생성해 반환한다.
+
+    summary() 결과표의 문자열을 파싱하지 않고, `fit` 객체가 이미 갖고 있는 속성에서
+    지표를 직접 읽어와 문장을 구성한다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+
+    Returns:
+        str: 모형 적합도 보고 문장. `IPython.display.Markdown`으로 감싸 출력하면 좋다.
+    """
+    # --- 1) 변수 라벨 구성 (상수항 제외) ---
+    yname = fit.model.endog_names
+    xnames = [name for name in fit.model.exog_names if name != "const"]
+    xlabel = ", ".join(xnames)
+
+    # --- 2) 유의확률 구간 표기 변환 ---
+    p = fit.llr_pvalue
+    if p < 0.001:   alpha = "< 0.001"
+    elif p < 0.01:  alpha = "< 0.01"
+    elif p < 0.05:  alpha = "< 0.05"
+    else:           alpha = "≥ 0.05"
+
+    # 유의수준(0.05) 기준 모형의 통계적 유의성 판정
+    result = "유의하였다" if p < 0.05 else "유의하지 않았다"
+
+    # --- 3) 유사결정계수의 적합 수준 해석 ---
+    # (fit.prsquared 관례: 0.2~0.4 매우 우수 / 0.1~0.2 양호 / 그 미만 다소 낮음)
+    prsq = fit.prsquared
+    if prsq >= 0.2:     fit_level = "매우 우수한"
+    elif prsq >= 0.1:   fit_level = "양호한"
+    else:               fit_level = "다소 낮은"
+
+    # --- 4) 문장 템플릿 구성 ---
+    template = (
+        "**Note. n = {n}. "
+        "LL = {llf}, LL-Null = {llnull}, "
+        "LLR χ²({df_model}) = {llr}, p {alpha}, "
+        "Pseudo R² = {prsq}**\n\n"
+        "{Y}를 종속변수로, {X}(을)를 독립변수로 한 로지스틱 회귀분석 결과, "
+        "모형은 통계적으로 {result}.\n\n"
+        "> LLR χ²({df_model}) = {llr}, p {alpha}, Pseudo R² = {prsq}.\n\n"
+        "즉, 모형의 유사결정계수는 {prsq}로 {fit_level} 적합 수준을 보였다.\n\n"
+        "> ※ Pseudo R²는 선형회귀의 R²처럼 '분산 설명 비율'로 해석하지 않는다. "
+        "일반적으로 **0.2~0.4** 구간이면 매우 우수한 적합으로 본다."
+    )
+
+    # --- 5) 문장 템플릿 값 치환 ---
+    report = template.format(
+        n=int(fit.nobs),
+        llf=round(fit.llf, 3),
+        llnull=round(fit.llnull, 3),
+        df_model=int(fit.df_model),
+        llr=round(fit.llr, 3),
+        alpha=alpha,
+        prsq=round(prsq, 3),
+        Y=yname,
+        X=xlabel,
+        result=result,
+        fit_level=fit_level,
+    )
+
+    # --- 6) 결과 리턴 ---
+    return report
+
+
+def report_variables(fit, data):
+    """적합된 로지스틱 모델의 독립변수별 회귀계수·오즈비 보고표를 데이터프레임으로 생성해 반환한다.
+
+    오즈비와 그 95% 신뢰구간을 함께 제공한다.
+    다중공선성 점검을 위한 VIF 계산에 원본 데이터가 필요하므로 `data`를 함께 받는다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+        data: 회귀분석에 사용한 원본 데이터프레임. 독립변수와 종속변수를 모두 포함해야 한다.
+
+    Returns:
+        DataFrame: 독립변수별 보고표. 종속변수·독립변수·B·표준오차·z·유의확률·
+            오즈비(OR)·OR 95% 신뢰구간·공차·VIF 컬럼을 가진다.
+            |B|(=|log OR|) 내림차순으로 정렬되어 영향력이 큰 변수가 위로 온다.
+    """
+    # --- 1) 대상 변수 확인 및 VIF 계산 ---
+    yname = fit.model.endog_names                # 종속변수 이름
+    exog_names = list(fit.model.exog_names)      # 상수항(const)을 포함한 전체 변수 이름 순서
+    xnames = [name for name in exog_names if name != "const"]  # 상수항 제외 독립변수
+
+    # 독립변수 전체를 대상으로 VIF를 한 번에 계산 (상수항 제외한 결과가 반환된다)
+    vif = my_stats.compute_vif(data, columns=xnames)
+
+    # 통계량을 위치 인덱스로 접근하기 위해 배열로 변환
+    params = np.asarray(fit.params)             # 비표준화 회귀계수(B)
+    bse = np.asarray(fit.bse)                   # 계수 표준오차
+    zvalues = np.asarray(fit.tvalues)           # z-통계량 (로지스틱은 t가 아니라 z)
+    pvalues = np.asarray(fit.pvalues)           # 계수 유의확률
+    conf = np.asarray(fit.conf_int())           # 계수의 95% 신뢰구간 [하한, 상한]
+
+    # --- 2) 독립변수별 계수·오즈비 정리 ---
+    variables = []   # 독립변수별 보고 내용을 저장할 빈 리스트
+    for x in xnames:
+        i = exog_names.index(x)                 # 상수항을 포함한 전체 순서에서의 위치
+        b = float(params[i])                    # 비표준화 회귀계수(B)
+        vif_value = vif.loc[x, "VIF"]           # 미리 계산해 둔 VIF 값 조회
+
+        # 표준화 회귀계수
+        # --> (βstd) = B × 독립변수 표준편차 = "독립변수 1 SD 변화당 log(오즈비) 변화".
+        # 로지스틱은 종속변수가 0/1이라 (OLS와 달리) y로는 표준화하지 않고 독립변수만 표준화한다.
+        beta_std = b * float(data[x].std(ddof=1))
+
+        row = {
+            "종속변수": yname,                          # 종속변수 이름
+            "독립변수": x,                              # 독립변수 이름
+            "B": b,                                    # 비표준화 회귀계수(B)
+            "βstd": beta_std,                          # 표준화 회귀계수
+            "표준오차": bse[i],                         # 계수 표준오차
+            "z": zvalues[i],                           # z-통계량
+            "유의확률": pvalues[i],                     # 계수 유의확률
+            "오즈비(OR)": float(np.exp(b)),             # 오즈비 = exp(B)
+            "OR 95% 하한": float(np.exp(conf[i, 0])),  # 오즈비 신뢰구간 하한
+            "OR 95% 상한": float(np.exp(conf[i, 1])),  # 오즈비 신뢰구간 상한
+            "공차": 1 / vif_value,                     # 공차(Tolerance = 1/VIF)
+            "VIF": vif_value,                          # 분산팽창계수
+        }
+        variables.append(row)
+
+    # --- 3) 독립변수별 보고표 생성 및 반환 ---
+    vdf = DataFrame(variables)
+
+    # |B|(=|log OR|)의 절대값으로 내림차순 정렬 후 리턴 (영향력이 큰 변수가 위로 오도록)
+    vdf = vdf.sort_values("B", key=abs, ascending=False).reset_index(drop=True)
+    return vdf
+
+
+def report_variables_text(fit, data=None, alpha=0.05):
+    """독립변수별 오즈비 해석 문장을 markdown 불릿 리스트로 생성해 반환한다.
+
+    각 독립변수에 대해 계수(B)·오즈비(OR)·z·유의확률을 문장으로 풀어 쓰고,
+    오즈비를 백분율 변화로 환산하여 "오즈가 약 몇 % 증가/감소" 형태로 해석한다.
+    `data`가 주어지면 이분형(더미) 변수와 연속형 변수를 구분해 해석 표현을 달리한다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+        data: 원본 데이터프레임 (기본값: None). 주어지면 이분형/연속형을 구분해 표현한다.
+        alpha (float): 유의성 판정에 사용할 유의수준 (기본값: 0.05).
+
+    Returns:
+        str: 독립변수별 해석 문장 불릿 리스트. `IPython.display.Markdown`으로 감싸 출력하면 좋다.
+    """
+    # --- 1) 해석 대상 결정 (상수항 제외) ---
+    yname = fit.model.endog_names
+    xnames = [name for name in fit.model.exog_names if name != "const"]
+
+    # --- 2) 문장 템플릿 구성 (독립변수마다 반복 적용) ---
+    line_template = (
+        "- **{x}**의 회귀계수는 **B = {B}**, 오즈비는 **OR = {OR}**로 나타났으며, "
+        "이는 **{y}**에 {sig} 요인임을 의미한다.      \n"
+        "(**z = {z}**, **{p}**)      \n"
+        "즉, {change} {y}가 1(사건 발생)이 될 오즈는 평균적으로 약 **{pct}% {direction}**하는 것으로 해석된다."
+    )
+
+    # --- 3) 독립변수별 해석 문장 생성 ---
+    lines = []   # 독립변수별 문장(불릿)을 저장할 빈 리스트
+    for x in xnames:
+        B = fit.params[x]               # 비표준화 회귀계수(B)
+        z = fit.tvalues[x]              # z-통계량
+        p = fit.pvalues[x]              # 계수 유의확률
+        OR = np.exp(B)                  # 오즈비 = exp(B)
+
+        # 유의성 판정 (유의수준 기준)
+        sig_word = "유의한" if p < alpha else "유의하지 않은"
+
+        # p값 APA 표기 (앞자리 0 생략)
+        if p < 0.001:   p_text = "p < .001"
+        else:           p_text = f"p = {p:.3f}".replace("0.", ".")
+
+        # 오즈비를 백분율 변화로 환산 (OR>1 증가, OR<1 감소)
+        pct = abs((OR - 1) * 100)
+        direction = "증가" if B > 0 else "감소"
+
+        # 변화 표현: 로그 계열은 % 해석의 기준이 되는 값이 무엇인지가 핵심이다.
+        # 변환하지 않은 변수만 이분형(더미)/연속형을 구분한다.
+        is_binary = data is not None and data[x].nunique() <= 2
+        if is_binary:   change = f"**{x}**에 해당하는 경우(기준 범주 대비)"
+        else:           change = f"**{x}**가 1 증가할 때"
+
+        # 하나의 독립변수 → 하나의 불릿 문장
+        lines.append(line_template.format(
+            x=x, B=round(B, 4), OR=round(OR, 4), y=yname, sig=sig_word,
+            z=round(z, 2), p=p_text, change=change,
+            pct=round(pct, 1), direction=direction,
+        ))
+
+    # --- 4) 해석 주의 각주 첨부 ---
+    report = "\n".join(lines)
+    report += (
+        "\n\n> ※ 오즈비(OR)가 1보다 크면 사건 발생 오즈가 증가, 1보다 작으면 감소함을 뜻한다. "
+        "유의확률이 유의수준보다 큰(=유의하지 않은) 변수는 효과가 통계적으로 확인되지 않았으므로 "
+        "오즈비 해석에 주의한다. 더미변수의 오즈비는 '기준(drop_first로 제외된) 범주' 대비 값이다."
+    )
+
+    return report
+
+
+def plot_odds(fit, data, palette=None, title=None, xlabel=None, ylabel=None,
+              width=1280, height=None, save_path=None):
+    """오즈비(Odds Ratio)를 가로 막대그래프로 시각화해 독립변수의 영향력을 보여준다.
+
+    막대는 `report_variables`가 정렬해 둔 |B|(=|log OR|) 내림차순 그대로 위에서
+    아래로 배치되며, 오즈비가 1보다 큰지(사건 발생 오즈 증가) 작은지(감소)에 따라
+    색을 달리하고 막대 끝에 오즈비 값을 표기한다. OR=1(영향 없음) 위치에 기준선을 둔다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+        data: 독립변수와 종속변수를 모두 포함하는 데이터프레임.
+        palette (dict): 부호별 막대 색상. None이면 {'+': 파랑, '-': 빨강} (기본값: None).
+        title (str): 그래프 제목 (기본값: None).
+        xlabel (str): x축 레이블 (기본값: None → "오즈비(Odds Ratio)").
+        ylabel (str): y축 레이블 (기본값: None → "독립변수").
+        width (int): 캔버스 가로 픽셀 (기본값: 1280).
+        height (int): 캔버스 세로 픽셀. None이면 독립변수 수 × 80으로 자동 계산 (기본값: None).
+        save_path (str): 이미지 저장 경로 (기본값: None).
+    """
+    # --- 1) 시각화용 데이터 전처리 ---
+    vdf = report_variables(fit, data)
+    rdf = vdf[["독립변수", "오즈비(OR)"]].copy()
+    # OR>1이면 증가(+), OR<1이면 감소(-)로 색상 구분
+    rdf["부호"] = np.where(rdf["오즈비(OR)"] > 1, "+", "-")
+
+    # 독립변수가 많을수록 막대가 촘촘해지므로, 변수 하나당 80px씩 세로 공간을 확보한다
+    if height is None:
+        height = len(rdf) * 80
+
+    if height < 200:
+        height = 200   # 최소 높이 200px
+
+    # 부호별 기본 색상: 증가(+)은 파랑, 감소(-)은 빨강
+    if palette is None:
+        palette = {"+": "#0066ff", "-": "#ff3333"}
+
+    # --- 2) 그래프 초기화 ---
+    fig, ax = my_plot.init(width=width, height=height, title=title,
+                           xlabel=xlabel if xlabel else "오즈비(Odds Ratio)",
+                           ylabel=ylabel if ylabel else "독립변수")
+
+    # --- 3) 가로 막대그래프 ---
+    my_plot.barplot(rdf, x="오즈비(OR)", y="독립변수", hue="부호", palette=palette, ax=ax)
+
+    # OR=1(영향 없음) 기준선
+    ax.axvline(x=1, color="gray", linestyle="--", alpha=0.7)
+
+    # --- 4) 막대 끝에 오즈비 값 표기 ---
+    for i in rdf.index:
+        orv = rdf.loc[i, "오즈비(OR)"]
+        ax.text(x=orv, y=i, s=f"{orv:.2f}", va="center",
+                ha="left" if orv >= 1 else "right", color="black")
+
+    # --- 5) 그래프 표시 ---
+    my_plot.show(save_path=save_path)
+
+
+def auto_logit(data, y, report=True, plot=True, threshold=0.5,
+               width=1280, height=640, backward=False, alpha=0.05):
+    """로지스틱 회귀모델 적합부터 변수 선택·보고서 출력·시각화까지 한 번에 수행한다.
+
+    `backward=True`이면 유의하지 않은 독립변수가 모두 사라질 때까지
+    후진소거법(유의확률이 가장 큰 변수를 하나씩 제거 후 재적합)을 반복한다.
+
+    Args:
+        data: 독립변수와 종속변수를 모두 포함하는 데이터프레임.
+        y: 종속변수로 사용할 컬럼명 (0/1 이분형).
+        report (bool): 오즈비 보고표·모형 적합도·해석 문장 출력 여부 (기본값: True).
+        plot (bool): 시각화 출력 여부 (기본값: True).
+        threshold (float): 시그모이드 곡선에 표시할 분류 임계값 (기본값: 0.5).
+        width (int): 그래프 너비 (기본값: 1280).
+        height (int): 그래프 높이 (기본값: 640).
+        backward (bool): 후진소거법으로 유의하지 않은 독립변수를 제거할지 여부 (기본값: False).
+        alpha (float): 후진소거법의 변수 제거 기준이자 해석 문장의 유의수준 (기본값: 0.05).
+
+    Returns:
+        적합이 완료된 로지스틱 회귀분석 결과 객체.
+    """
+    # --- 1) 모델 적합 (backward=True이면 유의하지 않은 변수가 없어질 때까지 반복) ---
+    # 빈 줄 출력 (출력 결과의 여백을 위함)
+    print()
+
+    while True:
+        fit = fit_model(data, y)
+
+        if not backward:
+            break   # 후진소거법이 아니면 반복문 종료
+
+        pvalues = report_variables(fit, data)["유의확률"]
+
+        # 종료 조건: 독립변수가 하나뿐이거나 남은 변수가 모두 유의한 경우
+        if len(pvalues) <= 1 or pvalues.max() < alpha:
+            break
+
+        # 유의확률이 가장 큰(=가장 유의하지 않은) 독립변수를 하나만 제거한다.
+        # 여러 개를 한꺼번에 지우면, 변수 간 상관 때문에 원래는 유의해졌을 변수까지 사라진다.
+        worst = report_variables(fit, data).loc[pvalues.idxmax(), "독립변수"]
+        print(f"유의하지 않은 독립변수 제거 → {worst} (p = {pvalues.max():.4f})")
+        data = data.drop(columns=[worst])
+
+    # --- 2) 모형 적합도 및 독립변수 보고 ---
+    if report:
+        display(Markdown("#### ▶︎ 모형 적합도"))   
+
+        # 모형 적합도 해설                       
+        display(Markdown(report_fitness(fit))) 
+        
+        display(Markdown("#### ▶︎ 독립변수 보고"))  
+        # 오즈비 보고 표
+        display(report_variables(fit, data))                      
+
+        # 변수별 해석       
+        display(Markdown(report_variables_text(fit, data=data, alpha=alpha)))  
+
+    # --- 2) 시각화 ---
+    if plot:
+        display(Markdown("#### ▶︎ 오즈비 시각화"))
+        plot_odds(fit, data, width=width)
+
+    # --- 4) 최종 적합 모델 객체 반환 ---
+    return fit
+
+
+def plot_confusion(fit, threshold=0.5, palette=None, title=None,
+                   size=640, save_path=None, ax=None):
+    """혼동행렬(Confusion Matrix)을 정사각형 히트맵으로 시각화한다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+        threshold (float): 확률을 0/1로 분류하는 임계값 (기본값: 0.5).
+        palette (str): 히트맵 색상 팔레트 이름 (기본값: None → "Blues").
+        title (str): 그래프 제목 (기본값: None → "혼동행렬(Confusion Matrix)").
+        size (int): 캔버스 한 변의 픽셀 크기. 가로·세로가 같다 (기본값: 640).
+        save_path (str): 이미지 저장 경로 (기본값: None).
+        ax: 그래프를 그릴 Axes 객체 (기본값: None → 캔버스를 새로 생성).
+    """
+    # --- 1) 실제값과 임계값 기준 예측 범주로 혼동행렬 구성 ---
+    y_true = np.asarray(fit.model.endog).astype(int)
+    y_pred = (np.asarray(fit.predict()) > threshold).astype(int)
+    cm = confusion_matrix(y_true, y_pred)
+
+    cmdf = DataFrame(cm,
+                     index=["실제 0 (Negative)", "실제 1 (Positive)"],
+                     columns=["예측 0 (Negative)", "예측 1 (Positive)"])
+
+    # --- 2) 시각화 ---
+    # ax를 넘겨받으면 서브플롯의 한 칸에 그리고, 없으면 단독 캔버스를 만든다
+    fig = None
+    if ax is None:
+        fig, ax = my_plot.init(width=size, height=size)
+
+    ax.set_title(title if title else "혼동행렬(Confusion Matrix)",
+                 fontsize=24, fontweight=500, pad=15)
+
+    # square=True로 셀을 정사각형으로 맞추고, 값이 표기되므로 색상막대(cbar)는 생략한다
+    # 빈도(정수)를 그대로 표기하도록 fmt="d" 사용
+    my_plot.heatmap(data=cmdf, annot=True, fmt="d",
+                    palette=palette if palette else "Blues",
+                    annot_kws={"size": size*0.07},  # 글자크기를 그래프 크기의 7%로 설정
+                    square=True, cbar=False, ax=ax)
+
+    if fig is not None:
+        my_plot.show(save_path=save_path)
+
+
+def plot_roc(fit, palette=None, title=None, size=640, save_path=None, ax=None):
+    """ROC Curve를 정사각형으로 그리고 AUC(곡선 아래 면적)를 제목에 표시한다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+        palette (str): 곡선 색상에 사용할 팔레트 이름 (기본값: None → 파랑 단색).
+        title (str): 그래프 제목 (기본값: None → "ROC Curve (AUC = ...)").
+        size (int): 캔버스 한 변의 픽셀 크기. 가로·세로가 같다 (기본값: 640).
+        save_path (str): 이미지 저장 경로 (기본값: None).
+        ax: 그래프를 그릴 Axes 객체 (기본값: None → 캔버스를 새로 생성).
+    """
+    # --- 1) 예측 확률로 ROC 좌표와 AUC 계산 ---
+    y_true = np.asarray(fit.model.endog).astype(int)    # 실제 종속변수 값 
+    proba = np.asarray(fit.predict())    # 모델의 예측값 --> 1이 될 확률  
+    auc = roc_auc_score(y_true, proba)   # AUC 계산
+    roc_fpr, roc_tpr, _ = roc_curve(y_true, proba) # ROC 좌표 (FPR,TPR,임계값)
+
+    # --- 2) 시각화 초기화 ---
+    # 팔레트가 지정되면 첫 번째 색을 곡선 색상으로 사용
+    line_color = sb.color_palette(palette)[0] if palette else "#328CC1"
+
+    fig = None
+    if ax is None:
+        fig, ax = my_plot.init(width=size, height=size)
+
+    # x축=위양성률(FPR), y축=재현율(TPR)  ← ROC의 표준 축 배치
+    ax.set_title(title if title else f"ROC Curve (AUC = {auc:.4f})",
+                 fontsize=24, fontweight=500, pad=15)
+    ax.set_xlabel("위양성률(FPR, 1 - 특이성)", fontsize=16, fontweight=400, labelpad=5)
+    ax.set_ylabel("재현율(TPR, 민감도)", fontsize=16, fontweight=400, labelpad=5)
+
+    # --- 3) ROC 곡선과 기준선 그리기 ---
+    my_plot.lineplot(x=roc_fpr, y=roc_tpr, color=line_color, ax=ax)
+
+    # 무작위로 찍었을 때의 기준선(대각선)
+    my_plot.lineplot(x=[0, 1], y=[0, 1], color="red", linestyle="--", ax=ax)
+
+    # x·y 모두 0~1 범위이므로 축 비율을 1:1로 맞추면 그래프 영역이 정사각형이 된다
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_aspect("equal")
+
+    if fig is not None:
+        my_plot.show(save_path=save_path)
+
+
+def report_performance(fit, threshold=0.5, plot=True, palette=None, 
+                       size=640, save_path=None):
+    """적합된 로지스틱 모델의 분류 성능을 혼동행렬과 평가지표로 정리해 출력한다.
+
+    위양성률(FPR)과 특이성(TNR)은 sklearn에 함수가 없어 혼동행렬로 직접 계산한다.
+    AUC는 구간별 판정("낮음"~"매우 우수")을, 진단오즈비는 (TP×TN)/(FP×FN)를 함께 출력한다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+        threshold (float): 확률을 0/1로 분류하는 임계값 (기본값: 0.5).
+        plot (bool): 혼동행렬 히트맵과 ROC Curve를 함께 그릴지 여부 (기본값: True).
+        palette (str): 그래프 색상에 사용할 팔레트 이름 (기본값: None).
+        size (int): 서브플롯 한 칸의 한 변 픽셀 크기 (기본값: 640).
+        save_path (str): 이미지 저장 경로 (기본값: None).
+    """
+    # --- 1) 실제값·예측확률·예측범주 준비 ---
+    y_true = np.asarray(fit.model.endog).astype(int)    # 실제 종속변수(0/1)
+    proba = np.asarray(fit.predict())                   # 1이 될 확률
+    y_pred = (proba > threshold).astype(int)            # 임계값 기준 예측 범주(0/1)
+
+    # --- 2) 혼동행렬 및 TN/FP/FN/TP 분해 ---
+    cm = confusion_matrix(y_true, y_pred)
+    tn, fp, fn, tp = cm.ravel()
+
+    # --- 3) 평가지표 계산 ---
+    fallout = fp / (fp + tn) if (fp + tn) > 0 else 0.0      # 위양성률(FPR)
+    specificity = tn / (tn + fp) if (tn + fp) > 0 else 0.0  # 특이성(TNR = 1 - FPR)
+
+    auc = roc_auc_score(y_true, proba)
+
+    # AUC 구간별 판정 (0.5는 동전 던지기와 같아 학습이 되지 않은 상태)
+    if auc < 0.6:
+        auc_grade = "모형이 아무 것도 학습하지 못함"
+    elif auc < 0.7:
+        auc_grade = "낮음"
+    elif auc < 0.8:
+        auc_grade = "쓸 만함"
+    elif auc < 0.9:
+        auc_grade = "우수"
+    else:
+        auc_grade = "매우 우수"
+
+    # 진단오즈비 = (TP×TN)/(FP×FN). 오분류가 하나도 없으면 분모가 0이므로 무한대로 둔다
+    if fp * fn > 0:
+        dor = (tp * tn) / (fp * fn)
+    else:
+        dor = np.inf
+
+    # --- 4) 평가표 구성 ---
+    metrics = DataFrame([{
+        "정확도(Accuracy)": accuracy_score(y_true, y_pred),
+        "정밀도(Precision)": precision_score(y_true, y_pred, zero_division=0),
+        "재현율(Recall,TPR)": recall_score(y_true, y_pred, zero_division=0),
+        "위양성율(Fallout,FPR)": fallout,
+        "특이성(Specificity,TNR)": specificity,
+        "F1": f1_score(y_true, y_pred, zero_division=0),
+        "AUC": auc,
+        "AUC 판단": auc_grade,
+        "진단오즈비(DOR)": dor,
+    }], index=["performance"])
+
+    # --- 5) 혼동행렬 ---
+    cmdf = DataFrame(cm,
+                     index=["실제 0 (Negative)", "실제 1 (Positive)"],
+                     columns=["예측 0 (Negative)", "예측 1 (Positive)"])
+
+    # --- 6) 결과 출력 ---
+    display(cmdf)
+    display(metrics)
+
+    # --- 7) 시각화: 혼동행렬 히트맵 + ROC Curve를 1행 2열로 나란히 배치 ---
+    if plot:
+        fig, ax = my_plot.init(width=size, height=size, rows=1, cols=2)
+        plot_confusion(fit, threshold=threshold, palette=palette, ax=ax[0])
+        plot_roc(fit, palette=palette, ax=ax[1])
+        my_plot.show(save_path=save_path)
+
+
+def test_linear(fit, data, alpha=0.05, groups=10, plot=False, palette=None,
+                width=640, height=400, save_path=None):
+    """Box-Tidwell 검정으로 연속형 독립변수의 로짓 선형성을 점검한다.
+
+    독립변수 x에 `x × ln(x)` 항을 하나씩 추가해 그 항이 유의한지 본다.
+    유의하면(p < alpha) 로짓이 직선이 아니라는 뜻이므로 변환·제곱항·구간화가 필요하다.
+    이분형(더미) 변수는 두 점을 잇는 선이 언제나 직선이므로 검정 대상에서 제외한다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+        data: 회귀분석에 사용한 원본 데이터프레임. 독립변수와 종속변수를 모두 포함해야 한다.
+        alpha (float): 유의수준 (기본값: 0.05).
+        groups (int): 경험적 로짓 그래프에서 독립변수를 나눌 구간 수 (기본값: 10).
+        plot (bool): 경험적 로짓 그래프를 그릴지 여부 (기본값: True).
+        palette (str): 그래프 색상에 사용할 팔레트 이름 (기본값: None).
+        width (int): 그래프 한 칸의 가로 픽셀 (기본값: 640).
+        height (int): 그래프 한 칸의 세로 픽셀 (기본값: 400).
+        save_path (str): 그래프 저장 경로 (기본값: None).
+    """
+    # --- 1) 검정 대상 결정 (상수항 제외, 연속형만) ---
+    yname = fit.model.endog_names
+
+    xnames = []
+    for name in fit.model.exog_names:
+        if name != "const":
+            xnames.append(name)
+
+    targets = []
+    for x in xnames:
+        # 값의 종류가 3가지 이상인 변수만 연속형으로 간주한다
+        if data[x].nunique() > 2:
+            targets.append(x)
+
+    # --- 2) Box-Tidwell 검정 (변수마다 x*ln(x) 항을 하나씩 추가) ---
+    rows = []
+    for x in targets:
+        bt_data = data[xnames].copy()       # 독립변수만 복사
+        base = bt_data[x]                   # 원본 독립변수 값
+
+        # 최소값이 0 이하이면 ln 정의역(양수)을 맞추기 위해 평행이동 필요
+        shifted = bool(base.min() <= 0)     
+        if shifted:
+            base = base - base.min() + 1
+
+        # Box-Tidwell 항 생성: x × ln(x)
+        bt_data["_bt_term"] = base * np.log(base)
+
+        # Logit 모델 적합 후 Box-Tidwell 항의 z·p값으로 선형성 판정
+        bt_fit = Logit(data[yname], add_constant(bt_data)).fit(disp=0)
+        z = float(bt_fit.tvalues["_bt_term"])
+        p = float(bt_fit.pvalues["_bt_term"])
+        linearity = bool(p >= alpha)
+
+        # 선형성 판정에 따라 결론 문구를 달리한다
+        if linearity:
+            conclusion = "귀무가설 채택 → 로짓 선형성 위배 근거 없음"
+        else:
+            conclusion = "대립가설 채택 → 로짓 선형성 위배(변환 필요)"
+
+        # 독립변수별 결과를 딕셔너리로 정리해 리스트에 추가
+        rows.append({
+            "z": round(z, 4),
+            "p-value": round(p, 4),
+            "linearity": linearity,
+            "위치이동": shifted,
+            "result": conclusion,
+            "독립변수": x,
+        })
+
+    # 결과표 생성 및 출력
+    result_df = DataFrame(rows).set_index("독립변수")
+    display(result_df)   # 결과표 출력
+
+    # --- 3) 시각화: 구간별 경험적 로짓 ---
+    if plot:
+        # 팔레트가 지정되면 첫 번째 색을 선 색상으로 사용
+        line_color = sb.color_palette(palette)[0] if palette else "#328CC1"
+
+        # 변수가 하나면 1칸, 그 이상이면 2칸씩 배치한다
+        if len(targets) == 1:
+            grid_cols = 1
+        else:
+            grid_cols = 2
+
+        grid_rows = int(np.ceil(len(targets) / grid_cols))
+        fig, axes = my_plot.init(width=width, height=height,
+                                 rows=grid_rows, cols=grid_cols)
+
+        # 칸이 하나면 배열이 아닌 단일 객체가 반환되므로 리스트로 감싼다
+        if grid_rows == 1 and grid_cols == 1:
+            axes = [axes]
+
+        for i in range(len(targets)):
+            x = targets[i]
+            axis = axes[i]
+
+            # 독립변수를 크기 순서대로 같은 개수씩 구간으로 나눈다
+            bins = qcut(data[x], groups, duplicates="drop")
+            grouped = data.groupby(bins, observed=True)
+
+            xmid = grouped[x].mean()        # 구간 대표값 (구간 내 평균)
+            count = grouped[yname].count()  # 구간별 관측치 수
+            event = grouped[yname].sum()    # 구간별 사건(=1) 발생 수
+
+            # 사건 비율이 0이나 1이면 로짓이 무한이 되므로 0.5씩 보정한다
+            ratio = (event + 0.5) / (count + 1)
+            emp_logit = np.log(ratio / (1 - ratio))
+
+            # 구간별 경험적 로짓을 선으로 잇는다
+            my_plot.lineplot(x=xmid.values, y=emp_logit.values, color=line_color,
+                             marker="o", ax=axis)
+
+            # 양 끝 두 점을 이은 직선 = "로짓이 직선이라면" 이렇게 되어야 한다는 기준선
+            my_plot.lineplot(x=[xmid.values[0], xmid.values[-1]],
+                             y=[emp_logit.values[0], emp_logit.values[-1]],
+                             color="red", linestyle="--", ax=axis)
+
+            axis.set_title(x, fontsize=16, fontweight=500, pad=10)
+            axis.set_xlabel(x, fontsize=12)
+            axis.set_ylabel("경험적 로짓", fontsize=12)
+
+        # 변수 수가 칸 수보다 적어 남는 칸은 숨긴다
+        for j in range(len(targets), len(axes)):
+            axes[j].set_visible(False)
+
+        my_plot.show(save_path=save_path)
+
+
+def test_multicollinear(fit, data, threshold=10):
+    """VIF(분산팽창계수)로 독립변수 사이의 다중공선성을 점검한다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+        data: 회귀분석에 사용한 원본 데이터프레임.
+        threshold (float): 다중공선성으로 판정할 VIF 기준값 (기본값: 10).
+    """
+    # --- 1) 독립변수별 VIF 계산 ---
+    xnames = []
+    for name in fit.model.exog_names:
+        if name != "const":
+            xnames.append(name)
+
+    vif = my_stats.compute_vif(data, columns=xnames)
+
+    # --- 2) 기준값과 비교해 변수별 판정 ---
+    rows = []
+    for x in xnames:
+        vif_value = float(vif.loc[x, "VIF"])
+        ok = bool(vif_value < threshold)
+
+        if ok:
+            conclusion = "다중공선성 없음"
+        else:
+            conclusion = f"다중공선성 의심 (VIF ≥ {threshold})"
+
+        rows.append({
+            "공차": round(1 / vif_value, 4),
+            "VIF": round(vif_value, 4),
+            "multicollinearity": not ok,
+            "result": conclusion,
+            "독립변수": x,
+        })
+
+    # --- 3) VIF가 큰 변수를 위로 올려 결과표 출력 ---
+    result_df = DataFrame(rows).set_index("독립변수")
+    result_df = result_df.sort_values("VIF", ascending=False)
+    display(result_df)
+
+    print(f"최대 VIF = {result_df['VIF'].max():.4f} · 판정: "
+          f"{'다중공선성 없음' if not result_df['multicollinearity'].any() else '다중공선성 의심'}")
+
+
+def test_separation(fit, se_threshold=10, or_threshold=1000):
+    """계수와 표준오차의 발산 여부를 확인해 완전분리(Perfect Separation)를 진단한다.
+
+    독립변수가 종속변수를 너무 완벽하게 갈라 놓으면 최대우도추정이 수렴하지 못하고
+    계수가 무한대로 밀려난다. 그 결과 오즈비와 표준오차가 함께 폭발해 해석이 불가능해진다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+        se_threshold (float): 표준오차가 이 값 이상이면 발산으로 의심한다 (기본값: 10).
+        or_threshold (float): 오즈비가 이 값 이상(또는 역수 이하)이면 발산으로 의심한다 (기본값: 1000).
+    """
+    # --- 1) 수렴 여부 확인 ---
+    converged = bool(fit.mle_retvals["converged"])
+
+    xnames = []
+    for name in fit.model.exog_names:
+        if name != "const":
+            xnames.append(name)
+
+    # --- 2) 변수별로 계수·표준오차·오즈비의 발산 징후 판정 ---
+    rows = []
+    for x in xnames:
+        b = float(fit.params[x])
+        se = float(fit.bse[x])
+        odds_ratio = float(np.exp(b))
+
+        big_se = se >= se_threshold                     # 표준오차 폭증
+        big_or = odds_ratio >= or_threshold             # 오즈비 폭증
+        small_or = odds_ratio <= 1 / or_threshold       # 오즈비 0에 붙음
+        suspect = bool(big_se or big_or or small_or)
+
+        if suspect:
+            conclusion = "발산 징후 (분리 의심)"
+        else:
+            conclusion = "정상 범위"
+
+        rows.append({
+            "B": round(b, 4),
+            "표준오차": round(se, 4),
+            "오즈비(OR)": round(odds_ratio, 4),
+            "separation": suspect,
+            "result": conclusion,
+            "독립변수": x,
+        })
+
+    result_df = DataFrame(rows).set_index("독립변수")
+    display(result_df)   # 결과표 출력
+
+    # --- 3) 수렴 여부와 발산 징후를 합쳐 최종 판정 ---
+    has_suspect = bool(result_df["separation"].any())
+
+    if converged and not has_suspect:
+        verdict = "완전분리 없음 (정상)"
+    elif not converged:
+        verdict = "수렴 실패 → 완전분리 가능성 매우 높음"
+    else:
+        verdict = "수렴은 했으나 계수가 발산 → 준완전분리 의심"
+
+    print(f"수렴 여부(converged) = {converged} · 판정: {verdict}")
+
+
+def test_influence(fit, cook_threshold=1.0, resid_threshold=3.0, top=5,
+                   plot=True, palette=None, width=1280, height=640, save_path=None):
+    """Cook의 거리와 표준화 잔차로 모형을 흔드는 이상치·영향점을 진단한다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+        cook_threshold (float): 영향점으로 판정할 Cook 거리 기준값 (기본값: 1.0).
+        resid_threshold (float): 이상치로 판정할 표준화 잔차의 절대값 기준 (기본값: 3.0).
+        top (int): 함께 출력할 Cook 거리 상위 관측치 개수 (기본값: 5).
+        plot (bool): Cook 거리 그래프를 그릴지 여부 (기본값: True).
+        palette (str): 그래프 색상에 사용할 팔레트 이름 (기본값: None).
+        width (int): 그래프 너비 (기본값: 1280).
+        height (int): 그래프 높이 (기본값: 640).
+        save_path (str): 그래프 저장 경로 (기본값: None).
+    """
+    # --- 1) 영향력 지표 계산 ---
+    influence = fit.get_influence()
+    cook = influence.cooks_distance[0]      # Cook의 거리 (관측치를 뺐을 때 계수가 흔들리는 정도)
+    leverage = influence.hat_matrix_diag    # 레버리지 (독립변수 공간에서 얼마나 외곽에 있는지)
+    std_resid = influence.resid_studentized  # 표준화 잔차
+
+    n = len(cook)                       # 표본수
+    k = len(fit.params)                 # 추정한 모수의 수 (절편 포함)
+    leverage_cut = 2 * k / n            # 레버리지 관례 기준 (2k/n)
+
+    # --- 2) 기준 초과 건수 집계 ---
+    cook_over = int((cook > cook_threshold).sum())
+    resid_over = int((np.abs(std_resid) > resid_threshold).sum())
+    leverage_over = int((leverage > leverage_cut).sum())
+
+    influential = bool(cook_over > 0)
+
+    if influential:
+        conclusion = f"영향점 존재 (Cook 거리 > {cook_threshold})"
+    else:
+        conclusion = f"영향점 없음 (모든 Cook 거리 ≤ {cook_threshold})"
+
+    summary_df = DataFrame([{
+        "표본수": n,
+        "Cook 거리 최대": round(float(cook.max()), 4),
+        f"Cook > {cook_threshold} 건수": cook_over,
+        f"|표준화잔차| > {resid_threshold} 건수": resid_over,
+        f"레버리지 > {round(leverage_cut, 4)} 건수": leverage_over,
+        "influential": influential,
+        "result": conclusion,
+    }], index=["영향점 진단"])
+
+    display(summary_df.T)   # 항목이 많아 전치해서 출력
+
+    # --- 3) Cook 거리 상위 관측치 확인 ---
+    detail_df = DataFrame({
+        "Cook 거리": cook,
+        "레버리지": leverage,
+        "표준화잔차": std_resid,
+    }, index=fit.model.data.row_labels)
+
+    display(detail_df.sort_values("Cook 거리", ascending=False).head(top).round(4))
+
+    # --- 4) 시각화: 관측치 순서에 따른 Cook 거리 ---
+    if plot:
+        # 팔레트가 지정되면 첫 번째 색을 막대 색상으로 사용
+        bar_color = sb.color_palette(palette)[0] if palette else "#328CC1"
+
+        fig, ax = my_plot.init(width=width, height=height,
+                               xlabel="관측치 순서", ylabel="Cook 거리")
+
+        # 관측치별 Cook 거리를 세로 막대(수직선)로 표현한다
+        ax.vlines(x=range(n), ymin=0, ymax=cook, color=bar_color, alpha=0.8)
+
+        # 관례적으로 함께 보는 보조 기준선 4/n (이 선을 넘는다고 곧 영향점은 아니다)
+        ax.axhline(y=4 / n, color="orange", linestyle="--", alpha=0.8)
+        ax.text(x=n, y=4 / n, s=f" 4/n = {4 / n:.4f}", color="orange",
+                va="bottom", ha="right")
+
+        # 실제 판정 기준선
+        ax.axhline(y=cook_threshold, color="red", linestyle="--", alpha=0.8)
+        ax.text(x=n, y=cook_threshold, s=f" 기준 = {cook_threshold}", color="red",
+                va="bottom", ha="right")
+
+        my_plot.show(save_path=save_path)
+
+
+def test_independent(fit):
+    """Durbin-Watson으로 관측치(잔차)의 독립성을 검정한다.
+
+    로지스틱 회귀에서는 원시잔차 대신 분산을 보정한 피어슨 잔차를 사용한다.
+    본래 시계열 전용 검정이므로, 수집 순서에 의미가 없는 데이터에서는
+    위배로 나와도 무시해도 되는 경우가 많다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+    """
+    # --- 1) 피어슨 잔차로 Durbin-Watson 통계량 계산 ---
+    dw = float(durbin_watson(fit.resid_pearson))
+
+    # --- 2) DW값에 따른 독립성 판정 및 해석 ---
+    if 1.5 <= dw <= 2.5:
+        independence = True
+        conclusion = "독립성 만족"
+    elif dw < 1.5:
+        independence = False
+        conclusion = "독립성 위반 (양(+)의 자기상관)"
+    else:
+        independence = False
+        conclusion = "독립성 위반 (음(-)의 자기상관)"
+
+    # --- 3) 단일 행 결과표 구성 및 출력 ---
+    result_df = DataFrame([{
+        "statistic": round(dw, 4),
+        "independence": independence,
+        "result": conclusion,
+    }], index=["Durbin-Watson"])
+
+    display(result_df)   # 결과표 출력
+
+
+def test_goodfit(fit, groups=10, alpha=0.05, detail=True):
+    """Hosmer-Lemeshow 검정으로 예측 확률과 실제 발생 비율이 맞는지 확인한다.
+
+    예측 확률이 낮은 순서대로 관측치를 같은 개수씩 나눈 뒤, 구간마다
+    "모형이 기대한 사건 수"와 "실제 사건 수"를 비교한다. 다른 검정과 달리
+    **귀무가설이 채택되어야(p ≥ alpha) 적합도가 좋다**는 점을 주의해야 한다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+        groups (int): 예측 확률을 나눌 구간 수 (기본값: 10).
+        alpha (float): 유의수준 (기본값: 0.05).
+        detail (bool): 구간별 기대·관측 빈도표를 함께 출력할지 여부 (기본값: True).
+    """
+    # --- 1) 예측 확률을 크기 순서대로 같은 개수씩 구간으로 나눈다 ---
+    y_true = np.asarray(fit.model.endog).astype(int)
+    proba = np.asarray(fit.predict())
+
+    bins = qcut(proba, groups, duplicates="drop", labels=False)
+    group_df = DataFrame({"실제": y_true, "확률": proba, "구간": bins})
+
+    # --- 2) 구간별 기대 빈도와 관측 빈도를 비교해 통계량을 누적한다 ---
+    statistic = 0.0
+    rows = []
+    for g, sub in group_df.groupby("구간"):
+        size = len(sub)
+        observed_event = float(sub["실제"].sum())          # 실제 사건(=1) 수
+        expected_event = float(sub["확률"].sum())          # 모형이 기대한 사건 수
+        observed_none = size - observed_event              # 실제 비사건(=0) 수
+        expected_none = size - expected_event              # 모형이 기대한 비사건 수
+
+        statistic += (observed_event - expected_event) ** 2 / expected_event
+        statistic += (observed_none - expected_none) ** 2 / expected_none
+
+        rows.append({
+            "구간": int(g) + 1,
+            "관측치 수": size,
+            "확률 하한": round(float(sub["확률"].min()), 4),
+            "확률 상한": round(float(sub["확률"].max()), 4),
+            "관측 사건": int(observed_event),
+            "기대 사건": round(expected_event, 2),
+            "관측 비사건": int(observed_none),
+            "기대 비사건": round(expected_none, 2),
+        })
+
+    if detail:
+        display(DataFrame(rows).set_index("구간"))
+
+    # --- 3) 자유도(구간 수 - 2)로 카이제곱 검정 ---
+    df_hl = len(rows) - 2
+    p = float(1 - chi2.cdf(statistic, df_hl))
+    goodfit = bool(p >= alpha)
+
+    if goodfit:
+        conclusion = "귀무가설 채택 → 예측 확률과 실제 비율이 일치(적합도 양호)"
+    else:
+        conclusion = "대립가설 채택 → 예측 확률과 실제 비율이 어긋남(적합도 불량)"
+
+    # --- 4) 단일 행 결과표 구성 및 출력 ---
+    result_df = DataFrame([{
+        "statistic": round(float(statistic), 4),
+        "df": df_hl,
+        "p-value": round(p, 4),
+        "goodfit": goodfit,
+        "result": conclusion,
+    }], index=["Hosmer-Lemeshow"])
+
+    display(result_df)   # 결과표 출력
+
+
+def test_samplesize(fit, epv=10):
+    """사건당 변수 수(EPV) 기준으로 표본이 충분한지 점검한다.
+
+    로지스틱 회귀는 전체 표본수가 아니라 **적은 쪽 범주의 개수**가 정밀도를 결정한다.
+    독립변수 하나당 적은 쪽 범주가 최소 10건은 있어야 한다는 것이 통상적인 기준이다.
+
+    Args:
+        fit: `fit_model` 함수로 적합된 회귀분석 결과 객체.
+        epv (int): 독립변수 하나당 필요한 최소 사건 수 (기본값: 10).
+    """
+    # --- 1) 범주별 개수와 독립변수 수 확인 ---
+    y_true = np.asarray(fit.model.endog).astype(int)
+    event = int(y_true.sum())               # 사건(=1) 개수
+    none_event = int(len(y_true) - event)   # 비사건(=0) 개수
+    minor = min(event, none_event)          # 적은 쪽 범주의 개수
+
+    k = int(fit.df_model)                   # 독립변수 개수 (절편 제외)
+
+    # --- 2) EPV 계산 및 판정 ---
+    actual_epv = minor / k
+    enough = bool(actual_epv >= epv)
+
+    if enough:
+        conclusion = f"표본 충분 (EPV ≥ {epv})"
+    else:
+        conclusion = f"표본 부족 (EPV < {epv}) → 변수를 줄이거나 표본을 늘릴 것"
+
+    # --- 3) 단일 행 결과표 구성 및 출력 ---
+    result_df = DataFrame([{
+        "표본수": len(y_true),
+        "사건(1)": event,
+        "비사건(0)": none_event,
+        "적은 쪽 범주": minor,
+        "독립변수 수": k,
+        "EPV": round(actual_epv, 2),
+        "필요 최소 사건 수": epv * k,
+        "enough": enough,
+        "result": conclusion,
+    }], index=["EPV(Events Per Variable)"])
+
+    display(result_df.T)   # 항목이 많아 전치해서 출력
