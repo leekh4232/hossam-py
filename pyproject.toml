@@ -59,12 +59,8 @@ dependencies = [
     "geopandas",
     "kmodes",
     "jenkspy",
-    "kneed",
-    "fastparquet"
+    "kneed"
 ]
-
-[project.scripts]
-hossam = "hossam._cli:main"
 
 [project.urls]
 Homepage = "https://github.com/leekh4232/hossam-py"
@@ -78,4 +74,4 @@ include-package-data = true
 include = ["hossam", "hossam.*"]
 
 [tool.setuptools.package-data]
-hossam = ["*.ttf", "*.png"]
+hossam = ["*.ttf", "*.png", "_fingerprints/*.json"]

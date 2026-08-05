@@ -891,7 +891,7 @@ def fit_pipeline(data, y, nominal_cols=None, *,
         alpha (float): 후진소거법의 변수 제거 기준 유의수준 (기본값: 0.05).
         name (str): 모델을 구분할 이름. 결과 객체의 `name_` 속성이 된다 (기본값: None).
         save_path (str): 전처리 완료 데이터의 저장 경로 (.xlsx/.xls/.csv) (기본값: None).
-        verbose (bool): 단계별 전처리 내역 출력 여부 (기본값: False).
+        verbose (bool): 단계별 전처리 내역 출력 여부 (기본값: True).
 
     Returns:
         적합이 완료된 회귀분석 결과 객체. 보고에 필요한 정보가 아래 속성으로 함께 붙는다.
@@ -1127,11 +1127,9 @@ def fit_pipeline(data, y, nominal_cols=None, *,
 # =====================================================================
 # 모델 성능 비교 — 여러 모델의 지표를 한 표로 모아 성능순으로 정렬한다
 # =====================================================================
-# 지표별로 '성능이 좋은 방향' (True = 값이 클수록 좋음)
 def compare_models(fits, metric='RMSE', sub_metric='변수수', tolerance=0.05,
                    digits=4, report=True):
     """여러 회귀모델의 성능지표를 한 표로 정리해 성능이 좋은 순으로 정렬하고, 최고 모델을 반환한다.
-
     주 지표 1위와의 격차가 tolerance 이내면 '근소 격차 그룹'으로 묶어 보조 지표로 순서를 정한다.
     종속변수를 log1p·반사 변환한 모델은 예측값을 원본 척도로 되돌려 RMSE·MAE·R²를 계산한다.
 
@@ -1194,7 +1192,9 @@ def compare_models(fits, metric='RMSE', sub_metric='변수수', tolerance=0.05,
     log_flags = []    # 종속변수의 척도가 섞여 있는지 확인하기 위해 기록
 
     for name, fit in fits.items():
-        # fit_pipeline() 이 붙여 둔 로그 변환 정보. 없으면 변환하지 않은 것으로 본다
+        # --- 3-1) 필요한 정보 추출
+        # fit_pipeline() 이 붙여 둔 로그 변환 정보 추출. 없으면 변환하지 않은 것으로 본다
+        # -> getattr() 로 속성이 없으면 False/None 을 반환하도록 한다
         plain_log_y = getattr(fit, 'log_y_', False)     # 순수 log
         log1p_y = getattr(fit, 'log1p_y_', False)       # log1p
         # 종속변수를 반사 변환(좌측 꼬리)한 경우와 그때 사용한 최댓값
@@ -1210,10 +1210,11 @@ def compare_models(fits, metric='RMSE', sub_metric='변수수', tolerance=0.05,
         y_pred = fit.fittedvalues
 
         if reflect_y and reflect_max is None:
-            # 최댓값을 모르면 되돌릴 수 없으므로, 조용히 틀린 값을 내지 않고 알린다
+            # 최댓값을 모르면 되돌릴 수 없으므로, 에러처리
             raise ValueError(f"'{name}' 은 종속변수를 반사 변환했지만 역변환에 필요한 "
                              f'최댓값(reflect_y_max_)이 없습니다.')
 
+        # --- 3-2) 원 척도로 되돌리기 (로그 변환 여부에 따라 다르다) ---
         if plain_log_y:
             # log(y) 의 역변환: exp(y)
             y_true, y_pred = np.exp(y_true), np.exp(y_pred)
@@ -1224,6 +1225,7 @@ def compare_models(fits, metric='RMSE', sub_metric='변수수', tolerance=0.05,
             y_true = reflect_max - np.expm1(y_true)
             y_pred = reflect_max - np.expm1(y_pred)
 
+        # --- 3-3) 성능지표 계산 ---
         result.append({
             '모델': name,
             '변수수': int(fit.df_model),        # 상수항을 제외한 독립변수 개수
@@ -1296,7 +1298,7 @@ def compare_models(fits, metric='RMSE', sub_metric='변수수', tolerance=0.05,
     # 표는 성능순으로 정렬되어 있으므로 첫 행이 곧 최고 모델이다
     best = fits[score_table.index[0]]
     best.score_table_ = score_table
-
+    
     return best
 
 
@@ -1324,7 +1326,7 @@ def report_model(fit, title=True, plot=True):
     Raises:
         AttributeError: 보고에 필요한 속성이 결과 객체에 없는 경우.
     """
-    # --- 0) 필요한 속성 확인 (fit_pipeline/auto_ols 산출물이 아니면 안내) ---
+    # --- 1) 필요한 속성 확인 (fit_pipeline/auto_ols 산출물이 아니면 안내) ---
     need = ['log1p_y_', 'log1p_x_', 'use_hc3_', 'data_']
     missing = []
     for attr in need:
@@ -1347,16 +1349,16 @@ def report_model(fit, title=True, plot=True):
     reflect_y = getattr(fit, 'reflect_y_', False)
     reflect_x = getattr(fit, 'reflect_x_', [])
 
+    # --- 2) 모델 이름 제목 (선택) ---
     # 제목은 수준에 상관없이 앞에 빈 줄을 하나 두어 위 내용과 간격을 준다
     def heading(text):
         print()
         display(Markdown(text))
 
-    # --- 0-1) 모델 이름 제목 (선택) ---
     if title and getattr(fit, 'name_', None) is not None:
         heading(f"## 최종 모델: {fit.name_}")
 
-    # --- 1) 성능 보고 ---
+    # --- 3) 성능 보고 ---
     heading("### ▶︎ 성능 보고")
 
     heading("#### 1) 모형 적합도")
@@ -1375,10 +1377,10 @@ def report_model(fit, title=True, plot=True):
                                            log1p_y=log1p_y, log1p_x=log1p_x,
                                            reflect_y=reflect_y, reflect_x=reflect_x, hc3=hc3)))
 
-    # --- 2) 성능 보고와 가정 검정 사이 구분선 ---
+    # --- 4) 성능 보고와 가정 검정 사이 구분선 ---
     display(Markdown("---"))
 
-    # --- 3) 회귀모형 가정 검정 ---
+    # --- 5) 회귀모형 가정 검정 ---
     heading("### ▶︎ 회귀모형 가정 검정")
 
     heading("#### 1) 선형성 검정")

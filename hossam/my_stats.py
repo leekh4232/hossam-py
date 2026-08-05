@@ -311,9 +311,9 @@ def test_independent(data, group1, group2, alpha=0.05, plot=True, palette=None,
     report = test_assumptions(paired, columns=list(paired.columns), alpha=alpha)
 
     # 두 집단 모두 정규성을 충족하는지 확인
-    group1_norlmal = bool(report.loc[str(lv[0]), "result"])
+    group1_normal = bool(report.loc[str(lv[0]), "result"])
     group2_normal = bool(report.loc[str(lv[1]), "result"])
-    both_normal = group1_norlmal and group2_normal
+    both_normal = group1_normal and group2_normal
 
     # 등분산성 충족 여부 추출
     equal_var = bool(report[report["test"] == "equal_var"]["result"].iloc[0])

@@ -1,24 +1,26 @@
-import os
-import glob as gl
-from matplotlib import font_manager as fm
-from matplotlib import pyplot as plt
-from pathlib import Path
-
 import importlib.metadata
 import requests
 import pandas as pd
 from importlib.resources import files
 from importlib.metadata import version
 
+import os
+import glob as gl
+from matplotlib import font_manager as fm
+from matplotlib import pyplot as plt
+from pathlib import Path
+
 # -------------------------------------
 # 내보낼 모듈 임포트
 # -------------------------------------
-from . import my_qtcheck
-from . import my_plot
-from . import my_stats
-from . import my_prep
-from . import my_ols
-from . import my_logit
+from . import my_qtcheck    # 데이터 품질 점검 관련 함수 모듈
+from . import my_plot       # 시각화 관련 함수 모듈
+from . import my_stats      # 통계 분석 관련 함수 모듈
+from . import my_prep       # 데이터 전처리 관련 함수 모듈
+from . import my_ols        # 선형회귀 관련 함수 모듈
+from . import my_logit      # 로지스틱 회귀 관련 함수 모듈
+from . import my_timeseries # 시계열 분석 관련 함수 모듈
+from . import code_checker  # 제출 코드를 원본 모듈과 대조하는 모듈
 from . import my_pipeline
 from . import my_util
 from .my_util import load_info
