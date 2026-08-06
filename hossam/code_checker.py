@@ -6,7 +6,7 @@
 
 대조 기준이 되는 원본은 다음 순서로 찾는다.
 
-    1) `source_dir` 인자 또는 `HOSSAM_CHECKER_SRC` 환경변수가 가리키는 폴더
+    1) `source_dir` 인자가 가리키는 폴더
        -> 강사가 `helpers` 를 고치는 중일 때 재배포 없이 즉시 반영된다.
     2) 설치된 `hossam` 패키지 안의 같은 이름 모듈
        -> `helpers` 의 내용이 배포 시점에 패키지로 동기화되므로, 학생이
@@ -56,15 +56,11 @@
     # 아직 배포되지 않은 helpers 의 최신 내용을 기준으로 점검
     code_checker.diff("my_logit", "1.py", source_dir="./helpers")
 
-    # 매번 인자를 넘기기 번거로우면 환경변수로 지정한다
-    os.environ["HOSSAM_CHECKER_SRC"] = "./helpers"
-
     # 원본 모듈을 배포에서 빼는 경우에만 필요한 지문 생성
     code_checker.build("./helpers")
 """
 
 import io
-import os
 import ast
 import copy
 import json
@@ -89,7 +85,6 @@ from ._config import PACKAGE_NAME
 SCHEMA_VERSION = 2                          # 지문 파일 형식 버전
 MODULE_DIR = Path(__file__).resolve().parent
 FINGERPRINT_DIR = MODULE_DIR / "_fingerprints"      # 동봉되는 지문 보관 폴더
-SOURCE_ENV = f"{PACKAGE_NAME.upper()}_CHECKER_SRC"  # 원본 폴더 지정 환경변수 (강사용)
 
 # 문자열 상수를 가릴 때 사용하는 대체값
 # -> 코드 모양은 같고 문자열만 다른 경우를 구분해 내기 위한 장치
@@ -560,16 +555,16 @@ def _source_dir(source_dir=None):
     """원본 폴더를 실시간으로 참조할지 결정한다.
 
     강사가 `helpers` 를 수정하는 중이라면 지문을 다시 만들지 않고도 최신 내용으로
-    대조할 수 있어야 한다. 인자나 환경변수로 원본 폴더가 지정되면 그 자리에서
-    지문을 만들어 쓰고, 지정되지 않으면 패키지에 동봉된 지문을 쓴다.
+    대조할 수 있어야 한다. 인자로 원본 폴더가 지정되면 그 자리에서 지문을 만들어
+    쓰고, 지정되지 않으면 패키지에 동봉된 지문을 쓴다.
 
     Args:
-        source_dir (str): 원본 폴더 경로 (기본값: None → 환경변수 확인).
+        source_dir (str): 원본 폴더 경로 (기본값: None).
 
     Returns:
         Path: 사용할 원본 폴더. 사용하지 않으면 None.
     """
-    path = source_dir or os.environ.get(SOURCE_ENV)
+    path = source_dir
 
     if not path:
         return None
@@ -621,7 +616,7 @@ def load_fingerprint(module, source_dir=None):
         module (str): 원본 모듈 이름 (예: 'my_logit'). 'hossam.my_logit' 처럼
             패키지 이름이 붙어 있어도 된다.
         source_dir (str): 원본 폴더 경로. 지정하면 이 폴더를 최우선으로 참조한다
-            (기본값: None → `HOSSAM_CHECKER_SRC` 환경변수 확인).
+            (기본값: None).
 
     Returns:
         dict: 지문 딕셔너리. 어느 경로에서 왔는지가 `origin` 키에 담긴다.
