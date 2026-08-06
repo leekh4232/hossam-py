@@ -339,6 +339,8 @@
       
         
       
+        
+      
     
     
     
@@ -920,6 +922,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../my_ts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    my_ts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../my_util/" class="md-nav__link">
         
   
@@ -1209,7 +1239,7 @@
 <p>수업에서 배포한 원본 모듈(my_logit, my_ols 등)을 학생이 직접 타이핑해 제출했을 때,
 제출 파일이 원본과 어디에서 어떻게 갈라지는지 찾아 준다.</p>
 <p>대조 기준이 되는 원본은 다음 순서로 찾는다.</p>
-<div class="highlight"><pre><span></span><code>1) `source_dir` 인자 또는 `HOSSAM_CHECKER_SRC` 환경변수가 가리키는 폴더
+<div class="highlight"><pre><span></span><code>1) `source_dir` 인자가 가리키는 폴더
    -&gt; 강사가 `helpers` 를 고치는 중일 때 재배포 없이 즉시 반영된다.
 2) 설치된 `hossam` 패키지 안의 같은 이름 모듈
    -&gt; `helpers` 의 내용이 배포 시점에 패키지로 동기화되므로, 학생이
@@ -1252,9 +1282,6 @@ open(&quot;결과.html&quot;, &quot;w&quot;).write(r.to_html())
 <p>사용 방법 (강사)</p>
 <div class="highlight"><pre><span></span><code># 아직 배포되지 않은 helpers 의 최신 내용을 기준으로 점검
 code_checker.diff(&quot;my_logit&quot;, &quot;1.py&quot;, source_dir=&quot;./helpers&quot;)
-
-# 매번 인자를 넘기기 번거로우면 환경변수로 지정한다
-os.environ[&quot;HOSSAM_CHECKER_SRC&quot;] = &quot;./helpers&quot;
 
 # 원본 모듈을 배포에서 빼는 경우에만 필요한 지문 생성
 code_checker.build(&quot;./helpers&quot;)
@@ -2341,7 +2368,7 @@ code_checker.build(&quot;./helpers&quot;)
             <td>
               <div class="doc-md-description">
                 <p>원본 폴더 경로. 지정하면 이 폴더를 최우선으로 참조한다
-(기본값: None → <code>HOSSAM_CHECKER_SRC</code> 환경변수 확인).</p>
+(기본값: None).</p>
               </div>
             </td>
             <td>
