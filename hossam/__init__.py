@@ -21,10 +21,11 @@ from . import my_ols        # 선형회귀 관련 함수 모듈
 from . import my_logit      # 로지스틱 회귀 관련 함수 모듈
 #from . import my_timeseries # 시계열 분석 관련 함수 모듈
 from . import code_checker  # 제출 코드를 원본 모듈과 대조하는 모듈
-from . import my_docs       # 소스코드로 API 레퍼런스 문서를 생성하는 모듈
+from . import make_docs     # 소스코드로 API 레퍼런스 문서를 생성하는 모듈
 from . import my_pipeline
 from . import my_util
-from .my_docs import make_api_docs
+from .make_docs import make_api_docs
+from .code_checker import diff
 from .my_util import load_info
 from .my_util import load_data
 

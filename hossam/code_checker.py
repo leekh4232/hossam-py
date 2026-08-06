@@ -132,6 +132,12 @@ _BETA_NOTICE = ("코드를 실행해 보고 판단하는 것이 아니라 구조
                 "결과는 참고용으로만 사용하고, 최종 판단은 직접 확인해 주세요.")
 _BETA_COLOR = "#e8710a"
 
+# 문자열 차이를 빼고 보여 줄 때 덧붙이는 안내
+_HIDDEN_HINT = ("문자열 내용만 다른 곳 {n}군데는 빼고 보여 줍니다. "
+                "대부분 출력 문구의 표기 차이라 실행에 영향이 없지만, "
+                "딕셔너리 키나 비교 대상 문자열이면 문제가 될 수 있습니다. "
+                "함께 보려면 force=True 를 주세요.")
+
 
 # -------------------------------------------------------------
 # 내부 유틸리티
@@ -1046,10 +1052,12 @@ class CompareResult:
         imports (DataFrame): 임포트 불일치 표.
         details (dict): 함수별 본문 불일치 위치 목록.
         source (list): 제출 파일의 줄 목록. 문제 지점의 코드를 보여 줄 때 쓴다.
+        force (bool): 문자열 내용만 다른 곳까지 담았는지 여부.
+        suppressed (int): 문자열 차이라서 보고서에서 뺀 곳의 수.
     """
 
     def __init__(self, module, path, fingerprint, defaults, params,
-                 functions, imports, details, source):
+                 functions, imports, details, source, force=True, suppressed=0):
         self.module = module
         self.path = path
         self.origin = fingerprint.get("origin", "알 수 없음")
@@ -1059,6 +1067,8 @@ class CompareResult:
         self.imports = imports
         self.details = details
         self.source = source
+        self.force = force
+        self.suppressed = suppressed
 
     # ---------------------------------------------------------
     # 요약 수치
@@ -1201,7 +1211,17 @@ class CompareResult:
             summary = (f"불일치 {spots}곳" if spots else "본문은 원본과 일치",
                        f"대상 함수 {len(names)}개")
 
+        # 범례는 실제로 나온 갈래만 보여 준다
+        kinds = []
+
+        for b in bodies:
+            for spot in b["지점"]:
+                if spot["kind"] not in kinds:
+                    kinds.append(spot["kind"])
+
         return {
+            "kinds": [k for k in _KIND_INFO if k in kinds],
+            "hidden": 0 if self.force else self.suppressed,
             "signature": signature,
             "bodies": bodies,
             "imports": self.imports.to_dict("records") if names is None else [],
@@ -1350,11 +1370,17 @@ class CompareResult:
 
         # --- 5) 범례 ---
         legend = "".join(
-            f'<div style="margin-top:4px;"><b style="color:{tone};">{k}</b> '
-            f'<span style="opacity:.75;">— {note}</span></div>'
-            for k, (note, tone) in _KIND_INFO.items())
+            f'<div style="margin-top:4px;">'
+            f'<b style="color:{_KIND_INFO[k][1]};">{e(k)}</b> '
+            f'<span style="opacity:.75;">— {e(_KIND_INFO[k][0])}</span></div>'
+            for k in s["kinds"])
 
-        out.append(f'<div style="{box} font-size:12.5px;">{legend}</div>')
+        if s["hidden"]:
+            legend += (f'<div style="margin-top:10px; opacity:.75;">'
+                       f'{e(_HIDDEN_HINT.format(n=s["hidden"]))}</div>')
+
+        if legend:
+            out.append(f'<div style="{box} font-size:12.5px;">{legend}</div>')
         out.append("</div>")
 
         return "".join(out)
@@ -1444,9 +1470,14 @@ class CompareResult:
             out.append("")
 
         # --- 5) 범례 ---
-        out.append("---\n")
-        for k, (note, _) in _KIND_INFO.items():
-            out.append(f"- **{k}** — {note}")
+        if s["kinds"] or s["hidden"]:
+            out.append("---\n")
+
+        for k in s["kinds"]:
+            out.append(f"- **{k}** — {_KIND_INFO[k][0]}")
+
+        if s["hidden"]:
+            out.append(f"\n> {_HIDDEN_HINT.format(n=s['hidden'])}")
 
         return "\n".join(out)
 
@@ -1535,9 +1566,17 @@ class CompareResult:
             out.extend(extras)
 
         # --- 5) 범례 ---
-        out.append(f"\n{bar}")
-        for k, (note, _) in _KIND_INFO.items():
-            out.append(f" {k} — {note}")
+        if s["kinds"] or s["hidden"]:
+            out.append(f"\n{bar}")
+
+        for k in s["kinds"]:
+            for i, chunk in enumerate(_wrap(f"{k} — {_KIND_INFO[k][0]}", 70)):
+                out.append(f" {chunk}" if i == 0 else f"   {chunk}")
+
+        if s["hidden"]:
+            out.append("")
+            for chunk in _wrap(_HIDDEN_HINT.format(n=s["hidden"]), 70):
+                out.append(f" {chunk}")
 
         out.append("")
 
@@ -1688,7 +1727,7 @@ def _compare_statements(ref_stmts, sub_stmts):
     return merged
 
 
-def diff(module, path, source_dir=None, report=True, progress=True):
+def diff(module, path, source_dir=None, report=True, progress=True, force=False):
     """제출 파일을 원본 모듈의 지문과 대조한다.
 
     제출 파일은 실행하지 않고 구문만 해석하므로, 임포트가 깨져 있거나 실행 시
@@ -1701,6 +1740,10 @@ def diff(module, path, source_dir=None, report=True, progress=True):
             실시간으로 참조한다. 강사용 (기본값: None).
         report (bool): 대조 결과를 바로 출력할지 여부 (기본값: True).
         progress (bool): 진행률 표시줄을 보여 줄지 여부 (기본값: True).
+        force (bool): 문자열 내용만 다른 곳까지 함께 보고할지 여부 (기본값: False).
+            대부분은 출력 문구의 표기 차이라 실행에 영향이 없으므로 기본으로는
+            빼고 보여 준다. 딕셔너리 키나 비교 대상 문자열까지 훑어보려면 True.
+            시그니처의 기본값은 이 설정과 무관하게 항상 대조한다.
 
     Returns:
         CompareResult: 대조 결과 객체.
@@ -1734,7 +1777,8 @@ def diff(module, path, source_dir=None, report=True, progress=True):
                 f"  {path}:{e.lineno}줄 → {e.msg}") from None
 
         bar.step("함수 대조 중")
-        result = _build_result(module, path, fingerprint, submitted, source, bar)
+        result = _build_result(module, path, fingerprint, submitted, source,
+                               bar, force)
     finally:
         bar.close()
 
@@ -1744,7 +1788,7 @@ def diff(module, path, source_dir=None, report=True, progress=True):
     return result
 
 
-def _build_result(module, path, fingerprint, submitted, source, bar):
+def _build_result(module, path, fingerprint, submitted, source, bar, force):
     """준비된 두 지문을 대조해 결과 객체를 만든다.
 
     Args:
@@ -1754,6 +1798,7 @@ def _build_result(module, path, fingerprint, submitted, source, bar):
         submitted (dict): 제출 파일 지문.
         source (str): 제출 파일 원문.
         bar (_Progress): 진행률 표시줄.
+        force (bool): 문자열 내용만 다른 곳까지 결과에 담을지 여부.
 
     Returns:
         CompareResult: 대조 결과 객체.
@@ -1765,6 +1810,7 @@ def _build_result(module, path, fingerprint, submitted, source, bar):
     # --- 2) 함수마다 시그니처와 본문을 대조 ---
     defaults, params, rows = [], [], []
     details = {}
+    suppressed = 0        # 문자열 차이라서 보고서에서 뺀 곳의 수
 
     # 함수 수만큼 칸을 늘려 대조가 진행되는 것이 보이게 한다
     bar.grow(len(ref_funcs))
@@ -1787,6 +1833,12 @@ def _build_result(module, path, fingerprint, submitted, source, bar):
             body_items = []
         else:
             body_items = _compare_statements(ref["statements"], sub["statements"])
+
+        # 문자열 내용만 다른 곳은 기본적으로 빼고 몇 군데였는지만 세어 둔다
+        if not force:
+            hidden = [i for i in body_items if i["kind"] == _KIND_STRING]
+            suppressed += sum(i.get("count", 1) for i in hidden)
+            body_items = [i for i in body_items if i["kind"] != _KIND_STRING]
 
         if body_items:
             details[name] = body_items
@@ -1826,6 +1878,8 @@ def _build_result(module, path, fingerprint, submitted, source, bar):
         imports=DataFrame(import_rows, columns=["구분", "이름"]),
         details=details,
         source=source.splitlines(),
+        force=force,
+        suppressed=suppressed,
     )
 
     bar.step("보고서 만드는 중")
