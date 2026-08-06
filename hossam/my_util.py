@@ -36,8 +36,8 @@ def __get_df(path: str, index_col=None) -> DataFrame:
 
     # 파일 확장자가 압축파일인 경우 로컬에 파일을 다운로드 후 압축 해제
     if exec == "zip":
-        tmp_dir = os.getcwd() + "/.hossam_tmp"
-        os.makedirs(tmp_dir, exist_ok=True)
+        # 패키지 이름에 의존하지 않도록 OS의 임시 폴더를 사용한다.
+        tmp_dir = tempfile.mkdtemp(prefix="dataload_")
         zip_path = join(tmp_dir, "data.zip")
 
         # 원격 URL인 경우 파일 다운로드
@@ -136,12 +136,12 @@ def __get_df(path: str, index_col=None) -> DataFrame:
         raise ValueError(f"지원하지 않는 파일 형식입니다: {exec}")
         
     if tmp_dir:
-        shutil.rmtree(tmp_dir)
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
     return df
 
 # -------------------------------------------------------------
-def __get_data_url(key: str, local: str | None = None) -> Tuple[str, Any, Any]:
+def __get_data_url(key: str, local: str | None = None) -> Tuple[str, Any, Any, Any]:
     global BASE_URL
 
     path = None
@@ -172,6 +172,10 @@ def __get_data_url(key: str, local: str | None = None) -> Tuple[str, Any, Any]:
             my_dict = json.loads(f.read())
 
         info = my_dict.get(key.lower())
+
+        if not info:
+            raise FileNotFoundError("%s는 존재하지 않는 데이터에 대한 요청입니다." % key)
+
         path = join(local, info['url'])
 
     return path, info.get('desc'), info.get('index'), info.get('metadata')

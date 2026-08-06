@@ -81,13 +81,15 @@ from difflib import SequenceMatcher
 
 from pandas import DataFrame
 
+from ._config import PACKAGE_NAME
+
 # -------------------------------------------------------------
 # 상수
 # -------------------------------------------------------------
 SCHEMA_VERSION = 2                          # 지문 파일 형식 버전
 MODULE_DIR = Path(__file__).resolve().parent
 FINGERPRINT_DIR = MODULE_DIR / "_fingerprints"      # 동봉되는 지문 보관 폴더
-SOURCE_ENV = "HOSSAM_CHECKER_SRC"                  # 원본 폴더 지정 환경변수 (강사용)
+SOURCE_ENV = f"{PACKAGE_NAME.upper()}_CHECKER_SRC"  # 원본 폴더 지정 환경변수 (강사용)
 
 # 문자열 상수를 가릴 때 사용하는 대체값
 # -> 코드 모양은 같고 문자열만 다른 경우를 구분해 내기 위한 장치
@@ -643,7 +645,7 @@ def load_fingerprint(module, source_dir=None):
 
     if installed:
         fingerprint = analyze_file(installed, module=module)
-        fingerprint["origin"] = f"설치된 hossam {_package_version()} 모듈"
+        fingerprint["origin"] = f"설치된 {PACKAGE_NAME} {_package_version()} 모듈"
 
         # 동봉 지문이 함께 있는데 내용이 어긋나면 동기화가 밀린 것이다
         _warn_if_stale(module, fingerprint)
@@ -706,9 +708,9 @@ def _warn_if_stale(module, fingerprint):
     ship_codes = {k: v["code"] for k, v in shipped.get("functions", {}).items()}
 
     if live_codes != ship_codes:
-        print(f"⚠ hossam/{module}.py 와 동봉 지문의 내용이 서로 다릅니다.\n"
+        print(f"⚠ {PACKAGE_NAME}/{module}.py 와 동봉 지문의 내용이 서로 다릅니다.\n"
               f"  설치된 모듈을 기준으로 대조합니다. "
-              f"(지문 갱신: python -m hossam.code_checker build --src ./helpers)")
+              f"(지문 갱신: python -m {PACKAGE_NAME}.code_checker build --src ./helpers)")
 
 
 def list_modules():

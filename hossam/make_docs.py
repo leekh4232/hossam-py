@@ -30,6 +30,8 @@ import tempfile
 import webbrowser
 from pathlib import Path
 
+from ._config import PACKAGE_NAME
+
 # 문서 생성에 필요한 패키지: (import 이름, pip 설치 이름)
 _REQUIRED_PACKAGES = [
     ("mkdocs", "mkdocs"),
@@ -40,7 +42,7 @@ _REQUIRED_PACKAGES = [
 ]
 
 # 이 모듈이 만든 출력 폴더임을 표시하는 파일 (다른 폴더를 덮어쓰지 않기 위한 표식)
-_MARKER_NAME = ".hossam-api-docs"
+_MARKER_NAME = f".{PACKAGE_NAME}-api-docs"
 
 
 # -------------------------------------------------------------
@@ -233,7 +235,7 @@ def _write_index_page(docs_dir: Path, package: str, modules: list) -> None:
         "소스 코드를 고친 뒤 아래 코드를 다시 실행하면 문서가 갱신됩니다.",
         "",
         "```python",
-        "from hossam import make_api_docs",
+        f"from {PACKAGE_NAME} import make_api_docs",
         "",
         f'make_api_docs("{package}", "...")',
         "```",
@@ -466,7 +468,7 @@ def make_api_docs(src_dir: str, out_dir: str, site_name: str = None,
     # 설정 파일을 임시 폴더에 만들고 빌드
     # -------------------------------------
     print(f"[준비] 모듈 {len(modules)}개: {', '.join(modules)}")
-    build_dir = Path(tempfile.mkdtemp(prefix="hossam-docs-"))
+    build_dir = Path(tempfile.mkdtemp(prefix=f"{PACKAGE_NAME}-docs-"))
 
     try:
         docs_dir = build_dir / "docs"
@@ -491,7 +493,7 @@ def make_api_docs(src_dir: str, out_dir: str, site_name: str = None,
 
     # 이 모듈이 만든 폴더임을 표시 (다음 실행 때 덮어쓰기 확인용)
     (out_path / _MARKER_NAME).write_text(
-        "이 폴더는 hossam.make_api_docs() 가 생성한 문서 폴더입니다.\n", encoding="utf-8"
+        f"이 폴더는 {PACKAGE_NAME}.make_api_docs() 가 생성한 문서 폴더입니다.\n", encoding="utf-8"
     )
 
     index_file = out_path / "index.html"
