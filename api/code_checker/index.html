@@ -18,7 +18,7 @@
         <link rel="prev" href="../hossam/">
       
       
-        <link rel="next" href="../my_logit/">
+        <link rel="next" href="../make_docs/">
       
       
         
@@ -316,6 +316,8 @@
   
     
     
+      
+        
       
         
       
@@ -682,6 +684,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../make_docs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    make_docs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1373,6 +1403,28 @@ code_checker.build(&quot;./helpers&quot;)
             <td>
               <div class="doc-md-description">
                 <p>제출 파일의 줄 목록. 문제 지점의 코드를 보여 줄 때 쓴다.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="hossam.code_checker.CompareResult.force">force</span></code></td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>문자열 내용만 다른 곳까지 담았는지 여부.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="hossam.code_checker.CompareResult.suppressed">suppressed</span></code></td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>문자열 차이라서 보고서에서 뺀 곳의 수.</p>
               </div>
             </td>
           </tr>
@@ -2406,6 +2458,7 @@ code_checker.build(&quot;./helpers&quot;)
     <span class="n">source_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">report</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -2506,6 +2559,25 @@ code_checker.build(&quot;./helpers&quot;)
             </td>
             <td>
                   <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>force</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>문자열 내용만 다른 곳까지 함께 보고할지 여부 (기본값: False).
+대부분은 출력 문구의 표기 차이라 실행에 영향이 없으므로 기본으로는
+빼고 보여 준다. 딕셔너리 키나 비교 대상 문자열까지 훑어보려면 True.
+시그니처의 기본값은 이 설정과 무관하게 항상 대조한다.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
             </td>
           </tr>
       </tbody>
