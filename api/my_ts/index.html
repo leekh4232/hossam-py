@@ -880,10 +880,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.my_ts.plot_lag" class="md-nav__link">
+  <a href="#hossam.my_ts.auto_correlation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        plot_lag
+        auto_correlation
       
     </span>
   </a>
@@ -891,10 +891,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.my_ts.report_correlation" class="md-nav__link">
+  <a href="#hossam.my_ts.fit_model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        report_correlation
+        fit_model
       
     </span>
   </a>
@@ -902,21 +902,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.my_ts.plot_correlation" class="md-nav__link">
+  <a href="#hossam.my_ts.predict" class="md-nav__link">
     <span class="md-ellipsis">
       
-        plot_correlation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.my_ts.report_order" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        report_order
+        predict
       
     </span>
   </a>
@@ -1143,10 +1132,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.my_ts.plot_lag" class="md-nav__link">
+  <a href="#hossam.my_ts.auto_correlation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        plot_lag
+        auto_correlation
       
     </span>
   </a>
@@ -1154,10 +1143,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.my_ts.report_correlation" class="md-nav__link">
+  <a href="#hossam.my_ts.fit_model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        report_correlation
+        fit_model
       
     </span>
   </a>
@@ -1165,21 +1154,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hossam.my_ts.plot_correlation" class="md-nav__link">
+  <a href="#hossam.my_ts.predict" class="md-nav__link">
     <span class="md-ellipsis">
       
-        plot_correlation
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hossam.my_ts.report_order" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        report_order
+        predict
       
     </span>
   </a>
@@ -2637,8 +2615,10 @@ p-value를 낮추는 것이 목적이 아니라 필요한 만큼만 차분하는
     <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span>
-    <span class="n">height</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
+    <span class="n">rows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">960</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">480</span><span class="p">,</span>
     <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
@@ -2759,6 +2739,38 @@ p-value를 낮추는 것이 목적이 아니라 필요한 만큼만 차분하는
           </tr>
           <tr class="doc-section-item">
             <td>
+                <code>rows</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>격자 행 수 (기본값: 2).</p>
+              </div>
+            </td>
+            <td>
+                  <code>2</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>cols</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>격자 열 수 (기본값: 2).</p>
+              </div>
+            </td>
+            <td>
+                  <code>2</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
                 <code>width</code>
             </td>
             <td>
@@ -2766,11 +2778,11 @@ p-value를 낮추는 것이 목적이 아니라 필요한 만큼만 차분하는
             </td>
             <td>
               <div class="doc-md-description">
-                <p>캔버스 가로 픽셀 (기본값: 1280).</p>
+                <p>캔버스 가로 픽셀 (기본값: 960).</p>
               </div>
             </td>
             <td>
-                  <code>1280</code>
+                  <code>960</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -2782,11 +2794,11 @@ p-value를 낮추는 것이 목적이 아니라 필요한 만큼만 차분하는
             </td>
             <td>
               <div class="doc-md-description">
-                <p>한 단의 세로 픽셀 (기본값: 250).</p>
+                <p>한 단의 세로 픽셀 (기본값: 480).</p>
               </div>
             </td>
             <td>
-                  <code>250</code>
+                  <code>480</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -3330,29 +3342,28 @@ p-value를 낮추는 것이 목적이 아니라 필요한 만큼만 차분하는
 <div class="doc doc-object doc-function">
 
 
-<h3 id="hossam.my_ts.plot_lag" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">plot_lag</span>
+<h3 id="hossam.my_ts.auto_correlation" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">auto_correlation</span>
 
 
-<a href="#hossam.my_ts.plot_lag" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">plot_lag</span><span class="p">(</span>
+<a href="#hossam.my_ts.auto_correlation" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">auto_correlation</span><span class="p">(</span>
     <span class="n">data</span><span class="p">,</span>
-    <span class="n">lag</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">rows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">380</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">width</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span>
-    <span class="n">height</span><span class="o">=</span><span class="mi">560</span><span class="p">,</span>
     <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>현재 값과 lag 시점 전의 값을 산점도로 그려 자기상관을 눈으로 확인한다.</p>
-<p>비정상 시계열의 상관계수는 추세 때문에 자동으로 높게 나오므로 의미가 없다.</p>
+        <p>ACF와 PACF를 한 번에 계산해 유의성과 차수 후보(p·q·P·Q)를 판정한다.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3375,27 +3386,11 @@ p-value를 낮추는 것이 목적이 아니라 필요한 만큼만 차분하는
             </td>
             <td>
               <div class="doc-md-description">
-                <p>시계열 데이터.</p>
+                <p>정상성을 만족하는 시계열 데이터.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>lag</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>몇 시점 전의 값과 비교할지 (기본값: 1).</p>
-              </div>
-            </td>
-            <td>
-                  <code>1</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -3408,6 +3403,564 @@ p-value를 낮추는 것이 목적이 아니라 필요한 만큼만 차분하는
             <td>
               <div class="doc-md-description">
                 <p>data가 데이터프레임인 경우 대상 컬럼명 (기본값: None).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>period</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>계절 주기. None이면 계절 차수를 판정하지 않음 (기본값: None).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>plot</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>ACF·PACF 그래프를 그릴지 여부 (기본값: True).</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>rows</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>그래프 격자의 행 수 (기본값: 2).</p>
+              </div>
+            </td>
+            <td>
+                  <code>2</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>cols</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>그래프 격자의 열 수 (기본값: 1).</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>width</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>캔버스 가로 픽셀 (기본값: 1280).</p>
+              </div>
+            </td>
+            <td>
+                  <code>1280</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>height</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>한 칸의 세로 픽셀 (기본값: 380).</p>
+              </div>
+            </td>
+            <td>
+                  <code>380</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>title</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>그래프 제목 (기본값: None).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>save_path</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>이미지 저장 경로 (기본값: None).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>DataFrame</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>lag별 acf·pacf·유의성과 차수 위치 표시.
+가장 뒤쪽 차수의 lag까지만 잘라서 반환하며,
+차수가 모두 0이면 근거를 볼 수 있도록 전체를 반환한다.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_ts.fit_model" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">fit_model</span>
+
+
+<a href="#hossam.my_ts.fit_model" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">fit_model</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">d</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">q</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">P</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">D</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">Q</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">s</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">log</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">search_diff</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">report</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>차수 범위 안의 모든 SARIMA 조합을 적합해 AIC가 가장 낮은 모형을 고른다.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pandas.Series">Series</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>차분하지 않은 원본 시계열.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>column</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>data가 데이터프레임인 경우 대상 컬럼명 (기본값: None).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>p</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>비계절 AR 차수의 상한 (기본값: 1).</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>d</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>일반 차분 횟수 (기본값: 1).</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>q</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>비계절 MA 차수의 상한 (기본값: 1).</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>P</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>계절 AR 차수의 상한 (기본값: 1).</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>D</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>계절 차분 횟수 (기본값: 1).</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>Q</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>계절 MA 차수의 상한 (기본값: 1).</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>s</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>계절 주기. None이면 계절 성분을 쓰지 않음 (기본값: None).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>log</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>로그를 씌워 적합할지 여부 (기본값: False).</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>search_diff</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>d·D도 0부터 탐색할지 여부 (기본값: False).</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>report</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>조합별 AIC·BIC 결과표 출력 여부 (기본값: True).</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>summary</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>선택된 모형의 요약 통계량 출력 여부 (기본값: False).</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>선택된 차수로 적합한 SARIMAX 결과 객체.
+탐색 결과표가 <code>grid_</code>, 로그변환 여부가 <code>log_</code> 속성으로 붙는다.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_ts.predict" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">predict</span>
+
+
+<a href="#hossam.my_ts.predict" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">predict</span><span class="p">(</span>
+    <span class="n">fit</span><span class="p">,</span>
+    <span class="n">steps</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">history</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">520</span><span class="p">,</span>
+    <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>적합된 SARIMA 모형으로 관측 구간 다음의 예측값과 예측구간을 계산한다.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>fit</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>fit_model</code> 함수로 적합된 SARIMAX 결과 객체.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>steps</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>내다볼 시점의 개수. 계절 주기를 넣으면 한 시즌이 된다.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>alpha</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>예측구간의 유의수준. 0.05면 95% 구간 (기본값: 0.05).</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.05</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>plot</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>관측값과 예측 결과를 그래프로 그릴지 여부 (기본값: True).</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>history</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>그래프에 함께 그릴 최근 관측치 수. None이면 전체 (기본값: None).</p>
               </div>
             </td>
             <td>
@@ -3471,11 +4024,11 @@ p-value를 낮추는 것이 목적이 아니라 필요한 만큼만 차분하는
             </td>
             <td>
               <div class="doc-md-description">
-                <p>캔버스 가로 픽셀 (기본값: 640).</p>
+                <p>캔버스 가로 픽셀 (기본값: 1280).</p>
               </div>
             </td>
             <td>
-                  <code>640</code>
+                  <code>1280</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -3487,11 +4040,11 @@ p-value를 낮추는 것이 목적이 아니라 필요한 만큼만 차분하는
             </td>
             <td>
               <div class="doc-md-description">
-                <p>캔버스 세로 픽셀 (기본값: 560).</p>
+                <p>캔버스 세로 픽셀 (기본값: 520).</p>
               </div>
             </td>
             <td>
-                  <code>560</code>
+                  <code>520</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -3508,144 +4061,6 @@ p-value를 낮추는 것이 목적이 아니라 필요한 만큼만 차분하는
             </td>
             <td>
                   <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>ax</code>
-            </td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>그래프를 그릴 Axes 객체. None이면 새로 생성 (기본값: None).</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>float</code></td>            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>현재 값과 lag 시점 전 값의 상관계수.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="hossam.my_ts.report_correlation" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">report_correlation</span>
-
-
-<a href="#hossam.my_ts.report_correlation" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">report_correlation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">lags</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;acf&#39;</span><span class="p">)</span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>ACF 또는 PACF 계수를 구하고 유의성과 절단 지점을 판정한다.</p>
-<p>반드시 정상 시계열에 적용한다. 비정상 시계열은 모든 시차가 유의하게 나와
-어디서 끊기는지 판단할 수 없다.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>data</code>
-            </td>
-            <td>
-                  <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pandas.Series">Series</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>정상성을 만족하는 시계열 데이터.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>lags</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>확인할 최대 시차. 계절 주기의 2~3배로 잡는다.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>column</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>data가 데이터프레임인 경우 대상 컬럼명 (기본값: None).</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>kind</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>"acf"(자기상관) 또는 "pacf"(부분자기상관) (기본값: "acf").</p>
-              </div>
-            </td>
-            <td>
-                  <code>&#39;acf&#39;</code>
             </td>
           </tr>
       </tbody>
@@ -3666,320 +4081,7 @@ p-value를 낮추는 것이 목적이 아니라 필요한 만큼만 차분하는
             </td>
             <td>
               <div class="doc-md-description">
-                <p>시차를 인덱스로 하는 계수·절댓값·기준값·유의성·절단후보.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="hossam.my_ts.plot_correlation" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">plot_correlation</span>
-
-
-<a href="#hossam.my_ts.plot_correlation" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">plot_correlation</span><span class="p">(</span>
-    <span class="n">data</span><span class="p">,</span>
-    <span class="n">lags</span><span class="p">,</span>
-    <span class="n">column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">p</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">q</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span>
-    <span class="n">height</span><span class="o">=</span><span class="mi">380</span><span class="p">,</span>
-    <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>ACF와 PACF를 위아래로 그리고, 차수를 주면 판정 위치에 세로선을 표시한다.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>data</code>
-            </td>
-            <td>
-                  <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pandas.Series">Series</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>정상성을 만족하는 시계열 데이터.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>lags</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>확인할 최대 시차. 계절 주기의 2~3배로 잡는다.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>column</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>data가 데이터프레임인 경우 대상 컬럼명 (기본값: None).</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>p</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>PACF에 표시할 AR 차수 (기본값: None).</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>q</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>ACF에 표시할 MA 차수 (기본값: None).</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>title</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>그래프 제목 (기본값: None).</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>width</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>캔버스 가로 픽셀 (기본값: 1280).</p>
-              </div>
-            </td>
-            <td>
-                  <code>1280</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>height</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>한 단의 세로 픽셀 (기본값: 380).</p>
-              </div>
-            </td>
-            <td>
-                  <code>380</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>save_path</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>이미지 저장 경로 (기본값: None).</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="hossam.my_ts.report_order" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">report_order</span>
-
-
-<a href="#hossam.my_ts.report_order" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">report_order</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">lags</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>ACF와 PACF의 절단 지점에서 AR·MA 차수 후보와 계절 성분을 판정한다.</p>
-<p>ACF/PACF는 후보를 좁히는 도구이지 정답을 주는 도구가 아니다.
-최종 차수는 실제로 적합해 보고 AIC/BIC로 고른다.
-일반차분(d)과 계절차분(D) 횟수는 adf_diff · adf_transform이 담당한다.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>data</code>
-            </td>
-            <td>
-                  <code><span title="pandas.DataFrame">DataFrame</span> | <span title="pandas.Series">Series</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>정상성을 만족하는 시계열 데이터.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>lags</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>확인할 최대 시차. 계절 주기의 2~3배로 잡는다.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>column</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>data가 데이터프레임인 경우 대상 컬럼명 (기본값: None).</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>period</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>계절 주기. None이면 계절 성분을 판정하지 않음 (기본값: None).</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>dict</code></td>            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>p · q · period · seasonal · seasonal_lags.</p>
+                <p>미래 시점을 인덱스로 하는 예측 표 (pred · lower · upper).</p>
               </div>
             </td>
           </tr>
