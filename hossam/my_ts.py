@@ -17,6 +17,9 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.stattools import acf, pacf
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 
+# 잔차 진단 (무상관)
+from statsmodels.stats.diagnostic import acorr_ljungbox
+
 from . import my_plot
 
 
@@ -916,8 +919,7 @@ def auto_correlation(data, column=None, period=None, plot=True,
     print(f"관측치 {n}개 | 유의성 기준값 {threshold:.3f} | "
             f"최대 시차 {lags} (상한 N/4={limit})")
 
-    for name, code, order, kind, step in (("AR", "p", p, "PACF", 1),
-                                            ("MA", "q", q, "ACF", 1)):
+    for name, code, order, kind, step in (("AR", "p", p, "PACF", 1), ("MA", "q", q, "ACF", 1)):
         reason = (f"{kind}가 lag {order * step} 이후 절단" if order
                     else f"{kind}가 lag {step}부터 비유의")
         print(f"{name} 차수 후보 ({code}): {order}   ← {reason}")
@@ -1162,5 +1164,242 @@ def predict(fit, steps, alpha=0.05, plot=True, history=None,
 
     ax.legend()
     my_plot.show(save_path=save_path)
+
+    return result
+
+
+# ===================================================================
+# [6단원] 잔차 진단 — 무상관 · 정규성 · 등분산성을 한 번에 점검
+# ===================================================================
+def report_residual(fit, alpha=0.05, report=True, plot=True, title=None, 
+                    xlabel=None, ylabel=None, width=800, height=480, save_path=None):
+    """적합된 시계열 모형의 잔차가 세 가지 가정을 만족하는지 한 표로 점검한다.
+
+    잔차에 패턴이 남아 있으면 모형이 아직 뽑아내지 못한 정보가 있다는 뜻이고,
+    정규성·등분산성이 깨지면 예측구간의 폭을 그대로 믿을 수 없게 된다.
+
+    Args:
+        fit: 적합된 시계열 모형 결과 객체.
+        alpha (float): 유의수준 (기본값: 0.05).
+        report (bool): 종합 판정 문장 출력 여부 (기본값: True).
+        plot (bool): 잔차의 흐름과 분포를 그래프로 그릴지 여부 (기본값: True).
+        title (str): 그래프 전체 제목 (기본값: None).
+        xlabel (str): 잔차 흐름 그래프의 x축 레이블 (기본값: None).
+        ylabel (str): 잔차 흐름 그래프의 y축 레이블 (기본값: None).
+        width (int): 캔버스 한 칸의 가로 픽셀 (기본값: 800).
+        height (int): 캔버스 세로 픽셀 (기본값: 480).
+        save_path (str): 이미지 저장 경로 (기본값: None).
+
+    Returns:
+        DataFrame: 검정명을 인덱스로 하는 잔차 진단 결과표.
+    """
+    # --- 1) 모형에서 차수 정보를 꺼낸다 ---
+    # SARIMAX 계열은 (p,d,q)와 (P,D,Q,s)를 모형 객체가 그대로 들고 있다.
+    # 여기서 쓰는 값은 차분 횟수(d·D)와 계절 주기(period)뿐이다
+    model = getattr(fit, "model", None)
+    p, d, q = getattr(model, "order", (0, 0, 0))
+    P, D, Q, period = getattr(model, "seasonal_order", (0, 0, 0, 0))
+
+    # --- 2) 진단 대상 잔차 준비 ---
+    x = Series(fit.resid).dropna()
+
+    # 차분이 소모한 앞 구간은 모형이 아직 자리를 잡지 못해 잔차가 비정상적으로 크다
+    burn = d + D * period
+
+    if burn:
+        x = x.iloc[burn:]
+
+    result = []     # 검정 결과를 담을 리스트
+
+    # --- 3) 무상관 : Ljung-Box 검정 ---
+    # 여러 시차를 한 묶음으로 검정해 "남은 자기상관이 있는가"를 판정한다
+    # 계절 주기가 있으면 한 시즌·두 시즌, 없으면 관례값인 10 시차를 본다
+    # (Hyndman & Athanasopoulos, 2021), statsmodels 내부 코드도 10 시차를 기본값으로 쓴다
+    lags = [period, period * 2] if period else [10]
+
+    # 모형이 추정한 계수 수만큼 자유도를 빼야 한다. 시차가 이보다 작으면 검정이 성립하지 않는다
+    model_df = p + q + P + Q
+
+    # 시차가 표본 대비 크면 검정력이 떨어진다. 관례에 따라 관측치 수의 1/5로 제한한다
+    lags = [lag for lag in lags if model_df < lag <= len(x) // 5]
+
+    # 시차가 하나도 남지 않으면 관례값을 쓰되, 관측치 수의 1/5보다 크면 안 된다
+    if not lags: lags = [max(model_df + 1, len(x) // 5)]
+
+    # 무상관 검정 수행
+    lb = acorr_ljungbox(x, lags=lags, model_df=model_df, return_df=True)
+
+    # 검정 결과를 표로 정리
+    for lag, row in lb.iterrows():
+        passed = bool(row["lb_pvalue"] >= alpha)
+
+        result.append({
+            "검정": f"Ljung-Box (시차 {lag})",
+            "가정": "무상관",
+            "관측치 수": len(x),
+            "통계량": round(row["lb_stat"], 3),
+            "p-value": round(row["lb_pvalue"], 4),
+            "통과": passed,
+            "판정": "통과 (자기상관 없음)" if passed else "실패 (자기상관 남음)",
+            "비고": f"자유도 {lag - model_df}",
+        })
+
+    # --- 4) 정규성 : Jarque-Bera 검정 ---
+    jb_stat, jb_p, skew, kurtosis = fit.test_normality("jarquebera")[0]
+
+    passed = bool(jb_p >= alpha)
+
+    result.append({
+        "검정": "Jarque-Bera",
+        "가정": "정규성",
+        "관측치 수": len(x),
+        "통계량": round(jb_stat, 3),
+        "p-value": round(jb_p, 4),
+        "통과": passed,
+        "판정": "통과 (정규성 만족)" if passed else "실패 (정규성 위배)",
+        "비고": f"왜도 {skew:.3f} · 첨도 {kurtosis:.3f}",
+    })
+
+    # --- 5) 등분산성 : 이분산(H) 검정 ---
+    h_stat, h_p = fit.test_heteroskedasticity("breakvar")[0]
+
+    passed = bool(h_p >= alpha)     # 이분산 검정 통과 여부
+
+    # 검정 결과를 표로 정리
+    result.append({
+        "검정": "이분산(H)",
+        "가정": "등분산성",
+        "관측치 수": len(x),
+        "통계량": round(h_stat, 3),
+        "p-value": round(h_p, 4),
+        "통과": passed,
+        "판정": "통과 (등분산)" if passed else "실패 (이분산)",
+        # H > 1이면 예측구간이 좁게(낙관적), H < 1이면 넓게(보수적) 잡힌다
+        "비고": "뒤로 갈수록 커짐" if h_stat > 1 else "뒤로 갈수록 작아짐",
+    })
+
+    # --- 6) 결과표 구성 ---
+    result = DataFrame(result).set_index("검정")
+
+    if report:
+        failed = list(result.index[~result["통과"]])
+
+        print(f"진단 대상 {len(x)}개 (앞 {burn}개 제외) | 유의수준 {alpha}")
+        print("실패한 검정:", ", ".join(failed) if failed else "없음 (모든 가정 통과)")
+
+    if not plot:               # 그래프 옵션 off시 결과 반환 및 함수 종료
+        return result
+
+    # --- 7) 잔차의 모습 살펴보기 ---
+    # 검정 결과는 숫자 하나로만 말해 준다. 눈으로 봐야 잡히는 문제도 있다
+    fig, ax = my_plot.init(rows=1, cols=2, width=width, height=height, title=title)
+
+    # 시간에 따른 잔차 : 0 주변을 무작위로 오가야 한다
+    my_plot.lineplot(x=x.index, y=x.values, ax=ax[0])
+    ax[0].axhline(0, color="red", linestyle="--", linewidth=1)
+    ax[0].set_title("시간에 따른 잔차")
+    ax[0].set_xlabel(xlabel)
+    ax[0].set_ylabel(ylabel)
+
+    # 잔차의 분포 : 종 모양이어야 한다
+    my_plot.histplot(data=x.to_frame(name="잔차"), x="잔차", kde=True, ax=ax[1])
+    ax[1].set_title("잔차의 분포")
+
+    my_plot.show(save_path=save_path)
+
+    return result
+
+
+# ===================================================================
+# [6단원] 적합도 평가 — 기준선과 나란히 비교하는 성능 지표표
+# ===================================================================
+def report_score(fit, name="적합값", report=True):
+    """모형의 예측값과 기준선(나이브)의 오차를 원래 단위에서 나란히 비교한다.
+
+    성능 지표는 혼자 보면 잘한 것인지 알 수 없다.
+    "작년 같은 달과 똑같을 것이다" 수준의 기준선을 함께 계산해 비교 대상으로 삼는다.
+
+    Args:
+        fit: 적합된 시계열 모형 결과 객체.
+        name (str): 결과표에 표시할 모형 행 이름 (기본값: "적합값").
+        report (bool): 평가 구간과 기준선 대비 개선폭 출력 여부 (기본값: True).
+
+    Returns:
+        DataFrame: 대상을 인덱스로 하는 성능 지표표 (MAE · RMSE · MAPE).
+    """
+    # --- 1) 모형에서 차수 정보를 꺼낸다 ---
+    # 여기서 쓰는 값은 차분 횟수(d·D)와 계절 주기(s)뿐이다
+    model = getattr(fit, "model", None)
+    p, d, q = getattr(model, "order", (0, 0, 0))
+    P, D, Q, s = getattr(model, "seasonal_order", (0, 0, 0, 0))
+
+    # 로그를 씌워 적합했다면 지표는 반드시 원래 단위로 되돌린 뒤 계산해야
+    # "몇 명 틀리는가"를 말할 수 있다
+    log = getattr(fit, "log_", False)
+
+    # --- 2) 관측값과 예측값 확보 ---
+    # 적합에 쓴 시계열은 결과 객체가 그대로 들고 있다. 따로 넘겨받을 필요가 없다
+    endog = model.data.orig_endog
+
+    actual = endog if isinstance(endog, Series) else \
+        Series(np.asarray(endog).ravel(), index=fit.fittedvalues.index)
+
+    pred = fit.fittedvalues
+
+    if log:
+        actual = np.exp(actual)
+        pred = np.exp(pred)
+
+    # --- 3) 기준선(나이브) 준비 ---
+    # 계절 주기가 있으면 작년 같은 달, 없으면 직전 시점을 그대로 예측값으로 쓴다
+    period = s if s else 1
+
+    base_name = f"계절 나이브 (시차 {period})" if period > 1 else "나이브 (직전값)"
+
+    # --- 4) 공통 평가 구간 맞추기 ---
+    # 대상마다 유효 구간이 다르면 비교가 성립하지 않는다. 모두 존재하는 구간만 남긴다
+    table = DataFrame({
+        "관측값": actual,
+        name: pred,
+        base_name: actual.shift(period),    # 기준선은 항상 함께 계산한다
+    })
+
+    # 차분이 소모한 앞 구간은 모형이 아직 자리를 잡지 못해 오차가 비정상적으로 크다
+    burn = d + D * s
+
+    # 차분이 소모한 구간이 있다면 그 구간은 평가에서 제외
+    if burn: table = table.iloc[burn:]
+
+    # 관측값이 없는 시점은 평가에서 제외
+    table = table.dropna()
+
+    # --- 5) 대상별 지표 계산 ---
+    y = table["관측값"].values   # 관측값
+    nonzero = y != 0            # 관측값이 0인 시점은 MAPE를 계산할 수 없다
+    result = []                 # 지표를 담을 리스트
+
+    for target in table.columns[1:]:        # 0번째 컬럼은 관측값이므로 제외
+        error = y - table[target].values    # 오차 계산 (관측값 − 예측값)
+
+        result.append({
+            "대상": target,
+            "관측치 수": len(error),
+            "MAE": round(np.mean(np.abs(error)), 3),
+            "RMSE": round(np.sqrt(np.mean(error ** 2)), 3),
+            "MAPE(%)": round(np.mean(np.abs(error[nonzero] / y[nonzero])) * 100, 3)
+            if nonzero.any() else np.nan,
+        })
+
+    result = DataFrame(result).set_index("대상")
+
+    # --- 6) 기준선 대비 개선폭 출력 및 반환 ---
+    if report:
+        model_mape = result.loc[name, "MAPE(%)"]
+        base_mape = result.loc[base_name, "MAPE(%)"]
+        gap = (base_mape - model_mape) / base_mape * 100
+
+        print(f"평가 구간 {len(table)}개 ({table.index[0]} ~ {table.index[-1]})")
+        print(f"MAPE {base_mape:.3f}% → {model_mape:.3f}% | "
+              f"기준선 대비 {abs(gap):.1f}% {'개선' if gap > 0 else '악화'}")
 
     return result
