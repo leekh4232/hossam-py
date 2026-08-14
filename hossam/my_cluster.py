@@ -1201,6 +1201,7 @@ def persona(data, labels=None, columns=None, cluster_name='ClusterID',
             if verbose:
                 print(f"  군집 {c} - {column} : 최빈값 = {persona_item[column]}")
 
+        # 7-5) 군집별 대표값을 리스트에 추가
         persona_list.append(persona_item)
 
     # --- 8) 페르소나 표 완성 (군집 번호 순으로 정렬) ---
