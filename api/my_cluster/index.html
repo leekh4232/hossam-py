@@ -18,7 +18,7 @@
         <link rel="prev" href="../make_docs/">
       
       
-        <link rel="next" href="../my_logit/">
+        <link rel="next" href="../my_gis/">
       
       
         
@@ -343,6 +343,12 @@
       
         
       
+        
+      
+        
+      
+        
+      
     
     
     
@@ -619,6 +625,61 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hossam.my_cluster.plot_dendrogram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_dendrogram
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_cluster.agglomerative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        agglomerative
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_cluster.best_eps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        best_eps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_cluster.dbscan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dbscan
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_cluster.persona" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        persona
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -628,6 +689,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../my_gis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    my_gis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -676,6 +765,34 @@
     
   
     my_ols
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../my_outlier_clipper/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    my_outlier_clipper
   
 
     
@@ -885,6 +1002,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../my_vif_selector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    my_vif_selector
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -990,6 +1135,61 @@
     <span class="md-ellipsis">
       
         dendrogram_source
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_cluster.plot_dendrogram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plot_dendrogram
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_cluster.agglomerative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        agglomerative
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_cluster.best_eps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        best_eps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_cluster.dbscan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dbscan
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hossam.my_cluster.persona" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        persona
       
     </span>
   </a>
@@ -1488,6 +1688,395 @@ k별 이너셔·감소량·실루엣 지표를 한 표로 합친 데이터프레
             <td>
               <div class="doc-md-description">
                 <p>[자식1, 자식2, 병합거리, 포함 샘플수] 형태의 linkage 행렬</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_cluster.plot_dendrogram" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">plot_dendrogram</span>
+
+
+<a href="#hossam.my_cluster.plot_dendrogram" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">plot_dendrogram</span><span class="p">(</span>
+    <span class="n">estimator</span><span class="p">,</span>
+    <span class="n">cut_height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">p</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">truncate_mode</span><span class="o">=</span><span class="s2">&quot;lastp&quot;</span><span class="p">,</span>
+    <span class="n">leaf_rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">leaf_font_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">count_sort</span><span class="o">=</span><span class="s2">&quot;ascending&quot;</span><span class="p">,</span>
+    <span class="n">cut_line</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">cut_color</span><span class="o">=</span><span class="s2">&quot;#ff0000&quot;</span><span class="p">,</span>
+    <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;병합 거리&quot;</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span>
+    <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>계층적 군집 모델이 합쳐온 과정을 덴드로그램으로 그리는 함수</p>
+<p>Args (기본값은 위의 함수 정의 참고):
+    estimator: compute_distances=True 로 학습한 AgglomerativeClustering 모델
+    cut_height: 나무를 자른 높이(병합 거리). 이 높이 아래의 가지를 군집별로 다른
+        색으로 칠하고 가로선으로 표시한다. None이면 모델이 실제로 자른 높이를
+        직접 계산해서 쓰므로, 보통은 지정할 필요가 없다
+    title, xlabel, ylabel: 그래프 제목(None이면 '덴드로그램'), x축·y축 이름
+        (xlabel이 None이면 가지를 묶어 그리는지에 따라 자동으로 정한다)
+    p, truncate_mode: 표시할 가지의 개수와 생략 방식
+        ('lastp'=마지막 p개의 가지만, None이면 데이터 전체를 그린다)
+    leaf_rotation, leaf_font_size, count_sort: 아래쪽 눈금의 회전 각도, 글자 크기,
+        가지의 정렬 기준('ascending'이면 작은 덩어리를 왼쪽에 둔다)
+    cut_line, cut_color: 자른 높이를 가로선으로 표시할지 여부와 그 색상
+    width, height, save_path, ax: 캔버스 가로·세로 픽셀, 저장 경로,
+        그래프를 그릴 Axes 객체(None이면 새로 생성)</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_cluster.agglomerative" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">agglomerative</span>
+
+
+<a href="#hossam.my_cluster.agglomerative" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">agglomerative</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">k</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">distance_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">scaling</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span>
+    <span class="n">cluster_name</span><span class="o">=</span><span class="s2">&quot;그룹번호&quot;</span><span class="p">,</span>
+    <span class="n">linkage</span><span class="o">=</span><span class="s2">&quot;ward&quot;</span><span class="p">,</span>
+    <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">p</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">truncate_mode</span><span class="o">=</span><span class="s2">&quot;lastp&quot;</span><span class="p">,</span>
+    <span class="n">leaf_rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">leaf_font_size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+    <span class="n">count_sort</span><span class="o">=</span><span class="s2">&quot;ascending&quot;</span><span class="p">,</span>
+    <span class="n">cut_line</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">cut_color</span><span class="o">=</span><span class="s2">&quot;#ff0000&quot;</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span>
+    <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>데이터를 계층적으로 묶어 군집화하고, 합쳐온 과정을 덴드로그램으로 시각화하는 함수</p>
+<p>Args (기본값은 위의 함수 정의 참고):
+    data: 군집화할 데이터프레임
+    k: 나눌 군집의 개수 (distance_threshold 와 둘 중 하나만 지정한다)
+    distance_threshold: 병합을 멈출 거리 기준 (이 값 이상 떨어진 덩어리는 합치지 않는다)
+    columns, cluster_name: 사용할 컬럼(None이면 수치형 전체), 군집 번호를 저장할 컬럼명
+    scaling: 스케일러 이름('standard'/'minmax'/'robust'/'maxabs', None이면 원본 값)
+    linkage: 두 덩어리 사이의 거리를 재는 방법
+        ('ward'=합쳤을 때 분산 증가가 최소, 'complete'=가장 먼 쌍,
+         'average'=모든 쌍의 평균, 'single'=가장 가까운 쌍)
+    metric: 데이터 사이의 거리 계산 방식 (linkage='ward'는 'euclidean'만 지원한다)
+    verbose: 스케일링 전후의 값의 범위와 군집별 데이터 개수를 출력할지 여부
+    plot, title: 덴드로그램 시각화 여부, 그래프 제목(None이면 자동 생성)
+    p, truncate_mode: 덴드로그램에 표시할 가지의 개수와 생략 방식
+        ('lastp'=마지막 p개의 가지만, None이면 데이터 전체를 그린다)
+    leaf_rotation, leaf_font_size, count_sort: 아래쪽 눈금의 회전 각도, 글자 크기,
+        가지의 정렬 기준('ascending'이면 작은 덩어리를 왼쪽에 둔다)
+    cut_line, cut_color: 나무를 자른 높이를 가로선으로 표시할지 여부와 그 색상
+    width, height, save_path, ax: 캔버스 가로·세로 픽셀, 저장 경로,
+        그래프를 그릴 Axes 객체(None이면 새로 생성)</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>tuple</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>(estimator, df) — 학습이 완료된 모델,
+군집 번호 컬럼이 추가된 데이터(스케일링 적용 후)</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_cluster.best_eps" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">best_eps</span>
+
+
+<a href="#hossam.my_cluster.best_eps" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">best_eps</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">min_samples</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">scaling</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span>
+    <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">sensitivity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;#1f77b4&quot;</span><span class="p">,</span>
+    <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span>
+    <span class="n">best_color</span><span class="o">=</span><span class="s2">&quot;#ff0000&quot;</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span>
+    <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>k-distance plot 의 꺾이는 지점을 찾아 DBSCAN 의 최적 eps 를 추정하는 함수</p>
+<p>Args (기본값은 위의 함수 정의 참고):
+    data: 군집화할 데이터프레임
+    min_samples: 반경 안에 있어야 할 최소 데이터 개수 (이 값이 곧 k가 된다)
+    columns, scaling: 사용할 컬럼(None이면 수치형 전체),
+        스케일러 이름(None이면 원본 값. 이미 스케일링한 데이터라면 None)
+    metric, n_jobs: 거리 계산 방식, 사용할 CPU 수(-1이면 전부 사용)
+    sensitivity: KneeLocator의 민감도(S). 작을수록 작은 꺾임에도 반응한다
+    verbose, plot, title: 계산 결과 출력 여부, 시각화 여부,
+        그래프 제목(None이면 자동 생성)
+    color, linestyle, best_color: 거리 곡선의 색상·선 스타일,
+        꺾이는 지점을 표시할 가로·세로선의 색상
+    width, height, save_path, ax: 캔버스 가로·세로 픽셀, 저장 경로,
+        그래프를 그릴 Axes 객체(None이면 새로 생성)</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>tuple</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>(best_eps, result_df) — eps 후보,
+거리 순위별 k번째 이웃까지의 거리가 담긴 데이터프레임</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_cluster.dbscan" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">dbscan</span>
+
+
+<a href="#hossam.my_cluster.dbscan" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">dbscan</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">eps</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">min_samples</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">scaling</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span>
+    <span class="n">cluster_name</span><span class="o">=</span><span class="s2">&quot;그룹번호&quot;</span><span class="p">,</span>
+    <span class="n">vector_name</span><span class="o">=</span><span class="s2">&quot;벡터유형&quot;</span><span class="p">,</span>
+    <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span>
+    <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">outline</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;tab10&quot;</span><span class="p">,</span>
+    <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;#ffffff&quot;</span><span class="p">,</span>
+    <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">core_marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span>
+    <span class="n">border_marker</span><span class="o">=</span><span class="s2">&quot;^&quot;</span><span class="p">,</span>
+    <span class="n">border_size</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+    <span class="n">border_alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">noise_marker</span><span class="o">=</span><span class="s2">&quot;X&quot;</span><span class="p">,</span>
+    <span class="n">noise_size</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span>
+    <span class="n">noise_color</span><span class="o">=</span><span class="s2">&quot;#ff0000&quot;</span><span class="p">,</span>
+    <span class="n">noise_edgecolor</span><span class="o">=</span><span class="s2">&quot;#000000&quot;</span><span class="p">,</span>
+    <span class="n">noise_linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span>
+    <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>반경 안의 데이터 개수(밀도)를 기준으로 군집화하고, 그 결과를 시각화하는 함수</p>
+<p>Args (기본값은 위의 함수 정의 참고):
+    data: 군집화할 데이터프레임
+    eps: 이웃으로 인정할 반경 (가장 중요한 값. 표준화 기준 0.3~1.0 에서 탐색한다)
+    min_samples: 반경 안에 있어야 할 최소 데이터 개수 (변수가 2~3개면 3~6)
+    columns, cluster_name, vector_name: 사용할 컬럼(None이면 수치형 전체),
+        군집 번호·벡터 유형을 저장할 컬럼명
+    scaling: 스케일러 이름('standard'/'minmax'/'robust'/'maxabs', None이면 원본 값)
+    metric, n_jobs: 거리 계산 방식, 사용할 CPU 수(-1이면 전부 사용)
+    verbose, plot: 스케일링·군집 요약의 출력 여부, 시각화 여부
+    x, y, title: 산점도의 x·y축 컬럼명(None이면 대상 컬럼의 앞 두 개), 그래프 제목
+    outline: 군집의 외곽선(ConvexHull)을 표시할지 여부
+    palette, size, edgecolor, linewidth, alpha: 군집별 색상 팔레트(외곽 벡터·외곽선에도
+        같이 적용), 핵심 벡터의 마커 크기, 테두리 색상, 테두리 두께, 투명도
+    core_marker, border_marker, border_size, border_alpha: 핵심·외곽 벡터의 마커 모양,
+        외곽 벡터의 마커 크기와 투명도(색은 그대로 두고 농도만 낮춰 구분한다)
+    noise_marker, noise_size, noise_color, noise_edgecolor, noise_linewidth:
+        노이즈 마커의 모양·크기·색상·테두리 색상·테두리 두께
+    width, height, save_path, ax: 캔버스 가로·세로 픽셀, 저장 경로,
+        그래프를 그릴 Axes 객체(None이면 새로 생성)</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>tuple</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>(estimator, df, summary_df) — 학습이 완료된 모델,
+군집 번호·벡터 유형 컬럼이 추가된 데이터(스케일링 적용 후),
+군집별 데이터 개수·비율·벡터 유형 개수를 정리한 표(노이즈는 -1 행)</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_cluster.persona" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">persona</span>
+
+
+<a href="#hossam.my_cluster.persona" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">persona</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cluster_name</span><span class="o">=</span><span class="s2">&quot;ClusterID&quot;</span><span class="p">,</span>
+    <span class="n">num_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cat_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">show_stat</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">crosstab_plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;tab10&quot;</span><span class="p">,</span>
+    <span class="n">cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">520</span><span class="p">,</span>
+    <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>군집별 대표값·구성비를 집계해 페르소나 표를 만들고, 군집별 분포를 시각화하는 함수</p>
+<p>학습은 스케일링된 값으로 하지만 해석은 사람이 읽을 수 있는 원본 값으로 해야 하므로,
+이 함수에는 스케일링 전의 원본 데이터를 넘긴다. 군집화에 쓰지 않은 변수까지 함께
+집계하는 이유는, 거기서 나온 차이가 "나눠 놓고 보니 달랐다"는 더 강한 근거이기 때문이다.</p>
+<p>Args (기본값은 위의 함수 정의 참고):
+    data: 해석에 사용할 원본 데이터프레임 (스케일링 전의 값)
+    labels: 군집 번호. 학습이 끝난 모델·배열·Series 모두 가능하며,
+        None이면 data 안의 cluster_name 컬럼을 사용한다
+    columns: 군집화에 실제로 사용한 컬럼 목록 (그래프 제목에 사용 여부를 표시한다)
+    cluster_name: 군집 번호 컬럼명
+    num_columns, cat_columns: 집계할 연속형·범주형 컬럼(None이면 자동 선택,
+        값이 모두 다른 식별자 컬럼은 자동으로 제외한다)
+    exclude: 자동 선택에서 빼고 싶은 컬럼 목록
+    alpha: 정규성 검정의 유의수준 (p &gt; alpha 이면 평균, 아니면 중앙값을 대표값으로 쓴다)
+    show_stat: 평균과 중앙값을 모두 표에 넣고 채택한 쪽에 별표(*)를 붙일지 여부
+        (붙이면 해당 컬럼이 문자열이 되므로, 값을 계산에 쓸 때는 False로 지정한다.
+         False면 채택한 대표값 하나만 숫자로 담는다)
+    verbose: 대표값 선택 근거와 범주형 교차표를 출력할지 여부
+    plot, crosstab_plot: 군집별 상자그림을 그릴지 여부,
+        범주형 구성비를 히트맵으로도 그릴지 여부
+    palette, cols: 색상 팔레트, 상자그림을 배치할 열의 개수
+    width, height, save_path: 그래프 한 칸의 가로·세로 픽셀, 상자그림 저장 경로</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>tuple</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>(persona_df, ratio_dict) — 군집별 대표값 표(군집 번호 순),
+범주형 컬럼별 구성비(%) 표의 딕셔너리(마지막 '전체' 행은 데이터 전체의 비율)</p>
               </div>
             </td>
           </tr>

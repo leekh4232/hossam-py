@@ -2,62 +2,74 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://py.hossam.kr/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/SUMMARY/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/code_checker/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/hossam/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/make_docs/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/my_cluster/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-08-14</lastmod>
+    </url>
+    <url>
+         <loc>https://py.hossam.kr/api/my_gis/</loc>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/my_logit/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/my_ols/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-08-14</lastmod>
+    </url>
+    <url>
+         <loc>https://py.hossam.kr/api/my_outlier_clipper/</loc>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/my_pipeline/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/my_plot/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/my_prep/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/my_qtcheck/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/my_stats/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/my_ts/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://py.hossam.kr/api/my_util/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-08-14</lastmod>
+    </url>
+    <url>
+         <loc>https://py.hossam.kr/api/my_vif_selector/</loc>
+         <lastmod>2026-08-14</lastmod>
     </url>
 </urlset>
