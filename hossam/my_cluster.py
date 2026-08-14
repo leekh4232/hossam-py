@@ -1,9 +1,16 @@
 import numpy as np
 import seaborn as sb
-from pandas import DataFrame
+from pandas import DataFrame, crosstab
+from IPython.display import display
 
-# K-평균 군집분석
-from sklearn.cluster import KMeans
+# K-평균 군집분석, 계층적(병합형) 군집분석, 밀도기반 군집분석
+from sklearn.cluster import KMeans, AgglomerativeClustering, DBSCAN
+
+# 계층적 군집이 합쳐온 과정을 나무 모양으로 그려주는 함수
+from scipy.cluster.hierarchy import dendrogram
+
+# 각 데이터에서 가까운 순서로 k개의 이웃을 찾아주는 클래스 (k-distance plot 에 사용)
+from sklearn.neighbors import NearestNeighbors
 
 # 군집 품질 평가 지표
 from sklearn.metrics import silhouette_samples, silhouette_score
@@ -11,9 +18,13 @@ from sklearn.metrics import silhouette_samples, silhouette_score
 # 곡선이 꺾이는 지점(엘보우 포인트)을 계산해주는 패키지
 from kneed import KneeLocator
 
+# 정규성 검정 (대표값으로 평균을 쓸지 중앙값을 쓸지 판단한다)
+from scipy.stats import normaltest
+
 from . import RANDOM_STATE
 from . import my_plot
 from . import my_prep
+from . import my_qtcheck
 
 
 # ===================================================================
@@ -576,3 +587,695 @@ def dendrogram_source(estimator):
     # --- 3) 네 칸(자식1, 자식2, 병합거리, 포함 샘플수)을 옆으로 이어 붙인다 ---
     return np.column_stack([estimator.children_,
                             estimator.distances_, counts]).astype(float)
+
+
+# ===================================================================
+# 자른 높이 — 학습이 끝난 모델에서 "나무를 어느 높이에서 잘랐는가"를 되돌린다
+# ===================================================================
+def _cut_height(estimator):
+    """계층적 군집 모델이 나무를 자른 높이(병합 거리)를 계산하는 내부 공용 함수
+
+    Args:
+        estimator: 학습이 끝난 AgglomerativeClustering 모델
+
+    Returns:
+        float: 자른 높이 (자를 곳이 없으면 None)
+    """
+    # --- 1) 거리 기준으로 잘랐다면 그 값이 곧 자른 높이 ---
+    if getattr(estimator, 'distance_threshold', None) is not None:
+        return estimator.distance_threshold
+
+    # --- 2) 군집 수로 잘랐다면 병합 거리 사이에서 되돌린다 ---
+    # (데이터 n개를 k개로 만들려면 n-k번 합쳐야 한다)
+    distances = np.sort(estimator.distances_)
+    n_merged = len(estimator.labels_) - estimator.n_clusters_
+
+    if n_merged >= len(distances):  # 하나로 다 합친 경우에는 나무의 꼭대기 위쪽이 자른 높이
+        return distances[-1] * 1.05
+
+    if n_merged < 1:    # 아무것도 합치지 않은 경우에는 자를 높이가 없다
+        return None
+
+    return (distances[n_merged - 1] + distances[n_merged]) / 2
+
+
+# ===================================================================
+# 덴드로그램 시각화 — 합쳐온 과정을 나무 그림으로 그리고, 자른 높이를 표시한다
+# ===================================================================
+def plot_dendrogram(estimator, cut_height=None, title=None,
+                         p=30, truncate_mode='lastp', leaf_rotation=0, leaf_font_size=8,
+                         count_sort='ascending', cut_line=True, cut_color='#ff0000',
+                         xlabel=None, ylabel='병합 거리',
+                         width=1280, height=640, save_path=None, ax=None):
+    """계층적 군집 모델이 합쳐온 과정을 덴드로그램으로 그리는 함수
+
+    Args (기본값은 위의 함수 정의 참고):
+        estimator: compute_distances=True 로 학습한 AgglomerativeClustering 모델
+        cut_height: 나무를 자른 높이(병합 거리). 이 높이 아래의 가지를 군집별로 다른
+            색으로 칠하고 가로선으로 표시한다. None이면 모델이 실제로 자른 높이를
+            직접 계산해서 쓰므로, 보통은 지정할 필요가 없다
+        title, xlabel, ylabel: 그래프 제목(None이면 '덴드로그램'), x축·y축 이름
+            (xlabel이 None이면 가지를 묶어 그리는지에 따라 자동으로 정한다)
+        p, truncate_mode: 표시할 가지의 개수와 생략 방식
+            ('lastp'=마지막 p개의 가지만, None이면 데이터 전체를 그린다)
+        leaf_rotation, leaf_font_size, count_sort: 아래쪽 눈금의 회전 각도, 글자 크기,
+            가지의 정렬 기준('ascending'이면 작은 덩어리를 왼쪽에 둔다)
+        cut_line, cut_color: 자른 높이를 가로선으로 표시할지 여부와 그 색상
+        width, height, save_path, ax: 캔버스 가로·세로 픽셀, 저장 경로,
+            그래프를 그릴 Axes 객체(None이면 새로 생성)
+    """
+    # --- 1) 모델이 합쳐온 과정을 dendrogram()이 읽는 표(linkage 행렬)로 변환 ---
+    source = dendrogram_source(estimator)
+
+    # --- 2) 자른 높이 확인 (지정하지 않았다면 모델이 실제로 자른 높이를 되돌린다) ---
+    if cut_height is None:
+        cut_height = _cut_height(estimator)
+
+    # --- 3) 제목과 x축 이름 결정 ---
+    if title is None:       title = '덴드로그램'
+
+    # 가지를 묶어 그리는 경우에만 눈금에 (묶인 개수)가 표시되므로 축 이름을 나눠 쓴다
+    if xlabel is None:
+        xlabel = '데이터 (괄호 안은 묶인 개수)' if truncate_mode else '데이터'
+
+    # --- 4) 그래프 초기화 (ax를 전달받은 경우에는 그 위에 겹쳐 그린다) ---
+    fig = None
+    if ax is None:
+        fig, ax = my_plot.init(width=width, height=height, title=title,
+                               xlabel=xlabel, ylabel=ylabel)
+
+    # --- 5) 덴드로그램 그리기 ---
+    # color_threshold: 자른 높이보다 아래쪽 가지를 군집별로 다른 색으로 칠한다
+    dendrogram(source, ax=ax, p=p, truncate_mode=truncate_mode,
+               leaf_rotation=leaf_rotation, leaf_font_size=leaf_font_size,
+               count_sort=count_sort, color_threshold=cut_height)
+
+    # --- 6) 나무를 자른 높이를 가로선으로 표시 ---
+    # (이 선과 만나는 가지의 수가 곧 군집 수다)
+    if cut_line and cut_height is not None:
+        ax.axhline(y=cut_height, color=cut_color, linestyle='--')
+        ax.text(ax.get_xlim()[1], cut_height, f' 자른 높이 = {cut_height:.3f}',
+                color=cut_color, va='bottom', ha='right')
+
+    # --- 7) 그래프 표시 (ax를 전달받은 경우에는 호출한 쪽에서 표시한다) ---
+    if fig is not None:
+        my_plot.show(save_path=save_path)
+
+
+# ===================================================================
+# 계층적(병합형) 군집분석 — 가까운 것끼리 차례로 합치고 그 과정을 덴드로그램으로 확인한다
+# ===================================================================
+def agglomerative(data, k=None, distance_threshold=None, columns=None, scaling='standard',
+                  cluster_name='그룹번호', linkage='ward', metric='euclidean',
+                  verbose=True, plot=True, title=None,
+                  p=30, truncate_mode='lastp', leaf_rotation=0, leaf_font_size=8,
+                  count_sort='ascending', cut_line=True, cut_color='#ff0000',
+                  width=1280, height=640, save_path=None, ax=None):
+    """데이터를 계층적으로 묶어 군집화하고, 합쳐온 과정을 덴드로그램으로 시각화하는 함수
+
+    Args (기본값은 위의 함수 정의 참고):
+        data: 군집화할 데이터프레임
+        k: 나눌 군집의 개수 (distance_threshold 와 둘 중 하나만 지정한다)
+        distance_threshold: 병합을 멈출 거리 기준 (이 값 이상 떨어진 덩어리는 합치지 않는다)
+        columns, cluster_name: 사용할 컬럼(None이면 수치형 전체), 군집 번호를 저장할 컬럼명
+        scaling: 스케일러 이름('standard'/'minmax'/'robust'/'maxabs', None이면 원본 값)
+        linkage: 두 덩어리 사이의 거리를 재는 방법
+            ('ward'=합쳤을 때 분산 증가가 최소, 'complete'=가장 먼 쌍,
+             'average'=모든 쌍의 평균, 'single'=가장 가까운 쌍)
+        metric: 데이터 사이의 거리 계산 방식 (linkage='ward'는 'euclidean'만 지원한다)
+        verbose: 스케일링 전후의 값의 범위와 군집별 데이터 개수를 출력할지 여부
+        plot, title: 덴드로그램 시각화 여부, 그래프 제목(None이면 자동 생성)
+        p, truncate_mode: 덴드로그램에 표시할 가지의 개수와 생략 방식
+            ('lastp'=마지막 p개의 가지만, None이면 데이터 전체를 그린다)
+        leaf_rotation, leaf_font_size, count_sort: 아래쪽 눈금의 회전 각도, 글자 크기,
+            가지의 정렬 기준('ascending'이면 작은 덩어리를 왼쪽에 둔다)
+        cut_line, cut_color: 나무를 자른 높이를 가로선으로 표시할지 여부와 그 색상
+        width, height, save_path, ax: 캔버스 가로·세로 픽셀, 저장 경로,
+            그래프를 그릴 Axes 객체(None이면 새로 생성)
+
+    Returns:
+        tuple: (estimator, df) — 학습이 완료된 모델,
+            군집 번호 컬럼이 추가된 데이터(스케일링 적용 후)
+    """
+    # --- 1) 자를 기준이 하나만 지정되었는지 확인 ---
+    # 군집 수와 거리 기준은 "나무를 어디서 자를까"에 대한 서로 다른 답이므로 함께 쓸 수 없다
+    if (k is None) == (distance_threshold is None):
+        raise ValueError("k(군집 수)와 distance_threshold(거리 기준) 중 "
+                         "하나만 지정해야 합니다.")
+
+    # --- 2) 군집화에 사용할 컬럼 결정 ---
+    # 지정이 없으면 수치형 컬럼만 자동 선택 (문자열 컬럼은 거리 계산이 불가능하다)
+    if columns is None:
+        columns = list(data.select_dtypes(include='number').columns)
+
+    # --- 3) 스케일링 적용 ---
+    if scaling:
+        df = my_prep.scaling(data[columns], method=scaling, verbose=verbose)
+    else:
+        df = data[columns].copy()
+
+    # --- 4) 모델 생성 및 학습 (가까운 덩어리부터 차례로 합치는 과정) ---
+    # compute_distances: 병합 거리를 남겨야 덴드로그램의 높이를 그릴 수 있다
+    # compute_full_tree: 중간에 멈추면 나무의 윗부분이 잘려 덴드로그램이 불완전해진다
+    estimator = AgglomerativeClustering(n_clusters=k, distance_threshold=distance_threshold,
+                                        linkage=linkage, metric=metric,
+                                        compute_distances=True, compute_full_tree=True)
+    estimator.fit(df)
+
+    # --- 5) 각 데이터가 몇 번 그룹인지 컬럼으로 추가 ---
+    # 계층적 군집은 새로운 데이터를 예측하는 기능이 없으므로 학습 결과(labels_)를 그대로 쓴다
+    df[cluster_name] = estimator.labels_
+
+    # --- 6) 나무를 자른 높이 계산 ---
+    cut_height = _cut_height(estimator)
+
+    # --- 7) 군집 결과 요약 출력 ---
+    if verbose:
+        sizes = df[cluster_name].value_counts().sort_index()
+
+        print(f"[계층적 군집] 군집 수 = {estimator.n_clusters_}, "
+              f"연결 방법 = {linkage}, 거리 = {metric}")
+
+        if cut_height is not None:
+            print(f"  · 자른 높이(병합 거리) = {cut_height:.4f}")
+
+        print("  · 군집별 데이터 개수 : " +
+              ', '.join([f"{c}번 {n}개" for c, n in sizes.items()]))
+
+    # --- 8) 덴드로그램 시각화 ---
+    if plot:
+        # 제목을 지정하지 않은 경우 자른 기준과 군집 개수를 포함한 제목을 자동으로 생성
+        if title is None:
+            basis = (f'거리 {distance_threshold}' if distance_threshold is not None else f'군집수 {k}')
+            title = f'덴드로그램 ({basis} 기준 → {estimator.n_clusters_}개 군집)'
+
+        # 그리는 일은 덴드로그램 함수에 맡긴다 (자른 높이를 넘겨 가로선과 색을 함께 표시)
+        plot_dendrogram(estimator, cut_height=cut_height, title=title,
+                             p=p, truncate_mode=truncate_mode,
+                             leaf_rotation=leaf_rotation, leaf_font_size=leaf_font_size,
+                             count_sort=count_sort, cut_line=cut_line, cut_color=cut_color,
+                             width=width, height=height, save_path=save_path, ax=ax)
+
+    # --- 9) 모델과 군집 결과 반환 ---
+    return estimator, df
+
+
+# ===================================================================
+# 최적 eps 탐색 — k번째 이웃까지의 거리가 치솟는 지점을 eps 후보로 삼는다
+# ===================================================================
+def best_eps(data, min_samples=5, columns=None, scaling='standard',
+             metric='euclidean', n_jobs=-1, sensitivity=1.0, verbose=True,
+             plot=True, title=None, color='#1f77b4', linestyle='-',
+             best_color='#ff0000', width=1280, height=640, save_path=None, ax=None):
+    """k-distance plot 의 꺾이는 지점을 찾아 DBSCAN 의 최적 eps 를 추정하는 함수
+
+    Args (기본값은 위의 함수 정의 참고):
+        data: 군집화할 데이터프레임
+        min_samples: 반경 안에 있어야 할 최소 데이터 개수 (이 값이 곧 k가 된다)
+        columns, scaling: 사용할 컬럼(None이면 수치형 전체),
+            스케일러 이름(None이면 원본 값. 이미 스케일링한 데이터라면 None)
+        metric, n_jobs: 거리 계산 방식, 사용할 CPU 수(-1이면 전부 사용)
+        sensitivity: KneeLocator의 민감도(S). 작을수록 작은 꺾임에도 반응한다
+        verbose, plot, title: 계산 결과 출력 여부, 시각화 여부,
+            그래프 제목(None이면 자동 생성)
+        color, linestyle, best_color: 거리 곡선의 색상·선 스타일,
+            꺾이는 지점을 표시할 가로·세로선의 색상
+        width, height, save_path, ax: 캔버스 가로·세로 픽셀, 저장 경로,
+            그래프를 그릴 Axes 객체(None이면 새로 생성)
+
+    Returns:
+        tuple: (best_eps, result_df) — eps 후보,
+            거리 순위별 k번째 이웃까지의 거리가 담긴 데이터프레임
+    """
+    # --- 1) 대상 컬럼 결정 ---
+    # 지정이 없으면 수치형 컬럼만 자동 선택 (문자열 컬럼은 거리 계산이 불가능하다)
+    if columns is None:
+        columns = list(data.select_dtypes(include='number').columns)
+
+    # --- 2) 스케일링 적용 ---
+    # 거리를 재는 계산이므로 단위가 큰 변수가 거리를 독점하지 않도록 맞춰준다
+    if scaling:
+        df = my_prep.scaling(data[columns], method=scaling, verbose=verbose)
+    else:
+        df = data[columns].copy()
+
+    # --- 3) 각 데이터에서 k번째 이웃까지의 거리 구하기 ---
+    k = min_samples
+
+    neighbors = NearestNeighbors(n_neighbors=k, metric=metric, n_jobs=n_jobs)
+    neighbors.fit(df)
+
+    # distance[i] = i번째 데이터에서 이웃들까지의 거리 (가까운 순)
+    # kneighbors() 는 자기 자신을 0번 이웃으로 포함하므로 마지막 열이 곧
+    # "자기 포함 min_samples 개를 채우려면 반경을 얼마까지 벌려야 하는가"가 된다
+    distance, _ = neighbors.kneighbors(df)
+
+    # 마지막 열만 뽑아서 작은 순으로 정렬한다.
+    # 정렬해야 x축이 밀도 순위가 되어 끝에서 치솟는 모양을 눈으로 확인할 수 있다
+    target = np.sort(distance[:, k - 1])
+
+    # --- 4) 결과 정리 ---
+    result_df = DataFrame({
+        '순위': range(1, len(target) + 1),
+        f'{k}번째 이웃까지의 거리': np.round(target, 4),
+    })
+
+    # --- 5) 꺾이는 지점(엘보우 포인트) 찾기 ---
+    # convex(아래로 볼록) + increasing(우상향)은 정렬된 거리 곡선의 모양이다
+    kl = KneeLocator(range(len(target)), target, curve='convex',
+                     direction='increasing', S=sensitivity)
+
+    point = kl.elbow        # 꺾이는 지점의 '순서'
+    eps = kl.elbow_y        # 꺾이는 지점의 '거리' → 이것이 eps 후보
+
+    # 곡선이 거의 직선이면 꺾이는 지점이 없어 None이 나온다
+    if eps is None:
+        print("곡선이 완만해 꺾이는 지점을 찾지 못했습니다. "
+              "sensitivity 를 낮추거나 min_samples 를 조정해 다시 시도해 보세요.")
+        return None, result_df
+
+    if verbose:
+        print(f"[k-distance] min_samples = {k}, 최적의 eps = {eps:.4f}")
+        print(f"  · 꺾이는 위치 = {point}번째 데이터 (전체 {len(target)}개 중)")
+        print(f"  · 노이즈 후보 = {int((target > eps).sum())}개 (거리가 eps 보다 먼 데이터)")
+
+    # --- 6) 시각화 ---
+    if plot:
+        if title is None:   title = f'{k}번째 이웃까지의 거리 (k-distance plot)'
+
+        fig = None
+        if ax is None:
+            fig, ax = my_plot.init(width=width, height=height, title=title,
+                                   xlabel='거리 순으로 정렬한 데이터', ylabel='거리')
+
+        my_plot.lineplot(x=list(range(len(target))), y=target,
+                         color=color, linestyle=linestyle, ax=ax)
+
+        # 꺾이는 지점을 가로선(거리)과 세로선(순서)으로 표시
+        ax.axhline(y=eps, color=best_color, linestyle='--', linewidth=1)
+        ax.axvline(x=point, color=best_color, linestyle='--', linewidth=1)
+        ax.text(0, eps, f'eps = {eps:.4f}', color=best_color, va='bottom')
+
+        if fig is not None:
+            my_plot.show(save_path=save_path)
+
+    # --- 7) eps 후보와 거리 표 반환 ---
+    return eps, result_df
+
+
+# ===================================================================
+# DBSCAN 군집분석 — 빽빽하게 모인 곳을 군집으로 묶고, 남는 데이터는 노이즈로 분리한다
+# ===================================================================
+def dbscan(data, eps=0.5, min_samples=5, columns=None, scaling='standard',
+           cluster_name='그룹번호', vector_name='벡터유형', metric='euclidean', n_jobs=-1,
+           verbose=True, plot=True, x=None, y=None, title=None, outline=True,
+           palette='tab10', size=100, edgecolor='#ffffff', linewidth=1.5, alpha=1,
+           core_marker='o', border_marker='^', border_size=120, border_alpha=0.5,
+           noise_marker='X', noise_size=150, noise_color='#ff0000',
+           noise_edgecolor='#000000', noise_linewidth=1.5,
+           width=1280, height=640, save_path=None, ax=None):
+    """반경 안의 데이터 개수(밀도)를 기준으로 군집화하고, 그 결과를 시각화하는 함수
+
+    Args (기본값은 위의 함수 정의 참고):
+        data: 군집화할 데이터프레임
+        eps: 이웃으로 인정할 반경 (가장 중요한 값. 표준화 기준 0.3~1.0 에서 탐색한다)
+        min_samples: 반경 안에 있어야 할 최소 데이터 개수 (변수가 2~3개면 3~6)
+        columns, cluster_name, vector_name: 사용할 컬럼(None이면 수치형 전체),
+            군집 번호·벡터 유형을 저장할 컬럼명
+        scaling: 스케일러 이름('standard'/'minmax'/'robust'/'maxabs', None이면 원본 값)
+        metric, n_jobs: 거리 계산 방식, 사용할 CPU 수(-1이면 전부 사용)
+        verbose, plot: 스케일링·군집 요약의 출력 여부, 시각화 여부
+        x, y, title: 산점도의 x·y축 컬럼명(None이면 대상 컬럼의 앞 두 개), 그래프 제목
+        outline: 군집의 외곽선(ConvexHull)을 표시할지 여부
+        palette, size, edgecolor, linewidth, alpha: 군집별 색상 팔레트(외곽 벡터·외곽선에도
+            같이 적용), 핵심 벡터의 마커 크기, 테두리 색상, 테두리 두께, 투명도
+        core_marker, border_marker, border_size, border_alpha: 핵심·외곽 벡터의 마커 모양,
+            외곽 벡터의 마커 크기와 투명도(색은 그대로 두고 농도만 낮춰 구분한다)
+        noise_marker, noise_size, noise_color, noise_edgecolor, noise_linewidth:
+            노이즈 마커의 모양·크기·색상·테두리 색상·테두리 두께
+        width, height, save_path, ax: 캔버스 가로·세로 픽셀, 저장 경로,
+            그래프를 그릴 Axes 객체(None이면 새로 생성)
+
+    Returns:
+        tuple: (estimator, df, summary_df) — 학습이 완료된 모델,
+            군집 번호·벡터 유형 컬럼이 추가된 데이터(스케일링 적용 후),
+            군집별 데이터 개수·비율·벡터 유형 개수를 정리한 표(노이즈는 -1 행)
+    """
+    # --- 1) 군집화에 사용할 컬럼 결정 ---
+    # 지정이 없으면 수치형 컬럼만 자동 선택 (문자열 컬럼은 거리 계산이 불가능하다)
+    if columns is None:
+        columns = list(data.select_dtypes(include='number').columns)
+
+    # --- 2) 스케일링 적용 ---
+    if scaling:
+        df = my_prep.scaling(data[columns], method=scaling, verbose=verbose)
+    else:
+        df = data[columns].copy()
+
+    # --- 3) 모델 생성 및 학습 (밀도가 높은 곳을 찾아 번호를 붙이는 과정) ---
+    estimator = DBSCAN(eps=eps, min_samples=min_samples, metric=metric, n_jobs=n_jobs)
+    estimator.fit(df)
+
+    # DBSCAN 에는 predict() 가 없다. 학습 결과는 labels_ 에 들어 있다
+    labels = estimator.labels_
+
+    # --- 4) 각 데이터의 군집 번호와 벡터 유형을 컬럼으로 추가 ---
+    # 핵심(core) : 반경 안에 min_samples 개 이상을 거느린 데이터 (군집의 몸통)
+    # 외곽(border): 스스로는 기준에 못 미치지만 핵심의 반경 안에 있는 데이터 (군집의 가장자리)
+    # 노이즈(noise): 어느 쪽도 아닌 데이터 (군집 번호가 -1)
+
+    # 'border'라는 값으로 채운, 데이터 길이와 동일한 배열 생성
+    vectors = np.full(len(df), 'border', dtype=object)
+
+    # core_sample_indices_ 는 "몇 번째 행"인지를 담은 위치 번호이므로 위치로 사용한다.
+    # 이 위치에 해당하는 벡터 유형을 'core'로 바꾼다.
+    vectors[estimator.core_sample_indices_] = 'core'
+
+    # 노이즈는 labels_가 -1이므로 따로 처리한다
+    vectors[labels == -1] = 'noise'
+
+    # 원본 데이터에 군집 번호와 벡터 유형 컬럼을 추가한다
+    df[cluster_name] = labels
+    df[vector_name] = vectors
+
+    # --- 5) 군집별 요약 정리 ---
+    # 노이즈(-1)는 군집이 아니므로 군집 개수에서 제외한다
+    cluster_ids = sorted([c for c in set(labels) if c != -1])
+    n_clusters = len(cluster_ids)
+    n_noise = int((labels == -1).sum())
+
+    items = []
+
+    for c in sorted(set(labels)):
+        mask = labels == c
+
+        items.append({
+            cluster_name: c,
+            '데이터수': int(mask.sum()),
+            '비율(%)': round(mask.sum() / len(labels) * 100, 1),
+            '핵심벡터': int((vectors[mask] == 'core').sum()),
+            '외곽벡터': int((vectors[mask] == 'border').sum()),
+        })
+
+    summary_df = DataFrame(items)
+
+    # --- 6) 군집 결과 요약 출력 ---
+    if verbose:
+        print(f"[DBSCAN] eps = {eps}, min_samples = {min_samples}, 거리 = {metric}")
+        print(f"  · 군집 수 = {n_clusters}개 (노이즈 제외)")
+        print(f"  · 노이즈 = {n_noise}개 (전체의 {n_noise / len(labels):.1%})")
+
+        # 군집이 하나도 만들어지지 않았다면 두 값이 데이터의 밀도와 맞지 않는다는 뜻이다
+        if n_clusters == 0:
+            print("  · 군집이 만들어지지 않았습니다. "
+                  "eps 를 키우거나 min_samples 를 줄여 다시 시도해 보세요.")
+
+        display(summary_df)
+
+    # --- 7) 군집 결과 시각화 ---
+    if plot:
+        # 7-0) 컬럼, 제목 설정
+        # 축으로 사용할 컬럼 결정 (지정이 없으면 대상 컬럼의 앞에서 두 개)
+        if x is None:       x = columns[0]
+        if y is None:       y = columns[1]
+
+        # 제목을 지정하지 않은 경우 두 하이퍼파라미터를 포함한 제목을 자동으로 생성
+        if title is None:
+            title = f'DBSCAN 군집 결과 (eps={eps:.3g}, min_samples={min_samples})'
+
+        # 7-1) 그래프 초기화 (ax를 전달받은 경우에는 그 위에 겹쳐 그린다)
+        fig = None
+
+        if ax is None:
+            fig, ax = my_plot.init(width=width, height=height, title=title,
+                                   xlabel=x, ylabel=y)
+
+        # 7-2) 벡터 유형에 따라 데이터를 세 덩어리로 나눈다
+        # (한 번에 그리지 않고 나눠 그려야 유형마다 마커 모양과 농도를 달리할 수 있다)
+        core = df[df[vector_name] == 'core']
+        border = df[df[vector_name] == 'border']
+        noise = df[df[vector_name] == 'noise']
+
+        # 7-3) 핵심 벡터 --> 군집별 색상, 진한 마커
+        if not core.empty:
+            my_plot.scatterplot(data=core, x=x, y=y, hue=cluster_name,
+                                palette=palette, marker=core_marker, size=size,
+                                edgecolor=edgecolor, linewidth=linewidth,
+                                alpha=alpha, outline=False, ax=ax)
+
+        # 7-4) 외곽 벡터 --> 군집별 색상(동일), 연한 마커
+        # (범례에 같은 군집이 두 번 나오므로 범례는 끈다)
+        if not border.empty:
+            my_plot.scatterplot(data=border, x=x, y=y, hue=cluster_name,
+                                palette=palette, marker=border_marker, size=border_size,
+                                edgecolor=edgecolor, linewidth=linewidth,
+                                alpha=border_alpha, outline=False, ax=ax, legend=False)
+
+        # 7-5) 외곽선은 군집 단위로 그린다
+        # (핵심/외곽으로 나눠 그리면 하나의 군집이 두 개로 쪼개져 보인다)
+        if outline and cluster_ids:
+            my_plot.plot_hull(data=df[df[cluster_name] != -1], x=x, y=y,
+                              hue=cluster_name, palette=palette, ax=ax)
+
+        # 7-6) 노이즈 --> 군집이 아니므로 팔레트 없이 눈에 띄는 마커로 덧그린다
+        # (이상치 후보를 바로 찾기 위한 표시)
+        if not noise.empty:
+            my_plot.scatterplot(data=noise, x=x, y=y,
+                                marker=noise_marker, size=noise_size,
+                                color=noise_color, edgecolor=noise_edgecolor,
+                                linewidth=noise_linewidth, outline=False, ax=ax,
+                                label='noise')
+
+        # 7-7) 그래프 표시 (ax를 전달받은 경우에는 호출한 쪽에서 표시한다)
+        if fig is not None:
+            my_plot.show(save_path=save_path)
+
+    # --- 8) 모델, 군집 결과, 요약 표 반환 ---
+    return estimator, df, summary_df
+
+
+# ===================================================================
+# 페르소나 도출 — 군집 번호를 "어떤 고객인지"로 번역한다
+# ===================================================================
+def persona(data, labels=None, columns=None, cluster_name='ClusterID',
+            num_columns=None, cat_columns=None, exclude=None, alpha=0.05,
+            show_stat=True, verbose=True, plot=True, crosstab_plot=False,
+            palette='tab10', cols=2, width=800, height=520, save_path=None):
+    """군집별 대표값·구성비를 집계해 페르소나 표를 만들고, 군집별 분포를 시각화하는 함수
+
+    학습은 스케일링된 값으로 하지만 해석은 사람이 읽을 수 있는 원본 값으로 해야 하므로,
+    이 함수에는 스케일링 전의 원본 데이터를 넘긴다. 군집화에 쓰지 않은 변수까지 함께
+    집계하는 이유는, 거기서 나온 차이가 "나눠 놓고 보니 달랐다"는 더 강한 근거이기 때문이다.
+
+    Args (기본값은 위의 함수 정의 참고):
+        data: 해석에 사용할 원본 데이터프레임 (스케일링 전의 값)
+        labels: 군집 번호. 학습이 끝난 모델·배열·Series 모두 가능하며,
+            None이면 data 안의 cluster_name 컬럼을 사용한다
+        columns: 군집화에 실제로 사용한 컬럼 목록 (그래프 제목에 사용 여부를 표시한다)
+        cluster_name: 군집 번호 컬럼명
+        num_columns, cat_columns: 집계할 연속형·범주형 컬럼(None이면 자동 선택,
+            값이 모두 다른 식별자 컬럼은 자동으로 제외한다)
+        exclude: 자동 선택에서 빼고 싶은 컬럼 목록
+        alpha: 정규성 검정의 유의수준 (p > alpha 이면 평균, 아니면 중앙값을 대표값으로 쓴다)
+        show_stat: 평균과 중앙값을 모두 표에 넣고 채택한 쪽에 별표(*)를 붙일지 여부
+            (붙이면 해당 컬럼이 문자열이 되므로, 값을 계산에 쓸 때는 False로 지정한다.
+             False면 채택한 대표값 하나만 숫자로 담는다)
+        verbose: 대표값 선택 근거와 범주형 교차표를 출력할지 여부
+        plot, crosstab_plot: 군집별 상자그림을 그릴지 여부,
+            범주형 구성비를 히트맵으로도 그릴지 여부
+        palette, cols: 색상 팔레트, 상자그림을 배치할 열의 개수
+        width, height, save_path: 그래프 한 칸의 가로·세로 픽셀, 상자그림 저장 경로
+
+    Returns:
+        tuple: (persona_df, ratio_dict) — 군집별 대표값 표(군집 번호 순),
+            범주형 컬럼별 구성비(%) 표의 딕셔너리(마지막 '전체' 행은 데이터 전체의 비율)
+    """
+    # --- 1) 원본 데이터에 군집 번호 붙이기 ---
+    df = data.copy()
+
+    if labels is not None:
+        # 모델을 그대로 넘긴 경우에는 학습 결과(labels_)를 꺼내 쓴다
+        df[cluster_name] = getattr(labels, 'labels_', labels)
+    elif cluster_name not in df.columns:
+        raise ValueError(f"군집 번호를 찾을 수 없습니다. labels 를 넘기거나 "
+                         f"'{cluster_name}' 컬럼이 있는 데이터를 사용하세요.")
+
+    # --- 2) 집계에서 뺄 컬럼 추리기 ---
+    # 고객ID처럼 값이 모두 다른 컬럼은 대표값을 구해도 의미가 없으므로 자동으로 걸러낸다
+    exclude = list(exclude) if exclude else []
+
+    # 값이 행의 개수만큼 전부 다른 컬럼은 식별자로 보고 제외한다 (고객ID, 주문번호 등)
+    id_columns = [c for c in df.columns
+                  if c != cluster_name and df[c].nunique() == len(df)]
+
+    if id_columns and verbose:
+        print(f"[페르소나] 식별자로 판단해 제외한 컬럼 : {', '.join(id_columns)}")
+
+    drop = set(exclude + id_columns + [cluster_name])
+
+    # --- 3) 집계할 연속형 컬럼 결정 (수치형 전체에서 군집 번호·식별자를 제외) ---
+    if num_columns is None:
+        num_columns = [c for c in my_qtcheck.get_number_column_names(df) if c not in drop]
+
+    # --- 4) 집계할 범주형 컬럼 결정 ---
+    # category 타입 전체 + 문자열(object) 컬럼
+    # (set_type() 으로 타입을 지정하지 않은 데이터도 그대로 쓸 수 있게 한다)
+    if cat_columns is None:
+        # 4-1) category 로 지정한 컬럼과 문자열 컬럼을 차례로 모아 후보를 만든다
+        candidates = my_qtcheck.get_categorical_column_names(df)
+        candidates += df.select_dtypes(include='object').columns.to_list()
+
+        cat_columns = []
+
+        # 4-2) 두 목록에 겹쳐 들어온 컬럼과 군집 번호·식별자는 담지 않는다
+        for column in candidates:
+            if column not in drop and column not in cat_columns:
+                cat_columns.append(column)
+
+    # --- 5) 컬럼 목록 정리 ---
+    # 넘겨받은 목록을 그대로 쓰면 아래에서 순서를 바꿀 때 호출부의 리스트까지 바뀐다
+    num_columns, cat_columns = list(num_columns), list(cat_columns)
+
+    # 군집화에 사용한 컬럼을 앞쪽에 두어 표에서 먼저 읽히게 한다
+    if columns:
+        used = [c for c in columns if c in num_columns]
+        num_columns = used + [c for c in num_columns if c not in used]
+
+    # --- 6) 군집 번호 목록 확인 (노이즈(-1)는 군집이 아니므로 제외한다) ---
+    cluster_ids = sorted([c for c in df[cluster_name].unique() if c != -1])
+    total = len(df)
+
+    if verbose:
+        print(f"[페르소나] 군집 수 = {len(cluster_ids)}, "
+              f"연속형 = {num_columns}, 범주형 = {cat_columns}")
+        print('-' * 60)
+
+    # --- 7) 군집별 대표값 집계 ---
+    persona_list = []
+
+    for c in cluster_ids:
+        # 7-1) 현재 군집에 속한 데이터만 추출
+        cluster_data = df[df[cluster_name] == c]
+
+        # 7-2) 군집의 크기와 전체에서 차지하는 비중
+        persona_item = {
+            cluster_name: c,
+            '데이터수': len(cluster_data),
+            '비율(%)': round(len(cluster_data) / total * 100, 1),
+        }
+
+        # 7-3) 연속형 변수: 정규분포면 평균, 아니면 중앙값
+        for column in num_columns:
+            # 정규성 검정 — normaltest 는 왜도·첨도를 함께 보므로 표본이 8개는 되어야 하고,
+            # 값이 모두 같으면 계산 자체가 되지 않는다 → 이런 경우는 검정을 건너뛴다
+            values = cluster_data[column].dropna()
+            p = normaltest(values)[1] if len(values) >= 8 and values.nunique() >= 2 else None
+
+            # 대표값 선택 — 평균은 한쪽으로 치우친 분포에서 꼬리에 끌려가므로 정규분포일 때만
+            # 쓰고, 검정을 못 한 경우에도 안전한 쪽인 중앙값을 쓴다
+            method = '평균' if p is not None and p > alpha else '중앙값'
+
+            # 두 값을 나란히 두면 "평균과 중앙값이 얼마나 벌어져 있는가"까지 함께 읽힌다
+            stats = {
+                '평균': round(values.mean(), 3),
+                '중앙값': round(values.median(), 3),
+            }
+
+            # 표에 담기 — 두 값을 모두 넣을지, 채택한 값 하나만 넣을지
+            if show_stat:
+                # 같은 컬럼이라도 군집마다 채택되는 쪽이 달라지므로 별표로 표시한다
+                for name, v in stats.items():
+                    persona_item[f'{column}({name})'] = f'{v}*' if name == method else f'{v}'
+            else:
+                persona_item[column] = stats[method]
+
+            # 선택 근거 출력
+            if verbose:
+                reason = f"p={p:.3f}" if p is not None else "검정 불가"
+                print(f"  군집 {c} - {column} : {method} 사용 ({reason})")
+
+        # 7-4) 범주형 변수: 최빈값
+        for column in cat_columns:
+            persona_item[column] = cluster_data[column].value_counts().idxmax()
+
+            if verbose:
+                print(f"  군집 {c} - {column} : 최빈값 = {persona_item[column]}")
+
+        persona_list.append(persona_item)
+
+    # --- 8) 페르소나 표 완성 (군집 번호 순으로 정렬) ---
+    persona_df = DataFrame(persona_list).sort_values(by=cluster_name).reset_index(drop=True)
+
+    # --- 9) 범주형 구성비 계산 ---
+    # 최빈값만 보면 모든 군집이 같은 값으로 나오는 경우가 많으므로 구성비까지 함께 본다
+    ratio_dict = {}
+
+    for column in cat_columns:
+        # 9-1) 군집 × 범주 교차표 (건수)
+        ct = crosstab(df[cluster_name], df[column])
+
+        # 9-2) 비교 기준이 되는 전체 비율은 노이즈를 빼기 전에 구한다 (실제 데이터 전체의 구성비)
+        overall = (ct.sum(axis=0) / ct.to_numpy().sum() * 100).round(1)
+
+        # 9-3) 노이즈를 뺀 뒤, 군집마다 행 합이 100%가 되도록 환산
+        ct = ct.loc[[c for c in ct.index if c in cluster_ids]]
+        ratio = (ct.div(ct.sum(axis=1), axis=0) * 100).round(1)
+
+        # 9-4) 데이터 전체의 비율을 마지막 행에 붙여 "이 군집만 다른가"를 바로 비교하게 한다
+        ratio.loc['전체'] = overall
+        ratio_dict[column] = ratio
+
+        # 9-5) 교차표와 구성비 출력
+        if verbose:
+            print('-' * 60)
+            print(f"[구성비] {cluster_name} × {column}")
+            display(ct)
+            display(ratio)
+
+        # 9-6) 군집 수와 범주 수가 많을 때는 표보다 히트맵이 빠르게 읽힌다
+        if crosstab_plot:
+            my_plot.heatmap(data=ratio, fmt='0.1f', palette=palette,
+                            title=f'{column} 구성비 (%)',
+                            xlabel=column, ylabel=cluster_name,
+                            width=width * cols, height=height)
+
+    # --- 10) 군집별 분포 시각화 ---
+    if plot and num_columns:
+        # 10-1) 컬럼 수에 맞춰 그래프 칸을 몇 행 몇 열로 놓을지 계산
+        n = len(num_columns)
+        ncols = min(cols, n)
+        nrows = int(np.ceil(n / ncols))
+
+        # 10-2) 그래프 초기화
+        fig, ax = my_plot.init(width=width, height=height, rows=nrows, cols=ncols,
+                               title='군집별 분포')
+
+        # 한 칸짜리 그래프는 배열이 아닌 Axes 하나가 오므로 배열로 맞춰준다
+        axes = np.atleast_1d(ax)
+
+        # 10-3) 노이즈(-1)는 군집이 아니므로 상자그림에서도 뺀다
+        vdf = df[df[cluster_name].isin(cluster_ids)]
+
+        # 10-4) 연속형 컬럼마다 군집별 상자그림
+        for i, column in enumerate(num_columns):
+            my_plot.boxplot(data=vdf, x=cluster_name, y=column, hue=cluster_name,
+                            palette=palette, ax=axes[i])
+
+            # 군집화에 쓴 변수인지 표시한다 (쓰지 않은 변수에서 나온 차이가 더 강한 근거다)
+            mark = '군집화 변수' if columns and column in columns else '군집화에 쓰지 않은 변수'
+            axes[i].set_title(f'{column} ({mark})', fontsize=16, pad=10)
+            axes[i].set_xlabel('군집 번호')
+            axes[i].set_ylabel(column)
+
+        # 10-5) 컬럼 수가 칸 수보다 적으면 남는 칸은 숨긴다
+        for a in axes[n:]:
+            a.set_visible(False)
+
+        # 10-6) 전체 제목이 들어갈 위쪽 공간(7%)을 미리 비워 둔 뒤 표시한다
+        #       (칸이 하나면 전체 제목이 붙지 않으므로 공간을 비우지 않는다)
+        if len(axes) > 1:
+            fig.tight_layout(rect=[0, 0, 1, 0.93])
+        my_plot.show(save_path=save_path)
+
+    # --- 11) 페르소나 표와 범주형 구성비 반환 ---
+    return persona_df, ratio_dict
