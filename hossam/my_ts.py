@@ -20,6 +20,9 @@ from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 # 잔차 진단 (무상관)
 from statsmodels.stats.diagnostic import acorr_ljungbox
 
+# 그랜저 인과성 검정
+from statsmodels.tsa.stattools import grangercausalitytests
+
 from . import my_plot
 
 
@@ -1403,3 +1406,114 @@ def report_score(fit, name="적합값", report=True):
               f"기준선 대비 {abs(gap):.1f}% {'개선' if gap > 0 else '악화'}")
 
     return result
+
+
+# ===================================================================
+# [7단원] 그랜저 인과성 검정 — 독립변수마다 시차별로 반복 검정
+# ===================================================================
+def granger_test(data, y, x=None, maxlag=4, alpha=0.05, report=True):
+    """독립변수들이 종속변수를 그랜저 인과하는지 시차별로 반복 검정한다.
+
+    그랜저 인과는 "원인"이 아니라 "예측에 도움이 되는가"를 본다.
+    x의 과거값을 함께 넣었을 때 y의 예측 오차가 유의하게 줄어들면 인과가 있다고 본다.
+
+    검정 대상은 반드시 정상 시계열이어야 한다. 비정상 시계열을 그대로 넣으면
+    추세끼리 닮았다는 이유만으로 인과가 있다고 나온다(허구적 인과).
+    그래서 검정 전에 ADF 검정으로 정상성을 먼저 점검하고 경고한다.
+
+    Args:
+        data (DataFrame): 종속변수와 독립변수가 모두 들어있는 시계열 데이터프레임.
+        y (str): 종속변수(결과) 컬럼명.
+        x (str | list): 독립변수(원인 후보) 컬럼명 또는 컬럼명 리스트 (기본값: None).
+            생략하면 y를 제외한 나머지 컬럼 전부를 독립변수로 사용한다.
+        maxlag (int): 검정할 최대 시차 (기본값: 4).
+        alpha (float): 유의수준 (기본값: 0.05).
+        report (bool): 정상성 경고와 변수별 요약 출력 여부 (기본값: True).
+
+    Returns:
+        DataFrame: 독립변수 · 시차를 인덱스로 하는 검정 결과표.
+            "권장" 컬럼에 ★ 표시가 붙은 시차가 그 변수를 shift() 할 시차다.
+    """
+    # --- 0) 검정 대상 정리 ---
+    if x is None:                                   # 독립변수를 지정하지 않았다면
+        x = [c for c in data.columns if c != y]     # y를 뺀 나머지 전부를 대상으로
+    elif isinstance(x, str):                        # 컬럼명 하나를 문자열로 준 경우
+        x = [x]                                     # 리스트로 감싸 아래 반복문에 맞춘다
+
+    # --- 1) 정상성 사전 점검 : 허구적 인과를 막는다 ---
+    if report:
+        checked = concat([adf_test(data, column=c, alpha=alpha) for c in [y] + x])
+        unstable = list(checked[~checked["정상성"]].index)   # 비정상으로 판정된 컬럼들
+
+        if unstable:
+            print(f"⚠️ 비정상 시계열이 포함되어 있습니다: {', '.join(unstable)}")
+            print("   차분·로그변환으로 정상성을 확보한 뒤 검정하세요. → adf_transform()")
+
+    result = []             # 검정 결과를 담을 리스트
+
+    # --- 2) 독립변수마다 반복 검정 ---
+    for name in x:
+        # 그랜저 인과 검정은 [결과, 원인] 순서로 두 컬럼을 넘긴다
+        pair = data[[y, name]].dropna()
+
+        # 시차마다 회귀식을 세우므로 관측치가 부족하면 검정 자체가 성립하지 않는다
+        try:
+            # 시차마다 검정 결과가 화면에 출력되고, 반환값으로도 딕셔너리를 받는다
+            tests = grangercausalitytests(pair, maxlag=maxlag)
+        except Exception as e:
+            if report:  print(f"⚠️ {name}: 검정을 수행할 수 없습니다. ({e})")
+            continue
+
+        # --- 2-1) 시차별 F검정 결과를 한 행씩 쌓는다 ---
+        for lag, test in tests.items():
+            # ssr_ftest = 잔차제곱합 기반 F검정. (F통계량, p-value, 자유도, 시차)
+            statistic, pvalue, dfd, dfn = test[0]["ssr_ftest"]
+            causal = bool(pvalue < alpha)       # p-value가 작아야 인과 있음
+
+            result.append({
+                "독립변수": name,
+                "시차": lag,
+                "관측치 수": len(pair),
+                "F 통계량": round(statistic, 3),
+                "p-value": round(pvalue, 4),
+                "인과": causal,
+                "판정": "인과 있음" if causal else "인과 없음",
+            })
+
+    if not result:                              # 검정에 성공한 변수가 하나도 없다면
+        return DataFrame()                      # 빈 결과표를 반환
+
+    result_df = DataFrame(result)
+
+    # --- 3) 변수별 권장 시차 표시 ---
+    # 유의한 시차가 여럿이면 p-value가 가장 작은 시차가 신호가 가장 뚜렷한 지점이다
+    recommend = []                              # 권장 표시를 담을 리스트
+    best_lag = {}                               # 변수별 권장 시차 (아래 요약 출력용)
+
+    for name in result_df["독립변수"].unique():
+        block = result_df[result_df["독립변수"] == name]     # 그 변수의 시차별 결과
+        causal = block[block["인과"]]                        # 그 중 유의한 시차만
+
+        # 유의한 시차가 없으면 권장 시차도 없다
+        best_lag[name] = causal["p-value"].idxmin() if len(causal) else None
+
+    for i in result_df.index:                               # 각 행을 순서대로 순회하며
+        name = result_df.loc[i, "독립변수"]
+        recommend.append("★ 권장 시차" if i == best_lag[name] else "")
+
+    result_df["권장"] = recommend               # 권장 표시를 결과표에 추가
+
+    # --- 4) 변수별 요약 출력 ---
+    if report:
+        print(f"\n종속변수 {y} ← 독립변수 {len(best_lag)}개 · 최대 시차 {maxlag}")
+
+        for name, i in best_lag.items():
+            if i is None:                       # 유의한 시차가 하나도 없었다면
+                print(f"  {name} → {y} : 인과 없음 (시차 1~{maxlag} 모두 p ≥ {alpha})")
+            else:
+                lag = result_df.loc[i, "시차"]
+                pvalue = result_df.loc[i, "p-value"]
+                print(f"  {name} → {y} : 시차 {lag}에서 인과 있음 (p-value {pvalue:.4f}) "
+                      f"→ {name}.shift({lag})")
+
+    return result_df.set_index(["독립변수", "시차"])
