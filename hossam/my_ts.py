@@ -43,9 +43,11 @@ def set_index(data, column, freq=None, sort=True):
     """
     df = data.copy()
 
-    # --- 1) 날짜 컬럼이 문자열이면 datetime으로 변환 ---
-    if df[column].dtype == "object":
-        df[column] = to_datetime(df[column])
+    # --- 1) 날짜 컬럼을 datetime으로 변환 ---
+    # 이미 datetime이면 그대로 통과하므로 타입을 미리 가려낼 필요가 없다.
+    # (pandas 3부터 문자열 컬럼의 dtype이 object가 아니라 str이라, 타입을 가려내면
+    #  변환이 그대로 건너뛰어지고 아래 asfreq()에서 값이 전부 NaN이 된다)
+    df[column] = to_datetime(df[column])
 
     # --- 2) 인덱스로 지정 ---
     df = df.set_index(column)
@@ -1455,6 +1457,12 @@ def granger_test(data, y, x=None, maxlag=4, alpha=0.05, report=True):
     for name in x:
         # 그랜저 인과 검정은 [결과, 원인] 순서로 두 컬럼을 넘긴다
         pair = data[[y, name]].dropna()
+
+        # 검정 보고서가 변수마다 쏟아지므로 어디서 변수가 바뀌는지 구분선을 찍어 둔다
+        if report:
+            print(f"\n{'=' * 70}")
+            print(f"■ {name} → {y}")
+            print(f"{'=' * 70}")
 
         # 시차마다 회귀식을 세우므로 관측치가 부족하면 검정 자체가 성립하지 않는다
         try:
