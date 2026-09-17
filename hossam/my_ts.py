@@ -498,7 +498,7 @@ def plot_rolling(data, window, column=None, title=None, xlabel=None, ylabel=None
 # ===================================================================
 def compare_smoothing(data, sizes, column=None, method="ma", overlay=False,
                       plot=True, title=None, xlabel=None, ylabel=None,
-                      width=960, height=400, save_path=None):
+                      width=1280, height=480, save_path=None):
     """창 크기(또는 span)를 바꿔가며 평활 결과를 비교한다.
 
     Args:

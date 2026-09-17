@@ -23,6 +23,10 @@ from . import my_ols        # 선형회귀 관련 함수 모듈
 from . import my_logit      # 로지스틱 회귀 관련 함수 모듈
 from . import my_ts         # 시계열 분석 관련 함수 모듈
 from . import my_cluster    # 군집 분석 관련 함수 모듈
+from . import my_ml         # 머신러닝 관련 함수 모듈
+from . import my_diag       # 모델 진단·해석 함수 모듈 (과적합 판정 · 변수 중요도 · SHAP)
+
+
 from . import code_checker  # 제출 코드를 원본 모듈과 대조하는 모듈
 from . import make_docs     # 소스코드로 API 레퍼런스 문서를 생성하는 모듈
 from . import my_pipeline

@@ -507,8 +507,9 @@ def reduce_vif(df, columns=None, threshold=10.0, verbose=True):
 
         # 종료 조건: 가장 큰 VIF도 기준 미만이거나 남은 변수가 한개라면 종료
         if max_vif < threshold or len(work.columns) <= 1:
-            print(f'\n완료! 남은 변수: {list(work.columns)}')
-            print(f'최대 VIF = {max_vif:.2f}')
+            if verbose:
+                print(f'\n완료! 남은 변수: {list(work.columns)}')
+                print(f'최대 VIF = {max_vif:.2f}')
             break
 
         # 가장 VIF 가 큰 변수를 찾아 제거하고 다시 반복

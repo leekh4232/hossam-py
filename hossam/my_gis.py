@@ -14,8 +14,8 @@ from pandas import DataFrame, to_numeric
 from tqdm.auto import tqdm
 from geopandas import GeoDataFrame, read_file, points_from_xy
 from pyproj import CRS
-
-from .my_util import pretty_table
+from libpysal.weights import Queen, Rook
+from esda.moran import Moran
 
 
 # ===================================================================
@@ -336,7 +336,7 @@ def save_shape(
     except Exception as e:
         raise ValueError(f"⚠️[ValueError] 유효하지 않은 좌표계 값입니다: {crs_input}") from e
 
-    # DataFrame인 경우 위경도 컬럼으로 포인트 지오메트리 생성
+    # DataFrame인 경우 경・위도 컬럼으로 포인트 지오메트리 생성
     if isinstance(gdf, DataFrame) and not isinstance(gdf, GeoDataFrame):
         if lat_col not in gdf.columns or lon_col not in gdf.columns:
             raise ValueError(
@@ -354,7 +354,7 @@ def save_shape(
 
         if df.empty:
             raise ValueError(
-                "⚠️[ValueError] 유효한 위경도 값이 없어 Shapefile을 생성할 수 없습니다."
+                "⚠️[ValueError] 유효한 경・위도 값이 없어 Shapefile을 생성할 수 없습니다."
             )
 
         geometry = points_from_xy(x=df[lon_col], y=df[lat_col])
@@ -392,3 +392,70 @@ def save_shape(
         warnings.filterwarnings("ignore", category=RuntimeWarning)
         gdf.to_file(path, **save_kwargs)
     print(f"✅ {file_format} 저장 완료: {path} (CRS: {target_crs.to_string()})")
+
+
+# ===================================================================
+# 공간자기상관 검정 (Moran's I)
+# ===================================================================
+def moran(data, y, longitude="longitude", latitude="latitude", source_epsg=4326,
+          target_epsg=5186, transform="R", alpha=0.05):
+    """경・위도 좌표를 이용해 종속변수의 공간자기상관을 검정하는 함수
+
+    인접 기반 공간가중치 행렬을 Queen·Rook 두 방식으로 만들어 각각 Moran's I를
+    계산한다. 두 결과가 같은 방향이면 인접 정의와 무관하게 공간 효과가 있다고 본다.
+
+    Args:
+        data (DataFrame): 경・위도와 검정 대상 변수가 포함된 데이터프레임
+        y (str): 공간자기상관을 확인할 변수(보통 종속변수) 컬럼명
+        longitude (str): 경도 컬럼명 (기본값: 'longitude')
+        latitude (str): 위도 컬럼명 (기본값: 'latitude')
+        source_epsg (int): 입력 좌표가 따르는 좌표계 코드 (기본값: 4326)
+        target_epsg (int): 거리 계산을 위해 변환할 투영 좌표계 코드 (기본값: 5186)
+        transform (str): 공간가중치 표준화 방식. R(행 표준화)/B(이진)/V(분산 안정화) (기본값: 'R')
+        alpha (float): 공간자기상관 판정에 사용할 유의수준 (기본값: 0.05)
+
+    Returns:
+        DataFrame: 인접 정의(Queen·Rook)를 인덱스로 하는 Moran's I·p-value·판정 결과표
+    """
+    # --- 1) 포인트 좌표(지오메트리) 객체 생성 ---
+    # 경・위도 두 컬럼을 점(Point) 형태의 공간 객체로 변환한다
+    geometry = points_from_xy(x=data[longitude], y=data[latitude])
+
+    # --- 2) GeoDataFrame 생성 ---
+    # 좌표값은 지오메트리에 담겼으므로 원본 경・위도 컬럼은 제거하고,
+    # 입력 좌표계(source_epsg)를 부여한 뒤 거리 계산이 가능한 투영 좌표계로 변환한다
+    gdf = GeoDataFrame(data.drop(columns=[longitude, latitude]),
+                       geometry=geometry, crs=f"EPSG:{source_epsg}")
+
+    # 입력 좌표계가 이미 목표 좌표계와 같다면 변환은 생략한다
+    if source_epsg != target_epsg:
+        gdf = gdf.to_crs(epsg=target_epsg)
+
+    # --- 3) 인접기반 공간가중치 행렬 생성 ---
+    # Queen은 한 점만 닿아도 이웃으로, Rook은 변을 공유해야 이웃으로 판정한다
+    weights = {
+        "Queen": Queen.from_dataframe(gdf, use_index=False),
+        "Rook": Rook.from_dataframe(gdf, use_index=False),
+    }
+
+    # 이웃 수 차이를 완화하기 위해 표준화를 적용한다
+    for w in weights.values():
+        w.transform = transform
+
+    # --- 4) 인접 정의별 Moran's I 계산 ---
+    result = []
+
+    for w in weights.values():
+        m = Moran(gdf[y], w)
+
+        # p-value가 유의수준보다 작아야 공간자기상관이 있다고 보고,
+        # 이때 Moran's I의 부호로 양(비슷한 값끼리 뭉침)・음(엇갈려 분포)을 구분한다
+        if m.p_sim < alpha:
+            judge = "양의 공간자기상관" if m.I > 0 else "음의 공간자기상관"
+        else:
+            judge = "없음(임의 분포)"
+
+        result.append({"Moran's I": m.I, "p-value": m.p_sim, "판정": judge})
+
+    # --- 5) 결과표 반환 ---
+    return DataFrame(result, index=list(weights.keys()))

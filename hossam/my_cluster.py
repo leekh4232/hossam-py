@@ -784,7 +784,7 @@ def agglomerative(data, k=None, distance_threshold=None, columns=None, scaling='
 # 최적 eps 탐색 — k번째 이웃까지의 거리가 치솟는 지점을 eps 후보로 삼는다
 # ===================================================================
 def best_eps(data, min_samples=5, columns=None, scaling='standard',
-             metric='euclidean', n_jobs=-1, sensitivity=1.0, verbose=True,
+             metric='euclidean', n_jobs=-1, sensitivity=0.01, verbose=True,
              plot=True, title=None, color='#1f77b4', linestyle='-',
              best_color='#ff0000', width=1280, height=640, save_path=None, ax=None):
     """k-distance plot 의 꺾이는 지점을 찾아 DBSCAN 의 최적 eps 를 추정하는 함수
@@ -1057,61 +1057,49 @@ def dbscan(data, eps=0.5, min_samples=5, columns=None, scaling='standard',
 # ===================================================================
 # 페르소나 도출 — 군집 번호를 "어떤 고객인지"로 번역한다
 # ===================================================================
-def persona(data, labels=None, columns=None, cluster_name='ClusterID',
-            num_columns=None, cat_columns=None, exclude=None, alpha=0.05,
-            show_stat=True, verbose=True, plot=True, crosstab_plot=False,
-            palette='tab10', cols=2, width=800, height=520, save_path=None):
+def persona(data, source_column_names=None, cluster_column_name='ClusterID',
+            num_columns=None, cat_columns=None, alpha=0.05, verbose=True, plot=True, palette='tab10',
+            width=1280, height=640, save_path=None):
     """군집별 대표값·구성비를 집계해 페르소나 표를 만들고, 군집별 분포를 시각화하는 함수
 
     학습은 스케일링된 값으로 하지만 해석은 사람이 읽을 수 있는 원본 값으로 해야 하므로,
-    이 함수에는 스케일링 전의 원본 데이터를 넘긴다. 군집화에 쓰지 않은 변수까지 함께
-    집계하는 이유는, 거기서 나온 차이가 "나눠 놓고 보니 달랐다"는 더 강한 근거이기 때문이다.
+    이 함수에는 스케일링 전의 원본 데이터에 군집 번호 컬럼을 붙인 것을 넘긴다.
 
     Args (기본값은 위의 함수 정의 참고):
-        data: 해석에 사용할 원본 데이터프레임 (스케일링 전의 값)
-        labels: 군집 번호. 학습이 끝난 모델·배열·Series 모두 가능하며,
-            None이면 data 안의 cluster_name 컬럼을 사용한다
-        columns: 군집화에 실제로 사용한 컬럼 목록 (그래프 제목에 사용 여부를 표시한다)
-        cluster_name: 군집 번호 컬럼명
+        data: 군집 번호 컬럼이 들어 있는 원본 데이터프레임 (스케일링 전의 값)
+        source_column_names: 군집화에 실제로 사용한 컬럼 목록 (표의 앞쪽에 두고, 그래프 제목에 사용 여부를 표시한다)
+        cluster_column_name: 군집 번호가 담긴 컬럼명
         num_columns, cat_columns: 집계할 연속형·범주형 컬럼(None이면 자동 선택,
             값이 모두 다른 식별자 컬럼은 자동으로 제외한다)
-        exclude: 자동 선택에서 빼고 싶은 컬럼 목록
         alpha: 정규성 검정의 유의수준 (p > alpha 이면 평균, 아니면 중앙값을 대표값으로 쓴다)
-        show_stat: 평균과 중앙값을 모두 표에 넣고 채택한 쪽에 별표(*)를 붙일지 여부
-            (붙이면 해당 컬럼이 문자열이 되므로, 값을 계산에 쓸 때는 False로 지정한다.
-             False면 채택한 대표값 하나만 숫자로 담는다)
         verbose: 대표값 선택 근거와 범주형 교차표를 출력할지 여부
-        plot, crosstab_plot: 군집별 상자그림을 그릴지 여부,
-            범주형 구성비를 히트맵으로도 그릴지 여부
-        palette, cols: 색상 팔레트, 상자그림을 배치할 열의 개수
-        width, height, save_path: 그래프 한 칸의 가로·세로 픽셀, 상자그림 저장 경로
+        plot: 연속형 상자그림과 범주형 구성비 히트맵을 2열로 묶어 그릴지 여부
+        palette: 상자그림 색상 팔레트 (히트맵은 값의 크기를 비교하는 그래프라 순차형 색을 쓴다)
+        width, height, save_path: 그래프 한 칸의 가로·세로 픽셀, 그래프 저장 경로
 
     Returns:
-        tuple: (persona_df, ratio_dict) — 군집별 대표값 표(군집 번호 순),
+        tuple: (persona_df, ratio_dict) — 군집별 대표값 표(군집 번호 순. 평균과 중앙값을
+            나란히 담고 채택한 쪽에 별표(*)를 붙이므로 해당 컬럼은 문자열이다),
             범주형 컬럼별 구성비(%) 표의 딕셔너리(마지막 '전체' 행은 데이터 전체의 비율)
     """
-    # --- 1) 원본 데이터에 군집 번호 붙이기 ---
+    # --- 1) 군집 번호 컬럼 확인 ---
     df = data.copy()
 
-    if labels is not None:
-        # 모델을 그대로 넘긴 경우에는 학습 결과(labels_)를 꺼내 쓴다
-        df[cluster_name] = getattr(labels, 'labels_', labels)
-    elif cluster_name not in df.columns:
-        raise ValueError(f"군집 번호를 찾을 수 없습니다. labels 를 넘기거나 "
-                         f"'{cluster_name}' 컬럼이 있는 데이터를 사용하세요.")
+    if cluster_column_name not in df.columns:
+        raise ValueError(f"'{cluster_column_name}' 컬럼을 찾을 수 없습니다. 군집 번호가 "
+                         f"포함된 데이터프레임을 넘기거나, cluster_column_name 에 "
+                         f"실제 컬럼명을 지정하세요.")
 
     # --- 2) 집계에서 뺄 컬럼 추리기 ---
     # 고객ID처럼 값이 모두 다른 컬럼은 대표값을 구해도 의미가 없으므로 자동으로 걸러낸다
-    exclude = list(exclude) if exclude else []
-
-    # 값이 행의 개수만큼 전부 다른 컬럼은 식별자로 보고 제외한다 (고객ID, 주문번호 등)
+    # (값이 행의 개수만큼 전부 다르면 식별자로 본다 — 고객ID, 주문번호 등)
     id_columns = [c for c in df.columns
-                  if c != cluster_name and df[c].nunique() == len(df)]
+                  if c != cluster_column_name and df[c].nunique() == len(df)]
 
     if id_columns and verbose:
         print(f"[페르소나] 식별자로 판단해 제외한 컬럼 : {', '.join(id_columns)}")
 
-    drop = set(exclude + id_columns + [cluster_name])
+    drop = set(id_columns + [cluster_column_name])
 
     # --- 3) 집계할 연속형 컬럼 결정 (수치형 전체에서 군집 번호·식별자를 제외) ---
     if num_columns is None:
@@ -1121,13 +1109,13 @@ def persona(data, labels=None, columns=None, cluster_name='ClusterID',
     # category 타입 전체 + 문자열(object) 컬럼
     # (set_type() 으로 타입을 지정하지 않은 데이터도 그대로 쓸 수 있게 한다)
     if cat_columns is None:
-        # 4-1) category 로 지정한 컬럼과 문자열 컬럼을 차례로 모아 후보를 만든다
+        # category 로 지정한 컬럼과 문자열 컬럼을 차례로 모아 후보를 만든다
         candidates = my_qtcheck.get_categorical_column_names(df)
         candidates += df.select_dtypes(include='object').columns.to_list()
 
         cat_columns = []
 
-        # 4-2) 두 목록에 겹쳐 들어온 컬럼과 군집 번호·식별자는 담지 않는다
+        # 두 목록에 겹쳐 들어온 컬럼과 군집 번호·식별자는 담지 않는다
         for column in candidates:
             if column not in drop and column not in cat_columns:
                 cat_columns.append(column)
@@ -1137,12 +1125,12 @@ def persona(data, labels=None, columns=None, cluster_name='ClusterID',
     num_columns, cat_columns = list(num_columns), list(cat_columns)
 
     # 군집화에 사용한 컬럼을 앞쪽에 두어 표에서 먼저 읽히게 한다
-    if columns:
-        used = [c for c in columns if c in num_columns]
+    if source_column_names:
+        used = [c for c in source_column_names if c in num_columns]
         num_columns = used + [c for c in num_columns if c not in used]
 
     # --- 6) 군집 번호 목록 확인 (노이즈(-1)는 군집이 아니므로 제외한다) ---
-    cluster_ids = sorted([c for c in df[cluster_name].unique() if c != -1])
+    cluster_ids = sorted([c for c in df[cluster_column_name].unique() if c != -1])
     total = len(df)
 
     if verbose:
@@ -1155,11 +1143,11 @@ def persona(data, labels=None, columns=None, cluster_name='ClusterID',
 
     for c in cluster_ids:
         # 7-1) 현재 군집에 속한 데이터만 추출
-        cluster_data = df[df[cluster_name] == c]
+        cluster_data = df[df[cluster_column_name] == c]
 
         # 7-2) 군집의 크기와 전체에서 차지하는 비중
         persona_item = {
-            cluster_name: c,
+            cluster_column_name: c,
             '데이터수': len(cluster_data),
             '비율(%)': round(len(cluster_data) / total * 100, 1),
         }
@@ -1171,23 +1159,19 @@ def persona(data, labels=None, columns=None, cluster_name='ClusterID',
             values = cluster_data[column].dropna()
             p = normaltest(values)[1] if len(values) >= 8 and values.nunique() >= 2 else None
 
-            # 대표값 선택 — 평균은 한쪽으로 치우친 분포에서 꼬리에 끌려가므로 정규분포일 때만
-            # 쓰고, 검정을 못 한 경우에도 안전한 쪽인 중앙값을 쓴다
+            # 대표값 선택 — 평균은 한쪽으로 치우친 분포에서 꼬리에 끌려가므로 정규분포일 때만 쓰고, 
+            # 검정을 못 한 경우에도 안전한 쪽인 중앙값을 쓴다
             method = '평균' if p is not None and p > alpha else '중앙값'
 
-            # 두 값을 나란히 두면 "평균과 중앙값이 얼마나 벌어져 있는가"까지 함께 읽힌다
+            # 표에 담기 — 두 값을 나란히 두면 "평균과 중앙값이 얼마나 벌어져 있는가"까지
+            # 함께 읽힌다. 같은 컬럼이라도 군집마다 채택되는 쪽이 달라지므로 별표로 표시한다
             stats = {
                 '평균': round(values.mean(), 3),
                 '중앙값': round(values.median(), 3),
             }
 
-            # 표에 담기 — 두 값을 모두 넣을지, 채택한 값 하나만 넣을지
-            if show_stat:
-                # 같은 컬럼이라도 군집마다 채택되는 쪽이 달라지므로 별표로 표시한다
-                for name, v in stats.items():
-                    persona_item[f'{column}({name})'] = f'{v}*' if name == method else f'{v}'
-            else:
-                persona_item[column] = stats[method]
+            for name, v in stats.items():
+                persona_item[f'{column}({name})'] = f'{v}*' if name == method else f'{v}'
 
             # 선택 근거 출력
             if verbose:
@@ -1205,74 +1189,83 @@ def persona(data, labels=None, columns=None, cluster_name='ClusterID',
         persona_list.append(persona_item)
 
     # --- 8) 페르소나 표 완성 (군집 번호 순으로 정렬) ---
-    persona_df = DataFrame(persona_list).sort_values(by=cluster_name).reset_index(drop=True)
+    persona_df = DataFrame(persona_list)
+    persona_df.sort_values(by=cluster_column_name, inplace=True)
+    persona_df.reset_index(drop=True, inplace=True)
 
     # --- 9) 범주형 구성비 계산 ---
     # 최빈값만 보면 모든 군집이 같은 값으로 나오는 경우가 많으므로 구성비까지 함께 본다
     ratio_dict = {}
 
     for column in cat_columns:
-        # 9-1) 군집 × 범주 교차표 (건수)
-        ct = crosstab(df[cluster_name], df[column])
+        # 군집 × 범주 교차표 (건수)
+        ct = crosstab(df[cluster_column_name], df[column])
 
-        # 9-2) 비교 기준이 되는 전체 비율은 노이즈를 빼기 전에 구한다 (실제 데이터 전체의 구성비)
+        # 비교 기준이 되는 전체 비율은 노이즈를 빼기 전에 구한다 (실제 데이터 전체의 구성비)
         overall = (ct.sum(axis=0) / ct.to_numpy().sum() * 100).round(1)
 
-        # 9-3) 노이즈를 뺀 뒤, 군집마다 행 합이 100%가 되도록 환산
+        # 노이즈를 뺀 뒤, 군집마다 행 합이 100%가 되도록 환산
         ct = ct.loc[[c for c in ct.index if c in cluster_ids]]
         ratio = (ct.div(ct.sum(axis=1), axis=0) * 100).round(1)
 
-        # 9-4) 데이터 전체의 비율을 마지막 행에 붙여 "이 군집만 다른가"를 바로 비교하게 한다
+        # 데이터 전체의 비율을 마지막 행에 붙여 "이 군집만 다른가"를 바로 비교하게 한다
         ratio.loc['전체'] = overall
         ratio_dict[column] = ratio
 
-        # 9-5) 교차표와 구성비 출력
+        # 교차표와 구성비 출력
         if verbose:
             print('-' * 60)
-            print(f"[구성비] {cluster_name} × {column}")
+            print(f"[구성비] {cluster_column_name} × {column}")
             display(ct)
             display(ratio)
 
-        # 9-6) 군집 수와 범주 수가 많을 때는 표보다 히트맵이 빠르게 읽힌다
-        if crosstab_plot:
-            my_plot.heatmap(data=ratio, fmt='0.1f', palette=palette,
-                            title=f'{column} 구성비 (%)',
-                            xlabel=column, ylabel=cluster_name,
-                            width=width * cols, height=height)
-
-    # --- 10) 군집별 분포 시각화 ---
-    if plot and num_columns:
-        # 10-1) 컬럼 수에 맞춰 그래프 칸을 몇 행 몇 열로 놓을지 계산
-        n = len(num_columns)
-        ncols = min(cols, n)
+    # --- 10) 시각화 — 연속형 상자그림과 범주형 구성비 히트맵을 2열로 묶는다 ---
+    if plot and (num_columns or cat_columns):
+        # 10-1) 두 종류를 합친 개수만큼 칸을 잡는다 (연속형 먼저, 범주형이 뒤)
+        n = len(num_columns) + len(cat_columns)
+        ncols = 2
         nrows = int(np.ceil(n / ncols))
 
         # 10-2) 그래프 초기화
         fig, ax = my_plot.init(width=width, height=height, rows=nrows, cols=ncols,
-                               title='군집별 분포')
+                               title='군집별 분포와 구성비')
 
-        # 한 칸짜리 그래프는 배열이 아닌 Axes 하나가 오므로 배열로 맞춰준다
+        # 칸이 하나뿐이면 배열이 아닌 Axes 하나가 오므로 배열로 맞춰준다
         axes = np.atleast_1d(ax)
 
         # 10-3) 노이즈(-1)는 군집이 아니므로 상자그림에서도 뺀다
-        vdf = df[df[cluster_name].isin(cluster_ids)]
+        vdf = df[df[cluster_column_name].isin(cluster_ids)]
 
-        # 10-4) 연속형 컬럼마다 군집별 상자그림
+        # 10-4) 연속형 컬럼: 군집별 상자그림
         for i, column in enumerate(num_columns):
-            my_plot.boxplot(data=vdf, x=cluster_name, y=column, hue=cluster_name,
-                            palette=palette, ax=axes[i])
+            my_plot.boxplot(data=vdf, x=cluster_column_name, y=column,
+                            hue=cluster_column_name, palette=palette, ax=axes[i])
 
             # 군집화에 쓴 변수인지 표시한다 (쓰지 않은 변수에서 나온 차이가 더 강한 근거다)
-            mark = '군집화 변수' if columns and column in columns else '군집화에 쓰지 않은 변수'
+            mark = ('군집화 변수'
+                    if source_column_names and column in source_column_names
+                    else '군집화에 쓰지 않은 변수')
             axes[i].set_title(f'{column} ({mark})', fontsize=16, pad=10)
             axes[i].set_xlabel('군집 번호')
             axes[i].set_ylabel(column)
 
-        # 10-5) 컬럼 수가 칸 수보다 적으면 남는 칸은 숨긴다
+        # 10-5) 범주형 컬럼: 구성비 히트맵
+        # (군집 수와 범주 수가 많을 때는 숫자 표보다 색으로 보는 편이 빠르게 읽힌다)
+        # 여기서는 palette 대신 순차형 색상을 쓴다. 구성비는 크기를 비교하는 값이라
+        # tab10 같은 범주형 팔레트를 쓰면 32%와 34%가 전혀 다른 색으로 찍혀 오히려 헷갈린다
+        for i, column in enumerate(cat_columns, start=len(num_columns)):
+            my_plot.heatmap(data=ratio_dict[column], fmt='0.1f',
+                            palette='Blues', ax=axes[i])
+
+            axes[i].set_title(f'{column} 구성비 (%)', fontsize=16, pad=10)
+            axes[i].set_xlabel(column)
+            axes[i].set_ylabel('군집 번호')
+
+        # 10-6) 칸이 홀수로 남으면 마지막 빈 칸은 숨긴다
         for a in axes[n:]:
             a.set_visible(False)
 
-        # 10-6) 전체 제목이 들어갈 위쪽 공간(7%)을 미리 비워 둔 뒤 표시한다
+        # 10-7) 전체 제목이 들어갈 위쪽 공간(7%)을 미리 비워 둔 뒤 표시한다
         #       (칸이 하나면 전체 제목이 붙지 않으므로 공간을 비우지 않는다)
         if len(axes) > 1:
             fig.tight_layout(rect=[0, 0, 1, 0.93])

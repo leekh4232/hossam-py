@@ -19,11 +19,9 @@ classifiers = [
 ]
 keywords = ["data", "analysis", "helper", "hossam", "scikit-learn", "pandas", "numpy", "matplotlib", "seaborn", "plotly"]
 dependencies = [
-    # Core
     "jupyter",
     "tqdm",
     "pyarrow",
-    "fastparquet",
     "tabulate",
     "numpy",
     "pandas",
@@ -32,34 +30,20 @@ dependencies = [
     "scikit-learn",
     "statsmodels",
     "requests",
-    "cloudpickle",
-    "psutil",
-    "importlib_metadata",
-    "deprecation",
-    "xxhash",
     "matplotlib",
     "seaborn",
-    "plotly",
-    "kaleido",
     "openpyxl",
     "xlrd",
-    "lxml",
-    "bs4",
     "pingouin",
     "statannotations",
     "xgboost",
     "lightgbm",
     "catboost",
     "shap",
-    "pmdarima",
-    "prophet",
-    "imbalanced-learn",
-    "category-encoders",
-    "yellowbrick",
     "geopandas",
-    "kmodes",
-    "jenkspy",
-    "kneed"
+    "libpysal",
+    "esda",
+    "kneed",
 ]
 
 [project.optional-dependencies]
