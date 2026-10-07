@@ -1,6 +1,6 @@
 # 🎓 Hossam Data Helper
 
-[![Python Version](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
+[![Python Version](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PyPI version](https://img.shields.io/pypi/v/hossam.svg)](https://pypi.org/project/hossam/)
 [![Documentation](https://img.shields.io/badge/docs-py.hossam.kr-blue.svg)](https://py.hossam.kr)
@@ -20,20 +20,21 @@
 ## 📦 설치
 
 ```bash
-pip install --upgrade hossam
+pip install --upgrade jussam
 ```
 
-**요구사항**: Python 3.11 ~ 3.13
+**요구사항**: Python 3.12 이상
 
-## 📚 전체 문서
+## 🚀 사용법
 
-**완전한 API 문서와 가이드는 [py.hossam.kr](https://py.hossam.kr)에서 확인하세요.**
+https://py.hossam.kr
+
+## 📬 문의
+
+- 👩‍🏫 이광호 (아이티윌)
+- 📧 Email: leekh4232@gmail.com
+- 📝 Website: https://hossam.kr/
+
 ## 📄 라이선스
 
 이 프로젝트는 MIT 라이선스를 따릅니다. 자유롭게 사용, 수정, 배포할 수 있습니다.
-
-## 🔗 링크
-
-- **문서**: [py.hossam.kr](https://py.hossam.kr)
-- **PyPI**: [pypi.org/project/hossam](https://pypi.org/project/hossam/)
-- **강사**: 이광호 (ITWILL 머신러닝 및 데이터 분석)
