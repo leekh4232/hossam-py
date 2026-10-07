@@ -3,3 +3,4 @@ include LICENSE
 global-exclude __pycache__
 recursive-include hossam *.ttf
 recursive-include hossam *.png
+include hossam/config.toml

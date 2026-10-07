@@ -437,42 +437,11 @@ def reg_score(estimator, x_test, y_test):
 
 
 # --------------------------------------------------------
-# 주 지표·보조 지표 이름이 지표표에 있는지 검증
-# --------------------------------------------------------
-def _validate_metrics(primary, aux, metric_specs):
-    """주 지표·보조 지표가 계산 가능한 이름인지 확인하고 보조 지표를 리스트로 통일한다.
-
-    Args:
-        primary (str): 순위를 가르는 주 지표
-        aux (list | str): 결함 판정에 쓸 보조 지표
-        metric_specs (dict): 사용 가능한 지표표
-
-    Returns:
-        list: 리스트로 통일된 보조 지표.
-
-    Raises:
-        ValueError: 계산되지 않는 지표명을 준 경우.
-    """
-    if isinstance(aux, str):
-        aux = [aux]     # 보조 지표를 문자열 하나로 준 경우도 허용
-
-    if primary not in metric_specs:
-        raise ValueError(f"지원하지 않는 주 지표입니다: '{primary}' "
-                         f"(사용 가능: {sorted(metric_specs)})")
-
-    for m in aux:
-        if m not in metric_specs:
-            raise ValueError(f"지원하지 않는 보조 지표입니다: '{m}' "
-                             f"(사용 가능: {sorted(metric_specs)})")
-
-    return list(aux)
-
-
-# --------------------------------------------------------
 # 모델별 점수표에 4단계 전략으로 Rank 를 매긴다
 # --------------------------------------------------------
-def _rank_score_table(final_score_table, metric_specs, primary, aux, verbose):
-    """모델별 점수표를 받아 4단계 전략으로 순위를 매긴 비교표를 돌려준다.
+def _rank_score_table(final_score_table, metric_specs, primary, aux, verbose=True,
+                      plot=True, title=None, width=1280, height=640, save_path=None):
+    """모델별 점수표를 받아 4단계 전략으로 순위를 매긴 비교표와 성능 비교 그래프를 만든다.
 
     주 지표 하나만으로는 소수점 차이로 1등이 갈리므로, ① 주 지표로 정렬 → ② 1등의 5%
     이내를 '근소 격차 그룹' 으로 묶기 → ③ 그룹 내부의 보조 지표 결함 개수 세기 →
@@ -484,180 +453,164 @@ def _rank_score_table(final_score_table, metric_specs, primary, aux, verbose):
         primary (str): 순위를 가르는 주 지표
         aux (list): 결함 판정에 쓸 보조 지표
         verbose (bool): 판정 과정 출력 여부
+        plot (bool): 성능 비교 그래프 출력 여부
+        title (str): 그래프 제목. 뒤에 '(지표 기준)' 이 붙는다
+        width (int): 그래프 가로 크기(픽셀)
+        height (int): 그래프 세로 크기(픽셀)
+        save_path (str): 그래프 이미지 저장 경로
 
     Returns:
-        DataFrame: Rank 순 비교표. 맨 앞에 `Rank`·`Group`, 맨 끝에 `{primary}_Gap` 컬럼.
+        DataFrame: 성능 비교표
     """
-    # --- 1) 주 지표의 정렬 기준을 확인한다. ---
-    p_better = metric_specs[primary]['better']
+    # --- 1) 지표별 key 를 만들어 방향을 통일한다 ---
+    # 지표마다 좋은 방향이 달라(낮을수록·높을수록·0에 가까울수록) 그대로 두면 정렬·그룹·
+    # 결함·격차 계산마다 비교식이 세 갈래로 갈린다. 여기서 한 번만 방향을 맞춰 두면
+    # 이후 단계는 전부 "key 가 작을수록 좋다, 1등과의 격차 = key - 1등 key" 로 읽힌다.
+    
+    # 인덱스만 갖는 빈 DataFrame 을 만들어, 지표별 key 를 채워 넣는다
+    keys = DataFrame(index=final_score_table.index)
+
+    for m in [primary] + aux:                       # `주 지표 + 보조 지표`만큼 반복
+        better = metric_specs[m]['better']          # 낮을수록 좋은지, 높을수록 좋은지, 0에 가까울수록 좋은지
+
+        if better == 'lower':                       # 낮을수록 좋은 지표
+            keys[m] = final_score_table[m]          # 그대로 쓴다
+        elif better == 'higher':                    # 높을수록 좋은 지표
+            keys[m] = -final_score_table[m]         # 부호를 뒤집어 작을수록 좋게 만든다
+        else:                                       # 0에 가까울수록 좋은 지표
+            keys[m] = final_score_table[m].abs()    # 0 에서 벗어난 크기만 본다
 
     if verbose:
         print('\n' + '=' * 70)
-        print(f'◆ Score Table Ranking : primary={primary!r}, aux={aux}')
+        print(f'◆ Score Table Ranking : primary={primary}, aux={aux}')
         print('=' * 70)
 
-    # --- 2) 주 지표를 기준으로 성능평가 결과를 정렬한다. ---
-    if p_better == 'closer_to_zero':
-        # 부호가 아니라 크기가 문제이므로 절대값으로 줄을 세운다
-        order_idx = final_score_table[primary].abs().sort_values(kind='mergesort').index
-        sorted_table = final_score_table.loc[order_idx]
-        primary_ascending = True
-    else:
-        primary_ascending = (p_better == 'lower')
-        sorted_table = final_score_table.sort_values(
-            primary, ascending=primary_ascending, kind='mergesort'
-        )
+    # --- 2) 주 지표의 key 가 작은 순으로 정렬한다 (NaN 은 맨 뒤) ---
+    order = keys[primary].sort_values(kind='mergesort').index
+    sorted_table = final_score_table.loc[order]
+    keys = keys.loc[order]
 
     if verbose:
         direction_label = {
-            'lower': '낮을수록 좋음 (ASC)',
-            'higher': '높을수록 좋음 (DESC)',
-            'closer_to_zero': '0에 가까울수록 좋음 (|x| ASC)',
-        }[p_better]
+            'lower': '낮을수록 좋음',
+            'higher': '높을수록 좋음',
+            'closer_to_zero': '0에 가까울수록 좋음',
+        }[metric_specs[primary]['better']]
         print(f'\n▲ step1: 주 지표({primary}) 기준 정렬 — {direction_label}')
         for i, (name, val) in enumerate(sorted_table[primary].items(), 1):
             print(f'   {i:>2}. {name:<14} {primary:<6}= {val:>16.3f}')
 
-    # --- 3) 1등과 5% 이내인 모델을 '근소 격차 그룹' 으로 묶기 ---
-    primary_col = sorted_table[primary]
+    # --- 3) 1등과의 격차가 5% 이내인 모델을 '근소 격차 그룹' 으로 묶는다 ---
+    best_key = keys[primary].min()
+    allow = abs(best_key) * 0.05                       # 허용 격차 = 1등 크기의 5%
+    close_mask = keys[primary] <= best_key + allow     # NaN 은 비교가 False 라 그룹 외부
 
-    if p_better == 'lower':    # ------------------------- 값이 작을 수록 더 좋은 지표의 경우
-        best_primary = primary_col.min(skipna=True) 
-        close_mask = primary_col <= best_primary * 1.05
-        band_str = f'{primary} ≤ {best_primary * 1.05:.3f}'
-    elif p_better == 'higher': # ------------------------- 값이 클 수록 더 좋은 지표의 경우
-        best_primary = primary_col.max(skipna=True)
-        # 1등의 5% 아래까지 — 1등이 음수일 수도 있으므로(R2) 크기의 5% 를 뺀다.
-        # best * 0.95 로 계산하면 음수일 때 기준선이 1등보다 위로 올라가 1등이 탈락한다
-        band = best_primary - abs(best_primary) * 0.05
-        close_mask = primary_col >= band
-        band_str = f'{primary} ≥ {band:.3f}'
-    else:   # -------------------------------------------- 값이 0에 가까울 수록 더 좋은 지표의 경우
-        best_primary = primary_col.abs().min(skipna=True)
-        close_mask = primary_col.abs() <= best_primary * 1.05
-        band_str = f'|{primary}| ≤ {abs(best_primary) * 1.05:.3f}'
-
-    # 근소 격차 그룹과 외부 그룹을 나눈다
-    close_group = sorted_table[close_mask].copy()
+    close_group = sorted_table[close_mask]
     outside_group = sorted_table[~close_mask]
 
     if verbose:
         print(f'\n▲ step2: 근소 격차 그룹 묶기 (1등의 5% 이내)')
-        print(f'   - 1등 {primary:<6} : {best_primary:.3f}')
-        print(f'   - 허용 범위    : {band_str}')
+        print(f'   - 1등 {primary:<6} : {sorted_table[primary].iloc[0]:.3f}')
+        print(f'   - 허용 격차    : 1등보다 {allow:.3f} 까지')
         print(f'   - 근소 격차 그룹 ({len(close_group)}) : {list(close_group.index)}')
         print(f'   - 그룹 외부     ({len(outside_group)}) : {list(outside_group.index)}')
 
-    # --- 4) 그룹에 1등만 있으면 비교할 상대가 없으므로 step3 을 건너뛴다 ---
+    # --- 4) 그룹 안에서 보조 지표의 '결정적 결함' 개수를 센다 ---
+    # 그룹 1등보다 허용 격차를 넘게 나쁘면 결함 1개. 계산되지 않은(NaN) 지표도 결함이다.
+    # 그룹에 1등만 있으면 비교할 상대가 없으므로 건너뛴다.
     if len(close_group) > 1:
-        # --- 4-1) 보조 지표별 결함 판정 ---
-        # 그룹 1등(best) 에서 threshold 만큼 벌어지면 결함이다.
-
-        # 각 보조 지표별로 best 값, 결함 기준(limit), 결함 여부(is_flaw)를 저장할 딕셔너리
-        aux_bests, aux_limits, aux_flaws = {}, {}, {}
-
-        for m in aux:
-            aux_col = close_group[m]                    # 1등과 비교할 보조 지표 컬럼
-            threshold = metric_specs[m]['threshold']    # 1등 대비 결함 허용치  
-            m_better = metric_specs[m]['better']        # 1등과 비교할 때 더 좋은 방향
-
-            if m_better == 'higher':  # --------------- 값이 클 수록 더 좋은 지표의 경우
-                best = aux_col.max(skipna=True)     # 최고 지표 추출
-
-                if metric_specs[m]['flaw_type'] == 'rel_drop':    # 상한이 없는 지표(DOR)
-                    limit = best - abs(best) * threshold    # 1등보다 threshold 비율만큼 작으면 결함
-                else:                                              # 상한이 1 인 지표
-                    limit = best - threshold                # 1등보다 threshold 만큼 작으면 결함
-
-                is_flaw = aux_col < limit           # 결함 여부 판단
-            elif m_better == 'lower': # --------------- 값이 작을 수록 더 좋은 지표의 경우
-                best = aux_col.min(skipna=True)     # 최저 지표 추출
-                limit = best * (1 + threshold)      # 1등보다 threshold 비율만큼 크면 결함
-                is_flaw = aux_col > limit           # 결함 여부 판단
-            else: # ----------------------------------- 값이 0에 가까울 수록 더 좋은 지표의 경우
-                best = aux_col.abs().min(skipna=True) # 1등과 비교할 때 절대값이 가장 작은 지표 추출
-                limit = best + threshold              # 크기가 1등보다 threshold 넘게 크면 결함
-                is_flaw = aux_col.abs() > limit       # 결함 여부 판단
-
-            aux_bests[m], aux_limits[m] = best, limit   # 1등과 결함 기준을 저장
-            aux_flaws[m] = is_flaw | aux_col.isna()     # 결측치도 결함으로 간주
-
-        # --- 4-2) 모델별 결함 개수 ---
-        flaw_counts = []            # 모델별 결함 개수를 담을 리스트
-
-        for idx in close_group.index:
-            count = 0               # 모델 idx 가 걸린 결함 개수
-
-            for m in aux:
-                if aux_flaws[m][idx]:
-                    count += 1      # 보조 지표 m 에서 결함 → 1 개 추가
-
-            flaw_counts.append(count)
-
-        close_group['_flaws'] = flaw_counts
+        # --- 4-1) 결함 여부표를 만든다 ---
+        flaws = DataFrame(index=close_group.index)     # 모델 × 보조 지표 결함 여부표
 
         if verbose:
             print(f'\n▲ step3: 보조 지표 결정적 결함 점검 (근소 격차 그룹 내부)')
 
-            for m in aux:
-                lhs = '|row|' if metric_specs[m]['better'] == 'closer_to_zero' else 'row'
-                op = '<' if metric_specs[m]['better'] == 'higher' else '>'
-                print(f'       · {m:<6} best={aux_bests[m]:>10.3f}   결함조건: {lhs} {op} {aux_limits[m]:.3f}')
+        # --- 4-2) 각 보조 지표별로 결함 여부를 계산한다 ---
+        for m in aux:   # `aux` 에 지정된 보조 지표만큼 반복
+            key = keys.loc[close_group.index, m]        # 근소 격차 그룹 내부의 m 지표 key
+            best_key = key.min()                        # 근소 격차 그룹 내부의 m 지표 1등 key
+            threshold = metric_specs[m]['threshold']    # 결함 판정 임계값
 
-            for idx in close_group.index:
-                triggered = [m for m in aux if aux_flaws[m][idx]]
-                print(f'       · {idx:<14} {len(triggered)}개 {triggered if triggered else "(결함 없음)"}')
+            # 허용 격차: 상한이 없는 지표(오차·DOR)는 1등 크기의 threshold 비율,
+            #            상한이 정해진 지표(R2·정확도 등)는 threshold 그 자체
+            if metric_specs[m]['flaw_type'] in ('rel_excess', 'rel_drop'):
+                allow = abs(best_key) * threshold
+            else:
+                allow = threshold
 
-        # --- 4-3) step4: (결함 수, 주 지표) 오름차순 재정렬 ---
+            flaws[m] = (key > best_key + allow) | key.isna()
+
+            if verbose:
+                best = -best_key if metric_specs[m]['better'] == 'higher' else best_key
+                print(f'       · {m:<6} best={best:>10.3f}   결함조건: 1등보다 {allow:.3f} 넘게 나쁘면')
+
+        # --- 4-3) 각 모델별 결함 개수를 카운트하여 문자열 출력 ---
+        if verbose:
+            for name in close_group.index:
+                hit = [m for m in aux if flaws.loc[name, m]]
+                print(f'       · {name:<14} {len(hit)}개 {hit if hit else "(결함 없음)"}')
+
+        # --- 4-4) (결함 수, 주 지표 key) 순으로 그룹 내부를 재정렬한다 ---
         # 결함이 적은 모델이 위로, 동률이면 주 지표가 좋은 모델이 위로 간다
-        if p_better == 'closer_to_zero':
-            close_group['_primary_key'] = close_group[primary].abs()
-        else:
-            close_group['_primary_key'] = close_group[primary]
+        order = DataFrame({
+            'flaws': flaws.sum(axis=1),
+            'key': keys.loc[close_group.index, primary],
+        }).sort_values(['flaws', 'key'], kind='mergesort').index
+        close_group = close_group.loc[order]
 
-        close_group = close_group.sort_values(
-            ['_flaws', '_primary_key'], ascending=[True, primary_ascending], kind='mergesort'
-        ).drop(columns=['_flaws', '_primary_key'])
-    elif verbose:
-        print(f'\n▲ step3: 스킵 — 근소 격차 그룹에 1등만 존재 (1등 압도적, step4 직행)')
-
-
-    # --- 5) 재정렬한 근소 격차 그룹 + 주 지표 순 그룹 외부를 이어 붙이고 Rank 부여 ---
+    # --- 5) 재정렬한 그룹 + 그룹 외부를 이어 붙이고 Rank·Group 을 붙인다 ---
+    # 근소격차그룹과 그룹 외부를 합쳐 최종 점수표를 만든다.
     final_score_table = concat([close_group, outside_group])
+
+    # 최종 점수표에 Rank 컬럼을 추가 --> 1등부터 순위를 매긴다
     final_score_table.insert(0, 'Rank', range(1, len(final_score_table) + 1))
 
-    close_set = set(close_group.index)
+    # 최종 점수표에 Group 컬럼을 추가 --> 근소격차그룹은 'Contender', 그룹 외부는 'Outside'
     final_score_table.insert(1, 'Group', [
-        'Contender' if name in close_set else 'Outside'
+        'Contender' if name in close_group.index else 'Outside'
         for name in final_score_table.index
     ])
 
-    # --- 6) 맨 끝 컬럼: 주 지표가 1등 대비 몇 % 나쁜지 (양수일수록 나쁨) ---
-    gap_col = f'{primary}_Gap'
-
-    if p_better == 'closer_to_zero':
-        ref = abs(final_score_table[primary].iloc[0])
-        diff = final_score_table[primary].abs() - ref
-    else:
-        ref = final_score_table[primary].iloc[0]
-        # 높을수록 좋은 지표면 1등보다 낮을수록 나쁜 것이므로 부호를 뒤집어 양수로 만든다
-        sign = 1.0 if p_better == 'lower' else -1.0
-        diff = sign * (final_score_table[primary] - ref)
+    # --- 6) 맨 끝 컬럼: 주 지표가 Rank 1 대비 몇 % 나쁜지 (양수일수록 나쁨) ---
+    # 결함 때문에 밀린 모델은 주 지표가 Rank 1 보다 좋을 수 있어 음수가 나오기도 한다
+    key = keys.loc[final_score_table.index, primary]
+    diff = key - key.iloc[0]
+    ref = abs(key.iloc[0])
 
     if ref == 0:
         # 기준값이 0 이면 비율을 계산할 수 없다
-        final_score_table[gap_col] = np.where(diff == 0, 0.0, np.nan)
+        final_score_table[f'{primary}_Gap'] = np.where(diff == 0, 0.0, np.nan)
     else:
-        final_score_table[gap_col] = (diff / abs(ref)).round(3)
+        final_score_table[f'{primary}_Gap'] = (diff / ref).round(3)
 
     if verbose:
         print(f'\n▲ step4: 최종 Rank')
         for rank, name in zip(final_score_table['Rank'], final_score_table.index):
-            tag = '[그룹 내]' if name in close_set else '[그룹 외 · 주 지표 순]'
+            tag = '[그룹 내]' if name in close_group.index else '[그룹 외 · 주 지표 순]'
             print(f'   {rank:>2}. {name:<14} {tag}')
         print('=' * 70 + '\n')
 
-    # --- 7) 결과표 리턴 ---
+    # --- 7) 성능 비교 그래프 ---
+    # RMSE·MAE 처럼 낮을수록 좋은 지표를 그대로 그리면 막대가 길수록 나쁜 모델이 되어
+    # 그래프가 직관과 어긋난다. 역수를 취해 '클수록 좋은 값' 으로 방향을 통일한다.
+    if plot:
+        chart = final_score_table[['Group']].copy()     # 그래프용 임시표 (결과표에는 넣지 않는다)
+
+        if metric_specs[primary]['better'] == 'higher':
+            chart['Score'] = final_score_table[primary]             # 이미 높을수록 좋은 지표
+            score_label = primary
+        elif metric_specs[primary]['better'] == 'lower':
+            chart['Score'] = 1 / final_score_table[primary]         # 역수로 방향을 뒤집는다
+            score_label = f'1/{primary}'
+        else:
+            chart['Score'] = 1 / final_score_table[primary].abs()   # 부호를 떼고 크기만 역수로
+            score_label = f'1/|{primary}|'
+
+        my_plot.barplot(chart, y=chart.index, x='Score', hue='Group',
+                        palette='tab10', width=width, height=len(chart) * 60 + 50,
+                        title=f'{title}({score_label} 기준)', save_path=save_path)
+
+    # --- 8) 결과표 리턴 ---
     return final_score_table
 
 
@@ -665,24 +618,25 @@ def _rank_score_table(final_score_table, metric_specs, primary, aux, verbose):
 # 여러 회귀 모델의 지표를 한 번에 계산하고 4단계 전략으로 순위를 매긴 비교표 생성
 # --------------------------------------------------------
 def reg_compare_models(estimator, x_test, y_test, primary='RMSE',
-                       aux=['MAE', 'R2'], verbose=True):
-    """여러 회귀 모델의 지표를 계산하고 4단계 전략으로 'Rank' 를 매긴 비교표를 만든다.
+                       aux=['MAE', 'R2'], verbose=True, plot=True,
+                       title='모델 성능 비교', width=1280, height=640, save_path=None):
+    """여러 회귀 모델의 지표를 계산하고 4단계 전략으로 'Rank' 를 매긴 비교표와 그래프를 만든다.
 
     Args:
         estimator (list | dict): 비교할 모델의 리스트 또는 {'이름': 모델} 딕셔너리.
-            리스트면 모델의 `name_` 속성을, 없으면 `Model 1` … 을 이름으로 쓴다.
-            GridSearchCV 같은 탐색 객체는 내부의 best_estimator_ 를 꺼내 평가한다.
         x_test (DataFrame): 검증 데이터의 독립변수.
         y_test (Series | ndarray): 검증 데이터의 종속변수.
         primary (str): 순위를 가르는 주 지표 (기본값: 'RMSE').
         aux (list): 결함 판정에 쓸 보조 지표 (기본값: ['MAE', 'R2']).
         verbose (bool): 판정 과정 출력 여부 (기본값: True).
-
-    primary·aux 에는 reg_score 가 계산하는 R2·MAE·MSE·RMSE·RMSLE·MAPE·MPE 를 쓴다.
+        plot (bool): 성능 비교 그래프 출력 여부 (기본값: True).
+        title (str): 그래프 제목 (기본값: '모델 성능 비교').
+        width (int): 그래프 가로 크기(픽셀) (기본값: 1280).
+        height (int): 그래프 세로 크기(픽셀) (기본값: 640).
+        save_path (str): 그래프 이미지 저장 경로 (기본값: None).
 
     Returns:
-        DataFrame: Rank 순 비교표. 맨 앞에 `Rank`·`Group`(Contender=근소 격차 그룹 /
-            Outside=그룹 외부), 맨 끝에 `{primary}_Gap`(1등 대비 격차, 양수일수록 나쁨) 컬럼.
+        DataFrame: Rank 순 비교표
     """
     # --- 1) 지표 메타데이터 ---
     # better    : 'lower' | 'higher' | 'closer_to_zero'  — 어느 쪽이 좋은 값인가
@@ -702,9 +656,16 @@ def reg_compare_models(estimator, x_test, y_test, primary='RMSE',
     }
 
     # --- 2) 파라미터 검증 ---
-    aux = _validate_metrics(primary, aux, metric_specs)
+    if isinstance(aux, str):
+        aux = [aux]     # 보조 지표를 문자열 하나로 준 경우도 허용
 
-    # --- 3) 모델별 점수 계산 ---
+    # `주 지표+보조 지표`가 위 metric_specs 에 있는 이름인지 확인한다
+    for m in [primary] + aux:
+        if m not in metric_specs:
+            raise ValueError(f"지원하지 않는 지표입니다: '{m}' "
+                             f"(사용 가능: {sorted(metric_specs)})")
+
+    # --- 3) 모델 이름과 객체를 (이름, 모델) 튜플로 묶어 리스트로 만든다 ---
     # 딕셔너리면 키가 곧 이름이고, 리스트면 아래 루프에서 이름을 정한다
     if isinstance(estimator, dict):
         models = list(estimator.items())
@@ -728,23 +689,26 @@ def reg_compare_models(estimator, x_test, y_test, primary='RMSE',
                     or getattr(best_model, 'name_', None)
                     or f'Model {i + 1}')
 
-        score_df = reg_score(best_model, x_test, y_test)
-        score_df.reset_index(inplace=True)   # 모델 클래스명을 'Model' 컬럼으로 내린다
-        score_df.index = [name]
-        score_tables.append(score_df)
+        score_df = reg_score(best_model, x_test, y_test)    # 현재 모델의 성능평가표
+        score_df.reset_index(inplace=True)   # 인덱스(=모델 클래스명)을 컬럼으로 내린다
+        score_df.index = [name]              # 인덱스를 모델 이름으로 바꾼다 (리스트로 받았을 때 구분이 되도록)
+        score_tables.append(score_df)        # 모델별 평가표를 score_tables 리스트에 저장
 
-    final_score_table = concat(score_tables)
-    final_score_table.index.name = 'name'
+    final_score_table = concat(score_tables)    # score_tables의 개별 평가표를 하나로 병합
+    final_score_table.index.name = 'name'       # 점수표의 인덱스에 이름 지정
 
-    return _rank_score_table(final_score_table, metric_specs, primary, aux, verbose)
+    # --- 5) 4단계 전략으로 순위를 매긴 비교표와 그래프를 만든다 ---
+    return _rank_score_table(final_score_table, metric_specs, primary, aux, verbose,
+                             plot=plot, title=title, width=width, height=height,
+                             save_path=save_path)
 
 
 # --------------------------------------------------------
 # 베이스라인 모델 11종을 한 번에 학습·저장하고 성능 순위표를 만든다
 # --------------------------------------------------------
-def reg_baseline(project_name, x_train, y_train, x_test, y_test,
-                 primary='RMSE', aux=['MAE', 'R2'], plot=True,
-                 width=1280, height=640, save_path=None, verbose=True):
+def reg_baseline(project_name, x_train, y_train, x_test, y_test, primary='RMSE', aux=['MAE', 'R2'], 
+                 impute=False, outlier=False, pca=False,
+                 plot=True, width=1280, height=640, save_path=None, verbose=True):
     """회귀 베이스라인 모델을 모두 학습·저장하고, 성능 순위표와 비교 그래프를 만든다.
 
     Args:
@@ -755,14 +719,17 @@ def reg_baseline(project_name, x_train, y_train, x_test, y_test,
         y_test (Series): 검증 데이터의 종속변수.
         primary (str): 순위를 가르는 주 지표 (기본값: 'RMSE').
         aux (list): 결함 판정에 쓸 보조 지표 (기본값: ['MAE', 'R2']).
+        impute (bool): 결측치 대체 여부 (기본값: False).
+        outlier (bool): 독립변수의 이상치를 경계값으로 대체(클리핑)할지 여부 (기본값: False).
+        pca (bool): PCA 차원 축소 여부 (기본값: False).
         plot (bool): 성능 비교 그래프 출력 여부 (기본값: True).
         width (int): 그래프 가로 크기(픽셀) (기본값: 1280).
         height (int): 그래프 세로 크기(픽셀) (기본값: 640).
         save_path (str): 그래프 이미지 저장 경로 (기본값: None).
         verbose (bool): 모델별 학습 진행 상황 출력 여부 (기본값: True).
 
-    마지막에 순위표(reg_compare_models 의 결과에 시각화용 `Score` 컬럼을 더한 표)를
-    화면에 출력한다. 별도로 반환하는 값은 없다.
+    Returns:
+        DataFrame: Rank 순 비교표
     """
     # 부스팅 3종은 무겁고 별도 설치가 필요한 패키지라 모듈 로드 시가 아니라 함수 안에서 import 한다
     from xgboost import XGBRegressor
@@ -780,12 +747,15 @@ def reg_baseline(project_name, x_train, y_train, x_test, y_test,
     models = {}
 
     # --- 2) 선형 계열 ---
+    # 결측치·이상치·PCA 는 함수 인자(impute·outlier·pca)를 그대로 넘기고,
+    # VIF·정규화·더미변수는 모델 계열에 맞춘 고정값을 적는다 (이하 모든 모델 동일)
     # 계수 해석과 규제의 전제가 되는 다중공선성을 VIF 로 제거하고, 더미 트랩도 함께 막는다.
     # LinearRegression 은 규제가 없어 스케일에 좌우되지 않으므로 정규화를 하지 않는다
     model = LinearRegression()
     model_name = model.__class__.__name__.lower().removesuffix('regression')
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
+        impute=impute, outlier=outlier, pca=pca,
         vif=True, scale=False, drop_first=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
@@ -794,9 +764,10 @@ def reg_baseline(project_name, x_train, y_train, x_test, y_test,
 
     # Ridge·Lasso·ElasticNet 은 계수의 크기에 벌점을 매기므로 정규화가 반드시 필요하다
     model = Ridge(random_state=RANDOM_STATE)
-    model_name = model.__class__.__name__.lower().removesuffix('regressor')
+    model_name = model.__class__.__name__.lower()
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
+        impute=impute, outlier=outlier, pca=pca,
         vif=True, scale=True, drop_first=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
@@ -804,9 +775,10 @@ def reg_baseline(project_name, x_train, y_train, x_test, y_test,
         print(f'학습 완료 [ 2/11] : {model_name}')
 
     model = Lasso(random_state=RANDOM_STATE)
-    model_name = model.__class__.__name__.lower().removesuffix('regressor')
+    model_name = model.__class__.__name__.lower()
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
+        impute=impute, outlier=outlier, pca=pca,
         vif=True, scale=True, drop_first=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
@@ -814,9 +786,10 @@ def reg_baseline(project_name, x_train, y_train, x_test, y_test,
         print(f'학습 완료 [ 3/11] : {model_name}')
 
     model = ElasticNet(random_state=RANDOM_STATE)
-    model_name = model.__class__.__name__.lower().removesuffix('regressor')
+    model_name = model.__class__.__name__.lower()
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
+        impute=impute, outlier=outlier, pca=pca,
         vif=True, scale=True, drop_first=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
@@ -829,6 +802,7 @@ def reg_baseline(project_name, x_train, y_train, x_test, y_test,
     model_name = model.__class__.__name__.lower().removesuffix('regressor')
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
+        impute=impute, outlier=outlier, pca=pca,
         vif=True, scale=True, encode=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
@@ -836,9 +810,10 @@ def reg_baseline(project_name, x_train, y_train, x_test, y_test,
         print(f'학습 완료 [ 5/11] : {model_name}')
 
     model = SVR()
-    model_name = model.__class__.__name__.lower().removesuffix('regressor')
+    model_name = model.__class__.__name__.lower()
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
+        impute=impute, outlier=outlier, pca=pca,
         vif=True, scale=True, encode=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
@@ -852,6 +827,7 @@ def reg_baseline(project_name, x_train, y_train, x_test, y_test,
     model_name = model.__class__.__name__.lower().removesuffix('regressor')
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
+        impute=impute, outlier=outlier, pca=pca,
         vif=True, scale=False, encode=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
@@ -863,6 +839,7 @@ def reg_baseline(project_name, x_train, y_train, x_test, y_test,
     model_name = model.__class__.__name__.lower().removesuffix('regressor')
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
+        impute=impute, outlier=outlier, pca=pca,
         vif=True, scale=False, encode=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
@@ -873,6 +850,7 @@ def reg_baseline(project_name, x_train, y_train, x_test, y_test,
     model_name = model.__class__.__name__.lower().removesuffix('regressor')
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
+        impute=impute, outlier=outlier, pca=pca,
         vif=True, scale=False, encode=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
@@ -883,6 +861,7 @@ def reg_baseline(project_name, x_train, y_train, x_test, y_test,
     model_name = model.__class__.__name__.lower().removesuffix('regressor')
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
+        impute=impute, outlier=outlier, pca=pca,
         vif=True, scale=False, encode=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
@@ -891,11 +870,12 @@ def reg_baseline(project_name, x_train, y_train, x_test, y_test,
 
     # CatBoost 는 범주형을 자체 방식(Ordered Target Statistics)으로 처리하므로
     # 더미 인코딩을 끄고, 어떤 컬럼이 범주형인지만 fit 인자로 알려준다.
-    # 범주형 판정은 fit_pipeline 의 명목형 자동 선택과 같은 기준(category·object)으로 한다 
+    # 범주형 판정은 fit_pipeline 의 명목형 자동 선택과 같은 기준(category·object)으로 한다
     model = CatBoostRegressor(random_state=RANDOM_STATE, verbose=0)
     model_name = model.__class__.__name__.lower().removesuffix('regressor')
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
+        impute=impute, outlier=outlier, pca=pca,
         vif=True, scale=False, encode=False,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False,
         model__cat_features=list(x_train.select_dtypes(include=['category', 'object']).columns))
@@ -903,37 +883,15 @@ def reg_baseline(project_name, x_train, y_train, x_test, y_test,
     if verbose:
         print(f'학습 완료 [11/11] : {model_name}')
 
-    # --- 6) 모델간 성능 비교 ---
-    # 개별 모델의 지표는 출력하지 않고, 순위가 매겨진 표 하나만 남긴다
+    # --- 6) 모델간 성능 비교 + 성능 비교 그래프 ---
+    # 개별 모델의 지표는 출력하지 않고, 순위가 매겨진 표 하나만 남긴다.
+    # 그래프는 순위를 매기는 쪽(_rank_score_table)이 함께 그린다
     score_table = reg_compare_models(models, x_test, y_test,
-                                     primary=primary, aux=aux, verbose=False)
+                                     primary=primary, aux=aux, verbose=False,
+                                     plot=plot, width=width, height=height,
+                                     save_path=save_path)
 
-    # --- 7) 시각화용 점수 계산 ---
-    # RMSE·MAE 처럼 낮을수록 좋은 지표를 그대로 그리면 막대가 길수록 나쁜 모델이 되어
-    # 그래프가 직관과 어긋난다. 역수를 취해 '클수록 좋은 값' 으로 방향을 통일한다.
-    if primary == 'R2':
-        # 이미 높을수록 좋은 지표이므로 변환하지 않는다
-        score_table['Score'] = score_table[primary]
-        score_label = primary
-    elif primary == 'MPE':
-        # 0 에 가까울수록 좋은 지표라 부호를 떼고 크기만 역수로 바꾼다
-        score_table['Score'] = 1 / score_table[primary].abs()
-        score_label = f'1/|{primary}|'
-    else:
-        score_table['Score'] = 1 / score_table[primary]
-        score_label = f'1/{primary}'
-
-    # --- 8) 성능 비교 그래프 ---
-    if plot:
-        my_plot.barplot(score_table, y=score_table.index, x='Score', hue='Group',
-                        palette='tab10', width=width, height=height,
-                        title=f'모델 성능 비교({score_label} 기준)', save_path=save_path)
-
-    # --- 9) 최종 순위표 출력 ---
-    # 순위표가 이 함수의 결과물이므로 화면에 직접 출력한다.
-    # 학습된 모델은 이미 pkl 로 저장했으니, 다시 쓸 때는 workdir 에서 load_model 로 불러온다
-    print(f'\n모델 {len(models)}개 학습·저장 완료 → {workdir}')
-    display(score_table)
+    return score_table
 
 
 
@@ -993,6 +951,7 @@ def reg_tunes(project_name, models, x_train, y_train, x_test, y_test,
         'MAPE':  'neg_mean_absolute_percentage_error',
     }
 
+    # 주지표 이름이 탐색 기준으로 쓸 수 있는 지표인지 확인
     if primary not in scoring_map:
         raise ValueError(f'탐색 기준으로 쓸 수 없는 지표입니다: {primary} '
                          f'(가능한 값: {", ".join(scoring_map)})')
@@ -1134,7 +1093,7 @@ def reg_tunes(project_name, models, x_train, y_train, x_test, y_test,
         },
     }
 
-    # --- 4) 튜닝 조합 채택, 튜닝 결과물을 담을 작업 폴더 생성, 결과 조합 결과를 저장할 자료구조 정의 ---
+    # --- 4) 튜닝 조합 채택, 작업 폴더 생성, 결과 조합 저장용 자료구조 정의 ---
     # 하이퍼파라미터 조합 채택
     #  --> 실습용은 명시적으로 요청했을 때만 쓰고, 기본은 실무용 범위로 탐색한다
     param_grids = practice_grids if practice else full_grids
@@ -1184,7 +1143,7 @@ def reg_tunes(project_name, models, x_train, y_train, x_test, y_test,
         else:
             fit_params = {}
 
-        # --- 5-2) 파라미터 탐색 수행 ---
+        # --- 5-2) 병렬 처리 설정 ---
         # 병렬 처리는 GridSearchCV 한 곳에서만 한다. 안쪽 모델(RF·XGB·LGBM·KNN·CatBoost)까지
         # 코어를 전부 쓰면 프로세스 수 × 스레드 수가 코어 수를 크게 넘어 오히려 느려진다.
         # 넘겨받은 원본은 그대로 두고 복제본에만 적용한다 (저장되는 튜닝 모델은 단일 스레드)
@@ -1200,7 +1159,8 @@ def reg_tunes(project_name, models, x_train, y_train, x_test, y_test,
 
             estimator = clone(estimator).set_params(**inner_jobs)
 
-        started = perf_counter()
+        # --- 5-3) 파라미터 탐색 수행 ---
+        started = perf_counter()    # 시간 측정 시작
         gs = GridSearchCV(estimator=estimator, param_grid=param_grid,
                           cv=cv, scoring=scoring, n_jobs=n_jobs)
         gs.fit(x_train, y_train, **fit_params)
@@ -1224,36 +1184,15 @@ def reg_tunes(project_name, models, x_train, y_train, x_test, y_test,
         print('튜닝된 모델이 없습니다. models 에 그리드가 정의된 회귀 모델을 넣어 주세요.')
         return
 
-    # --- 6) 모델간 성능 비교 ---
-    # 개별 모델의 지표는 출력하지 않고, 순위가 매겨진 표 하나만 남긴다
+    # --- 6) 모델간 성능 비교 + 튜닝 결과 시각화 ---
+    # 개별 모델의 지표는 출력하지 않고, 순위가 매겨진 표 하나만 남긴다.
+    # 그래프는 순위를 매기는 쪽(_rank_score_table)이 함께 그린다
     score_table = reg_compare_models(tuned, x_test, y_test,
-                                     primary=primary, aux=aux, verbose=False)
+                                     primary=primary, aux=aux, verbose=False,
+                                     plot=plot, title='하이퍼파라미터 튜닝 결과 성능 비교',
+                                     width=width, height=height, save_path=save_path)
 
-    # --- 7) 시각화용 점수 계산 ---
-    if primary == 'R2':
-        # 이미 높을수록 좋은 지표이므로 변환하지 않는다
-        score_table['Score'] = score_table[primary]
-        score_label = primary
-    else:
-        score_table['Score'] = 1 / score_table[primary]
-        score_label = f'1/{primary}'
-
-    # --- 8) 튜닝 결과 시각화 ---
-    if plot:
-        my_plot.barplot(score_table, y=score_table.index, x='Score', hue='Group',
-                        palette='tab10', width=width, height=height,
-                        title=f'하이퍼파라미터 튜닝 결과 성능 비교({score_label} 기준)',
-                        save_path=save_path)
-
-    # --- 9) 최종 순위표 출력 ---
-    # 순위표가 이 함수의 결과물이므로 화면에 직접 출력한다.
-    # 튜닝된 모델은 이미 pkl 로 저장했으니, 다시 쓸 때는 workdir 에서 load_model 로 불러온다
-    print(f'\n모델 {len(tuned)}개 튜닝·저장 완료 → {workdir}')
-
-    if skipped:
-        print(f'탐색 범위가 없어 건너뛴 모델: {", ".join(skipped)}')
-
-    display(score_table)
+    return score_table
 
 
 
@@ -1372,8 +1311,9 @@ def cls_score(estimator, x_test, y_test, average='auto'):
 # 모델 성능 비교
 # --------------------------------------------------------
 def cls_compare_models(estimator, x_test, y_test, primary='F1',
-                       aux=['ROC_AUC', 'Accuracy'], average='auto', verbose=True):
-    """여러 분류 모델의 지표를 계산하고 성능을 비교한다.
+                       aux=['ROC_AUC', 'Accuracy'], average='auto', verbose=True,
+                       plot=True, title='모델 성능 비교', width=1280, height=640, save_path=None):
+    """여러 분류 모델의 지표를 계산하고 4단계 전략으로 'Rank' 를 매긴 비교표와 그래프를 만든다.
 
     Args:
         estimator (list | dict): 비교할 모델의 리스트 또는 {'이름': 모델} 딕셔너리.
@@ -1385,6 +1325,11 @@ def cls_compare_models(estimator, x_test, y_test, primary='F1',
         aux (list): 결함 판정에 쓸 보조 지표 (기본값: ['ROC_AUC', 'Accuracy']).
         average (str): 다중분류의 클래스 평균 방식 (기본값: 'auto').
         verbose (bool): 판정 과정 출력 여부 (기본값: True).
+        plot (bool): 성능 비교 그래프 출력 여부 (기본값: True).
+        title (str): 그래프 제목 (기본값: '모델 성능 비교').
+        width (int): 그래프 가로 크기(픽셀) (기본값: 1280).
+        height (int): 그래프 세로 크기(픽셀) (기본값: 640).
+        save_path (str): 그래프 이미지 저장 경로 (기본값: None).
 
     primary·aux 에는 cls_score 가 계산하는 Accuracy·Precision·Recall·F1·ROC_AUC·
     PR_AUC·DOR 를 쓴다.
@@ -1414,7 +1359,14 @@ def cls_compare_models(estimator, x_test, y_test, primary='F1',
     }
 
     # --- 2) 파라미터 검증 ---
-    aux = _validate_metrics(primary, aux, metric_specs)
+    if isinstance(aux, str):
+        aux = [aux]     # 보조 지표를 문자열 하나로 준 경우도 허용
+
+    # `주 지표+보조 지표`가 위 metric_specs 에 있는 이름인지 확인한다
+    for m in [primary] + aux:
+        if m not in metric_specs:
+            raise ValueError(f"지원하지 않는 지표입니다: '{m}' "
+                             f"(사용 가능: {sorted(metric_specs)})")
 
     # --- 3) 모델별 점수 계산 ---
     # 딕셔너리면 키가 곧 이름이고, 리스트면 아래 루프에서 이름을 정한다
@@ -1452,7 +1404,9 @@ def cls_compare_models(estimator, x_test, y_test, primary='F1',
     final_score_table = concat(score_tables)
     final_score_table.index.name = 'name'
 
-    return _rank_score_table(final_score_table, metric_specs, primary, aux, verbose)
+    return _rank_score_table(final_score_table, metric_specs, primary, aux, verbose,
+                             plot=plot, title=title, width=width, height=height,
+                             save_path=save_path)
 
 
 # --------------------------------------------------------
@@ -1460,7 +1414,8 @@ def cls_compare_models(estimator, x_test, y_test, primary='F1',
 # --------------------------------------------------------
 def cls_baseline(project_name, x_train, y_train, x_test, y_test,
                  primary='F1', aux=['ROC_AUC', 'Accuracy'], average='auto', plot=True,
-                 width=1280, height=640, save_path=None, verbose=True):
+                 width=1280, height=640, save_path=None, verbose=True,
+                 impute=False, outlier=False, pca=False, vif=True):
     """분류 베이스라인 모델을 모두 학습·저장하고, 성능 순위표와 비교 그래프를 만든다.
 
     Args:
@@ -1477,6 +1432,15 @@ def cls_baseline(project_name, x_train, y_train, x_test, y_test,
         height (int): 그래프 세로 크기(픽셀) (기본값: 640).
         save_path (str): 그래프 이미지 저장 경로 (기본값: None).
         verbose (bool): 모델별 학습 진행 상황 출력 여부 (기본값: True).
+        impute (bool): 결측치 대체 여부 (기본값: False).
+        outlier (bool): 독립변수의 이상치를 경계값으로 대체(클리핑)할지 여부 (기본값: False).
+        pca (bool): PCA 차원 축소 여부 (기본값: False).
+        vif (bool): VIF 기준 다중공선성 제거 여부 (기본값: True). 텍스트 DTM 처럼 컬럼이 매우 많을 때만 끈다.
+
+    결측치·이상치·PCA 는 데이터 상황에 따라 분석가가 정하므로 인자로 받아 모든 모델에 같이 적용한다.
+    정규화·더미변수 인코딩은 모델 계열의 특성에 맞춰야 하므로 함수 안에 고정한다 (회귀 baseline 과 같은 규칙).
+
+    마지막에 순위표를 화면에 출력한다. 별도로 반환하는 값은 없다.
     """
     # 부스팅 3종은 무겁고 별도 설치가 필요한 패키지라 모듈 로드 시가 아니라 함수 안에서 import 한다
     from xgboost import XGBClassifier
@@ -1514,13 +1478,16 @@ def cls_baseline(project_name, x_train, y_train, x_test, y_test,
     models = {}
 
     # --- 3) 선형 계열 ---
+    # 결측치·이상치·PCA·VIF 는 함수 인자를 그대로 넘기고,
+    # 정규화·더미변수는 모델 계열에 맞춘 고정값을 적는다 (이하 모든 모델 동일)
     # 계수 해석과 규제의 전제가 되는 다중공선성을 VIF 로 제거하고, 더미 트랩도 함께 막는다.
     # 두 모델 모두 계수의 크기에 벌점을 매기므로 정규화가 반드시 필요하다
     model = LogisticRegression(random_state=RANDOM_STATE, max_iter=1000)
     model_name = model.__class__.__name__.lower().removesuffix('regression')
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
-        vif=True, scale=True, drop_first=True,
+        impute=impute, outlier=outlier, pca=pca,
+        vif=vif, scale=True, drop_first=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
     if verbose:
@@ -1531,7 +1498,8 @@ def cls_baseline(project_name, x_train, y_train, x_test, y_test,
     model_name = model.__class__.__name__.lower().removesuffix('classifier')
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
-        vif=True, scale=True, drop_first=True,
+        impute=impute, outlier=outlier, pca=pca,
+        vif=vif, scale=True, drop_first=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
     if verbose:
@@ -1543,7 +1511,8 @@ def cls_baseline(project_name, x_train, y_train, x_test, y_test,
     model_name = model.__class__.__name__.lower().removesuffix('classifier')
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
-        vif=True, scale=True, encode=True,
+        impute=impute, outlier=outlier, pca=pca,
+        vif=vif, scale=True, encode=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
     if verbose:
@@ -1553,7 +1522,8 @@ def cls_baseline(project_name, x_train, y_train, x_test, y_test,
     model_name = model.__class__.__name__.lower()
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
-        vif=True, scale=True, encode=True,
+        impute=impute, outlier=outlier, pca=pca,
+        vif=vif, scale=True, encode=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
     if verbose:
@@ -1566,7 +1536,8 @@ def cls_baseline(project_name, x_train, y_train, x_test, y_test,
     model_name = model.__class__.__name__.lower().removesuffix('classifier')
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
-        vif=True, scale=False, encode=True,
+        impute=impute, outlier=outlier, pca=pca,
+        vif=vif, scale=False, encode=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
     if verbose:
@@ -1577,7 +1548,8 @@ def cls_baseline(project_name, x_train, y_train, x_test, y_test,
     model_name = model.__class__.__name__.lower().removesuffix('classifier')
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
-        vif=True, scale=False, encode=True,
+        impute=impute, outlier=outlier, pca=pca,
+        vif=vif, scale=False, encode=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
     if verbose:
@@ -1587,7 +1559,8 @@ def cls_baseline(project_name, x_train, y_train, x_test, y_test,
     model_name = model.__class__.__name__.lower().removesuffix('classifier')
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
-        vif=True, scale=False, encode=True,
+        impute=impute, outlier=outlier, pca=pca,
+        vif=vif, scale=False, encode=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
     if verbose:
@@ -1597,7 +1570,8 @@ def cls_baseline(project_name, x_train, y_train, x_test, y_test,
     model_name = model.__class__.__name__.lower().removesuffix('classifier')
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
-        vif=True, scale=False, encode=True,
+        impute=impute, outlier=outlier, pca=pca,
+        vif=vif, scale=False, encode=True,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False)
 
     if verbose:
@@ -1611,31 +1585,23 @@ def cls_baseline(project_name, x_train, y_train, x_test, y_test,
     model_name = model.__class__.__name__.lower().removesuffix('classifier')
     models[model_name] = fit_pipeline(
         model=model, x_train=x_train, y_train=y_train,
-        vif=True, scale=False, encode=False,
+        impute=impute, outlier=outlier, pca=pca,
+        vif=vif, scale=False, encode=False,
         name=model_name, save_path=workdir / f'{model_name}.pkl', verbose=False,
         model__cat_features=list(x_train.select_dtypes(include=['category', 'object']).columns))
 
     if verbose:
         print(f'학습 완료 [9/9] : {model_name}')
 
-    # --- 7) 모델간 성능 비교 ---
-    # 개별 모델의 지표는 출력하지 않고, 순위가 매겨진 표 하나만 남긴다
+    # --- 7) 모델간 성능 비교 + 성능 비교 그래프 ---
+    # 개별 모델의 지표는 출력하지 않고, 순위가 매겨진 표 하나만 남긴다.
+    # 그래프는 순위를 매기는 쪽(_rank_score_table)이 함께 그린다
     score_table = cls_compare_models(models, x_test, y_test, primary=primary,
-                                     aux=aux, average=average, verbose=False)
+                                     aux=aux, average=average, verbose=False,
+                                     plot=plot, width=width, height=height,
+                                     save_path=save_path)
 
-    # --- 8) 시각화용 점수 계산 ---
-    # 분류 지표는 모두 높을수록 좋으므로 방향을 바꾸지 않고 그대로 그린다
-    score_table['Score'] = score_table[primary]
-    # (수정 전) score_label = primary  — 회귀판의 '1/RMSE' 라벨 흔적. 분류는 항상 primary 라 제거 (2026-09-17)
-
-    # --- 9) 성능 비교 그래프 ---
-    if plot:
-        my_plot.barplot(score_table, y=score_table.index, x='Score', hue='Group',
-                        palette='tab10', width=width, height=height,
-                        # (수정 전) title=f'모델 성능 비교({score_label} 기준)'
-                        title=f'모델 성능 비교({primary} 기준)', save_path=save_path)
-
-    # --- 10) 최종 순위표 출력 ---
+    # --- 8) 최종 순위표 출력 ---
     # 순위표가 이 함수의 결과물이므로 화면에 직접 출력한다.
     # 학습된 모델은 이미 pkl 로 저장했으니, 다시 쓸 때는 workdir 에서 load_model 로 불러온다
     print(f'\n모델 {len(models)}개 학습·저장 완료 → {workdir}')
@@ -1939,25 +1905,15 @@ def cls_tunes(project_name, models, x_train, y_train, x_test, y_test,
         print('튜닝된 모델이 없습니다. models 에 그리드가 정의된 분류 모델을 넣어 주세요.')
         return
 
-    # --- 7) 모델간 성능 비교 ---
-    # 개별 모델의 지표는 출력하지 않고, 순위가 매겨진 표 하나만 남긴다
+    # --- 7) 모델간 성능 비교 + 튜닝 결과 시각화 ---
+    # 개별 모델의 지표는 출력하지 않고, 순위가 매겨진 표 하나만 남긴다.
+    # 그래프는 순위를 매기는 쪽(_rank_score_table)이 함께 그린다
     score_table = cls_compare_models(tuned, x_test, y_test, primary=primary,
-                                     aux=aux, average=average, verbose=False)
+                                     aux=aux, average=average, verbose=False,
+                                     plot=plot, title='하이퍼파라미터 튜닝 결과 성능 비교',
+                                     width=width, height=height, save_path=save_path)
 
-    # --- 8) 시각화용 점수 계산 ---
-    # 분류 지표는 모두 높을수록 좋으므로 방향을 바꾸지 않고 그대로 그린다
-    score_table['Score'] = score_table[primary]
-    # (수정 전) score_label = primary  — 회귀판의 '1/RMSE' 라벨 흔적. 분류는 항상 primary 라 제거 (2026-09-17)
-
-    # --- 9) 튜닝 결과 시각화 ---
-    if plot:
-        my_plot.barplot(score_table, y=score_table.index, x='Score', hue='Group',
-                        palette='tab10', width=width, height=height,
-                        # (수정 전) title=f'하이퍼파라미터 튜닝 결과 성능 비교({score_label} 기준)'
-                        title=f'하이퍼파라미터 튜닝 결과 성능 비교({primary} 기준)',
-                        save_path=save_path)
-
-    # --- 10) 최종 순위표 출력 ---
+    # --- 8) 최종 순위표 출력 ---
     # 순위표가 이 함수의 결과물이므로 화면에 직접 출력한다.
     # 튜닝된 모델은 이미 pkl 로 저장했으니, 다시 쓸 때는 workdir 에서 load_model 로 불러온다
     print(f'\n모델 {len(tuned)}개 튜닝·저장 완료 → {workdir}')

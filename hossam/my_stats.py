@@ -1118,7 +1118,9 @@ def compute_vif(df, columns=None):
 
     # --- 2) VIF 계산 ---
     # 회귀모형에 절편(상수항)이 있어야 올바른 VIF 가 나오므로 절편(상수항)을 추가
-    X = add_constant(target)
+    # has_constant='add': 데이터에 이미 상수 컬럼(예: 이상치 절단 후 전부 0 이 된 더미)이 있어도
+    # 절편을 반드시 추가한다. 기본값('skip')은 이 경우 절편을 건너뛰어 아래 drop('const') 가 KeyError 로 죽는다
+    X = add_constant(target, has_constant='add')
 
     # 각 변수(열)별로 VIF 를 하나씩 계산해서 리스트에 담는다.
     vif_values = []
@@ -1136,7 +1138,7 @@ def compute_vif(df, columns=None):
     # 인덱스 오름차순으로 먼저 정렬
     # 그 후 VIF 기준 내림차순으로 정렬해서 반환
     # 단, 동점일 경우 기존 순서를 유지하도록 kind="stable" 옵션 사용
-    vif = (vif.drop('const').sort_index()
+    vif = (vif.drop('const', errors='ignore').sort_index()
              .sort_values(by='VIF', ascending=False, kind="stable"))
 
     return vif

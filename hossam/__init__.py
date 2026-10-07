@@ -5,12 +5,18 @@ from pathlib import Path as _Path
 import pandas as pd
 from matplotlib import pyplot as plt
 
+import numpy as np
+import random as rn
+
 # -------------------------------------
 # 전역 상수
 # -------------------------------------
 # 무작위성이 개입하는 모든 기능(PCA, 군집, 데이터 분할 등)의 재현성을 위한 랜덤시드.
 # 하위 모듈에서 `from . import RANDOM_STATE` 로 참조하므로 모듈 임포트보다 먼저 정의한다.
 RANDOM_STATE = 3217
+
+np.random.seed(RANDOM_STATE)  # numpy 랜덤시드 고정
+rn.seed(RANDOM_STATE)         # random 랜덤시드 고정
 
 # -------------------------------------
 # 내보낼 모듈 임포트
@@ -29,7 +35,6 @@ from . import my_diag       # 모델 진단·해석 함수 모듈 (과적합 판
 
 from . import code_checker  # 제출 코드를 원본 모듈과 대조하는 모듈
 from . import make_docs     # 소스코드로 API 레퍼런스 문서를 생성하는 모듈
-from . import my_pipeline
 from . import my_util
 from .make_docs import make_api_docs
 from .code_checker import diff
@@ -38,7 +43,7 @@ from .my_util import load_data
 
 # -------------------------------------
 # 초기화
-# 패키지 이름/안내 메시지는 _config.py, 공통 로직은 _bootstrap.py 에 있다.
+# 안내 메시지는 config.toml, 공통 로직은 _bootstrap.py 에 있다.
 # (한글 폰트 등록, 그래프/pandas 출력 옵션, 버전 확인, 안내 메시지 출력)
 # -------------------------------------
 from ._bootstrap import check_pypi_latest

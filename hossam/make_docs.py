@@ -30,7 +30,7 @@ import tempfile
 import webbrowser
 from pathlib import Path
 
-from ._config import PACKAGE_NAME
+from ._bootstrap import PACKAGE_NAME
 
 # 문서 생성에 필요한 패키지: (import 이름, pip 설치 이름)
 _REQUIRED_PACKAGES = [

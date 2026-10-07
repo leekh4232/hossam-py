@@ -142,7 +142,7 @@ def __get_df(path: str, index_col=None) -> DataFrame:
     df = df.astype({col: 'float32' for col in df.select_dtypes(include=['float']).columns})
 
 
-    # 숫자형 컬럼을 float32로 변환
+    # 숫자형 컬럼을 int32로 변환
     df = df.astype({col: 'int32' for col in df.select_dtypes(include=['int']).columns})
 
     return df

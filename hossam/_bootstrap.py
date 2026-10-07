@@ -1,18 +1,25 @@
 # -*- coding: utf-8 -*-
 """패키지 공통 초기화 로직.
 
-패키지마다 달라지는 값(패키지 이름, 안내 메시지)은 전부 `_config.py` 에 들어 있다.
+패키지마다 달라지는 값(안내 메시지)은 전부 `config.toml` 에 들어 있고,
+패키지 이름은 이 모듈이 속한 패키지에서 자동으로 알아낸다.
 따라서 이 파일은 다른 패키지(hossam ↔ jussam)에 **그대로 복사해 붙여넣어도** 된다.
 """
 
 import importlib.metadata
 import multiprocessing as mp
+import tomllib
 from pathlib import Path
 
 import pandas as pd
 import requests
 
-from ._config import MESSAGES, PACKAGE_NAME
+# PyPI 배포명. 버전 조회와 업데이트 안내에 사용된다. (hossam/jussam 처럼 패키지 폴더명과 같다)
+PACKAGE_NAME = __package__
+
+# import 시 출력되는 안내 메시지 (패키지 폴더의 config.toml)
+with open(Path(__file__).resolve().parent / "config.toml", "rb") as _f:
+    MESSAGES = tomllib.load(_f)["messages"]
 
 # 이 파일들이 패키지 상위 폴더에 있으면 설치본이 아니라 소스 트리를 참조 중인 것으로 본다.
 _SOURCE_MARKERS = ("pyproject.toml", "setup.py", "setup.cfg")

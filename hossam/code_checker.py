@@ -77,7 +77,7 @@ from difflib import SequenceMatcher
 
 from pandas import DataFrame
 
-from ._config import PACKAGE_NAME
+from ._bootstrap import PACKAGE_NAME
 
 # -------------------------------------------------------------
 # 상수

@@ -104,8 +104,14 @@ class VIFSelector(BaseEstimator, TransformerMixin):
             # 이후 계산이 깨지므로 100만으로 눌러 유한한 값으로 만든다
             round_df['VIF'] = round_df['VIF'].clip(upper=1e6)
 
+            # nan 이었던 행은 compute_vif 의 정렬에서 맨 아래에 놓였다가 방금 1e6 이 되었으므로
+            # 다시 내림차순으로 정렬해야 첫 행이 진짜 최대값이 된다
+            # (수정 전) 재정렬 없이 첫 행을 읽어 상수 컬럼(VIF nan→1e6) 이 끝까지 제거되지 않았다 (2026-09-23)
+            round_df = (round_df.sort_values(by='VIF', ascending=False, kind='stable')
+                                .reset_index(drop=True))
+
             # --- 6-2) 가장 VIF 가 큰 변수를 찾고 이번 라운드 표를 기록 ---
-            # 이미 내림차순으로 정렬돼 있으므로 첫 번째 행이 곧 최대값이다
+            # 재정렬했으므로 첫 번째 행이 곧 최대값이다
             max_col = round_df.iloc[0]['Variable']
             max_vif = round_df.iloc[0]['VIF']
 

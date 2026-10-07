@@ -241,7 +241,6 @@ def kdeplot(data=None, x=None, hue=None, meanline=False, clevel=0,
         else:
             # hue 범주별 평균선 표시 (kdeplot이 그린 라인의 색상과 일치시킴)
             categories = list(data[hue].unique())
-
             # 팔레트에서 범주의 수에 맞는 색상값 추출
             colors = sb.color_palette(palette, n_colors=len(categories))
 
@@ -425,8 +424,7 @@ def violinplot(data=None, x=None, y=None, hue=None, orient=None,
     hue, dodge, legend = _resolve_hue(x if orient != "h" else y, hue=hue, palette=palette)
 
     # 바이올린 플롯 그리기
-    sb.violinplot(data=data, x=x, y=y, hue=hue, orient=orient, palette=palette,
-                  dodge=dodge, legend=legend, ax=ax, **params)
+    sb.violinplot(data=data, x=x, y=y, hue=hue, orient=orient, palette=palette, dodge=dodge, legend=legend, ax=ax, **params)
 
     # 그래프 표시
     if fig is not None:
@@ -506,8 +504,7 @@ def barplot(data=None, x=None, y=None, hue=None, estimator=np.mean,
     hue, dodge, legend = _resolve_hue(x if x is not None else y, hue=hue, palette=palette)
 
     # 막대그래프 그리기
-    sb.barplot(data=data, x=x, y=y, hue=hue, estimator=estimator, order=order,
-               palette=palette, dodge=dodge, legend=legend, ax=ax, **params)
+    sb.barplot(data=data, x=x, y=y, hue=hue, estimator=estimator, order=order, palette=palette, dodge=dodge, legend=legend, ax=ax, **params)
 
     # 그래프 표시
     if fig is not None:
@@ -547,8 +544,7 @@ def countplot(data=None, x=None, y=None, hue=None, order=None,
     hue, dodge, legend = _resolve_hue(x if x is not None else y, hue=hue, palette=palette)
 
     # 빈도 그래프 그리기
-    sb.countplot(data=data, x=x, y=y, hue=hue, order=order, palette=palette,
-                 dodge=dodge, legend=legend, ax=ax, **params)
+    sb.countplot(data=data, x=x, y=y, hue=hue, order=order, palette=palette, dodge=dodge, legend=legend, ax=ax, **params)
 
     # 그래프 표시
     if fig is not None:
@@ -646,7 +642,7 @@ def stackplot(data, x, y, hue, aggfunc=np.sum, orient='v', ratio=False,
         fig, ax = init(width=width, height=height, title=title, xlabel=xlabel, ylabel=ylabel)
 
     # 데이터 피벗팅 (fill_value=0 --> 결측치를 0으로 채움)후 인덱스를 문자열 카테고리로 변환
-    df = pivot_table(data=data, index=x, values=y, columns=hue, aggfunc=aggfunc, fill_value=0)
+    df = pivot_table(data=data, index=x, values=y, columns=hue, aggfunc=aggfunc, fill_value=0, observed=True)
     df.index = df.index.astype("str").astype("category")
 
     # 누적값을 비율로 변환하는 경우

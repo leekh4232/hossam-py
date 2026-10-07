@@ -1,6 +1,8 @@
 # ---- 기본 참조 ----------------------------------------------------
 import numpy as np                              # 배열 연산
-from pandas import DataFrame, concat            # 데이터프레임 처리·행 결합
+# shap_proba_table 의 구간 나누기·다중 인덱스를 위해 cut·qcut·MultiIndex 추가 (2026-09-18, LAB-04 08 SHAP)
+# (수정 전) from pandas import DataFrame, concat            # 데이터프레임 처리·행 결합
+from pandas import DataFrame, concat, MultiIndex, cut, qcut    # 데이터프레임 처리·행 결합·구간 나누기
 from pathlib import Path                        # 작업 폴더 경로 조립
 from IPython.display import display             # 출력 기능
 
@@ -36,7 +38,8 @@ from matplotlib import pyplot as plt
 def overfit(estimator, x_train, y_train, x_test, y_test,
             metrics=None, average='auto', threshold=0.20, underfit_threshold=None,
             cv=5, fit_params=None, learning_curve=True,
-            width=1280, height=640, grid=True, save_path=None, verbose=True):
+            width=1280, height=640, grid=True, save_path=None, verbose=True,
+            return_result=False):
     """Train / CV / Test 성능을 한 표로 보여주고 과적합 여부를 판정한다 (회귀·분류 공용).
 
     Args:
@@ -56,6 +59,10 @@ def overfit(estimator, x_train, y_train, x_test, y_test,
         grid (bool): 학습곡선 격자 표시 여부 (기본값: True).
         save_path (str): 학습곡선 이미지 저장 경로 (기본값: None).
         verbose (bool): 판정 과정 출력 여부 (기본값: True).
+        return_result (bool): True 면 결과표(DataFrame)를 반환한다. 표의 `attrs['diagnosis']` 에
+            모델 수준 최종 진단('일반화' | '과대적합' | '과소적합') 이 담겨 있어 여러 모델을
+            순서대로 판정해 고르는 코드에서 쓴다. False(기본값) 면 표를 화면에만 출력하고
+            반환하지 않는다 — 셀 마지막 줄에서 호출할 때 표가 두 번 출력되는 것을 막기 위함 (2026-09-23 추가).
 
     Raises:
         ValueError: metrics 에 지원하지 않는 지표명을 준 경우.
@@ -69,8 +76,17 @@ def overfit(estimator, x_train, y_train, x_test, y_test,
     if classname.startswith("CatBoost"):    # CatBoost 계열인 경우
         # 교차검증은 폴드마다 모델을 새로 학습하므로 어떤 컬럼이 범주형인지 다시 알려줘야 한다.
         # 데이터 타입으로 추측하면 object 컬럼이나 nominal_cols 로 직접 지정한 컬럼을 놓치므로,
-        # 학습을 마친 모델이 실제로 범주형으로 쓴 컬럼의 위치(인덱스)를 그대로 꺼내 쓴다
-        cat_features = [int(i) for i in model.get_cat_feature_indices()]
+        # 학습을 마친 모델이 실제로 범주형으로 쓴 컬럼을 꺼내 쓴다.
+        # (수정 전) 위치(인덱스)를 그대로 넘겼다 — 앞 단계에 VIFSelector 가 있으면 폴드마다 제거되는
+        #   컬럼 수가 달라져 인덱스가 어긋나 CatBoostError(index must be < n) 가 났다 (2026-09-23)
+        # cat_features = [int(i) for i in model.get_cat_feature_indices()]
+        # 전처리 출력이 DataFrame(set_output='pandas') 이므로 컬럼 "이름" 으로 넘기면 폴드마다 위치가 달라져도 안전하다
+        cat_idx = [int(i) for i in model.get_cat_feature_indices()]
+        names = getattr(model, 'feature_names_', None)
+        if names is not None and len(names) > max(cat_idx, default=-1):
+            cat_features = [names[i] for i in cat_idx]
+        else:                                   # 이름을 알 수 없으면 종전대로 인덱스 사용
+            cat_features = cat_idx
 
         # 파이프라인이면 '마지막 단계명__cat_features', 단독 모델이면 'cat_features' 로 넘긴다
         if isinstance(base_est, Pipeline):
@@ -392,6 +408,11 @@ def overfit(estimator, x_train, y_train, x_test, y_test,
 
         print('=' * 78 + '\n')
 
+    # --- 18) 결과 반환 (요청한 경우에만) ---
+    # attrs['diagnosis'] 로 모델 수준 진단을 코드에서 읽을 수 있다 (2026-09-23 추가)
+    if return_result:
+        return result
+
 
 # --------------------------------------------------------
 # 변수 중요도를 산출해 상위 변수를 추려서 반환
@@ -602,182 +623,173 @@ def feature_importance(estimator, cum_ratio=0.95,
 # --------------------------------------------------------
 def shap_analysis(project_name, estimator, x, max_samples='auto',
                   background_clusters=50, workdir='shap'):
-    """학습된 예측(회귀) 모델을 SHAP 으로 분석해 변수 기여도 요약표를 반환한다.
+    """학습된 회귀·분류 모델을 SHAP 으로 분석해 변수 기여도 요약표를 반환한다.
 
     Args:
         project_name (str): 작업 폴더의 이름이 될 프로젝트명.
         estimator: 학습된 파이프라인 또는 그것을 감싼 GridSearchCV 등 탐색 객체.
         x (DataFrame): 설명에 사용할 원본 입력 (보통 x_train 또는 x_test).
-        max_samples (str or int): 설명 대상 행 수 (기본값: 'auto').
-            'auto' 면 선형·트리는 전체, KernelExplainer 는 200행을 쓴다.
-            정수를 주면 explainer 종류와 무관하게 그 행 수만큼, None 이면 언제나 전체.
+        max_samples (str or int): 설명 대상 행 수 (기본값: 'auto' → Kernel 만 200행, 나머지는 전체).
         background_clusters (int): KernelExplainer 의 배경을 kmeans 로 압축할 대표점 수 (기본값: 50).
         workdir (str): 분석 결과 pkl 을 저장할 폴더명 (기본값: "shap").
 
     Returns:
-        DataFrame: mean_abs_shap 내림차순 요약표.
+        DataFrame: mean_abs_shap 내림차순 요약표. attrs 에 shap_values(n×f)·data·expected_value·feature_names·
+            explainer_type·model_class·task·class_index·class_names·output_space 가 담기고,
+            같은 객체가 `{project_name}/{workdir}/{모델이름}_shap.pkl` 로 저장된다. 분류는 마지막 클래스(이진의 양성)를 설명한다.
     """
-    # KernelExplainer에 적용할 행 수 상한.
-    # Kernel은 행 하나에 수 초가 걸려 전체를 돌리면 십수 시간이 된다.
-    _KERNEL_MAX_SAMPLES = 200
-
-    # shap 은 별도 설치가 필요한 무거운 패키지라 함수 안에서 import 한다
-    import shap
+    import shap    # 별도 설치가 필요한 무거운 패키지라 함수 안에서 import 한다
 
     # --- 1) 최종 모델 추출 ---
     model, pre, _, _ = _unwrap_estimator(estimator)
-    model_class = type(model).__name__      # 모델 클래스명
+    model_class = type(model).__name__
 
     if pre is None:    # 전처리 단계가 없는 단독 모델인 경우
         raise TypeError(f"'{model_class}' 단독 모델은 받지 않습니다. 전처리를 포함한 파이프라인을 넘기세요.")
 
-    # 이 함수는 회귀 전용이다. 분류 구현은 helpers/backup/shap_analysis_classification.py 에 있다
-    # (수정 전) 분류 대응을 위한 과제 판별. 분류 분기가 미완성(pass)이라 회귀 전용으로 정리 (2026-09-17)
-    # if is_classifier(model):        # 분류 모형인 경우
-    #     task = 'classification'
-    # else:                           # 예측 모형인 경우
-    #     task = 'regression'
-    if is_classifier(model):
-        raise TypeError(f"'{model_class}' 분류 모델은 지원하지 않습니다. 회귀 모델·파이프라인을 넘기세요.")
+    # 분류는 마지막 클래스(이진에서 양성)를 설명한다
+    task = 'classification' if is_classifier(model) else 'regression'
+    class_names = list(model.classes_) if task == 'classification' else []
 
     # --- 2) 전처리 재현하기 ---
     x_df = pre.transform(x).copy()
 
     # --- 3) explainer 생성 ---
+    # 선형은 계수로 기여도를 바로 풀고, 트리는 정확·고속이다. 둘 다 아니면 느린 Kernel 로 넘어간다.
     explainer = None
     explainer_type = None
 
-    if hasattr(model, 'coef_'):     # 선형 — 계수로 기여도를 바로 풀 수 있다
-        # LinearExplainer 는 kmeans 요약을 받지 못하므로 원시 데이터를 그대로 넘긴다
+    if hasattr(model, 'coef_'):    # 선형 — kmeans 요약을 못 받으므로 원시 데이터를 넘긴다
         explainer = shap.LinearExplainer(model, x_df)
         explainer_type = 'LinearExplainer'
-    else:    # 선형이 아닌 경우
-        try:                 # 트리 구조면 정확·고속이라 먼저 시도한다
+    else:
+        try:
             explainer = shap.TreeExplainer(model)
             explainer_type = 'TreeExplainer'
         except Exception:    # shap 이 거부한 경우 (KNN·SVM 등)
             explainer = None
 
-    if explainer is None:           # 폴백 — 모델 구조를 따지지 않지만 느리다
-        # Kernel 은 (배경 대표점 수 × 설명 행 수) 에 비례해 느리므로 배경을 kmeans 로 압축한다
+    if explainer is None:    # 폴백 — 배경이 클수록 느려지므로 kmeans 로 압축한다
         bg = shap.kmeans(x_df, min(background_clusters, len(x_df)))
-        explainer = shap.KernelExplainer(model.predict, bg)
+
+        # Kernel 은 '숫자를 돌려주는 함수' 를 받는다 — 분류는 확률(없으면 결정함수), 회귀는 예측값
+        if task == 'regression':
+            f = model.predict
+        elif hasattr(model, 'predict_proba'):
+            f = model.predict_proba
+        else:    # 확률이 없는 분류 모형 (SVC·RidgeClassifier)
+            f = model.decision_function
+
+        explainer = shap.KernelExplainer(f, bg)
         explainer_type = 'KernelExplainer'
 
     # --- 4) 행 샘플링 ---
-    # 선형·트리는 정확 계산이라 전체를 돌려도 대개 몇 초면 끝난다. 
-    # Kernel 만 행 하나에 수 초가 걸려 (이 규모에서 전체를 돌리면 십수 시간) 자동으로 행을 줄인다.
-    if max_samples == 'auto':    # 기본 — explainer 종류에 맡긴다
-        if explainer_type == 'KernelExplainer':    # 근사 계산 — 행을 줄인다
-            n_target = _KERNEL_MAX_SAMPLES
-        else:                                      # 정확 계산 — 전체를 쓴다
-            n_target = None
-    else:                        # 사용자가 직접 지정한 경우
+    # 선형·트리는 정확 계산이라 전체를 써도 몇 초면 끝나지만, Kernel 은 행 하나에 수 초가 걸린다.
+    if max_samples == 'auto':
+        n_target = 200 if explainer_type == 'KernelExplainer' else None
+    else:
         n_target = max_samples
 
-    if n_target is not None and len(x_df) > n_target:    # 상한을 넘으면 표본을 뽑는다
-        # 재현 가능한 샘플링으로 계산량을 줄인다
-        rng = np.random.RandomState(RANDOM_STATE)
-        pick = rng.choice(len(x_df), size=n_target, replace=False)
-        pick.sort()                     # 원본 행 순서를 유지한다
-        x_explain = x_df.iloc[pick]     # SHAP 을 계산할 행
-    else:    # 상한이 없거나 상한 이하인 경우 — 전체를 쓴다
+    if n_target is not None and len(x_df) > n_target:    # 재현 가능한 샘플링으로 계산량을 줄인다
+        pick = np.sort(np.random.RandomState(RANDOM_STATE).choice(len(x_df), n_target, replace=False))
+        x_explain = x_df.iloc[pick]
+    else:
         x_explain = x_df
 
     # --- 5) SHAP 값 계산 ---
     if explainer_type == 'KernelExplainer':    # Kernel 은 진행 막대를 끈다
         raw = explainer.shap_values(x_explain, silent=True)
-    else:                                      # Tree·Linear
+    else:
         raw = explainer.shap_values(x_explain)
 
-    expected_value = explainer.expected_value      # base value (평균 예측)
-
     # --- 6) SHAP 값 배열 정리 ---
-    # 회귀 모형의 결과 배열은 (n, f) 단일 출력이다.
+    # 회귀는 (n, f) 단일 출력이다. 분류는 클래스축이 붙은 (n, f, c) 로 오기도 하고
+    # (RandomForest·Kernel+predict_proba), 양성 클래스만 담은 (n, f) 로 오기도 한다 (XGBoost·로지스틱).
     arr = np.asarray(raw)
+    ev = np.ravel(np.asarray(explainer.expected_value, dtype=float))    # base value 를 1차원으로 통일
 
-    # (수정 전) 클래스축이 있는 (n, f, c) 분류 출력을 위한 자리(pass). 회귀 전용으로 정리 (2026-09-17)
-    # if arr.ndim == 3:    # (n, f, c) — 클래스축이 있는 분류 모형
-    #     pass 
-    # else:                # (n, f) — 회귀 모형의 단일 출력
-    #     shap_2d = arr.astype(float)
-    #     base_value = float(np.ravel(expected_value)[0])
-    shap_2d = arr.astype(float)                         # (n, f) 기여도 배열
-    base_value = float(np.ravel(expected_value)[0])     # base value (평균 예측)
+    if arr.ndim == 3:    # 클래스축이 있으면 마지막 클래스만 잘라 (n, f) 로 맞춘다
+        idx = arr.shape[2] - 1
+        shap_2d = arr[:, :, idx].astype(float)
+        base_value = float(ev[idx])
+    else:                # 단일 출력 — 분류면 양성 클래스로 본다
+        idx = len(class_names) - 1
+        shap_2d = arr.astype(float)
+        base_value = float(ev[0])
+
+    used_class = idx if task == 'classification' else None    # 회귀는 클래스 개념이 없다
 
     # --- 7) 가산성으로 모델 출력 복원 ---
-    # SHAP 은 '가산성' 을 만족한다 — 행마다 (base value + 그 행의 SHAP 합) 이 모델 출력과 같아진다. 
-    # 그래서 이 합을 모델의 실제 출력과 맞춰보면 단위를 역으로 알 수 있다.
-    preds = shap_2d.sum(axis=1) + base_value    # 행별로 복원한 모델 출력
+    # SHAP 은 행마다 (base value + 그 행의 SHAP 합) 이 모델 출력과 같아진다.
+    # 이 합을 실제 출력과 맞춰보면 SHAP 값의 단위를 역으로 알 수 있다.
+    preds = shap_2d.sum(axis=1) + base_value
 
     # --- 8) 예측값과 대조 ---
-    # 예측 모형은 후보가 하나뿐이라 model.predict 와만 맞춰 보면 된다.
-    # (수정 전) 분류 분기 자리(pass). 회귀 전용으로 정리하며 분기를 풀었다 (2026-09-17)
-    # if task == 'classification':    # 분류 모형인 경우
-    #     pass
-    # else:                           # 예측 모형인 경우
-    # SHAP 값의 단위를 판정하기 위해 모델 예측값을 가져온다
-    y_hat = np.asarray(model.predict(x_explain), dtype=float).ravel()
-    # 0으로 나누는 것을 방지하기 위해 작은 수를 더한다
-    scale = float(np.abs(y_hat).mean()) + 1e-9
-    # SHAP 으로 복원한 예측값과 실제 예측값의 평균 절대 오차를 계산한다
-    error = float(np.abs(preds - y_hat).mean())
+    # 회귀는 후보가 predict 하나뿐이다. 분류는 모델·explainer 조합에 따라 단위가 갈리므로
+    # 확률·로그오즈·마진 후보를 모두 세워 가장 잘 맞는 것을 고른다.
+    #   - RandomForest·DecisionTree + Tree → 확률 / XGBoost·LightGBM·로지스틱 → 로그오즈
+    #   - Kernel → predict_proba 면 확률, decision_function 이면 마진
+    if task == 'regression':    # y 단위 예측값과 맞아떨어지는지만 본다
+        y_hat = np.asarray(model.predict(x_explain), dtype=float).ravel()
+        scale = float(np.abs(y_hat).mean()) + 1e-9    # 오차 허용치의 기준 (0 으로 나누기 방지)
+        output_space = '예측값(y 단위)' if np.abs(preds - y_hat).mean() < scale * 1e-3 else '알 수 없음'
+    else:                       # 후보별로 실제 출력과의 평균 오차를 잰다
+        candidates = {}    # {단위 이름: 실제 출력과의 평균 오차}
 
-    if error < scale * 1e-3:    # 예측값과 사실상 일치하면
-        output_space = '예측값(y 단위)'
-    else:                       # 어긋나면 단위를 특정할 수 없다
-        output_space = '알 수 없음'
+        if hasattr(model, 'predict_proba'):
+            proba = np.asarray(model.predict_proba(x_explain), dtype=float)[:, used_class]
 
-    # --- 9) SHAP 값을 데이터프레임으로 ---
-    # 행이 관측치, 열이 변수다. 한 칸이 '이 행에서 이 변수가 예측을 얼마나 밀었나' 이다.
+            if arr.ndim == 3:    # 클래스축이 있으면 전체 클래스의 복원 출력을 softmax 로 확률화한다
+                full = arr.sum(axis=1) + ev[None, :arr.shape[2]]
+                exp = np.exp(full - full.max(axis=1, keepdims=True))    # 오버플로 방지
+                converted = (exp / exp.sum(axis=1, keepdims=True))[:, used_class]
+            else:                # 단일 출력이면 시그모이드로 확률화한다
+                converted = 1.0 / (1.0 + np.exp(-np.clip(preds, -500, 500)))
+
+            candidates['확률'] = float(np.abs(preds - proba).mean())          # 그대로 확률이면 오차 0
+            candidates['로그오즈'] = float(np.abs(converted - proba).mean())    # 확률화한 뒤 맞으면 로그오즈
+
+        if hasattr(model, 'decision_function'):    # SVC·RidgeClassifier 등
+            margin = np.asarray(model.decision_function(x_explain), dtype=float)
+            margin = margin if margin.ndim == 1 else margin[:, used_class]    # 다중은 설명 클래스 열
+            candidates['마진'] = float(np.abs(preds - margin).mean())
+
+        best = min(candidates, key=candidates.get)    # 오차가 가장 작은 후보
+        output_space = best if candidates[best] <= 0.05 else '알 수 없음'
+
+    # --- 9) 변수별 통계량 ---
+    # shap_2d 는 행이 관측치, 열이 변수다. 한 칸이 '이 행에서 이 변수가 예측을 얼마나 밀었나' 이다.
     feat_names = list(x_explain.columns)
-    shap_df = DataFrame(shap_2d, columns=feat_names, index=x_explain.index)
+    mean_abs = np.abs(shap_2d).mean(axis=0)     # 영향력 크기 (부호 무관)
+    mean_s = shap_2d.mean(axis=0)               # 평균 기여 (부호 = 방향)
+    std_s = shap_2d.std(axis=0, ddof=1)         # 기여의 흔들림
 
-    # --- 10) 변수별 통계량 계산 ---
-    mean_abs = shap_df.abs().mean().values      # 영향력 크기 (부호 무관)
-    mean_s = shap_df.mean().values              # 평균 기여 (부호 = 방향)
-    std_s = shap_df.std().values                # 기여의 흔들림
-
-    direction = []      # 평균 기여의 부호를 방향 라벨로 바꾼다
-
-    for v in mean_s:    # 변수마다
-        if v > 0:      # 평균 기여가 양수
-            direction.append('증가')
-        elif v < 0:    # 평균 기여가 음수
-            direction.append('감소')
-        else:          # 평균 기여가 0
-            direction.append('중립')
-
-    # --- 11) 요약표로 조립 ---
+    # --- 10) 요약표로 조립 ---
     summary = DataFrame({
         'mean_abs_shap': mean_abs,
         'mean_shap': mean_s,
         'std_shap': std_s,
-        'direction': direction,
+        # 평균 기여의 부호를 방향 라벨로 바꾼다
+        'direction': np.where(mean_s > 0, '증가', np.where(mean_s < 0, '감소', '중립')),
         # 변동계수 — 평균 기여보다 흔들림이 크면 비선형·상호작용을 의심한다
         'cv': std_s / (mean_abs + 1e-9),
     }, index=feat_names)
 
     summary['stability'] = np.where(summary['cv'] < 1, '안정적', '비선형/불안정')
     summary.index.name = 'Feature'
-    summary = summary.sort_values('mean_abs_shap', ascending=False)     # 영향력 내림차순
+    summary = summary.sort_values('mean_abs_shap', ascending=False)    # 영향력 내림차순
 
-    # --- 12) 비율과 누적 비율 ---
+    # --- 11) 비율과 누적 비율 ---
     total_abs = float(summary['mean_abs_shap'].sum())
-
-    if total_abs > 0:    # 영향력 총합이 0 보다 큰 경우
-        summary['ratio'] = summary['mean_abs_shap'] / total_abs         # 합 1 로 정규화
-    else:                # 모든 기여가 0 인 경우
-        summary['ratio'] = 0.0
-
-    summary['cum_ratio'] = summary['ratio'].cumsum()                    # 내림차순 누적 비율
+    summary['ratio'] = summary['mean_abs_shap'] / total_abs if total_abs > 0 else 0.0
+    summary['cum_ratio'] = summary['ratio'].cumsum()
 
     # 컬럼 순서 정리 — 영향력 → 비율 → 누적 비율 → 해석용 컬럼
     summary = summary[['mean_abs_shap', 'ratio', 'cum_ratio',
                        'mean_shap', 'std_shap', 'direction', 'cv', 'stability']]
 
-    # --- 13) 원시 데이터를 attrs 에 담기 ---
-    # 후속 Dependence·Waterfall 이 재계산 없이 쓰는 원시 데이터를 담는다.
+    # --- 12) 원시 데이터를 attrs 에 담기 ---
+    # 후속 Dependence·Waterfall 이 재계산 없이 쓴다.
     # explainer 객체 자체는 담지 않는다 — 복사가 안 되는 객체라 슬라이스할 때 깨진다.
     summary.attrs['shap_values'] = shap_2d              # (n, f) 기여도 배열
     summary.attrs['data'] = x_explain                   # 모델공간 입력
@@ -785,19 +797,27 @@ def shap_analysis(project_name, estimator, x, max_samples='auto',
     summary.attrs['feature_names'] = feat_names         # 변환 후 변수명
     summary.attrs['explainer_type'] = explainer_type    # 사용한 explainer 종류
     summary.attrs['model_class'] = model_class          # 모델 클래스명
-    # (수정 전) 회귀 전용으로 정리하며 과제 구분 attrs 제거 (2026-09-17)
-    # summary.attrs['task'] = task                        # 'regression' | 'classification'
+    summary.attrs['task'] = task                        # 'regression' | 'classification'
+    summary.attrs['class_index'] = used_class           # 설명 대상 클래스 위치 (회귀는 None)
+    summary.attrs['class_names'] = class_names          # 클래스 목록 (회귀는 빈 리스트)
     summary.attrs['output_space'] = output_space        # SHAP 값의 단위
 
-    # --- 14) 분석 결과 저장 ---
-    # 계산은 무겁고 시각화는 가볍다. 결과를 파일로 남겨 두면 shap_bar_plot·shap_beeswarm_plot 이
-    # 모델도 explainer 도 없이 이 파일만으로 그래프를 다시 그릴 수 있다.
+    # --- 13) 분석 결과 저장 ---
+    # 계산은 무겁고 시각화는 가볍다. 파일로 남겨 두면 그래프 함수들이 이 파일만으로 다시 그린다.
     workdir = Path(project_name) / workdir
     workdir.mkdir(parents=True, exist_ok=True)
 
     # reg_tunes 가 붙여 둔 이름('xgb_tuned' 등)이 있으면 이어 쓰고, 없으면 모델 클래스명을 쓴다
     save_path = workdir / f'{getattr(estimator, "name_", model_class.lower())}_shap.pkl'
     save_model(summary, save_path)
+
+    # --- 14) 분석 개요 출력 ---
+    # 그래프를 읽기 전에 explainer·단위·기준점·설명 클래스를 확인한다
+    print(f'모델: {model_class} / explainer: {explainer_type}')
+    print(f'설명 대상: {shap_2d.shape[0]}행 × {shap_2d.shape[1]}변수 / base value: {base_value:.4f} / SHAP 값의 단위: {output_space}')
+
+    if task == 'classification':
+        print(f'설명 대상 클래스: {class_names[used_class]} (index={used_class})')
 
     print(f'SHAP 분석 결과 저장 완료 → {save_path}')
 
@@ -837,21 +857,20 @@ def shap_bar_plot(summary, cum_ratio=0.95, palette=None, column_means=None,
     # --- 2) 메타정보 꺼내기 ---
     # 계산부가 attrs 에 얹어 둔 값들이다. 저장·로드를 거쳐도 그대로 살아 있다.
     model_class = summary.attrs.get('model_class', '')          # 모델 클래스명
-    # (수정 전) 분류용 꼬리표(클래스·단위). shap_analysis 가 회귀 전용이라 도달하지 않아 정리 (2026-09-17)
-    # task = summary.attrs.get('task', 'regression')              # 회귀 | 분류
-    # class_names = summary.attrs.get('class_names', [])          # 클래스 목록
-    # used_class = summary.attrs.get('class_index', None)         # 설명 대상 클래스 위치
-    # output_space = summary.attrs.get('output_space', '알 수 없음')  # SHAP 값의 단위
-    #
-    # # --- 3) 그래프에 붙일 꼬리표 ---
-    # cls_tag = ''
-    # unit_tag = ''
-    #
-    # if task == 'classification':    # 분류인 경우
-    #     if class_names:             # 클래스 목록이 있는 경우 — 어느 클래스를 설명했는가
-    #         cls_tag = f' · class={class_names[used_class]}'
-    #
-    #     unit_tag = f' [{output_space}]'
+    # 분류용 꼬리표(클래스·단위) 복원 — shap_analysis 가 분류를 다시 지원한다 (2026-09-18, LAB-04 08 SHAP)
+    # (2026-09-17 에 주석 처리했던 코드를 되살림. 회귀 결과는 task 가 없거나 'regression' 이라 꼬리표가 빈 문자열이다)
+    task = summary.attrs.get('task', 'regression')              # 회귀 | 분류
+    class_names = summary.attrs.get('class_names', [])          # 클래스 목록
+    used_class = summary.attrs.get('class_index', None)         # 설명 대상 클래스 위치
+    output_space = summary.attrs.get('output_space', '알 수 없음')  # SHAP 값의 단위
+
+    # --- 3) 그래프에 붙일 꼬리표 ---
+    cls_tag = ''
+    unit_tag = ''
+
+    if task == 'classification':    # 분류인 경우 — 어느 클래스를 어떤 단위로 설명했는가
+        cls_tag = f' · class={class_names[used_class]}'
+        unit_tag = f' [{output_space}]'
 
     # --- 4) 채택 개수(k) 결정 ---
     # 누적 비율이 cum_ratio 에 처음 도달하는 위치를 찾고 1을 더해, 경계에 걸친 변수까지 채택한다.
@@ -886,14 +905,14 @@ def shap_bar_plot(summary, cum_ratio=0.95, palette=None, column_means=None,
 
     # --- 6) 제목·축 라벨 ---
     if title is None:    # 제목을 주지 않은 경우
-        # (수정 전) plot_title = f'SHAP Bar (mean|SHAP| · 누적 {cum_ratio:.0%} 채택): {model_class}{cls_tag}'  (2026-09-17)
-        plot_title = f'SHAP Bar (mean|SHAP| · 누적 {cum_ratio:.0%} 채택): {model_class}'
+        # (수정 전) plot_title = f'SHAP Bar (mean|SHAP| · 누적 {cum_ratio:.0%} 채택): {model_class}'  (2026-09-17 → 2026-09-18 꼬리표 복원)
+        plot_title = f'SHAP Bar (mean|SHAP| · 누적 {cum_ratio:.0%} 채택): {model_class}{cls_tag}'
     else:                # 사용자가 준 제목
         plot_title = title
 
     if xlabel is None:    # x축 라벨을 주지 않은 경우
-        # (수정 전) plot_xlabel = f'mean|SHAP|{unit_tag}'  (2026-09-17)
-        plot_xlabel = 'mean|SHAP|'
+        # (수정 전) plot_xlabel = 'mean|SHAP|'  (2026-09-17 → 2026-09-18 꼬리표 복원)
+        plot_xlabel = f'mean|SHAP|{unit_tag}'
     else:                 # 사용자가 준 라벨
         plot_xlabel = xlabel
 
@@ -956,21 +975,20 @@ def shap_summary_plot(summary, cum_ratio=0.95, title=None, xlabel=None,
     shap_2d = summary.attrs['shap_values']                      # (n, f) 기여도 배열
     x_explain = summary.attrs['data']                           # 모델공간 입력 (점의 색)
     model_class = summary.attrs.get('model_class', '')          # 모델 클래스명
-    # (수정 전) 분류용 꼬리표(클래스·단위). shap_analysis 가 회귀 전용이라 도달하지 않아 정리 (2026-09-17)
-    # task = summary.attrs.get('task', 'regression')              # 회귀 | 분류
-    # class_names = summary.attrs.get('class_names', [])          # 클래스 목록
-    # used_class = summary.attrs.get('class_index', None)         # 설명 대상 클래스 위치
-    # output_space = summary.attrs.get('output_space', '알 수 없음')  # SHAP 값의 단위
-    #
-    # # --- 3) 그래프에 붙일 꼬리표 ---
-    # cls_tag = ''
-    # unit_tag = ''
-    #
-    # if task == 'classification':    # 분류인 경우
-    #     if class_names:             # 클래스 목록이 있는 경우 — 어느 클래스를 설명했는가
-    #         cls_tag = f' · class={class_names[used_class]}'
-    #
-    #     unit_tag = f' [{output_space}]'
+    # 분류용 꼬리표(클래스·단위) 복원 — shap_analysis 가 분류를 다시 지원한다 (2026-09-18, LAB-04 08 SHAP)
+    # (2026-09-17 에 주석 처리했던 코드를 되살림. 회귀 결과는 task 가 없거나 'regression' 이라 꼬리표가 빈 문자열이다)
+    task = summary.attrs.get('task', 'regression')              # 회귀 | 분류
+    class_names = summary.attrs.get('class_names', [])          # 클래스 목록
+    used_class = summary.attrs.get('class_index', None)         # 설명 대상 클래스 위치
+    output_space = summary.attrs.get('output_space', '알 수 없음')  # SHAP 값의 단위
+
+    # --- 3) 그래프에 붙일 꼬리표 ---
+    cls_tag = ''
+    unit_tag = ''
+
+    if task == 'classification':    # 분류인 경우 — 어느 클래스를 어떤 단위로 설명했는가
+        cls_tag = f' · class={class_names[used_class]}'
+        unit_tag = f' [{output_space}]'
 
     # --- 4) 시각화 할 변수 결정 ---
     # 요약표는 이미 mean_abs_shap 내림차순이고 누적 비율까지 들어 있다.
@@ -999,8 +1017,8 @@ def shap_summary_plot(summary, cum_ratio=0.95, title=None, xlabel=None,
         plot_height = height
 
     if title is None:    # 제목을 주지 않은 경우
-        # (수정 전) plot_title = f'SHAP Summary (Beeswarm · 누적 {cum_ratio:.0%} 채택): {model_class}{cls_tag}'  (2026-09-17)
-        plot_title = f'SHAP Summary (Beeswarm · 누적 {cum_ratio:.0%} 채택): {model_class}'
+        # (수정 전) plot_title = f'SHAP Summary (Beeswarm · 누적 {cum_ratio:.0%} 채택): {model_class}'  (2026-09-17 → 2026-09-18 꼬리표 복원)
+        plot_title = f'SHAP Summary (Beeswarm · 누적 {cum_ratio:.0%} 채택): {model_class}{cls_tag}'
     else:                # 사용자가 준 제목
         plot_title = title
 
@@ -1013,8 +1031,8 @@ def shap_summary_plot(summary, cum_ratio=0.95, title=None, xlabel=None,
                       max_display=k, show=False, plot_size=None)
 
     if xlabel is None:    # x축 라벨을 주지 않은 경우
-        # (수정 전) plt.xlabel(f'SHAP value{unit_tag}')  (2026-09-17)
-        plt.xlabel('SHAP value')                # shap 이 붙인 라벨을 덮어쓴다
+        # (수정 전) plt.xlabel('SHAP value')  (2026-09-17 → 2026-09-18 꼬리표 복원)
+        plt.xlabel(f'SHAP value{unit_tag}')     # shap 이 붙인 라벨을 덮어쓴다
     else:                 # 사용자가 준 라벨
         plt.xlabel(xlabel)
 
@@ -1054,11 +1072,12 @@ def shap_dependence_plot(summary, cum_ratio=0.95, title=None, column_means=None,
     shap_2d = summary.attrs['shap_values']    # (n, f) 기여도 배열
     x_df = summary.attrs['data']              # 모델공간 입력 (x축·점의 색)
 
-    # (수정 전) 분류용 단위 꼬리표. shap_analysis 가 회귀 전용이라 도달하지 않아 정리 (2026-09-17)
-    # unit_tag = ''
-    #
-    # if summary.attrs.get('task') == 'classification':
-    #     unit_tag = f" [{summary.attrs.get('output_space', '알 수 없음')}]"
+    # 분류용 단위 꼬리표 복원 — shap_analysis 가 분류를 다시 지원한다 (2026-09-18, LAB-04 08 SHAP)
+    # (2026-09-17 에 주석 처리했던 코드를 되살림. 회귀 결과는 꼬리표가 빈 문자열이다)
+    unit_tag = ''
+
+    if summary.attrs.get('task') == 'classification':    # 분류인 경우 — SHAP 값의 단위를 제목에 적는다
+        unit_tag = f" [{summary.attrs.get('output_space', '알 수 없음')}]"
 
 
     # --- 3) 주변수 고르기 ---
@@ -1086,8 +1105,8 @@ def shap_dependence_plot(summary, cum_ratio=0.95, title=None, column_means=None,
         pair_tag = f'{column_means.get(f, f)}  ×  {column_means.get(partner, partner)}'
 
         if title is None:    # 제목을 주지 않은 경우
-            # (수정 전) plot_title = f'SHAP Dependence: {pair_tag}{unit_tag}'  (2026-09-17)
-            plot_title = f'SHAP Dependence: {pair_tag}'
+            # (수정 전) plot_title = f'SHAP Dependence: {pair_tag}'  (2026-09-17 → 2026-09-18 꼬리표 복원)
+            plot_title = f'SHAP Dependence: {pair_tag}{unit_tag}'
         else:                # 사용자가 준 제목 — 장마다 변수쌍을 덧붙여 구분한다
             plot_title = f'{title} — {pair_tag}'
 
@@ -1147,20 +1166,20 @@ def shap_waterfall_plot(summary, index, cum_ratio=0.95, title=None, label=None,
     data = summary.attrs['data']                                  # 막대 왼쪽의 변수값
     base_value = float(summary.attrs['expected_value'])           # base value (평균 예측)
     feat_names = list(summary.attrs['feature_names'])             # 변환 후 변수명
-    # (수정 전) 분류용 꼬리표(클래스·단위). shap_analysis 가 회귀 전용이라 도달하지 않아 정리 (2026-09-17)
-    # task = summary.attrs.get('task', 'regression')                # 회귀 | 분류
-    # class_names = summary.attrs.get('class_names', [])            # 클래스 목록
-    # used_class = summary.attrs.get('class_index', None)           # 설명 대상 클래스 위치
-    # output_space = summary.attrs.get('output_space', '알 수 없음')  # SHAP 값의 단위
-    #
-    # cls_tag = ''
-    # unit_tag = ''
-    #
-    # if task == 'classification':    # 분류인 경우
-    #     if class_names:    # 클래스 목록이 있는 경우
-    #         cls_tag = f' · class={class_names[used_class]}'
-    #
-    #     unit_tag = f' [{output_space}]'
+    # 분류용 꼬리표(클래스·단위) 복원 — shap_analysis 가 분류를 다시 지원한다 (2026-09-18, LAB-04 08 SHAP)
+    # (2026-09-17 에 주석 처리했던 코드를 되살림. 회귀 결과는 task 가 없거나 'regression' 이라 꼬리표가 빈 문자열이다)
+    task = summary.attrs.get('task', 'regression')              # 회귀 | 분류
+    class_names = summary.attrs.get('class_names', [])          # 클래스 목록
+    used_class = summary.attrs.get('class_index', None)         # 설명 대상 클래스 위치
+    output_space = summary.attrs.get('output_space', '알 수 없음')  # SHAP 값의 단위
+
+    # --- 3) 그래프에 붙일 꼬리표 ---
+    cls_tag = ''
+    unit_tag = ''
+
+    if task == 'classification':    # 분류인 경우 — 어느 클래스를 어떤 단위로 설명했는가
+        cls_tag = f' · class={class_names[used_class]}'
+        unit_tag = f' [{output_space}]'
 
 
     # --- 3) 행별 예측값 복원 ---
@@ -1181,6 +1200,10 @@ def shap_waterfall_plot(summary, index, cum_ratio=0.95, title=None, label=None,
     pick = data.iloc[[i]].copy()
     pick.insert(0, 'pred', pred[i])          # 복원한 예측값
     pick.insert(0, 'quantile', quantile)     # 예측값 분포에서의 위치
+
+    # 로그오즈 단위의 분류 결과는 확률로 바꾼 값도 싣는다 — 표를 '생존 확률 n%' 로 읽을 수 있다 (2026-09-18, LAB-04 08 SHAP)
+    if output_space == '로그오즈':    # 분류 로그오즈인 경우
+        pick.insert(2, 'proba', 1.0 / (1.0 + np.exp(-pred[i])))    # 시그모이드로 확률화
 
     # --- 5) 막대로 보여줄 개수와 높이 ---
     n_all = len(feat_names)     # 전체 변수 개수
@@ -1207,9 +1230,9 @@ def shap_waterfall_plot(summary, index, cum_ratio=0.95, title=None, label=None,
         else:                # 사용자가 준 이름
             pick_tag = label
 
-        # (수정 전) f'pred≈{pred[i]:.4g}{unit_tag} ({pick_tag}){cls_tag}' — 분류용 꼬리표 제거 (2026-09-17)
+        # (수정 전) f'pred≈{pred[i]:.4g} ({pick_tag})'  (2026-09-17 → 2026-09-18 꼬리표 복원)
         plot_title = (f'SHAP Waterfall: obs#{i} — '
-                      f'pred≈{pred[i]:.4g} ({pick_tag})')
+                      f'pred≈{pred[i]:.4g}{unit_tag} ({pick_tag}){cls_tag}')
     else:                # 사용자가 준 제목
         plot_title = title
 
@@ -1328,3 +1351,130 @@ def shap_waterfall_stats_plot(summary, cum_ratio=0.95, title=None, column_means=
     pick.insert(0, 'stat', list(picks.values()))    # 어떤 통계의 대표인가
 
     return pick
+
+
+# --------------------------------------------------------
+# 분류 SHAP 결과를 변수의 수준·구간별 확률로 환산하는 표
+# --------------------------------------------------------
+def shap_proba_table(summary, cum_ratio=1.0, bins=5, max_levels=10, inverse=None,
+                     column_means=None):
+    """분류 SHAP 결과를 변수의 수준(범주)·구간(연속)별 평균 SHAP → 확률로 환산한 표를 만든다.
+
+    Args:
+        summary (DataFrame): shap_analysis 가 반환한(또는 my_ml.load_model 로 불러온) 분류 결과표.
+        cum_ratio (float): 표에 실을 변수를 고르는 누적 비율 (기본값: 1.0 → 전체 변수).
+        bins (int or dict): 연속형 변수의 구간 (기본값: 5 → 분위수 5구간). `{변수명: 구간 수 | 경계 리스트}` 로 변수별 지정하며 경계는 모델공간 값이다.
+        max_levels (int): 고유값이 이 개수 이하면 구간을 나누지 않고 값 하나를 수준 하나로 쓴다 (기본값: 10).
+        inverse (dict): `{변수명: 역변환 함수}` (기본값: None). 로그 변환된 변수의 수준 라벨을 원단위로 되돌린다 (예: `{'Fare': np.expm1}`).
+        column_means (dict): `{변수명: 실제 의미}` 사전 (기본값: None → 변수명을 그대로 쓴다).
+
+    Returns:
+        DataFrame: (Feature, Level) 인덱스. n·share·mean_shap·z(base + mean_shap)·proba·delta_pp(base 대비 %p)·
+            step_dz·step_dpp(같은 변수의 직전 수준 대비 변화). attrs['base_proba'] 에 base 확률이 담긴다.
+
+    Raises:
+        ValueError: 분류 결과가 아니거나 SHAP 값의 단위가 확률·로그오즈가 아닌 경우.
+    """
+    # --- 1) 파라미터 검증 ---
+    if summary.attrs.get('task') != 'classification':    # 회귀 결과이거나 attrs 가 없는 경우
+        raise ValueError("분류 모형의 SHAP 결과만 확률로 환산할 수 있습니다")
+
+    output_space = summary.attrs['output_space']    # SHAP 값의 단위
+
+    if output_space not in ('확률', '로그오즈'):    # 마진·알 수 없음은 확률로 옮길 수 없다
+        raise ValueError(f"SHAP 값의 단위가 '{output_space}' 라 확률로 환산할 수 없습니다")
+
+    # --- 2) 원시 데이터·메타정보 꺼내기 ---
+    shap_2d = summary.attrs['shap_values']              # (n, f) 기여도 배열
+    x_df = summary.attrs['data']                        # 모델공간 입력 (수준·구간의 기준)
+    base_value = float(summary.attrs['expected_value']) # base value
+    class_names = summary.attrs['class_names']          # 클래스 목록
+    used_class = summary.attrs['class_index']           # 설명 대상 클래스 위치
+
+    # --- 3) 단위별 환산식 ---
+    # 로그오즈는 base 에 더한 뒤 시그모이드를 취해야 확률이 되고, 확률 단위는 더한 값이 이미 확률이다.
+    def to_proba(z):
+        if output_space == '로그오즈':    # p = 1 / (1 + e^-z)
+            return 1.0 / (1.0 + np.exp(-z))
+        return z                          # 확률 단위 — 그대로
+
+    base_proba = float(to_proba(base_value))    # 아무 정보가 없을 때의 확률
+
+    # --- 4) 변수 고르기 ---
+    # 요약표는 이미 mean_abs_shap 내림차순이고 누적 비율까지 들어 있다. 그래프 함수들과 같은 규칙이다.
+    k = int(np.searchsorted(summary['cum_ratio'].values, cum_ratio)) + 1
+    features = list(summary.index[:max(1, min(k, len(summary)))])
+
+    if inverse is None:         # 역변환 사전을 주지 않은 경우
+        inverse = {}
+
+    if column_means is None:    # 의미 사전을 주지 않은 경우
+        column_means = {}
+
+    # --- 5) 변수마다 수준·구간별 평균 SHAP → 확률 ---
+    parts = []    # 변수별 결과표
+
+    for f in features:    # 변수마다
+        v = x_df[f]                                     # 변수값
+        s = shap_2d[:, x_df.columns.get_loc(f)]         # 그 변수의 SHAP 값
+        inv = inverse.get(f, lambda a: a)               # 라벨용 역변환 (없으면 항등)
+
+        if str(v.dtype) == 'category' or v.nunique() <= max_levels:    # 범주형·고유값이 적은 변수 — 값 하나가 수준 하나
+            key = v.astype(object)
+            levels = sorted(key.unique())
+
+            if str(v.dtype) == 'category':    # 범주 코드는 그대로 적는다
+                labels = [str(lv) for lv in levels]
+            else:                             # 숫자 수준은 역변환해 적는다 (예: log(가족 수) → 가족 수)
+                labels = [f'{inv(lv):.4g}' for lv in levels]
+
+            key = key.map({lv: i for i, lv in enumerate(levels)})    # 수준 순서 = 정렬 순서
+        else:                                                           # 연속형 — 구간으로 나눈다
+            b = bins.get(f, 5) if isinstance(bins, dict) else bins    # 변수별 지정이 있으면 우선
+
+            if isinstance(b, int):    # 구간 수 → 분위수 구간
+                key, edges = qcut(v, b, labels=False, retbins=True, duplicates='drop')
+            else:                     # 경계 리스트 → 지정 구간 (첫 구간은 왼쪽 끝 포함)
+                key, edges = cut(v, b, labels=False, retbins=True, include_lowest=True)
+
+            # 구간 라벨 — 역변환한 경계로 적고, 첫 구간만 왼쪽 끝을 포함한다는 뜻으로 '[' 를 쓴다
+            labels = [f'{"[" if i == 0 else "("}{inv(edges[i]):.4g}, {inv(edges[i + 1]):.4g}]'
+                      for i in range(len(edges) - 1)]
+
+        g = DataFrame({'key': key, 'shap': s}).groupby('key', observed=True)['shap'].agg(['count', 'mean'])
+
+        z = base_value + g['mean']    # base 에 그 수준의 평균 SHAP 만 더한 값
+        p = to_proba(z)               # 그때의 확률
+
+        part = DataFrame({
+            'n': g['count'].astype(int),          # 수준에 속한 관측치 수
+            'ratio': g['count'] / len(v),         # 비율
+            'mean_shap': g['mean'],               # 수준별 평균 SHAP
+            'z': z,                               # base + mean_shap
+            'proba': p,                           # 확률
+            'delta_pp': (p - base_proba) * 100,   # base 대비 %p
+            'step_dz': z.diff(),                  # 직전 수준 대비 SHAP 변화 (첫 수준은 NaN)
+            'step_dpp': p.diff() * 100,           # 직전 수준 대비 확률 변화 (%p)
+        })
+        part.index = MultiIndex.from_arrays(
+            [[column_means.get(f, f)] * len(part), [labels[i] for i in g.index]],
+            names=['Feature', 'Level'])
+        parts.append(part)
+
+    table = concat(parts)
+    table.attrs['base_proba'] = base_proba      # base 확률
+    table.attrs['output_space'] = output_space  # 환산에 쓴 단위
+
+    # --- 6) 읽는 법 출력 ---
+    print(f'base value: {base_value:.4f} ({output_space}) → 확률 {base_proba:.1%} / 설명 대상 클래스: {class_names[used_class]}')
+    print('proba·delta_pp = base 에 그 수준의 평균 SHAP 만 더했을 때의 확률과 base 대비 %p / step_dz·step_dpp = 같은 변수의 직전 수준과의 차이')
+    print(" • n: 수준에 속한 관측치 수")
+    print(" • ratio: 전체 관측치 대비 비율")
+    print(" • mean_shap: 수준별 평균 SHAP")
+    print(" • z: base + mean_shap")
+    print(" • proba: 확률")
+    print(" • delta_pp: base 대비 %p")
+    print(" • step_dz: 직전 수준 대비 SHAP 변화")
+    print(" • step_dpp: 직전 수준 대비 확률 변화 (%p)")
+
+    return table
