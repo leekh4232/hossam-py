@@ -349,8 +349,6 @@
       
         
       
-        
-      
     
     
     
@@ -666,34 +664,6 @@
     
   
     my_outlier_clipper
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../my_pipeline/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    my_pipeline
   
 
     
@@ -1375,7 +1345,13 @@ VIF가 가장 높은 변수부터 반복적으로 제거한다.</p>
 <span class="normal">184</span>
 <span class="normal">185</span>
 <span class="normal">186</span>
-<span class="normal">187</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VIFSelector</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VIFSelector</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">TransformerMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    VIF(Variance Inflation Factor) 기반 다중공선성 제거기</span>
 
@@ -1472,8 +1448,14 @@ VIF가 가장 높은 변수부터 반복적으로 제거한다.</p>
             <span class="c1"># 이후 계산이 깨지므로 100만으로 눌러 유한한 값으로 만든다</span>
             <span class="n">round_df</span><span class="p">[</span><span class="s1">'VIF'</span><span class="p">]</span> <span class="o">=</span> <span class="n">round_df</span><span class="p">[</span><span class="s1">'VIF'</span><span class="p">]</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">upper</span><span class="o">=</span><span class="mf">1e6</span><span class="p">)</span>
 
+            <span class="c1"># nan 이었던 행은 compute_vif 의 정렬에서 맨 아래에 놓였다가 방금 1e6 이 되었으므로</span>
+            <span class="c1"># 다시 내림차순으로 정렬해야 첫 행이 진짜 최대값이 된다</span>
+            <span class="c1"># (수정 전) 재정렬 없이 첫 행을 읽어 상수 컬럼(VIF nan→1e6) 이 끝까지 제거되지 않았다 (2026-09-23)</span>
+            <span class="n">round_df</span> <span class="o">=</span> <span class="p">(</span><span class="n">round_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">'VIF'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">'stable'</span><span class="p">)</span>
+                                <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
             <span class="c1"># --- 6-2) 가장 VIF 가 큰 변수를 찾고 이번 라운드 표를 기록 ---</span>
-            <span class="c1"># 이미 내림차순으로 정렬돼 있으므로 첫 번째 행이 곧 최대값이다</span>
+            <span class="c1"># 재정렬했으므로 첫 번째 행이 곧 최대값이다</span>
             <span class="n">max_col</span> <span class="o">=</span> <span class="n">round_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'Variable'</span><span class="p">]</span>
             <span class="n">max_vif</span> <span class="o">=</span> <span class="n">round_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'VIF'</span><span class="p">]</span>
 
@@ -1759,7 +1741,13 @@ VIF 임계값을 초과하는 변수를 제거할 때까지 반복적으로 VIF�
 <span class="normal">128</span>
 <span class="normal">129</span>
 <span class="normal">130</span>
-<span class="normal">131</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""개발자가 직접 부르지 않는다. 정의만 해두면 sklearn이 알아서 부른다.</span>
 <span class="sd">    VIF 임계값을 초과하는 변수를 제거할 때까지 반복적으로 VIF를 계산하여 삭제 대상 컬럼을 결정한다.(실제 제거는 안함)</span>
 
@@ -1837,8 +1825,14 @@ VIF 임계값을 초과하는 변수를 제거할 때까지 반복적으로 VIF�
         <span class="c1"># 이후 계산이 깨지므로 100만으로 눌러 유한한 값으로 만든다</span>
         <span class="n">round_df</span><span class="p">[</span><span class="s1">'VIF'</span><span class="p">]</span> <span class="o">=</span> <span class="n">round_df</span><span class="p">[</span><span class="s1">'VIF'</span><span class="p">]</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">upper</span><span class="o">=</span><span class="mf">1e6</span><span class="p">)</span>
 
+        <span class="c1"># nan 이었던 행은 compute_vif 의 정렬에서 맨 아래에 놓였다가 방금 1e6 이 되었으므로</span>
+        <span class="c1"># 다시 내림차순으로 정렬해야 첫 행이 진짜 최대값이 된다</span>
+        <span class="c1"># (수정 전) 재정렬 없이 첫 행을 읽어 상수 컬럼(VIF nan→1e6) 이 끝까지 제거되지 않았다 (2026-09-23)</span>
+        <span class="n">round_df</span> <span class="o">=</span> <span class="p">(</span><span class="n">round_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">'VIF'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">'stable'</span><span class="p">)</span>
+                            <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
         <span class="c1"># --- 6-2) 가장 VIF 가 큰 변수를 찾고 이번 라운드 표를 기록 ---</span>
-        <span class="c1"># 이미 내림차순으로 정렬돼 있으므로 첫 번째 행이 곧 최대값이다</span>
+        <span class="c1"># 재정렬했으므로 첫 번째 행이 곧 최대값이다</span>
         <span class="n">max_col</span> <span class="o">=</span> <span class="n">round_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'Variable'</span><span class="p">]</span>
         <span class="n">max_vif</span> <span class="o">=</span> <span class="n">round_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'VIF'</span><span class="p">]</span>
 
@@ -1941,13 +1935,7 @@ train·test에 같은 열 목록을 적용하므로 데이터 누수가 생기�
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_vif_selector.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">133</span>
-<span class="normal">134</span>
-<span class="normal">135</span>
-<span class="normal">136</span>
-<span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">139</span>
 <span class="normal">140</span>
 <span class="normal">141</span>
 <span class="normal">142</span>
@@ -1974,7 +1962,13 @@ train·test에 같은 열 목록을 적용하므로 데이터 누수가 생기�
 <span class="normal">163</span>
 <span class="normal">164</span>
 <span class="normal">165</span>
-<span class="normal">166</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""sklearn에 의해서 호출되는 기능이다. 개발자가 직접 부르지 않는다.</span>
 
 <span class="sd">    pipeline의 fit / predict / score 과정마다. fit에서 확정한 drop_cols_만 떨어내며,</span>
@@ -2088,13 +2082,7 @@ train·test에 같은 열 목록을 적용하므로 데이터 누수가 생기�
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_vif_selector.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">174</span>
 <span class="normal">175</span>
 <span class="normal">176</span>
 <span class="normal">177</span>
@@ -2107,7 +2095,13 @@ train·test에 같은 열 목록을 적용하므로 데이터 누수가 생기�
 <span class="normal">184</span>
 <span class="normal">185</span>
 <span class="normal">186</span>
-<span class="normal">187</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_feature_names_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_feature_names_out</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""sklearn이 호출한다. 개발자가 직접 사용하지 않는다. (BaseEstimator 규약)</span>
 
 <span class="sd">    sklearn이 현재 작업중인 데이터의 컬럼명을 물을 때 호출된다.</span>

@@ -351,8 +351,6 @@
       
         
       
-        
-      
     
     
     
@@ -853,34 +851,6 @@
     
   
     my_outlier_clipper
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../my_pipeline/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    my_pipeline
   
 
     
@@ -3931,12 +3901,10 @@ k별 이너셔·감소량·실루엣 지표를 한 표로 합친 데이터프레
     <span class="n">num_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">cat_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
-    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">palette</span><span class="o">=</span><span class="s2">"tab10"</span><span class="p">,</span>
     <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span>
     <span class="n">height</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span>
-    <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -3947,39 +3915,13 @@ k별 이너셔·감소량·실루엣 지표를 한 표로 합친 데이터프레
 이 함수에는 스케일링 전의 원본 데이터에 군집 번호 컬럼을 붙인 것을 넘긴다.</p>
 <p>Args (기본값은 위의 함수 정의 참고):
     data: 군집 번호 컬럼이 들어 있는 원본 데이터프레임 (스케일링 전의 값)
-    source_column_names: 군집화에 실제로 사용한 컬럼 목록 (표의 앞쪽에 두고, 그래프 제목에 사용 여부를 표시한다)
     cluster_column_name: 군집 번호가 담긴 컬럼명
     num_columns, cat_columns: 집계할 연속형·범주형 컬럼(None이면 자동 선택,
         값이 모두 다른 식별자 컬럼은 자동으로 제외한다)
     alpha: 정규성 검정의 유의수준 (p &gt; alpha 이면 평균, 아니면 중앙값을 대표값으로 쓴다)
-    verbose: 대표값 선택 근거와 범주형 교차표를 출력할지 여부
-    plot: 연속형 상자그림과 범주형 구성비 히트맵을 2열로 묶어 그릴지 여부
+    plot: 그래프 표시 여부
     palette: 상자그림 색상 팔레트 (히트맵은 값의 크기를 비교하는 그래프라 순차형 색을 쓴다)
-    width, height, save_path: 그래프 한 칸의 가로·세로 픽셀, 그래프 저장 경로</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>tuple</code></td>            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>(persona_df, ratio_dict) — 군집별 대표값 표(군집 번호 순. 평균과 중앙값을
-나란히 담고 채택한 쪽에 별표(*)를 붙이므로 해당 컬럼은 문자열이다),
-범주형 컬럼별 구성비(%) 표의 딕셔너리(마지막 '전체' 행은 데이터 전체의 비율)</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+    width, height: 그래프 한 칸의 가로·세로 픽셀</p>
 
 
             <details class="mkdocstrings-source">
@@ -4098,110 +4040,9 @@ k별 이너셔·감소량·실루엣 지표를 한 표로 합친 데이터프레
 <span class="normal">1171</span>
 <span class="normal">1172</span>
 <span class="normal">1173</span>
-<span class="normal">1174</span>
-<span class="normal">1175</span>
-<span class="normal">1176</span>
-<span class="normal">1177</span>
-<span class="normal">1178</span>
-<span class="normal">1179</span>
-<span class="normal">1180</span>
-<span class="normal">1181</span>
-<span class="normal">1182</span>
-<span class="normal">1183</span>
-<span class="normal">1184</span>
-<span class="normal">1185</span>
-<span class="normal">1186</span>
-<span class="normal">1187</span>
-<span class="normal">1188</span>
-<span class="normal">1189</span>
-<span class="normal">1190</span>
-<span class="normal">1191</span>
-<span class="normal">1192</span>
-<span class="normal">1193</span>
-<span class="normal">1194</span>
-<span class="normal">1195</span>
-<span class="normal">1196</span>
-<span class="normal">1197</span>
-<span class="normal">1198</span>
-<span class="normal">1199</span>
-<span class="normal">1200</span>
-<span class="normal">1201</span>
-<span class="normal">1202</span>
-<span class="normal">1203</span>
-<span class="normal">1204</span>
-<span class="normal">1205</span>
-<span class="normal">1206</span>
-<span class="normal">1207</span>
-<span class="normal">1208</span>
-<span class="normal">1209</span>
-<span class="normal">1210</span>
-<span class="normal">1211</span>
-<span class="normal">1212</span>
-<span class="normal">1213</span>
-<span class="normal">1214</span>
-<span class="normal">1215</span>
-<span class="normal">1216</span>
-<span class="normal">1217</span>
-<span class="normal">1218</span>
-<span class="normal">1219</span>
-<span class="normal">1220</span>
-<span class="normal">1221</span>
-<span class="normal">1222</span>
-<span class="normal">1223</span>
-<span class="normal">1224</span>
-<span class="normal">1225</span>
-<span class="normal">1226</span>
-<span class="normal">1227</span>
-<span class="normal">1228</span>
-<span class="normal">1229</span>
-<span class="normal">1230</span>
-<span class="normal">1231</span>
-<span class="normal">1232</span>
-<span class="normal">1233</span>
-<span class="normal">1234</span>
-<span class="normal">1235</span>
-<span class="normal">1236</span>
-<span class="normal">1237</span>
-<span class="normal">1238</span>
-<span class="normal">1239</span>
-<span class="normal">1240</span>
-<span class="normal">1241</span>
-<span class="normal">1242</span>
-<span class="normal">1243</span>
-<span class="normal">1244</span>
-<span class="normal">1245</span>
-<span class="normal">1246</span>
-<span class="normal">1247</span>
-<span class="normal">1248</span>
-<span class="normal">1249</span>
-<span class="normal">1250</span>
-<span class="normal">1251</span>
-<span class="normal">1252</span>
-<span class="normal">1253</span>
-<span class="normal">1254</span>
-<span class="normal">1255</span>
-<span class="normal">1256</span>
-<span class="normal">1257</span>
-<span class="normal">1258</span>
-<span class="normal">1259</span>
-<span class="normal">1260</span>
-<span class="normal">1261</span>
-<span class="normal">1262</span>
-<span class="normal">1263</span>
-<span class="normal">1264</span>
-<span class="normal">1265</span>
-<span class="normal">1266</span>
-<span class="normal">1267</span>
-<span class="normal">1268</span>
-<span class="normal">1269</span>
-<span class="normal">1270</span>
-<span class="normal">1271</span>
-<span class="normal">1272</span>
-<span class="normal">1273</span>
-<span class="normal">1274</span>
-<span class="normal">1275</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">persona</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">source_column_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cluster_column_name</span><span class="o">=</span><span class="s1">'ClusterID'</span><span class="p">,</span>
-            <span class="n">num_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cat_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s1">'tab10'</span><span class="p">,</span>
-            <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">1174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">persona</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">source_column_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cluster_column_name</span><span class="o">=</span><span class="s1">'ClusterID'</span><span class="p">,</span>
+            <span class="n">num_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cat_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s1">'tab10'</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">640</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""군집별 대표값·구성비를 집계해 페르소나 표를 만들고, 군집별 분포를 시각화하는 함수</span>
 
 <span class="sd">    학습은 스케일링된 값으로 하지만 해석은 사람이 읽을 수 있는 원본 값으로 해야 하므로,</span>
@@ -4209,212 +4050,111 @@ k별 이너셔·감소량·실루엣 지표를 한 표로 합친 데이터프레
 
 <span class="sd">    Args (기본값은 위의 함수 정의 참고):</span>
 <span class="sd">        data: 군집 번호 컬럼이 들어 있는 원본 데이터프레임 (스케일링 전의 값)</span>
-<span class="sd">        source_column_names: 군집화에 실제로 사용한 컬럼 목록 (표의 앞쪽에 두고, 그래프 제목에 사용 여부를 표시한다)</span>
 <span class="sd">        cluster_column_name: 군집 번호가 담긴 컬럼명</span>
 <span class="sd">        num_columns, cat_columns: 집계할 연속형·범주형 컬럼(None이면 자동 선택,</span>
 <span class="sd">            값이 모두 다른 식별자 컬럼은 자동으로 제외한다)</span>
 <span class="sd">        alpha: 정규성 검정의 유의수준 (p &gt; alpha 이면 평균, 아니면 중앙값을 대표값으로 쓴다)</span>
-<span class="sd">        verbose: 대표값 선택 근거와 범주형 교차표를 출력할지 여부</span>
-<span class="sd">        plot: 연속형 상자그림과 범주형 구성비 히트맵을 2열로 묶어 그릴지 여부</span>
+<span class="sd">        plot: 그래프 표시 여부</span>
 <span class="sd">        palette: 상자그림 색상 팔레트 (히트맵은 값의 크기를 비교하는 그래프라 순차형 색을 쓴다)</span>
-<span class="sd">        width, height, save_path: 그래프 한 칸의 가로·세로 픽셀, 그래프 저장 경로</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        tuple: (persona_df, ratio_dict) — 군집별 대표값 표(군집 번호 순. 평균과 중앙값을</span>
-<span class="sd">            나란히 담고 채택한 쪽에 별표(*)를 붙이므로 해당 컬럼은 문자열이다),</span>
-<span class="sd">            범주형 컬럼별 구성비(%) 표의 딕셔너리(마지막 '전체' 행은 데이터 전체의 비율)</span>
+<span class="sd">        width, height: 그래프 한 칸의 가로·세로 픽셀</span>
 <span class="sd">    """</span>
-    <span class="c1"># --- 1) 군집 번호 컬럼 확인 ---</span>
+    <span class="c1"># --- 1) 데이터 확인 ---</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
+    <span class="c1"># 클러스터 번호 컬럼이 없으면 에러를 발생시킨다</span>
     <span class="k">if</span> <span class="n">cluster_column_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">cluster_column_name</span><span class="si">}</span><span class="s2">' 컬럼을 찾을 수 없습니다. 군집 번호가 "</span>
-                         <span class="sa">f</span><span class="s2">"포함된 데이터프레임을 넘기거나, cluster_column_name 에 "</span>
-                         <span class="sa">f</span><span class="s2">"실제 컬럼명을 지정하세요."</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">cluster_column_name</span><span class="si">}</span><span class="s2">' 컬럼을 찾을 수 없습니다."</span><span class="p">)</span>
 
-    <span class="c1"># --- 2) 집계에서 뺄 컬럼 추리기 ---</span>
-    <span class="c1"># 고객ID처럼 값이 모두 다른 컬럼은 대표값을 구해도 의미가 없으므로 자동으로 걸러낸다</span>
-    <span class="c1"># (값이 행의 개수만큼 전부 다르면 식별자로 본다 — 고객ID, 주문번호 등)</span>
-    <span class="n">id_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
-                  <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="n">cluster_column_name</span> <span class="ow">and</span> <span class="n">df</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)]</span>
+    <span class="c1"># 연속형 컬럼 목록이 없거나 전체 컬럼의 부분집합이 아니라면 에러</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">num_columns</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">num_columns</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"num_columns는 없거나 전체 컬럼의 부분집합이 아닙니다."</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">id_columns</span> <span class="ow">and</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[페르소나] 식별자로 판단해 제외한 컬럼 : </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">id_columns</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="c1"># 범주형 컬럼 목록이 없거나 전체 컬럼의 부분집합이 아니라면 에러</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cat_columns</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">cat_columns</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"cat_columns는 없거나 전체 컬럼의 부분집합이 아닙니다."</span><span class="p">)</span>
 
-    <span class="n">drop</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">id_columns</span> <span class="o">+</span> <span class="p">[</span><span class="n">cluster_column_name</span><span class="p">])</span>
+    <span class="c1"># 원본 데이터에서 노이즈 데이터를 제거한다</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">cluster_column_name</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="c1"># --- 3) 집계할 연속형 컬럼 결정 (수치형 전체에서 군집 번호·식별자를 제외) ---</span>
-    <span class="k">if</span> <span class="n">num_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">num_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">my_qtcheck</span><span class="o">.</span><span class="n">get_number_column_names</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">drop</span><span class="p">]</span>
+    <span class="c1"># 군집별 대표값을 집계할 때 순서를 맞추기 위해서 군집번호를 중복 없이 정렬한 리스트를 만든다.</span>
+    <span class="n">cluster_ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">cluster_column_name</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
 
-    <span class="c1"># --- 4) 집계할 범주형 컬럼 결정 ---</span>
-    <span class="c1"># category 타입 전체 + 문자열(object) 컬럼</span>
-    <span class="c1"># (set_type() 으로 타입을 지정하지 않은 데이터도 그대로 쓸 수 있게 한다)</span>
-    <span class="k">if</span> <span class="n">cat_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># category 로 지정한 컬럼과 문자열 컬럼을 차례로 모아 후보를 만든다</span>
-        <span class="n">candidates</span> <span class="o">=</span> <span class="n">my_qtcheck</span><span class="o">.</span><span class="n">get_categorical_column_names</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-        <span class="n">candidates</span> <span class="o">+=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="s1">'object'</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
-
-        <span class="n">cat_columns</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="c1"># 두 목록에 겹쳐 들어온 컬럼과 군집 번호·식별자는 담지 않는다</span>
-        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">drop</span> <span class="ow">and</span> <span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cat_columns</span><span class="p">:</span>
-                <span class="n">cat_columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
-
-    <span class="c1"># --- 5) 컬럼 목록 정리 ---</span>
-    <span class="c1"># 넘겨받은 목록을 그대로 쓰면 아래에서 순서를 바꿀 때 호출부의 리스트까지 바뀐다</span>
-    <span class="n">num_columns</span><span class="p">,</span> <span class="n">cat_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">num_columns</span><span class="p">),</span> <span class="nb">list</span><span class="p">(</span><span class="n">cat_columns</span><span class="p">)</span>
-
-    <span class="c1"># 군집화에 사용한 컬럼을 앞쪽에 두어 표에서 먼저 읽히게 한다</span>
-    <span class="k">if</span> <span class="n">source_column_names</span><span class="p">:</span>
-        <span class="n">used</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">source_column_names</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">num_columns</span><span class="p">]</span>
-        <span class="n">num_columns</span> <span class="o">=</span> <span class="n">used</span> <span class="o">+</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">num_columns</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">used</span><span class="p">]</span>
-
-    <span class="c1"># --- 6) 군집 번호 목록 확인 (노이즈(-1)는 군집이 아니므로 제외한다) ---</span>
-    <span class="n">cluster_ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="n">cluster_column_name</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span> <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="c1"># 전체 데이터 수</span>
     <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[페르소나] 군집 수 = </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cluster_ids</span><span class="p">)</span><span class="si">}</span><span class="s2">, "</span>
-              <span class="sa">f</span><span class="s2">"연속형 = </span><span class="si">{</span><span class="n">num_columns</span><span class="si">}</span><span class="s2">, 범주형 = </span><span class="si">{</span><span class="n">cat_columns</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">'-'</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="c1"># --- 2) 군집별 대표값 집계 ---</span>
+    <span class="n">persona_list</span> <span class="o">=</span> <span class="p">[]</span>       <span class="c1"># 결과를 저장할 빈 리스트</span>
 
-    <span class="c1"># --- 7) 군집별 대표값 집계 ---</span>
-    <span class="n">persona_list</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cluster_ids</span><span class="p">:</span>
-        <span class="c1"># 7-1) 현재 군집에 속한 데이터만 추출</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cluster_ids</span><span class="p">:</span>   <span class="c1"># 군집의 종류를 탐색하면서 반복</span>
+        <span class="c1"># 2-1) 현재 군집에 속한 데이터만 추출</span>
         <span class="n">cluster_data</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">cluster_column_name</span><span class="p">]</span> <span class="o">==</span> <span class="n">c</span><span class="p">]</span>
 
-        <span class="c1"># 7-2) 군집의 크기와 전체에서 차지하는 비중</span>
+        <span class="c1"># 2-2) 군집의 크기와 전체에서 차지하는 비중</span>
         <span class="n">persona_item</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">cluster_column_name</span><span class="p">:</span> <span class="n">c</span><span class="p">,</span>
             <span class="s1">'데이터수'</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">cluster_data</span><span class="p">),</span>
             <span class="s1">'비율(%)'</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cluster_data</span><span class="p">)</span> <span class="o">/</span> <span class="n">total</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
         <span class="p">}</span>
 
-        <span class="c1"># 7-3) 연속형 변수: 정규분포면 평균, 아니면 중앙값</span>
+        <span class="c1"># 2-3) 현재 군집에 속한 데이터의 연속형 컬럼을 하나씩 탐색하면서 대표값을 계산</span>
         <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">num_columns</span><span class="p">:</span>
-            <span class="c1"># 정규성 검정 — normaltest 는 왜도·첨도를 함께 보므로 표본이 8개는 되어야 하고,</span>
-            <span class="c1"># 값이 모두 같으면 계산 자체가 되지 않는다 → 이런 경우는 검정을 건너뛴다</span>
+            <span class="c1"># 현재 군집에 속한 데이터에서 연속형 컬럼에 대한 데이터만 추출 (NaN은 제외)</span>
             <span class="n">values</span> <span class="o">=</span> <span class="n">cluster_data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="n">normaltest</span><span class="p">(</span><span class="n">values</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">8</span> <span class="ow">and</span> <span class="n">values</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="k">else</span> <span class="kc">None</span>
 
-            <span class="c1"># 대표값 선택 — 평균은 한쪽으로 치우친 분포에서 꼬리에 끌려가므로 정규분포일 때만 쓰고, </span>
-            <span class="c1"># 검정을 못 한 경우에도 안전한 쪽인 중앙값을 쓴다</span>
-            <span class="n">method</span> <span class="o">=</span> <span class="s1">'평균'</span> <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="n">alpha</span> <span class="k">else</span> <span class="s1">'중앙값'</span>
+            <span class="c1"># 표에 담기</span>
+            <span class="n">persona_item</span><span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s1"> 평균'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">persona_item</span><span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s1"> 중앙값'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">median</span><span class="p">(),</span> <span class="mi">3</span><span class="p">)</span>
 
-            <span class="c1"># 표에 담기 — 두 값을 나란히 두면 "평균과 중앙값이 얼마나 벌어져 있는가"까지</span>
-            <span class="c1"># 함께 읽힌다. 같은 컬럼이라도 군집마다 채택되는 쪽이 달라지므로 별표로 표시한다</span>
-            <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">'평균'</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="mi">3</span><span class="p">),</span>
-                <span class="s1">'중앙값'</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">median</span><span class="p">(),</span> <span class="mi">3</span><span class="p">),</span>
-            <span class="p">}</span>
+            <span class="c1"># 정규성 검정 (normaltest의 p-value가 alpha 이상이면 정규성을 만족한다고 판단)</span>
+            <span class="k">if</span> <span class="n">normaltest</span><span class="p">(</span><span class="n">values</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">alpha</span><span class="p">:</span>
+                <span class="c1"># 평균을 대표값으로 채택했음을 표시</span>
+                <span class="n">persona_item</span><span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s1"> 평균'</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">persona_item</span><span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s1"> 평균'</span><span class="p">]</span><span class="si">}</span><span class="s2">*"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># 중앙값을 대표값으로 채택했음을 표시</span>
+                <span class="n">persona_item</span><span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s1"> 중앙값'</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">persona_item</span><span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s1"> 중앙값'</span><span class="p">]</span><span class="si">}</span><span class="s2">*"</span>
 
-            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">persona_item</span><span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s1">(</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">)'</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">*'</span> <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="n">method</span> <span class="k">else</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">'</span>
-
-            <span class="c1"># 선택 근거 출력</span>
-            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="n">reason</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"p=</span><span class="si">{</span><span class="n">p</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">"검정 불가"</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  군집 </span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2"> : </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2"> 사용 (</span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
-
-        <span class="c1"># 7-4) 범주형 변수: 최빈값</span>
+        <span class="c1"># 2-4) 현재 군집에 속한 데이터의 범주형 컬럼을 하나씩 탐색하면서 대표값(최빈값)을 계산</span>
         <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">cat_columns</span><span class="p">:</span>
-            <span class="n">persona_item</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">cluster_data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()</span>
+            <span class="c1"># 현재 컬럼의 값의 빈도수를 세어 최대값의 인덱스(idmax)를 대표값으로 채택 (NaN은 제외)</span>
+            <span class="n">max_value</span> <span class="o">=</span> <span class="n">cluster_data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()</span>
 
-            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  군집 </span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2"> : 최빈값 = </span><span class="si">{</span><span class="n">persona_item</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="c1"># 최빈값의 구성비</span>
+            <span class="n">max_value_ratio</span> <span class="o">=</span> <span class="n">cluster_data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
 
-        <span class="c1"># 7-5) 군집별 대표값을 리스트에 추가</span>
+            <span class="c1"># 표에 담기</span>
+            <span class="n">persona_item</span><span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s1"> 최빈값'</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">max_value</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">max_value_ratio</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1">)'</span>
+
+        <span class="c1"># 2-5) 군집별 대표값을 리스트에 추가</span>
         <span class="n">persona_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">persona_item</span><span class="p">)</span>
 
-    <span class="c1"># --- 8) 페르소나 표 완성 (군집 번호 순으로 정렬) ---</span>
+    <span class="c1"># 페르소나 표 완성 및 출력</span>
     <span class="n">persona_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">persona_list</span><span class="p">)</span>
     <span class="n">persona_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">cluster_column_name</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">persona_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">persona_df</span><span class="p">)</span>
 
-    <span class="c1"># --- 9) 범주형 구성비 계산 ---</span>
-    <span class="c1"># 최빈값만 보면 모든 군집이 같은 값으로 나오는 경우가 많으므로 구성비까지 함께 본다</span>
-    <span class="n">ratio_dict</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">cat_columns</span><span class="p">:</span>
-        <span class="c1"># 군집 × 범주 교차표 (건수)</span>
-        <span class="n">ct</span> <span class="o">=</span> <span class="n">crosstab</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">cluster_column_name</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">])</span>
-
-        <span class="c1"># 비교 기준이 되는 전체 비율은 노이즈를 빼기 전에 구한다 (실제 데이터 전체의 구성비)</span>
-        <span class="n">overall</span> <span class="o">=</span> <span class="p">(</span><span class="n">ct</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">ct</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="c1"># 노이즈를 뺀 뒤, 군집마다 행 합이 100%가 되도록 환산</span>
-        <span class="n">ct</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">ct</span><span class="o">.</span><span class="n">index</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cluster_ids</span><span class="p">]]</span>
-        <span class="n">ratio</span> <span class="o">=</span> <span class="p">(</span><span class="n">ct</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="n">ct</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="c1"># 데이터 전체의 비율을 마지막 행에 붙여 "이 군집만 다른가"를 바로 비교하게 한다</span>
-        <span class="n">ratio</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">'전체'</span><span class="p">]</span> <span class="o">=</span> <span class="n">overall</span>
-        <span class="n">ratio_dict</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">ratio</span>
-
-        <span class="c1"># 교차표와 구성비 출력</span>
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">'-'</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[구성비] </span><span class="si">{</span><span class="n">cluster_column_name</span><span class="si">}</span><span class="s2"> × </span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="n">display</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
-            <span class="n">display</span><span class="p">(</span><span class="n">ratio</span><span class="p">)</span>
-
-    <span class="c1"># --- 10) 시각화 — 연속형 상자그림과 범주형 구성비 히트맵을 2열로 묶는다 ---</span>
-    <span class="k">if</span> <span class="n">plot</span> <span class="ow">and</span> <span class="p">(</span><span class="n">num_columns</span> <span class="ow">or</span> <span class="n">cat_columns</span><span class="p">):</span>
-        <span class="c1"># 10-1) 두 종류를 합친 개수만큼 칸을 잡는다 (연속형 먼저, 범주형이 뒤)</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">num_columns</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">cat_columns</span><span class="p">)</span>
-        <span class="n">ncols</span> <span class="o">=</span> <span class="mi">2</span>
-        <span class="n">nrows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">ncols</span><span class="p">))</span>
-
-        <span class="c1"># 10-2) 그래프 초기화</span>
-        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">my_plot</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="n">nrows</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="n">ncols</span><span class="p">,</span>
-                               <span class="n">title</span><span class="o">=</span><span class="s1">'군집별 분포와 구성비'</span><span class="p">)</span>
-
-        <span class="c1"># 칸이 하나뿐이면 배열이 아닌 Axes 하나가 오므로 배열로 맞춰준다</span>
-        <span class="n">axes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
-
-        <span class="c1"># 10-3) 노이즈(-1)는 군집이 아니므로 상자그림에서도 뺀다</span>
-        <span class="n">vdf</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">cluster_column_name</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">cluster_ids</span><span class="p">)]</span>
-
-        <span class="c1"># 10-4) 연속형 컬럼: 군집별 상자그림</span>
+    <span class="c1"># --- 3) 시각화 ---</span>
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="c1"># 군집별 연속형 변수 분포 상자그림 시각화</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">num_columns</span><span class="p">):</span>
-            <span class="n">my_plot</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">vdf</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">cluster_column_name</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
-                            <span class="n">hue</span><span class="o">=</span><span class="n">cluster_column_name</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">my_plot</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">cluster_column_name</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
+                            <span class="n">hue</span><span class="o">=</span><span class="n">cluster_column_name</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">cluster_ids</span><span class="p">,</span>
+                            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s1">'군집별 </span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s1"> 분포'</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+                            <span class="n">xlabel</span><span class="o">=</span><span class="n">cluster_column_name</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="n">column</span><span class="p">)</span>
 
-            <span class="c1"># 군집화에 쓴 변수인지 표시한다 (쓰지 않은 변수에서 나온 차이가 더 강한 근거다)</span>
-            <span class="n">mark</span> <span class="o">=</span> <span class="p">(</span><span class="s1">'군집화 변수'</span>
-                    <span class="k">if</span> <span class="n">source_column_names</span> <span class="ow">and</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">source_column_names</span>
-                    <span class="k">else</span> <span class="s1">'군집화에 쓰지 않은 변수'</span><span class="p">)</span>
-            <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">mark</span><span class="si">}</span><span class="s1">)'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-            <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'군집 번호'</span><span class="p">)</span>
-            <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+        <span class="c1"># 군집별 범주형 변수 구성비 시각화</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">cat_columns</span><span class="p">:</span>
+            <span class="c1"># 군집별 구성비를 계산하기 위해 cluster_column_name과 column만 남긴 데이터프레임을 만든다</span>
+            <span class="n">tdf</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">cluster_column_name</span><span class="p">,</span> <span class="n">column</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 
-        <span class="c1"># 10-5) 범주형 컬럼: 구성비 히트맵</span>
-        <span class="c1"># (군집 수와 범주 수가 많을 때는 숫자 표보다 색으로 보는 편이 빠르게 읽힌다)</span>
-        <span class="c1"># 여기서는 palette 대신 순차형 색상을 쓴다. 구성비는 크기를 비교하는 값이라</span>
-        <span class="c1"># tab10 같은 범주형 팔레트를 쓰면 32%와 34%가 전혀 다른 색으로 찍혀 오히려 헷갈린다</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">column</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cat_columns</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">num_columns</span><span class="p">)):</span>
-            <span class="n">my_plot</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ratio_dict</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">'0.1f'</span><span class="p">,</span>
-                            <span class="n">palette</span><span class="o">=</span><span class="s1">'Blues'</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="c1"># 군집별 범주의 개수를 세어 그래프 높이를 조정한다 (50픽셀 * 범주 수 + 50픽셀)</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tdf</span><span class="p">[</span><span class="n">cluster_column_name</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+            <span class="n">hh</span> <span class="o">=</span> <span class="mi">50</span> <span class="o">*</span> <span class="n">size</span> <span class="o">+</span> <span class="mi">50</span>
 
-            <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s1"> 구성비 (%)'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-            <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
-            <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'군집 번호'</span><span class="p">)</span>
-
-        <span class="c1"># 10-6) 칸이 홀수로 남으면 마지막 빈 칸은 숨긴다</span>
-        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">[</span><span class="n">n</span><span class="p">:]:</span>
-            <span class="n">a</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
-
-        <span class="c1"># 10-7) 전체 제목이 들어갈 위쪽 공간(7%)을 미리 비워 둔 뒤 표시한다</span>
-        <span class="c1">#       (칸이 하나면 전체 제목이 붙지 않으므로 공간을 비우지 않는다)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.93</span><span class="p">])</span>
-        <span class="n">my_plot</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">)</span>
-
-    <span class="c1"># --- 11) 페르소나 표와 범주형 구성비 반환 ---</span>
-    <span class="k">return</span> <span class="n">persona_df</span><span class="p">,</span> <span class="n">ratio_dict</span>
+            <span class="c1"># 그래프 높이는 범주의 개수에 따라 자동으로 조정한다 (50픽셀 * 범주 수 + 50픽셀)</span>
+            <span class="n">my_plot</span><span class="o">.</span><span class="n">stackplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">tdf</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">column</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">"index"</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="n">cluster_column_name</span><span class="p">,</span> 
+                              <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">'h'</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="s1">'count'</span><span class="p">,</span> 
+                              <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">hh</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">'군집별 구성비'</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

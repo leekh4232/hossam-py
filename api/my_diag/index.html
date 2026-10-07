@@ -351,8 +351,6 @@
       
         
       
-        
-      
     
     
     
@@ -679,6 +677,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hossam.my_diag.shap_proba_table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        shap_proba_table
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -820,34 +829,6 @@
     
   
     my_outlier_clipper
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../my_pipeline/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    my_pipeline
   
 
     
@@ -1190,6 +1171,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#hossam.my_diag.shap_proba_table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        shap_proba_table
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1273,6 +1265,7 @@
     <span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">return_result</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 
@@ -1516,6 +1509,25 @@
                   <code>True</code>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>return_result</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True 면 결과표(DataFrame)를 반환한다. 표의 <code>attrs['diagnosis']</code> 에
+모델 수준 최종 진단('일반화' | '과대적합' | '과소적합') 이 담겨 있어 여러 모델을
+순서대로 판정해 고르는 코드에서 쓴다. False(기본값) 면 표를 화면에만 출력하고
+반환하지 않는다 — 셀 마지막 줄에서 호출할 때 표가 두 번 출력되는 것을 막기 위함 (2026-09-23 추가).</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -1545,9 +1557,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_diag.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 36</span>
-<span class="normal"> 37</span>
-<span class="normal"> 38</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 38</span>
 <span class="normal"> 39</span>
 <span class="normal"> 40</span>
 <span class="normal"> 41</span>
@@ -1902,10 +1912,32 @@
 <span class="normal">390</span>
 <span class="normal">391</span>
 <span class="normal">392</span>
-<span class="normal">393</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">overfit</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">overfit</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span>
             <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">'auto'</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.20</span><span class="p">,</span> <span class="n">underfit_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">fit_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">learning_curve</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">return_result</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Train / CV / Test 성능을 한 표로 보여주고 과적합 여부를 판정한다 (회귀·분류 공용).</span>
 
 <span class="sd">    Args:</span>
@@ -1925,6 +1957,10 @@
 <span class="sd">        grid (bool): 학습곡선 격자 표시 여부 (기본값: True).</span>
 <span class="sd">        save_path (str): 학습곡선 이미지 저장 경로 (기본값: None).</span>
 <span class="sd">        verbose (bool): 판정 과정 출력 여부 (기본값: True).</span>
+<span class="sd">        return_result (bool): True 면 결과표(DataFrame)를 반환한다. 표의 `attrs['diagnosis']` 에</span>
+<span class="sd">            모델 수준 최종 진단('일반화' | '과대적합' | '과소적합') 이 담겨 있어 여러 모델을</span>
+<span class="sd">            순서대로 판정해 고르는 코드에서 쓴다. False(기본값) 면 표를 화면에만 출력하고</span>
+<span class="sd">            반환하지 않는다 — 셀 마지막 줄에서 호출할 때 표가 두 번 출력되는 것을 막기 위함 (2026-09-23 추가).</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: metrics 에 지원하지 않는 지표명을 준 경우.</span>
@@ -1938,8 +1974,17 @@
     <span class="k">if</span> <span class="n">classname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"CatBoost"</span><span class="p">):</span>    <span class="c1"># CatBoost 계열인 경우</span>
         <span class="c1"># 교차검증은 폴드마다 모델을 새로 학습하므로 어떤 컬럼이 범주형인지 다시 알려줘야 한다.</span>
         <span class="c1"># 데이터 타입으로 추측하면 object 컬럼이나 nominal_cols 로 직접 지정한 컬럼을 놓치므로,</span>
-        <span class="c1"># 학습을 마친 모델이 실제로 범주형으로 쓴 컬럼의 위치(인덱스)를 그대로 꺼내 쓴다</span>
-        <span class="n">cat_features</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">get_cat_feature_indices</span><span class="p">()]</span>
+        <span class="c1"># 학습을 마친 모델이 실제로 범주형으로 쓴 컬럼을 꺼내 쓴다.</span>
+        <span class="c1"># (수정 전) 위치(인덱스)를 그대로 넘겼다 — 앞 단계에 VIFSelector 가 있으면 폴드마다 제거되는</span>
+        <span class="c1">#   컬럼 수가 달라져 인덱스가 어긋나 CatBoostError(index must be &lt; n) 가 났다 (2026-09-23)</span>
+        <span class="c1"># cat_features = [int(i) for i in model.get_cat_feature_indices()]</span>
+        <span class="c1"># 전처리 출력이 DataFrame(set_output='pandas') 이므로 컬럼 "이름" 으로 넘기면 폴드마다 위치가 달라져도 안전하다</span>
+        <span class="n">cat_idx</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">get_cat_feature_indices</span><span class="p">()]</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">'feature_names_'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">max</span><span class="p">(</span><span class="n">cat_idx</span><span class="p">,</span> <span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">cat_features</span> <span class="o">=</span> <span class="p">[</span><span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cat_idx</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>                                   <span class="c1"># 이름을 알 수 없으면 종전대로 인덱스 사용</span>
+            <span class="n">cat_features</span> <span class="o">=</span> <span class="n">cat_idx</span>
 
         <span class="c1"># 파이프라인이면 '마지막 단계명__cat_features', 단독 모델이면 'cat_features' 로 넘긴다</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">base_est</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">):</span>
@@ -2260,6 +2305,11 @@
               <span class="sa">f</span><span class="s1">'CV </span><span class="si">{</span><span class="n">underfit_metric</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">cv_base</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s1">'='</span> <span class="o">*</span> <span class="mi">78</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+
+    <span class="c1"># --- 18) 결과 반환 (요청한 경우에만) ---</span>
+    <span class="c1"># attrs['diagnosis'] 로 모델 수준 진단을 코드에서 읽을 수 있다 (2026-09-23 추가)</span>
+    <span class="k">if</span> <span class="n">return_result</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">result</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -2457,28 +2507,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_diag.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">399</span>
-<span class="normal">400</span>
-<span class="normal">401</span>
-<span class="normal">402</span>
-<span class="normal">403</span>
-<span class="normal">404</span>
-<span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span>
-<span class="normal">408</span>
-<span class="normal">409</span>
-<span class="normal">410</span>
-<span class="normal">411</span>
-<span class="normal">412</span>
-<span class="normal">413</span>
-<span class="normal">414</span>
-<span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
-<span class="normal">418</span>
-<span class="normal">419</span>
-<span class="normal">420</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">420</span>
 <span class="normal">421</span>
 <span class="normal">422</span>
 <span class="normal">423</span>
@@ -2655,7 +2684,28 @@
 <span class="normal">594</span>
 <span class="normal">595</span>
 <span class="normal">596</span>
-<span class="normal">597</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">feature_importance</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">cum_ratio</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> 
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span>
+<span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span>
+<span class="normal">614</span>
+<span class="normal">615</span>
+<span class="normal">616</span>
+<span class="normal">617</span>
+<span class="normal">618</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">feature_importance</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">cum_ratio</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> 
                        <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s1">'tab10'</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""학습된 회귀·분류 모델에서 변수 중요도를 도출해 상위 변수만 추려서 반환한다.</span>
 
@@ -2880,7 +2930,7 @@
 
     <div class="doc doc-contents ">
 
-        <p>학습된 예측(회귀) 모델을 SHAP 으로 분석해 변수 기여도 요약표를 반환한다.</p>
+        <p>학습된 회귀·분류 모델을 SHAP 으로 분석해 변수 기여도 요약표를 반환한다.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2950,9 +3000,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>설명 대상 행 수 (기본값: 'auto').
-'auto' 면 선형·트리는 전체, KernelExplainer 는 200행을 쓴다.
-정수를 주면 explainer 종류와 무관하게 그 행 수만큼, None 이면 언제나 전체.</p>
+                <p>설명 대상 행 수 (기본값: 'auto' → Kernel 만 200행, 나머지는 전체).</p>
               </div>
             </td>
             <td>
@@ -3009,7 +3057,9 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>mean_abs_shap 내림차순 요약표.</p>
+                <p>mean_abs_shap 내림차순 요약표. attrs 에 shap_values(n×f)·data·expected_value·feature_names·
+explainer_type·model_class·task·class_index·class_names·output_space 가 담기고,
+같은 객체가 <code>{project_name}/{workdir}/{모델이름}_shap.pkl</code> 로 저장된다. 분류는 마지막 클래스(이진의 양성)를 설명한다.</p>
               </div>
             </td>
           </tr>
@@ -3019,28 +3069,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_diag.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">603</span>
-<span class="normal">604</span>
-<span class="normal">605</span>
-<span class="normal">606</span>
-<span class="normal">607</span>
-<span class="normal">608</span>
-<span class="normal">609</span>
-<span class="normal">610</span>
-<span class="normal">611</span>
-<span class="normal">612</span>
-<span class="normal">613</span>
-<span class="normal">614</span>
-<span class="normal">615</span>
-<span class="normal">616</span>
-<span class="normal">617</span>
-<span class="normal">618</span>
-<span class="normal">619</span>
-<span class="normal">620</span>
-<span class="normal">621</span>
-<span class="normal">622</span>
-<span class="normal">623</span>
-<span class="normal">624</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">624</span>
 <span class="normal">625</span>
 <span class="normal">626</span>
 <span class="normal">627</span>
@@ -3220,184 +3249,195 @@
 <span class="normal">801</span>
 <span class="normal">802</span>
 <span class="normal">803</span>
-<span class="normal">804</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_analysis</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span> <span class="n">estimator</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">max_samples</span><span class="o">=</span><span class="s1">'auto'</span><span class="p">,</span>
+<span class="normal">804</span>
+<span class="normal">805</span>
+<span class="normal">806</span>
+<span class="normal">807</span>
+<span class="normal">808</span>
+<span class="normal">809</span>
+<span class="normal">810</span>
+<span class="normal">811</span>
+<span class="normal">812</span>
+<span class="normal">813</span>
+<span class="normal">814</span>
+<span class="normal">815</span>
+<span class="normal">816</span>
+<span class="normal">817</span>
+<span class="normal">818</span>
+<span class="normal">819</span>
+<span class="normal">820</span>
+<span class="normal">821</span>
+<span class="normal">822</span>
+<span class="normal">823</span>
+<span class="normal">824</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_analysis</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span> <span class="n">estimator</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">max_samples</span><span class="o">=</span><span class="s1">'auto'</span><span class="p">,</span>
                   <span class="n">background_clusters</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s1">'shap'</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""학습된 예측(회귀) 모델을 SHAP 으로 분석해 변수 기여도 요약표를 반환한다.</span>
+<span class="w">    </span><span class="sd">"""학습된 회귀·분류 모델을 SHAP 으로 분석해 변수 기여도 요약표를 반환한다.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        project_name (str): 작업 폴더의 이름이 될 프로젝트명.</span>
 <span class="sd">        estimator: 학습된 파이프라인 또는 그것을 감싼 GridSearchCV 등 탐색 객체.</span>
 <span class="sd">        x (DataFrame): 설명에 사용할 원본 입력 (보통 x_train 또는 x_test).</span>
-<span class="sd">        max_samples (str or int): 설명 대상 행 수 (기본값: 'auto').</span>
-<span class="sd">            'auto' 면 선형·트리는 전체, KernelExplainer 는 200행을 쓴다.</span>
-<span class="sd">            정수를 주면 explainer 종류와 무관하게 그 행 수만큼, None 이면 언제나 전체.</span>
+<span class="sd">        max_samples (str or int): 설명 대상 행 수 (기본값: 'auto' → Kernel 만 200행, 나머지는 전체).</span>
 <span class="sd">        background_clusters (int): KernelExplainer 의 배경을 kmeans 로 압축할 대표점 수 (기본값: 50).</span>
 <span class="sd">        workdir (str): 분석 결과 pkl 을 저장할 폴더명 (기본값: "shap").</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        DataFrame: mean_abs_shap 내림차순 요약표.</span>
+<span class="sd">        DataFrame: mean_abs_shap 내림차순 요약표. attrs 에 shap_values(n×f)·data·expected_value·feature_names·</span>
+<span class="sd">            explainer_type·model_class·task·class_index·class_names·output_space 가 담기고,</span>
+<span class="sd">            같은 객체가 `{project_name}/{workdir}/{모델이름}_shap.pkl` 로 저장된다. 분류는 마지막 클래스(이진의 양성)를 설명한다.</span>
 <span class="sd">    """</span>
-    <span class="c1"># KernelExplainer에 적용할 행 수 상한.</span>
-    <span class="c1"># Kernel은 행 하나에 수 초가 걸려 전체를 돌리면 십수 시간이 된다.</span>
-    <span class="n">_KERNEL_MAX_SAMPLES</span> <span class="o">=</span> <span class="mi">200</span>
-
-    <span class="c1"># shap 은 별도 설치가 필요한 무거운 패키지라 함수 안에서 import 한다</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">shap</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">shap</span>    <span class="c1"># 별도 설치가 필요한 무거운 패키지라 함수 안에서 import 한다</span>
 
     <span class="c1"># --- 1) 최종 모델 추출 ---</span>
     <span class="n">model</span><span class="p">,</span> <span class="n">pre</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_unwrap_estimator</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span>
-    <span class="n">model_class</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>      <span class="c1"># 모델 클래스명</span>
+    <span class="n">model_class</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
 
     <span class="k">if</span> <span class="n">pre</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>    <span class="c1"># 전처리 단계가 없는 단독 모델인 경우</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">model_class</span><span class="si">}</span><span class="s2">' 단독 모델은 받지 않습니다. 전처리를 포함한 파이프라인을 넘기세요."</span><span class="p">)</span>
 
-    <span class="c1"># 이 함수는 회귀 전용이다. 분류 구현은 helpers/backup/shap_analysis_classification.py 에 있다</span>
-    <span class="c1"># (수정 전) 분류 대응을 위한 과제 판별. 분류 분기가 미완성(pass)이라 회귀 전용으로 정리 (2026-09-17)</span>
-    <span class="c1"># if is_classifier(model):        # 분류 모형인 경우</span>
-    <span class="c1">#     task = 'classification'</span>
-    <span class="c1"># else:                           # 예측 모형인 경우</span>
-    <span class="c1">#     task = 'regression'</span>
-    <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">model_class</span><span class="si">}</span><span class="s2">' 분류 모델은 지원하지 않습니다. 회귀 모델·파이프라인을 넘기세요."</span><span class="p">)</span>
+    <span class="c1"># 분류는 마지막 클래스(이진에서 양성)를 설명한다</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="s1">'classification'</span> <span class="k">if</span> <span class="n">is_classifier</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="k">else</span> <span class="s1">'regression'</span>
+    <span class="n">class_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">classes_</span><span class="p">)</span> <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s1">'classification'</span> <span class="k">else</span> <span class="p">[]</span>
 
     <span class="c1"># --- 2) 전처리 재현하기 ---</span>
     <span class="n">x_df</span> <span class="o">=</span> <span class="n">pre</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="c1"># --- 3) explainer 생성 ---</span>
+    <span class="c1"># 선형은 계수로 기여도를 바로 풀고, 트리는 정확·고속이다. 둘 다 아니면 느린 Kernel 로 넘어간다.</span>
     <span class="n">explainer</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">explainer_type</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">'coef_'</span><span class="p">):</span>     <span class="c1"># 선형 — 계수로 기여도를 바로 풀 수 있다</span>
-        <span class="c1"># LinearExplainer 는 kmeans 요약을 받지 못하므로 원시 데이터를 그대로 넘긴다</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">'coef_'</span><span class="p">):</span>    <span class="c1"># 선형 — kmeans 요약을 못 받으므로 원시 데이터를 넘긴다</span>
         <span class="n">explainer</span> <span class="o">=</span> <span class="n">shap</span><span class="o">.</span><span class="n">LinearExplainer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">x_df</span><span class="p">)</span>
         <span class="n">explainer_type</span> <span class="o">=</span> <span class="s1">'LinearExplainer'</span>
-    <span class="k">else</span><span class="p">:</span>    <span class="c1"># 선형이 아닌 경우</span>
-        <span class="k">try</span><span class="p">:</span>                 <span class="c1"># 트리 구조면 정확·고속이라 먼저 시도한다</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
             <span class="n">explainer</span> <span class="o">=</span> <span class="n">shap</span><span class="o">.</span><span class="n">TreeExplainer</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
             <span class="n">explainer_type</span> <span class="o">=</span> <span class="s1">'TreeExplainer'</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>    <span class="c1"># shap 이 거부한 경우 (KNN·SVM 등)</span>
             <span class="n">explainer</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">if</span> <span class="n">explainer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>           <span class="c1"># 폴백 — 모델 구조를 따지지 않지만 느리다</span>
-        <span class="c1"># Kernel 은 (배경 대표점 수 × 설명 행 수) 에 비례해 느리므로 배경을 kmeans 로 압축한다</span>
+    <span class="k">if</span> <span class="n">explainer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>    <span class="c1"># 폴백 — 배경이 클수록 느려지므로 kmeans 로 압축한다</span>
         <span class="n">bg</span> <span class="o">=</span> <span class="n">shap</span><span class="o">.</span><span class="n">kmeans</span><span class="p">(</span><span class="n">x_df</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">background_clusters</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_df</span><span class="p">)))</span>
-        <span class="n">explainer</span> <span class="o">=</span> <span class="n">shap</span><span class="o">.</span><span class="n">KernelExplainer</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">,</span> <span class="n">bg</span><span class="p">)</span>
+
+        <span class="c1"># Kernel 은 '숫자를 돌려주는 함수' 를 받는다 — 분류는 확률(없으면 결정함수), 회귀는 예측값</span>
+        <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s1">'regression'</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">'predict_proba'</span><span class="p">):</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict_proba</span>
+        <span class="k">else</span><span class="p">:</span>    <span class="c1"># 확률이 없는 분류 모형 (SVC·RidgeClassifier)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">decision_function</span>
+
+        <span class="n">explainer</span> <span class="o">=</span> <span class="n">shap</span><span class="o">.</span><span class="n">KernelExplainer</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">bg</span><span class="p">)</span>
         <span class="n">explainer_type</span> <span class="o">=</span> <span class="s1">'KernelExplainer'</span>
 
     <span class="c1"># --- 4) 행 샘플링 ---</span>
-    <span class="c1"># 선형·트리는 정확 계산이라 전체를 돌려도 대개 몇 초면 끝난다. </span>
-    <span class="c1"># Kernel 만 행 하나에 수 초가 걸려 (이 규모에서 전체를 돌리면 십수 시간) 자동으로 행을 줄인다.</span>
-    <span class="k">if</span> <span class="n">max_samples</span> <span class="o">==</span> <span class="s1">'auto'</span><span class="p">:</span>    <span class="c1"># 기본 — explainer 종류에 맡긴다</span>
-        <span class="k">if</span> <span class="n">explainer_type</span> <span class="o">==</span> <span class="s1">'KernelExplainer'</span><span class="p">:</span>    <span class="c1"># 근사 계산 — 행을 줄인다</span>
-            <span class="n">n_target</span> <span class="o">=</span> <span class="n">_KERNEL_MAX_SAMPLES</span>
-        <span class="k">else</span><span class="p">:</span>                                      <span class="c1"># 정확 계산 — 전체를 쓴다</span>
-            <span class="n">n_target</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">else</span><span class="p">:</span>                        <span class="c1"># 사용자가 직접 지정한 경우</span>
+    <span class="c1"># 선형·트리는 정확 계산이라 전체를 써도 몇 초면 끝나지만, Kernel 은 행 하나에 수 초가 걸린다.</span>
+    <span class="k">if</span> <span class="n">max_samples</span> <span class="o">==</span> <span class="s1">'auto'</span><span class="p">:</span>
+        <span class="n">n_target</span> <span class="o">=</span> <span class="mi">200</span> <span class="k">if</span> <span class="n">explainer_type</span> <span class="o">==</span> <span class="s1">'KernelExplainer'</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
         <span class="n">n_target</span> <span class="o">=</span> <span class="n">max_samples</span>
 
-    <span class="k">if</span> <span class="n">n_target</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">n_target</span><span class="p">:</span>    <span class="c1"># 상한을 넘으면 표본을 뽑는다</span>
-        <span class="c1"># 재현 가능한 샘플링으로 계산량을 줄인다</span>
-        <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">RANDOM_STATE</span><span class="p">)</span>
-        <span class="n">pick</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_df</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">n_target</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">pick</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>                     <span class="c1"># 원본 행 순서를 유지한다</span>
-        <span class="n">x_explain</span> <span class="o">=</span> <span class="n">x_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">pick</span><span class="p">]</span>     <span class="c1"># SHAP 을 계산할 행</span>
-    <span class="k">else</span><span class="p">:</span>    <span class="c1"># 상한이 없거나 상한 이하인 경우 — 전체를 쓴다</span>
+    <span class="k">if</span> <span class="n">n_target</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">n_target</span><span class="p">:</span>    <span class="c1"># 재현 가능한 샘플링으로 계산량을 줄인다</span>
+        <span class="n">pick</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">RANDOM_STATE</span><span class="p">)</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_df</span><span class="p">),</span> <span class="n">n_target</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="n">x_explain</span> <span class="o">=</span> <span class="n">x_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">pick</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
         <span class="n">x_explain</span> <span class="o">=</span> <span class="n">x_df</span>
 
     <span class="c1"># --- 5) SHAP 값 계산 ---</span>
     <span class="k">if</span> <span class="n">explainer_type</span> <span class="o">==</span> <span class="s1">'KernelExplainer'</span><span class="p">:</span>    <span class="c1"># Kernel 은 진행 막대를 끈다</span>
         <span class="n">raw</span> <span class="o">=</span> <span class="n">explainer</span><span class="o">.</span><span class="n">shap_values</span><span class="p">(</span><span class="n">x_explain</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>                                      <span class="c1"># Tree·Linear</span>
+    <span class="k">else</span><span class="p">:</span>
         <span class="n">raw</span> <span class="o">=</span> <span class="n">explainer</span><span class="o">.</span><span class="n">shap_values</span><span class="p">(</span><span class="n">x_explain</span><span class="p">)</span>
 
-    <span class="n">expected_value</span> <span class="o">=</span> <span class="n">explainer</span><span class="o">.</span><span class="n">expected_value</span>      <span class="c1"># base value (평균 예측)</span>
-
     <span class="c1"># --- 6) SHAP 값 배열 정리 ---</span>
-    <span class="c1"># 회귀 모형의 결과 배열은 (n, f) 단일 출력이다.</span>
+    <span class="c1"># 회귀는 (n, f) 단일 출력이다. 분류는 클래스축이 붙은 (n, f, c) 로 오기도 하고</span>
+    <span class="c1"># (RandomForest·Kernel+predict_proba), 양성 클래스만 담은 (n, f) 로 오기도 한다 (XGBoost·로지스틱).</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+    <span class="n">ev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">explainer</span><span class="o">.</span><span class="n">expected_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>    <span class="c1"># base value 를 1차원으로 통일</span>
 
-    <span class="c1"># (수정 전) 클래스축이 있는 (n, f, c) 분류 출력을 위한 자리(pass). 회귀 전용으로 정리 (2026-09-17)</span>
-    <span class="c1"># if arr.ndim == 3:    # (n, f, c) — 클래스축이 있는 분류 모형</span>
-    <span class="c1">#     pass </span>
-    <span class="c1"># else:                # (n, f) — 회귀 모형의 단일 출력</span>
-    <span class="c1">#     shap_2d = arr.astype(float)</span>
-    <span class="c1">#     base_value = float(np.ravel(expected_value)[0])</span>
-    <span class="n">shap_2d</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>                         <span class="c1"># (n, f) 기여도 배열</span>
-    <span class="n">base_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">expected_value</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>     <span class="c1"># base value (평균 예측)</span>
+    <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>    <span class="c1"># 클래스축이 있으면 마지막 클래스만 잘라 (n, f) 로 맞춘다</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">shap_2d</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">base_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ev</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>                <span class="c1"># 단일 출력 — 분류면 양성 클래스로 본다</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">class_names</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">shap_2d</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">base_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ev</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">used_class</span> <span class="o">=</span> <span class="n">idx</span> <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s1">'classification'</span> <span class="k">else</span> <span class="kc">None</span>    <span class="c1"># 회귀는 클래스 개념이 없다</span>
 
     <span class="c1"># --- 7) 가산성으로 모델 출력 복원 ---</span>
-    <span class="c1"># SHAP 은 '가산성' 을 만족한다 — 행마다 (base value + 그 행의 SHAP 합) 이 모델 출력과 같아진다. </span>
-    <span class="c1"># 그래서 이 합을 모델의 실제 출력과 맞춰보면 단위를 역으로 알 수 있다.</span>
-    <span class="n">preds</span> <span class="o">=</span> <span class="n">shap_2d</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">base_value</span>    <span class="c1"># 행별로 복원한 모델 출력</span>
+    <span class="c1"># SHAP 은 행마다 (base value + 그 행의 SHAP 합) 이 모델 출력과 같아진다.</span>
+    <span class="c1"># 이 합을 실제 출력과 맞춰보면 SHAP 값의 단위를 역으로 알 수 있다.</span>
+    <span class="n">preds</span> <span class="o">=</span> <span class="n">shap_2d</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">base_value</span>
 
     <span class="c1"># --- 8) 예측값과 대조 ---</span>
-    <span class="c1"># 예측 모형은 후보가 하나뿐이라 model.predict 와만 맞춰 보면 된다.</span>
-    <span class="c1"># (수정 전) 분류 분기 자리(pass). 회귀 전용으로 정리하며 분기를 풀었다 (2026-09-17)</span>
-    <span class="c1"># if task == 'classification':    # 분류 모형인 경우</span>
-    <span class="c1">#     pass</span>
-    <span class="c1"># else:                           # 예측 모형인 경우</span>
-    <span class="c1"># SHAP 값의 단위를 판정하기 위해 모델 예측값을 가져온다</span>
-    <span class="n">y_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_explain</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-    <span class="c1"># 0으로 나누는 것을 방지하기 위해 작은 수를 더한다</span>
-    <span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">+</span> <span class="mf">1e-9</span>
-    <span class="c1"># SHAP 으로 복원한 예측값과 실제 예측값의 평균 절대 오차를 계산한다</span>
-    <span class="n">error</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">preds</span> <span class="o">-</span> <span class="n">y_hat</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+    <span class="c1"># 회귀는 후보가 predict 하나뿐이다. 분류는 모델·explainer 조합에 따라 단위가 갈리므로</span>
+    <span class="c1"># 확률·로그오즈·마진 후보를 모두 세워 가장 잘 맞는 것을 고른다.</span>
+    <span class="c1">#   - RandomForest·DecisionTree + Tree → 확률 / XGBoost·LightGBM·로지스틱 → 로그오즈</span>
+    <span class="c1">#   - Kernel → predict_proba 면 확률, decision_function 이면 마진</span>
+    <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s1">'regression'</span><span class="p">:</span>    <span class="c1"># y 단위 예측값과 맞아떨어지는지만 본다</span>
+        <span class="n">y_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_explain</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y_hat</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">+</span> <span class="mf">1e-9</span>    <span class="c1"># 오차 허용치의 기준 (0 으로 나누기 방지)</span>
+        <span class="n">output_space</span> <span class="o">=</span> <span class="s1">'예측값(y 단위)'</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">preds</span> <span class="o">-</span> <span class="n">y_hat</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">scale</span> <span class="o">*</span> <span class="mf">1e-3</span> <span class="k">else</span> <span class="s1">'알 수 없음'</span>
+    <span class="k">else</span><span class="p">:</span>                       <span class="c1"># 후보별로 실제 출력과의 평균 오차를 잰다</span>
+        <span class="n">candidates</span> <span class="o">=</span> <span class="p">{}</span>    <span class="c1"># {단위 이름: 실제 출력과의 평균 오차}</span>
 
-    <span class="k">if</span> <span class="n">error</span> <span class="o">&lt;</span> <span class="n">scale</span> <span class="o">*</span> <span class="mf">1e-3</span><span class="p">:</span>    <span class="c1"># 예측값과 사실상 일치하면</span>
-        <span class="n">output_space</span> <span class="o">=</span> <span class="s1">'예측값(y 단위)'</span>
-    <span class="k">else</span><span class="p">:</span>                       <span class="c1"># 어긋나면 단위를 특정할 수 없다</span>
-        <span class="n">output_space</span> <span class="o">=</span> <span class="s1">'알 수 없음'</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">'predict_proba'</span><span class="p">):</span>
+            <span class="n">proba</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">x_explain</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)[:,</span> <span class="n">used_class</span><span class="p">]</span>
 
-    <span class="c1"># --- 9) SHAP 값을 데이터프레임으로 ---</span>
-    <span class="c1"># 행이 관측치, 열이 변수다. 한 칸이 '이 행에서 이 변수가 예측을 얼마나 밀었나' 이다.</span>
+            <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>    <span class="c1"># 클래스축이 있으면 전체 클래스의 복원 출력을 softmax 로 확률화한다</span>
+                <span class="n">full</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">ev</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+                <span class="n">exp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">full</span> <span class="o">-</span> <span class="n">full</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>    <span class="c1"># 오버플로 방지</span>
+                <span class="n">converted</span> <span class="o">=</span> <span class="p">(</span><span class="n">exp</span> <span class="o">/</span> <span class="n">exp</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">))[:,</span> <span class="n">used_class</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>                <span class="c1"># 단일 출력이면 시그모이드로 확률화한다</span>
+                <span class="n">converted</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="o">-</span><span class="mi">500</span><span class="p">,</span> <span class="mi">500</span><span class="p">)))</span>
+
+            <span class="n">candidates</span><span class="p">[</span><span class="s1">'확률'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">preds</span> <span class="o">-</span> <span class="n">proba</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>          <span class="c1"># 그대로 확률이면 오차 0</span>
+            <span class="n">candidates</span><span class="p">[</span><span class="s1">'로그오즈'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">converted</span> <span class="o">-</span> <span class="n">proba</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>    <span class="c1"># 확률화한 뒤 맞으면 로그오즈</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">'decision_function'</span><span class="p">):</span>    <span class="c1"># SVC·RidgeClassifier 등</span>
+            <span class="n">margin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">x_explain</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">margin</span> <span class="o">=</span> <span class="n">margin</span> <span class="k">if</span> <span class="n">margin</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">margin</span><span class="p">[:,</span> <span class="n">used_class</span><span class="p">]</span>    <span class="c1"># 다중은 설명 클래스 열</span>
+            <span class="n">candidates</span><span class="p">[</span><span class="s1">'마진'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">preds</span> <span class="o">-</span> <span class="n">margin</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+
+        <span class="n">best</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">candidates</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">candidates</span><span class="o">.</span><span class="n">get</span><span class="p">)</span>    <span class="c1"># 오차가 가장 작은 후보</span>
+        <span class="n">output_space</span> <span class="o">=</span> <span class="n">best</span> <span class="k">if</span> <span class="n">candidates</span><span class="p">[</span><span class="n">best</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.05</span> <span class="k">else</span> <span class="s1">'알 수 없음'</span>
+
+    <span class="c1"># --- 9) 변수별 통계량 ---</span>
+    <span class="c1"># shap_2d 는 행이 관측치, 열이 변수다. 한 칸이 '이 행에서 이 변수가 예측을 얼마나 밀었나' 이다.</span>
     <span class="n">feat_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">x_explain</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
-    <span class="n">shap_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">shap_2d</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">feat_names</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">x_explain</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">mean_abs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">shap_2d</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>     <span class="c1"># 영향력 크기 (부호 무관)</span>
+    <span class="n">mean_s</span> <span class="o">=</span> <span class="n">shap_2d</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>               <span class="c1"># 평균 기여 (부호 = 방향)</span>
+    <span class="n">std_s</span> <span class="o">=</span> <span class="n">shap_2d</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>         <span class="c1"># 기여의 흔들림</span>
 
-    <span class="c1"># --- 10) 변수별 통계량 계산 ---</span>
-    <span class="n">mean_abs</span> <span class="o">=</span> <span class="n">shap_df</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>      <span class="c1"># 영향력 크기 (부호 무관)</span>
-    <span class="n">mean_s</span> <span class="o">=</span> <span class="n">shap_df</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>              <span class="c1"># 평균 기여 (부호 = 방향)</span>
-    <span class="n">std_s</span> <span class="o">=</span> <span class="n">shap_df</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>                <span class="c1"># 기여의 흔들림</span>
-
-    <span class="n">direction</span> <span class="o">=</span> <span class="p">[]</span>      <span class="c1"># 평균 기여의 부호를 방향 라벨로 바꾼다</span>
-
-    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">mean_s</span><span class="p">:</span>    <span class="c1"># 변수마다</span>
-        <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>      <span class="c1"># 평균 기여가 양수</span>
-            <span class="n">direction</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'증가'</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>    <span class="c1"># 평균 기여가 음수</span>
-            <span class="n">direction</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'감소'</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>          <span class="c1"># 평균 기여가 0</span>
-            <span class="n">direction</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'중립'</span><span class="p">)</span>
-
-    <span class="c1"># --- 11) 요약표로 조립 ---</span>
+    <span class="c1"># --- 10) 요약표로 조립 ---</span>
     <span class="n">summary</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span>
         <span class="s1">'mean_abs_shap'</span><span class="p">:</span> <span class="n">mean_abs</span><span class="p">,</span>
         <span class="s1">'mean_shap'</span><span class="p">:</span> <span class="n">mean_s</span><span class="p">,</span>
         <span class="s1">'std_shap'</span><span class="p">:</span> <span class="n">std_s</span><span class="p">,</span>
-        <span class="s1">'direction'</span><span class="p">:</span> <span class="n">direction</span><span class="p">,</span>
+        <span class="c1"># 평균 기여의 부호를 방향 라벨로 바꾼다</span>
+        <span class="s1">'direction'</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mean_s</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'증가'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mean_s</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'감소'</span><span class="p">,</span> <span class="s1">'중립'</span><span class="p">)),</span>
         <span class="c1"># 변동계수 — 평균 기여보다 흔들림이 크면 비선형·상호작용을 의심한다</span>
         <span class="s1">'cv'</span><span class="p">:</span> <span class="n">std_s</span> <span class="o">/</span> <span class="p">(</span><span class="n">mean_abs</span> <span class="o">+</span> <span class="mf">1e-9</span><span class="p">),</span>
     <span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="n">feat_names</span><span class="p">)</span>
 
     <span class="n">summary</span><span class="p">[</span><span class="s1">'stability'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s1">'cv'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'안정적'</span><span class="p">,</span> <span class="s1">'비선형/불안정'</span><span class="p">)</span>
     <span class="n">summary</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">'Feature'</span>
-    <span class="n">summary</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'mean_abs_shap'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>     <span class="c1"># 영향력 내림차순</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'mean_abs_shap'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>    <span class="c1"># 영향력 내림차순</span>
 
-    <span class="c1"># --- 12) 비율과 누적 비율 ---</span>
+    <span class="c1"># --- 11) 비율과 누적 비율 ---</span>
     <span class="n">total_abs</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s1">'mean_abs_shap'</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
-
-    <span class="k">if</span> <span class="n">total_abs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>    <span class="c1"># 영향력 총합이 0 보다 큰 경우</span>
-        <span class="n">summary</span><span class="p">[</span><span class="s1">'ratio'</span><span class="p">]</span> <span class="o">=</span> <span class="n">summary</span><span class="p">[</span><span class="s1">'mean_abs_shap'</span><span class="p">]</span> <span class="o">/</span> <span class="n">total_abs</span>         <span class="c1"># 합 1 로 정규화</span>
-    <span class="k">else</span><span class="p">:</span>                <span class="c1"># 모든 기여가 0 인 경우</span>
-        <span class="n">summary</span><span class="p">[</span><span class="s1">'ratio'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
-
-    <span class="n">summary</span><span class="p">[</span><span class="s1">'cum_ratio'</span><span class="p">]</span> <span class="o">=</span> <span class="n">summary</span><span class="p">[</span><span class="s1">'ratio'</span><span class="p">]</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>                    <span class="c1"># 내림차순 누적 비율</span>
+    <span class="n">summary</span><span class="p">[</span><span class="s1">'ratio'</span><span class="p">]</span> <span class="o">=</span> <span class="n">summary</span><span class="p">[</span><span class="s1">'mean_abs_shap'</span><span class="p">]</span> <span class="o">/</span> <span class="n">total_abs</span> <span class="k">if</span> <span class="n">total_abs</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+    <span class="n">summary</span><span class="p">[</span><span class="s1">'cum_ratio'</span><span class="p">]</span> <span class="o">=</span> <span class="n">summary</span><span class="p">[</span><span class="s1">'ratio'</span><span class="p">]</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
 
     <span class="c1"># 컬럼 순서 정리 — 영향력 → 비율 → 누적 비율 → 해석용 컬럼</span>
     <span class="n">summary</span> <span class="o">=</span> <span class="n">summary</span><span class="p">[[</span><span class="s1">'mean_abs_shap'</span><span class="p">,</span> <span class="s1">'ratio'</span><span class="p">,</span> <span class="s1">'cum_ratio'</span><span class="p">,</span>
                        <span class="s1">'mean_shap'</span><span class="p">,</span> <span class="s1">'std_shap'</span><span class="p">,</span> <span class="s1">'direction'</span><span class="p">,</span> <span class="s1">'cv'</span><span class="p">,</span> <span class="s1">'stability'</span><span class="p">]]</span>
 
-    <span class="c1"># --- 13) 원시 데이터를 attrs 에 담기 ---</span>
-    <span class="c1"># 후속 Dependence·Waterfall 이 재계산 없이 쓰는 원시 데이터를 담는다.</span>
+    <span class="c1"># --- 12) 원시 데이터를 attrs 에 담기 ---</span>
+    <span class="c1"># 후속 Dependence·Waterfall 이 재계산 없이 쓴다.</span>
     <span class="c1"># explainer 객체 자체는 담지 않는다 — 복사가 안 되는 객체라 슬라이스할 때 깨진다.</span>
     <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'shap_values'</span><span class="p">]</span> <span class="o">=</span> <span class="n">shap_2d</span>              <span class="c1"># (n, f) 기여도 배열</span>
     <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'data'</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_explain</span>                   <span class="c1"># 모델공간 입력</span>
@@ -3405,19 +3445,27 @@
     <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'feature_names'</span><span class="p">]</span> <span class="o">=</span> <span class="n">feat_names</span>         <span class="c1"># 변환 후 변수명</span>
     <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'explainer_type'</span><span class="p">]</span> <span class="o">=</span> <span class="n">explainer_type</span>    <span class="c1"># 사용한 explainer 종류</span>
     <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'model_class'</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_class</span>          <span class="c1"># 모델 클래스명</span>
-    <span class="c1"># (수정 전) 회귀 전용으로 정리하며 과제 구분 attrs 제거 (2026-09-17)</span>
-    <span class="c1"># summary.attrs['task'] = task                        # 'regression' | 'classification'</span>
+    <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'task'</span><span class="p">]</span> <span class="o">=</span> <span class="n">task</span>                        <span class="c1"># 'regression' | 'classification'</span>
+    <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'class_index'</span><span class="p">]</span> <span class="o">=</span> <span class="n">used_class</span>           <span class="c1"># 설명 대상 클래스 위치 (회귀는 None)</span>
+    <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'class_names'</span><span class="p">]</span> <span class="o">=</span> <span class="n">class_names</span>          <span class="c1"># 클래스 목록 (회귀는 빈 리스트)</span>
     <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'output_space'</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_space</span>        <span class="c1"># SHAP 값의 단위</span>
 
-    <span class="c1"># --- 14) 분석 결과 저장 ---</span>
-    <span class="c1"># 계산은 무겁고 시각화는 가볍다. 결과를 파일로 남겨 두면 shap_bar_plot·shap_beeswarm_plot 이</span>
-    <span class="c1"># 모델도 explainer 도 없이 이 파일만으로 그래프를 다시 그릴 수 있다.</span>
+    <span class="c1"># --- 13) 분석 결과 저장 ---</span>
+    <span class="c1"># 계산은 무겁고 시각화는 가볍다. 파일로 남겨 두면 그래프 함수들이 이 파일만으로 다시 그린다.</span>
     <span class="n">workdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">project_name</span><span class="p">)</span> <span class="o">/</span> <span class="n">workdir</span>
     <span class="n">workdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># reg_tunes 가 붙여 둔 이름('xgb_tuned' 등)이 있으면 이어 쓰고, 없으면 모델 클래스명을 쓴다</span>
     <span class="n">save_path</span> <span class="o">=</span> <span class="n">workdir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="nb">getattr</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span><span class="w"> </span><span class="s2">"name_"</span><span class="p">,</span><span class="w"> </span><span class="n">model_class</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span><span class="si">}</span><span class="s1">_shap.pkl'</span>
     <span class="n">save_model</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">save_path</span><span class="p">)</span>
+
+    <span class="c1"># --- 14) 분석 개요 출력 ---</span>
+    <span class="c1"># 그래프를 읽기 전에 explainer·단위·기준점·설명 클래스를 확인한다</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'모델: </span><span class="si">{</span><span class="n">model_class</span><span class="si">}</span><span class="s1"> / explainer: </span><span class="si">{</span><span class="n">explainer_type</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'설명 대상: </span><span class="si">{</span><span class="n">shap_2d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">행 × </span><span class="si">{</span><span class="n">shap_2d</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">변수 / base value: </span><span class="si">{</span><span class="n">base_value</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1"> / SHAP 값의 단위: </span><span class="si">{</span><span class="n">output_space</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s1">'classification'</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'설명 대상 클래스: </span><span class="si">{</span><span class="n">class_names</span><span class="p">[</span><span class="n">used_class</span><span class="p">]</span><span class="si">}</span><span class="s1"> (index=</span><span class="si">{</span><span class="n">used_class</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'SHAP 분석 결과 저장 완료 → </span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 
@@ -3655,27 +3703,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_diag.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">810</span>
-<span class="normal">811</span>
-<span class="normal">812</span>
-<span class="normal">813</span>
-<span class="normal">814</span>
-<span class="normal">815</span>
-<span class="normal">816</span>
-<span class="normal">817</span>
-<span class="normal">818</span>
-<span class="normal">819</span>
-<span class="normal">820</span>
-<span class="normal">821</span>
-<span class="normal">822</span>
-<span class="normal">823</span>
-<span class="normal">824</span>
-<span class="normal">825</span>
-<span class="normal">826</span>
-<span class="normal">827</span>
-<span class="normal">828</span>
-<span class="normal">829</span>
-<span class="normal">830</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">830</span>
 <span class="normal">831</span>
 <span class="normal">832</span>
 <span class="normal">833</span>
@@ -3767,7 +3795,26 @@
 <span class="normal">919</span>
 <span class="normal">920</span>
 <span class="normal">921</span>
-<span class="normal">922</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_bar_plot</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">cum_ratio</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_means</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="normal">922</span>
+<span class="normal">923</span>
+<span class="normal">924</span>
+<span class="normal">925</span>
+<span class="normal">926</span>
+<span class="normal">927</span>
+<span class="normal">928</span>
+<span class="normal">929</span>
+<span class="normal">930</span>
+<span class="normal">931</span>
+<span class="normal">932</span>
+<span class="normal">933</span>
+<span class="normal">934</span>
+<span class="normal">935</span>
+<span class="normal">936</span>
+<span class="normal">937</span>
+<span class="normal">938</span>
+<span class="normal">939</span>
+<span class="normal">940</span>
+<span class="normal">941</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_bar_plot</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">cum_ratio</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_means</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""SHAP 분석 결과로 mean|SHAP| 순위 막대그래프를 그린다.</span>
@@ -3797,21 +3844,20 @@
     <span class="c1"># --- 2) 메타정보 꺼내기 ---</span>
     <span class="c1"># 계산부가 attrs 에 얹어 둔 값들이다. 저장·로드를 거쳐도 그대로 살아 있다.</span>
     <span class="n">model_class</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'model_class'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>          <span class="c1"># 모델 클래스명</span>
-    <span class="c1"># (수정 전) 분류용 꼬리표(클래스·단위). shap_analysis 가 회귀 전용이라 도달하지 않아 정리 (2026-09-17)</span>
-    <span class="c1"># task = summary.attrs.get('task', 'regression')              # 회귀 | 분류</span>
-    <span class="c1"># class_names = summary.attrs.get('class_names', [])          # 클래스 목록</span>
-    <span class="c1"># used_class = summary.attrs.get('class_index', None)         # 설명 대상 클래스 위치</span>
-    <span class="c1"># output_space = summary.attrs.get('output_space', '알 수 없음')  # SHAP 값의 단위</span>
-    <span class="c1">#</span>
-    <span class="c1"># # --- 3) 그래프에 붙일 꼬리표 ---</span>
-    <span class="c1"># cls_tag = ''</span>
-    <span class="c1"># unit_tag = ''</span>
-    <span class="c1">#</span>
-    <span class="c1"># if task == 'classification':    # 분류인 경우</span>
-    <span class="c1">#     if class_names:             # 클래스 목록이 있는 경우 — 어느 클래스를 설명했는가</span>
-    <span class="c1">#         cls_tag = f' · class={class_names[used_class]}'</span>
-    <span class="c1">#</span>
-    <span class="c1">#     unit_tag = f' [{output_space}]'</span>
+    <span class="c1"># 분류용 꼬리표(클래스·단위) 복원 — shap_analysis 가 분류를 다시 지원한다 (2026-09-18, LAB-04 08 SHAP)</span>
+    <span class="c1"># (2026-09-17 에 주석 처리했던 코드를 되살림. 회귀 결과는 task 가 없거나 'regression' 이라 꼬리표가 빈 문자열이다)</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'task'</span><span class="p">,</span> <span class="s1">'regression'</span><span class="p">)</span>              <span class="c1"># 회귀 | 분류</span>
+    <span class="n">class_names</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'class_names'</span><span class="p">,</span> <span class="p">[])</span>          <span class="c1"># 클래스 목록</span>
+    <span class="n">used_class</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'class_index'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>         <span class="c1"># 설명 대상 클래스 위치</span>
+    <span class="n">output_space</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'output_space'</span><span class="p">,</span> <span class="s1">'알 수 없음'</span><span class="p">)</span>  <span class="c1"># SHAP 값의 단위</span>
+
+    <span class="c1"># --- 3) 그래프에 붙일 꼬리표 ---</span>
+    <span class="n">cls_tag</span> <span class="o">=</span> <span class="s1">''</span>
+    <span class="n">unit_tag</span> <span class="o">=</span> <span class="s1">''</span>
+
+    <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s1">'classification'</span><span class="p">:</span>    <span class="c1"># 분류인 경우 — 어느 클래스를 어떤 단위로 설명했는가</span>
+        <span class="n">cls_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">' · class=</span><span class="si">{</span><span class="n">class_names</span><span class="p">[</span><span class="n">used_class</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span>
+        <span class="n">unit_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">' [</span><span class="si">{</span><span class="n">output_space</span><span class="si">}</span><span class="s1">]'</span>
 
     <span class="c1"># --- 4) 채택 개수(k) 결정 ---</span>
     <span class="c1"># 누적 비율이 cum_ratio 에 처음 도달하는 위치를 찾고 1을 더해, 경계에 걸친 변수까지 채택한다.</span>
@@ -3846,14 +3892,14 @@
 
     <span class="c1"># --- 6) 제목·축 라벨 ---</span>
     <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>    <span class="c1"># 제목을 주지 않은 경우</span>
-        <span class="c1"># (수정 전) plot_title = f'SHAP Bar (mean|SHAP| · 누적 {cum_ratio:.0%} 채택): {model_class}{cls_tag}'  (2026-09-17)</span>
-        <span class="n">plot_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'SHAP Bar (mean|SHAP| · 누적 </span><span class="si">{</span><span class="n">cum_ratio</span><span class="si">:</span><span class="s1">.0%</span><span class="si">}</span><span class="s1"> 채택): </span><span class="si">{</span><span class="n">model_class</span><span class="si">}</span><span class="s1">'</span>
+        <span class="c1"># (수정 전) plot_title = f'SHAP Bar (mean|SHAP| · 누적 {cum_ratio:.0%} 채택): {model_class}'  (2026-09-17 → 2026-09-18 꼬리표 복원)</span>
+        <span class="n">plot_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'SHAP Bar (mean|SHAP| · 누적 </span><span class="si">{</span><span class="n">cum_ratio</span><span class="si">:</span><span class="s1">.0%</span><span class="si">}</span><span class="s1"> 채택): </span><span class="si">{</span><span class="n">model_class</span><span class="si">}{</span><span class="n">cls_tag</span><span class="si">}</span><span class="s1">'</span>
     <span class="k">else</span><span class="p">:</span>                <span class="c1"># 사용자가 준 제목</span>
         <span class="n">plot_title</span> <span class="o">=</span> <span class="n">title</span>
 
     <span class="k">if</span> <span class="n">xlabel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>    <span class="c1"># x축 라벨을 주지 않은 경우</span>
-        <span class="c1"># (수정 전) plot_xlabel = f'mean|SHAP|{unit_tag}'  (2026-09-17)</span>
-        <span class="n">plot_xlabel</span> <span class="o">=</span> <span class="s1">'mean|SHAP|'</span>
+        <span class="c1"># (수정 전) plot_xlabel = 'mean|SHAP|'  (2026-09-17 → 2026-09-18 꼬리표 복원)</span>
+        <span class="n">plot_xlabel</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'mean|SHAP|</span><span class="si">{</span><span class="n">unit_tag</span><span class="si">}</span><span class="s1">'</span>
     <span class="k">else</span><span class="p">:</span>                 <span class="c1"># 사용자가 준 라벨</span>
         <span class="n">plot_xlabel</span> <span class="o">=</span> <span class="n">xlabel</span>
 
@@ -4079,26 +4125,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_diag.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 928</span>
-<span class="normal"> 929</span>
-<span class="normal"> 930</span>
-<span class="normal"> 931</span>
-<span class="normal"> 932</span>
-<span class="normal"> 933</span>
-<span class="normal"> 934</span>
-<span class="normal"> 935</span>
-<span class="normal"> 936</span>
-<span class="normal"> 937</span>
-<span class="normal"> 938</span>
-<span class="normal"> 939</span>
-<span class="normal"> 940</span>
-<span class="normal"> 941</span>
-<span class="normal"> 942</span>
-<span class="normal"> 943</span>
-<span class="normal"> 944</span>
-<span class="normal"> 945</span>
-<span class="normal"> 946</span>
-<span class="normal"> 947</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 947</span>
 <span class="normal"> 948</span>
 <span class="normal"> 949</span>
 <span class="normal"> 950</span>
@@ -4172,7 +4199,25 @@
 <span class="normal">1018</span>
 <span class="normal">1019</span>
 <span class="normal">1020</span>
-<span class="normal">1021</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_summary_plot</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">cum_ratio</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="normal">1021</span>
+<span class="normal">1022</span>
+<span class="normal">1023</span>
+<span class="normal">1024</span>
+<span class="normal">1025</span>
+<span class="normal">1026</span>
+<span class="normal">1027</span>
+<span class="normal">1028</span>
+<span class="normal">1029</span>
+<span class="normal">1030</span>
+<span class="normal">1031</span>
+<span class="normal">1032</span>
+<span class="normal">1033</span>
+<span class="normal">1034</span>
+<span class="normal">1035</span>
+<span class="normal">1036</span>
+<span class="normal">1037</span>
+<span class="normal">1038</span>
+<span class="normal">1039</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_summary_plot</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">cum_ratio</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">column_means</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""SHAP 분석 결과로 Beeswarm 그래프를 그린다.</span>
 
@@ -4203,21 +4248,20 @@
     <span class="n">shap_2d</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'shap_values'</span><span class="p">]</span>                      <span class="c1"># (n, f) 기여도 배열</span>
     <span class="n">x_explain</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'data'</span><span class="p">]</span>                           <span class="c1"># 모델공간 입력 (점의 색)</span>
     <span class="n">model_class</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'model_class'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>          <span class="c1"># 모델 클래스명</span>
-    <span class="c1"># (수정 전) 분류용 꼬리표(클래스·단위). shap_analysis 가 회귀 전용이라 도달하지 않아 정리 (2026-09-17)</span>
-    <span class="c1"># task = summary.attrs.get('task', 'regression')              # 회귀 | 분류</span>
-    <span class="c1"># class_names = summary.attrs.get('class_names', [])          # 클래스 목록</span>
-    <span class="c1"># used_class = summary.attrs.get('class_index', None)         # 설명 대상 클래스 위치</span>
-    <span class="c1"># output_space = summary.attrs.get('output_space', '알 수 없음')  # SHAP 값의 단위</span>
-    <span class="c1">#</span>
-    <span class="c1"># # --- 3) 그래프에 붙일 꼬리표 ---</span>
-    <span class="c1"># cls_tag = ''</span>
-    <span class="c1"># unit_tag = ''</span>
-    <span class="c1">#</span>
-    <span class="c1"># if task == 'classification':    # 분류인 경우</span>
-    <span class="c1">#     if class_names:             # 클래스 목록이 있는 경우 — 어느 클래스를 설명했는가</span>
-    <span class="c1">#         cls_tag = f' · class={class_names[used_class]}'</span>
-    <span class="c1">#</span>
-    <span class="c1">#     unit_tag = f' [{output_space}]'</span>
+    <span class="c1"># 분류용 꼬리표(클래스·단위) 복원 — shap_analysis 가 분류를 다시 지원한다 (2026-09-18, LAB-04 08 SHAP)</span>
+    <span class="c1"># (2026-09-17 에 주석 처리했던 코드를 되살림. 회귀 결과는 task 가 없거나 'regression' 이라 꼬리표가 빈 문자열이다)</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'task'</span><span class="p">,</span> <span class="s1">'regression'</span><span class="p">)</span>              <span class="c1"># 회귀 | 분류</span>
+    <span class="n">class_names</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'class_names'</span><span class="p">,</span> <span class="p">[])</span>          <span class="c1"># 클래스 목록</span>
+    <span class="n">used_class</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'class_index'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>         <span class="c1"># 설명 대상 클래스 위치</span>
+    <span class="n">output_space</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'output_space'</span><span class="p">,</span> <span class="s1">'알 수 없음'</span><span class="p">)</span>  <span class="c1"># SHAP 값의 단위</span>
+
+    <span class="c1"># --- 3) 그래프에 붙일 꼬리표 ---</span>
+    <span class="n">cls_tag</span> <span class="o">=</span> <span class="s1">''</span>
+    <span class="n">unit_tag</span> <span class="o">=</span> <span class="s1">''</span>
+
+    <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s1">'classification'</span><span class="p">:</span>    <span class="c1"># 분류인 경우 — 어느 클래스를 어떤 단위로 설명했는가</span>
+        <span class="n">cls_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">' · class=</span><span class="si">{</span><span class="n">class_names</span><span class="p">[</span><span class="n">used_class</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span>
+        <span class="n">unit_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">' [</span><span class="si">{</span><span class="n">output_space</span><span class="si">}</span><span class="s1">]'</span>
 
     <span class="c1"># --- 4) 시각화 할 변수 결정 ---</span>
     <span class="c1"># 요약표는 이미 mean_abs_shap 내림차순이고 누적 비율까지 들어 있다.</span>
@@ -4246,8 +4290,8 @@
         <span class="n">plot_height</span> <span class="o">=</span> <span class="n">height</span>
 
     <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>    <span class="c1"># 제목을 주지 않은 경우</span>
-        <span class="c1"># (수정 전) plot_title = f'SHAP Summary (Beeswarm · 누적 {cum_ratio:.0%} 채택): {model_class}{cls_tag}'  (2026-09-17)</span>
-        <span class="n">plot_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'SHAP Summary (Beeswarm · 누적 </span><span class="si">{</span><span class="n">cum_ratio</span><span class="si">:</span><span class="s1">.0%</span><span class="si">}</span><span class="s1"> 채택): </span><span class="si">{</span><span class="n">model_class</span><span class="si">}</span><span class="s1">'</span>
+        <span class="c1"># (수정 전) plot_title = f'SHAP Summary (Beeswarm · 누적 {cum_ratio:.0%} 채택): {model_class}'  (2026-09-17 → 2026-09-18 꼬리표 복원)</span>
+        <span class="n">plot_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'SHAP Summary (Beeswarm · 누적 </span><span class="si">{</span><span class="n">cum_ratio</span><span class="si">:</span><span class="s1">.0%</span><span class="si">}</span><span class="s1"> 채택): </span><span class="si">{</span><span class="n">model_class</span><span class="si">}{</span><span class="n">cls_tag</span><span class="si">}</span><span class="s1">'</span>
     <span class="k">else</span><span class="p">:</span>                <span class="c1"># 사용자가 준 제목</span>
         <span class="n">plot_title</span> <span class="o">=</span> <span class="n">title</span>
 
@@ -4260,8 +4304,8 @@
                       <span class="n">max_display</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">plot_size</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">xlabel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>    <span class="c1"># x축 라벨을 주지 않은 경우</span>
-        <span class="c1"># (수정 전) plt.xlabel(f'SHAP value{unit_tag}')  (2026-09-17)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'SHAP value'</span><span class="p">)</span>                <span class="c1"># shap 이 붙인 라벨을 덮어쓴다</span>
+        <span class="c1"># (수정 전) plt.xlabel('SHAP value')  (2026-09-17 → 2026-09-18 꼬리표 복원)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s1">'SHAP value</span><span class="si">{</span><span class="n">unit_tag</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>     <span class="c1"># shap 이 붙인 라벨을 덮어쓴다</span>
     <span class="k">else</span><span class="p">:</span>                 <span class="c1"># 사용자가 준 라벨</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
 
@@ -4448,25 +4492,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_diag.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1027</span>
-<span class="normal">1028</span>
-<span class="normal">1029</span>
-<span class="normal">1030</span>
-<span class="normal">1031</span>
-<span class="normal">1032</span>
-<span class="normal">1033</span>
-<span class="normal">1034</span>
-<span class="normal">1035</span>
-<span class="normal">1036</span>
-<span class="normal">1037</span>
-<span class="normal">1038</span>
-<span class="normal">1039</span>
-<span class="normal">1040</span>
-<span class="normal">1041</span>
-<span class="normal">1042</span>
-<span class="normal">1043</span>
-<span class="normal">1044</span>
-<span class="normal">1045</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1045</span>
 <span class="normal">1046</span>
 <span class="normal">1047</span>
 <span class="normal">1048</span>
@@ -4529,7 +4555,26 @@
 <span class="normal">1105</span>
 <span class="normal">1106</span>
 <span class="normal">1107</span>
-<span class="normal">1108</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_dependence_plot</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">cum_ratio</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_means</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="normal">1108</span>
+<span class="normal">1109</span>
+<span class="normal">1110</span>
+<span class="normal">1111</span>
+<span class="normal">1112</span>
+<span class="normal">1113</span>
+<span class="normal">1114</span>
+<span class="normal">1115</span>
+<span class="normal">1116</span>
+<span class="normal">1117</span>
+<span class="normal">1118</span>
+<span class="normal">1119</span>
+<span class="normal">1120</span>
+<span class="normal">1121</span>
+<span class="normal">1122</span>
+<span class="normal">1123</span>
+<span class="normal">1124</span>
+<span class="normal">1125</span>
+<span class="normal">1126</span>
+<span class="normal">1127</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_dependence_plot</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">cum_ratio</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_means</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                          <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">640</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""SHAP 분석 결과로 Dependence Plot 을 그린다 (변수값과 기여의 관계).</span>
 
@@ -4559,11 +4604,12 @@
     <span class="n">shap_2d</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'shap_values'</span><span class="p">]</span>    <span class="c1"># (n, f) 기여도 배열</span>
     <span class="n">x_df</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'data'</span><span class="p">]</span>              <span class="c1"># 모델공간 입력 (x축·점의 색)</span>
 
-    <span class="c1"># (수정 전) 분류용 단위 꼬리표. shap_analysis 가 회귀 전용이라 도달하지 않아 정리 (2026-09-17)</span>
-    <span class="c1"># unit_tag = ''</span>
-    <span class="c1">#</span>
-    <span class="c1"># if summary.attrs.get('task') == 'classification':</span>
-    <span class="c1">#     unit_tag = f" [{summary.attrs.get('output_space', '알 수 없음')}]"</span>
+    <span class="c1"># 분류용 단위 꼬리표 복원 — shap_analysis 가 분류를 다시 지원한다 (2026-09-18, LAB-04 08 SHAP)</span>
+    <span class="c1"># (2026-09-17 에 주석 처리했던 코드를 되살림. 회귀 결과는 꼬리표가 빈 문자열이다)</span>
+    <span class="n">unit_tag</span> <span class="o">=</span> <span class="s1">''</span>
+
+    <span class="k">if</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'task'</span><span class="p">)</span> <span class="o">==</span> <span class="s1">'classification'</span><span class="p">:</span>    <span class="c1"># 분류인 경우 — SHAP 값의 단위를 제목에 적는다</span>
+        <span class="n">unit_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">" [</span><span class="si">{</span><span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'output_space'</span><span class="p">,</span><span class="w"> </span><span class="s1">'알 수 없음'</span><span class="p">)</span><span class="si">}</span><span class="s2">]"</span>
 
 
     <span class="c1"># --- 3) 주변수 고르기 ---</span>
@@ -4591,8 +4637,8 @@
         <span class="n">pair_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">column_means</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="s1">  ×  </span><span class="si">{</span><span class="n">column_means</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">partner</span><span class="p">,</span><span class="w"> </span><span class="n">partner</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span>
 
         <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>    <span class="c1"># 제목을 주지 않은 경우</span>
-            <span class="c1"># (수정 전) plot_title = f'SHAP Dependence: {pair_tag}{unit_tag}'  (2026-09-17)</span>
-            <span class="n">plot_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'SHAP Dependence: </span><span class="si">{</span><span class="n">pair_tag</span><span class="si">}</span><span class="s1">'</span>
+            <span class="c1"># (수정 전) plot_title = f'SHAP Dependence: {pair_tag}'  (2026-09-17 → 2026-09-18 꼬리표 복원)</span>
+            <span class="n">plot_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'SHAP Dependence: </span><span class="si">{</span><span class="n">pair_tag</span><span class="si">}{</span><span class="n">unit_tag</span><span class="si">}</span><span class="s1">'</span>
         <span class="k">else</span><span class="p">:</span>                <span class="c1"># 사용자가 준 제목 — 장마다 변수쌍을 덧붙여 구분한다</span>
             <span class="n">plot_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1"> — </span><span class="si">{</span><span class="n">pair_tag</span><span class="si">}</span><span class="s1">'</span>
 
@@ -4849,26 +4895,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_diag.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1114</span>
-<span class="normal">1115</span>
-<span class="normal">1116</span>
-<span class="normal">1117</span>
-<span class="normal">1118</span>
-<span class="normal">1119</span>
-<span class="normal">1120</span>
-<span class="normal">1121</span>
-<span class="normal">1122</span>
-<span class="normal">1123</span>
-<span class="normal">1124</span>
-<span class="normal">1125</span>
-<span class="normal">1126</span>
-<span class="normal">1127</span>
-<span class="normal">1128</span>
-<span class="normal">1129</span>
-<span class="normal">1130</span>
-<span class="normal">1131</span>
-<span class="normal">1132</span>
-<span class="normal">1133</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1133</span>
 <span class="normal">1134</span>
 <span class="normal">1135</span>
 <span class="normal">1136</span>
@@ -4979,7 +5006,30 @@
 <span class="normal">1241</span>
 <span class="normal">1242</span>
 <span class="normal">1243</span>
-<span class="normal">1244</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_waterfall_plot</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">cum_ratio</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="normal">1244</span>
+<span class="normal">1245</span>
+<span class="normal">1246</span>
+<span class="normal">1247</span>
+<span class="normal">1248</span>
+<span class="normal">1249</span>
+<span class="normal">1250</span>
+<span class="normal">1251</span>
+<span class="normal">1252</span>
+<span class="normal">1253</span>
+<span class="normal">1254</span>
+<span class="normal">1255</span>
+<span class="normal">1256</span>
+<span class="normal">1257</span>
+<span class="normal">1258</span>
+<span class="normal">1259</span>
+<span class="normal">1260</span>
+<span class="normal">1261</span>
+<span class="normal">1262</span>
+<span class="normal">1263</span>
+<span class="normal">1264</span>
+<span class="normal">1265</span>
+<span class="normal">1266</span>
+<span class="normal">1267</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_waterfall_plot</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">cum_ratio</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">column_means</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""SHAP 분석 결과로 관측치 한 건의 Waterfall Plot 을 그린다 (개별 사례 기여 분해).</span>
 
@@ -5015,20 +5065,20 @@
     <span class="n">data</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'data'</span><span class="p">]</span>                                  <span class="c1"># 막대 왼쪽의 변수값</span>
     <span class="n">base_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'expected_value'</span><span class="p">])</span>           <span class="c1"># base value (평균 예측)</span>
     <span class="n">feat_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'feature_names'</span><span class="p">])</span>             <span class="c1"># 변환 후 변수명</span>
-    <span class="c1"># (수정 전) 분류용 꼬리표(클래스·단위). shap_analysis 가 회귀 전용이라 도달하지 않아 정리 (2026-09-17)</span>
-    <span class="c1"># task = summary.attrs.get('task', 'regression')                # 회귀 | 분류</span>
-    <span class="c1"># class_names = summary.attrs.get('class_names', [])            # 클래스 목록</span>
-    <span class="c1"># used_class = summary.attrs.get('class_index', None)           # 설명 대상 클래스 위치</span>
-    <span class="c1"># output_space = summary.attrs.get('output_space', '알 수 없음')  # SHAP 값의 단위</span>
-    <span class="c1">#</span>
-    <span class="c1"># cls_tag = ''</span>
-    <span class="c1"># unit_tag = ''</span>
-    <span class="c1">#</span>
-    <span class="c1"># if task == 'classification':    # 분류인 경우</span>
-    <span class="c1">#     if class_names:    # 클래스 목록이 있는 경우</span>
-    <span class="c1">#         cls_tag = f' · class={class_names[used_class]}'</span>
-    <span class="c1">#</span>
-    <span class="c1">#     unit_tag = f' [{output_space}]'</span>
+    <span class="c1"># 분류용 꼬리표(클래스·단위) 복원 — shap_analysis 가 분류를 다시 지원한다 (2026-09-18, LAB-04 08 SHAP)</span>
+    <span class="c1"># (2026-09-17 에 주석 처리했던 코드를 되살림. 회귀 결과는 task 가 없거나 'regression' 이라 꼬리표가 빈 문자열이다)</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'task'</span><span class="p">,</span> <span class="s1">'regression'</span><span class="p">)</span>              <span class="c1"># 회귀 | 분류</span>
+    <span class="n">class_names</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'class_names'</span><span class="p">,</span> <span class="p">[])</span>          <span class="c1"># 클래스 목록</span>
+    <span class="n">used_class</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'class_index'</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>         <span class="c1"># 설명 대상 클래스 위치</span>
+    <span class="n">output_space</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'output_space'</span><span class="p">,</span> <span class="s1">'알 수 없음'</span><span class="p">)</span>  <span class="c1"># SHAP 값의 단위</span>
+
+    <span class="c1"># --- 3) 그래프에 붙일 꼬리표 ---</span>
+    <span class="n">cls_tag</span> <span class="o">=</span> <span class="s1">''</span>
+    <span class="n">unit_tag</span> <span class="o">=</span> <span class="s1">''</span>
+
+    <span class="k">if</span> <span class="n">task</span> <span class="o">==</span> <span class="s1">'classification'</span><span class="p">:</span>    <span class="c1"># 분류인 경우 — 어느 클래스를 어떤 단위로 설명했는가</span>
+        <span class="n">cls_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">' · class=</span><span class="si">{</span><span class="n">class_names</span><span class="p">[</span><span class="n">used_class</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span>
+        <span class="n">unit_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">' [</span><span class="si">{</span><span class="n">output_space</span><span class="si">}</span><span class="s1">]'</span>
 
 
     <span class="c1"># --- 3) 행별 예측값 복원 ---</span>
@@ -5049,6 +5099,10 @@
     <span class="n">pick</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">pick</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">'pred'</span><span class="p">,</span> <span class="n">pred</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>          <span class="c1"># 복원한 예측값</span>
     <span class="n">pick</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">'quantile'</span><span class="p">,</span> <span class="n">quantile</span><span class="p">)</span>     <span class="c1"># 예측값 분포에서의 위치</span>
+
+    <span class="c1"># 로그오즈 단위의 분류 결과는 확률로 바꾼 값도 싣는다 — 표를 '생존 확률 n%' 로 읽을 수 있다 (2026-09-18, LAB-04 08 SHAP)</span>
+    <span class="k">if</span> <span class="n">output_space</span> <span class="o">==</span> <span class="s1">'로그오즈'</span><span class="p">:</span>    <span class="c1"># 분류 로그오즈인 경우</span>
+        <span class="n">pick</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">'proba'</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">pred</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>    <span class="c1"># 시그모이드로 확률화</span>
 
     <span class="c1"># --- 5) 막대로 보여줄 개수와 높이 ---</span>
     <span class="n">n_all</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">feat_names</span><span class="p">)</span>     <span class="c1"># 전체 변수 개수</span>
@@ -5075,9 +5129,9 @@
         <span class="k">else</span><span class="p">:</span>                <span class="c1"># 사용자가 준 이름</span>
             <span class="n">pick_tag</span> <span class="o">=</span> <span class="n">label</span>
 
-        <span class="c1"># (수정 전) f'pred≈{pred[i]:.4g}{unit_tag} ({pick_tag}){cls_tag}' — 분류용 꼬리표 제거 (2026-09-17)</span>
+        <span class="c1"># (수정 전) f'pred≈{pred[i]:.4g} ({pick_tag})'  (2026-09-17 → 2026-09-18 꼬리표 복원)</span>
         <span class="n">plot_title</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">'SHAP Waterfall: obs#</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1"> — '</span>
-                      <span class="sa">f</span><span class="s1">'pred≈</span><span class="si">{</span><span class="n">pred</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s1">.4g</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">pick_tag</span><span class="si">}</span><span class="s1">)'</span><span class="p">)</span>
+                      <span class="sa">f</span><span class="s1">'pred≈</span><span class="si">{</span><span class="n">pred</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s1">.4g</span><span class="si">}{</span><span class="n">unit_tag</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">pick_tag</span><span class="si">}</span><span class="s1">)</span><span class="si">{</span><span class="n">cls_tag</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>                <span class="c1"># 사용자가 준 제목</span>
         <span class="n">plot_title</span> <span class="o">=</span> <span class="n">title</span>
 
@@ -5316,30 +5370,7 @@
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>hossam/my_diag.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1250</span>
-<span class="normal">1251</span>
-<span class="normal">1252</span>
-<span class="normal">1253</span>
-<span class="normal">1254</span>
-<span class="normal">1255</span>
-<span class="normal">1256</span>
-<span class="normal">1257</span>
-<span class="normal">1258</span>
-<span class="normal">1259</span>
-<span class="normal">1260</span>
-<span class="normal">1261</span>
-<span class="normal">1262</span>
-<span class="normal">1263</span>
-<span class="normal">1264</span>
-<span class="normal">1265</span>
-<span class="normal">1266</span>
-<span class="normal">1267</span>
-<span class="normal">1268</span>
-<span class="normal">1269</span>
-<span class="normal">1270</span>
-<span class="normal">1271</span>
-<span class="normal">1272</span>
-<span class="normal">1273</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1273</span>
 <span class="normal">1274</span>
 <span class="normal">1275</span>
 <span class="normal">1276</span>
@@ -5396,7 +5427,30 @@
 <span class="normal">1327</span>
 <span class="normal">1328</span>
 <span class="normal">1329</span>
-<span class="normal">1330</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_waterfall_stats_plot</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">cum_ratio</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_means</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="normal">1330</span>
+<span class="normal">1331</span>
+<span class="normal">1332</span>
+<span class="normal">1333</span>
+<span class="normal">1334</span>
+<span class="normal">1335</span>
+<span class="normal">1336</span>
+<span class="normal">1337</span>
+<span class="normal">1338</span>
+<span class="normal">1339</span>
+<span class="normal">1340</span>
+<span class="normal">1341</span>
+<span class="normal">1342</span>
+<span class="normal">1343</span>
+<span class="normal">1344</span>
+<span class="normal">1345</span>
+<span class="normal">1346</span>
+<span class="normal">1347</span>
+<span class="normal">1348</span>
+<span class="normal">1349</span>
+<span class="normal">1350</span>
+<span class="normal">1351</span>
+<span class="normal">1352</span>
+<span class="normal">1353</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_waterfall_stats_plot</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">cum_ratio</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_means</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                               <span class="n">width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""예측값의 대표 통계마다 Waterfall Plot 을 그린다 (최소・1사분위・중앙값・평균・3사분위・최대).</span>
 
@@ -5477,6 +5531,437 @@
     <span class="n">pick</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">'stat'</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">picks</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>    <span class="c1"># 어떤 통계의 대표인가</span>
 
     <span class="k">return</span> <span class="n">pick</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="hossam.my_diag.shap_proba_table" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">shap_proba_table</span>
+
+
+<a href="#hossam.my_diag.shap_proba_table" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">shap_proba_table</span><span class="p">(</span>
+    <span class="n">summary</span><span class="p">,</span>
+    <span class="n">cum_ratio</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">bins</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">max_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">inverse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">column_means</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>분류 SHAP 결과를 변수의 수준(범주)·구간(연속)별 평균 SHAP → 확률로 환산한 표를 만든다.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>summary</code>
+            </td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>shap_analysis 가 반환한(또는 my_ml.load_model 로 불러온) 분류 결과표.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>cum_ratio</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>표에 실을 변수를 고르는 누적 비율 (기본값: 1.0 → 전체 변수).</p>
+              </div>
+            </td>
+            <td>
+                  <code>1.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>bins</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span> or <span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>연속형 변수의 구간 (기본값: 5 → 분위수 5구간). <code>{변수명: 구간 수 | 경계 리스트}</code> 로 변수별 지정하며 경계는 모델공간 값이다.</p>
+              </div>
+            </td>
+            <td>
+                  <code>5</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_levels</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>고유값이 이 개수 이하면 구간을 나누지 않고 값 하나를 수준 하나로 쓴다 (기본값: 10).</p>
+              </div>
+            </td>
+            <td>
+                  <code>10</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>inverse</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>{변수명: 역변환 함수}</code> (기본값: None). 로그 변환된 변수의 수준 라벨을 원단위로 되돌린다 (예: <code>{'Fare': np.expm1}</code>).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>column_means</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>{변수명: 실제 의미}</code> 사전 (기본값: None → 변수명을 그대로 쓴다).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>DataFrame</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>(Feature, Level) 인덱스. n·share·mean_shap·z(base + mean_shap)·proba·delta_pp(base 대비 %p)·
+step_dz·step_dpp(같은 변수의 직전 수준 대비 변화). attrs['base_proba'] 에 base 확률이 담긴다.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>분류 결과가 아니거나 SHAP 값의 단위가 확률·로그오즈가 아닌 경우.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>hossam/my_diag.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1359</span>
+<span class="normal">1360</span>
+<span class="normal">1361</span>
+<span class="normal">1362</span>
+<span class="normal">1363</span>
+<span class="normal">1364</span>
+<span class="normal">1365</span>
+<span class="normal">1366</span>
+<span class="normal">1367</span>
+<span class="normal">1368</span>
+<span class="normal">1369</span>
+<span class="normal">1370</span>
+<span class="normal">1371</span>
+<span class="normal">1372</span>
+<span class="normal">1373</span>
+<span class="normal">1374</span>
+<span class="normal">1375</span>
+<span class="normal">1376</span>
+<span class="normal">1377</span>
+<span class="normal">1378</span>
+<span class="normal">1379</span>
+<span class="normal">1380</span>
+<span class="normal">1381</span>
+<span class="normal">1382</span>
+<span class="normal">1383</span>
+<span class="normal">1384</span>
+<span class="normal">1385</span>
+<span class="normal">1386</span>
+<span class="normal">1387</span>
+<span class="normal">1388</span>
+<span class="normal">1389</span>
+<span class="normal">1390</span>
+<span class="normal">1391</span>
+<span class="normal">1392</span>
+<span class="normal">1393</span>
+<span class="normal">1394</span>
+<span class="normal">1395</span>
+<span class="normal">1396</span>
+<span class="normal">1397</span>
+<span class="normal">1398</span>
+<span class="normal">1399</span>
+<span class="normal">1400</span>
+<span class="normal">1401</span>
+<span class="normal">1402</span>
+<span class="normal">1403</span>
+<span class="normal">1404</span>
+<span class="normal">1405</span>
+<span class="normal">1406</span>
+<span class="normal">1407</span>
+<span class="normal">1408</span>
+<span class="normal">1409</span>
+<span class="normal">1410</span>
+<span class="normal">1411</span>
+<span class="normal">1412</span>
+<span class="normal">1413</span>
+<span class="normal">1414</span>
+<span class="normal">1415</span>
+<span class="normal">1416</span>
+<span class="normal">1417</span>
+<span class="normal">1418</span>
+<span class="normal">1419</span>
+<span class="normal">1420</span>
+<span class="normal">1421</span>
+<span class="normal">1422</span>
+<span class="normal">1423</span>
+<span class="normal">1424</span>
+<span class="normal">1425</span>
+<span class="normal">1426</span>
+<span class="normal">1427</span>
+<span class="normal">1428</span>
+<span class="normal">1429</span>
+<span class="normal">1430</span>
+<span class="normal">1431</span>
+<span class="normal">1432</span>
+<span class="normal">1433</span>
+<span class="normal">1434</span>
+<span class="normal">1435</span>
+<span class="normal">1436</span>
+<span class="normal">1437</span>
+<span class="normal">1438</span>
+<span class="normal">1439</span>
+<span class="normal">1440</span>
+<span class="normal">1441</span>
+<span class="normal">1442</span>
+<span class="normal">1443</span>
+<span class="normal">1444</span>
+<span class="normal">1445</span>
+<span class="normal">1446</span>
+<span class="normal">1447</span>
+<span class="normal">1448</span>
+<span class="normal">1449</span>
+<span class="normal">1450</span>
+<span class="normal">1451</span>
+<span class="normal">1452</span>
+<span class="normal">1453</span>
+<span class="normal">1454</span>
+<span class="normal">1455</span>
+<span class="normal">1456</span>
+<span class="normal">1457</span>
+<span class="normal">1458</span>
+<span class="normal">1459</span>
+<span class="normal">1460</span>
+<span class="normal">1461</span>
+<span class="normal">1462</span>
+<span class="normal">1463</span>
+<span class="normal">1464</span>
+<span class="normal">1465</span>
+<span class="normal">1466</span>
+<span class="normal">1467</span>
+<span class="normal">1468</span>
+<span class="normal">1469</span>
+<span class="normal">1470</span>
+<span class="normal">1471</span>
+<span class="normal">1472</span>
+<span class="normal">1473</span>
+<span class="normal">1474</span>
+<span class="normal">1475</span>
+<span class="normal">1476</span>
+<span class="normal">1477</span>
+<span class="normal">1478</span>
+<span class="normal">1479</span>
+<span class="normal">1480</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">shap_proba_table</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">cum_ratio</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">max_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">column_means</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""분류 SHAP 결과를 변수의 수준(범주)·구간(연속)별 평균 SHAP → 확률로 환산한 표를 만든다.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        summary (DataFrame): shap_analysis 가 반환한(또는 my_ml.load_model 로 불러온) 분류 결과표.</span>
+<span class="sd">        cum_ratio (float): 표에 실을 변수를 고르는 누적 비율 (기본값: 1.0 → 전체 변수).</span>
+<span class="sd">        bins (int or dict): 연속형 변수의 구간 (기본값: 5 → 분위수 5구간). `{변수명: 구간 수 | 경계 리스트}` 로 변수별 지정하며 경계는 모델공간 값이다.</span>
+<span class="sd">        max_levels (int): 고유값이 이 개수 이하면 구간을 나누지 않고 값 하나를 수준 하나로 쓴다 (기본값: 10).</span>
+<span class="sd">        inverse (dict): `{변수명: 역변환 함수}` (기본값: None). 로그 변환된 변수의 수준 라벨을 원단위로 되돌린다 (예: `{'Fare': np.expm1}`).</span>
+<span class="sd">        column_means (dict): `{변수명: 실제 의미}` 사전 (기본값: None → 변수명을 그대로 쓴다).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame: (Feature, Level) 인덱스. n·share·mean_shap·z(base + mean_shap)·proba·delta_pp(base 대비 %p)·</span>
+<span class="sd">            step_dz·step_dpp(같은 변수의 직전 수준 대비 변화). attrs['base_proba'] 에 base 확률이 담긴다.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: 분류 결과가 아니거나 SHAP 값의 단위가 확률·로그오즈가 아닌 경우.</span>
+<span class="sd">    """</span>
+    <span class="c1"># --- 1) 파라미터 검증 ---</span>
+    <span class="k">if</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'task'</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">'classification'</span><span class="p">:</span>    <span class="c1"># 회귀 결과이거나 attrs 가 없는 경우</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"분류 모형의 SHAP 결과만 확률로 환산할 수 있습니다"</span><span class="p">)</span>
+
+    <span class="n">output_space</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'output_space'</span><span class="p">]</span>    <span class="c1"># SHAP 값의 단위</span>
+
+    <span class="k">if</span> <span class="n">output_space</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'확률'</span><span class="p">,</span> <span class="s1">'로그오즈'</span><span class="p">):</span>    <span class="c1"># 마진·알 수 없음은 확률로 옮길 수 없다</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"SHAP 값의 단위가 '</span><span class="si">{</span><span class="n">output_space</span><span class="si">}</span><span class="s2">' 라 확률로 환산할 수 없습니다"</span><span class="p">)</span>
+
+    <span class="c1"># --- 2) 원시 데이터·메타정보 꺼내기 ---</span>
+    <span class="n">shap_2d</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'shap_values'</span><span class="p">]</span>              <span class="c1"># (n, f) 기여도 배열</span>
+    <span class="n">x_df</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'data'</span><span class="p">]</span>                        <span class="c1"># 모델공간 입력 (수준·구간의 기준)</span>
+    <span class="n">base_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'expected_value'</span><span class="p">])</span> <span class="c1"># base value</span>
+    <span class="n">class_names</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'class_names'</span><span class="p">]</span>          <span class="c1"># 클래스 목록</span>
+    <span class="n">used_class</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'class_index'</span><span class="p">]</span>           <span class="c1"># 설명 대상 클래스 위치</span>
+
+    <span class="c1"># --- 3) 단위별 환산식 ---</span>
+    <span class="c1"># 로그오즈는 base 에 더한 뒤 시그모이드를 취해야 확률이 되고, 확률 단위는 더한 값이 이미 확률이다.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_proba</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">output_space</span> <span class="o">==</span> <span class="s1">'로그오즈'</span><span class="p">:</span>    <span class="c1"># p = 1 / (1 + e^-z)</span>
+            <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">z</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">z</span>                          <span class="c1"># 확률 단위 — 그대로</span>
+
+    <span class="n">base_proba</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">to_proba</span><span class="p">(</span><span class="n">base_value</span><span class="p">))</span>    <span class="c1"># 아무 정보가 없을 때의 확률</span>
+
+    <span class="c1"># --- 4) 변수 고르기 ---</span>
+    <span class="c1"># 요약표는 이미 mean_abs_shap 내림차순이고 누적 비율까지 들어 있다. 그래프 함수들과 같은 규칙이다.</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s1">'cum_ratio'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">cum_ratio</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">index</span><span class="p">[:</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">summary</span><span class="p">)))])</span>
+
+    <span class="k">if</span> <span class="n">inverse</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>         <span class="c1"># 역변환 사전을 주지 않은 경우</span>
+        <span class="n">inverse</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">if</span> <span class="n">column_means</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>    <span class="c1"># 의미 사전을 주지 않은 경우</span>
+        <span class="n">column_means</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># --- 5) 변수마다 수준·구간별 평균 SHAP → 확률 ---</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="p">[]</span>    <span class="c1"># 변수별 결과표</span>
+
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">features</span><span class="p">:</span>    <span class="c1"># 변수마다</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">x_df</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>                                     <span class="c1"># 변수값</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">shap_2d</span><span class="p">[:,</span> <span class="n">x_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span>         <span class="c1"># 그 변수의 SHAP 값</span>
+        <span class="n">inv</span> <span class="o">=</span> <span class="n">inverse</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="p">)</span>               <span class="c1"># 라벨용 역변환 (없으면 항등)</span>
+
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">==</span> <span class="s1">'category'</span> <span class="ow">or</span> <span class="n">v</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">max_levels</span><span class="p">:</span>    <span class="c1"># 범주형·고유값이 적은 변수 — 값 하나가 수준 하나</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+            <span class="n">levels</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">==</span> <span class="s1">'category'</span><span class="p">:</span>    <span class="c1"># 범주 코드는 그대로 적는다</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">lv</span><span class="p">)</span> <span class="k">for</span> <span class="n">lv</span> <span class="ow">in</span> <span class="n">levels</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>                             <span class="c1"># 숫자 수준은 역변환해 적는다 (예: log(가족 수) → 가족 수)</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">inv</span><span class="p">(</span><span class="n">lv</span><span class="p">)</span><span class="si">:</span><span class="s1">.4g</span><span class="si">}</span><span class="s1">'</span> <span class="k">for</span> <span class="n">lv</span> <span class="ow">in</span> <span class="n">levels</span><span class="p">]</span>
+
+            <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="n">lv</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">lv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">levels</span><span class="p">)})</span>    <span class="c1"># 수준 순서 = 정렬 순서</span>
+        <span class="k">else</span><span class="p">:</span>                                                           <span class="c1"># 연속형 — 구간으로 나눈다</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">bins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="n">bins</span>    <span class="c1"># 변수별 지정이 있으면 우선</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>    <span class="c1"># 구간 수 → 분위수 구간</span>
+                <span class="n">key</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">qcut</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">retbins</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="s1">'drop'</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>                     <span class="c1"># 경계 리스트 → 지정 구간 (첫 구간은 왼쪽 끝 포함)</span>
+                <span class="n">key</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">cut</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">retbins</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_lowest</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># 구간 라벨 — 역변환한 경계로 적고, 첫 구간만 왼쪽 끝을 포함한다는 뜻으로 '[' 를 쓴다</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="s2">"["</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">"("</span><span class="si">}{</span><span class="n">inv</span><span class="p">(</span><span class="n">edges</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="si">:</span><span class="s1">.4g</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">inv</span><span class="p">(</span><span class="n">edges</span><span class="p">[</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">])</span><span class="si">:</span><span class="s1">.4g</span><span class="si">}</span><span class="s1">]'</span>
+                      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+
+        <span class="n">g</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span><span class="s1">'key'</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span> <span class="s1">'shap'</span><span class="p">:</span> <span class="n">s</span><span class="p">})</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'key'</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="s1">'shap'</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s1">'count'</span><span class="p">,</span> <span class="s1">'mean'</span><span class="p">])</span>
+
+        <span class="n">z</span> <span class="o">=</span> <span class="n">base_value</span> <span class="o">+</span> <span class="n">g</span><span class="p">[</span><span class="s1">'mean'</span><span class="p">]</span>    <span class="c1"># base 에 그 수준의 평균 SHAP 만 더한 값</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">to_proba</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>               <span class="c1"># 그때의 확률</span>
+
+        <span class="n">part</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">({</span>
+            <span class="s1">'n'</span><span class="p">:</span> <span class="n">g</span><span class="p">[</span><span class="s1">'count'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span>          <span class="c1"># 수준에 속한 관측치 수</span>
+            <span class="s1">'ratio'</span><span class="p">:</span> <span class="n">g</span><span class="p">[</span><span class="s1">'count'</span><span class="p">]</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">),</span>         <span class="c1"># 비율</span>
+            <span class="s1">'mean_shap'</span><span class="p">:</span> <span class="n">g</span><span class="p">[</span><span class="s1">'mean'</span><span class="p">],</span>               <span class="c1"># 수준별 평균 SHAP</span>
+            <span class="s1">'z'</span><span class="p">:</span> <span class="n">z</span><span class="p">,</span>                               <span class="c1"># base + mean_shap</span>
+            <span class="s1">'proba'</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span>                           <span class="c1"># 확률</span>
+            <span class="s1">'delta_pp'</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">base_proba</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>   <span class="c1"># base 대비 %p</span>
+            <span class="s1">'step_dz'</span><span class="p">:</span> <span class="n">z</span><span class="o">.</span><span class="n">diff</span><span class="p">(),</span>                  <span class="c1"># 직전 수준 대비 SHAP 변화 (첫 수준은 NaN)</span>
+            <span class="s1">'step_dpp'</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>           <span class="c1"># 직전 수준 대비 확률 변화 (%p)</span>
+        <span class="p">})</span>
+        <span class="n">part</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_arrays</span><span class="p">(</span>
+            <span class="p">[[</span><span class="n">column_means</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">f</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">part</span><span class="p">),</span> <span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">index</span><span class="p">]],</span>
+            <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">'Feature'</span><span class="p">,</span> <span class="s1">'Level'</span><span class="p">])</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
+
+    <span class="n">table</span> <span class="o">=</span> <span class="n">concat</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+    <span class="n">table</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'base_proba'</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_proba</span>      <span class="c1"># base 확률</span>
+    <span class="n">table</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">'output_space'</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_space</span>  <span class="c1"># 환산에 쓴 단위</span>
+
+    <span class="c1"># --- 6) 읽는 법 출력 ---</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'base value: </span><span class="si">{</span><span class="n">base_value</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">output_space</span><span class="si">}</span><span class="s1">) → 확률 </span><span class="si">{</span><span class="n">base_proba</span><span class="si">:</span><span class="s1">.1%</span><span class="si">}</span><span class="s1"> / 설명 대상 클래스: </span><span class="si">{</span><span class="n">class_names</span><span class="p">[</span><span class="n">used_class</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'proba·delta_pp = base 에 그 수준의 평균 SHAP 만 더했을 때의 확률과 base 대비 %p / step_dz·step_dpp = 같은 변수의 직전 수준과의 차이'</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">" • n: 수준에 속한 관측치 수"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">" • ratio: 전체 관측치 대비 비율"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">" • mean_shap: 수준별 평균 SHAP"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">" • z: base + mean_shap"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">" • proba: 확률"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">" • delta_pp: base 대비 %p"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">" • step_dz: 직전 수준 대비 SHAP 변화"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">" • step_dpp: 직전 수준 대비 확률 변화 (%p)"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">table</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
